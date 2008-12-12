@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Topshelf</RootNamespace>
+    <AssemblyName>Topshelf</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actions\InstallServiceAction.cs" />
+    <Compile Include="Actions\NamedAction.cs" />
+    <Compile Include="Actions\RunAsConsoleAction.cs" />
+    <Compile Include="Actions\RunAsServiceAction.cs" />
+    <Compile Include="Actions\RunAsWinFormAction.cs" />
+    <Compile Include="Actions\ServiceNamedAction.cs" />
+    <Compile Include="Actions\UninstallServiceAction.cs" />
+    <Compile Include="ArgumentParsing\Argument.cs" />
+    <Compile Include="ArgumentParsing\ArgumentAttribute.cs" />
+    <Compile Include="ArgumentParsing\ArgumentMap.cs" />
+    <Compile Include="ArgumentParsing\ArgumentMapFactory.cs" />
+    <Compile Include="ArgumentParsing\ArgumentParser.cs" />
+    <Compile Include="ArgumentParsing\ArgumentParsingException.cs" />
+    <Compile Include="ArgumentParsing\ArgumentTarget.cs" />
+    <Compile Include="ArgumentParsing\IArgument.cs" />
+    <Compile Include="ArgumentParsing\IArgumentMap.cs" />
+    <Compile Include="ArgumentParsing\IArgumentMapFactory.cs" />
+    <Compile Include="ArgumentParsing\IArgumentParser.cs" />
+    <Compile Include="Configurations\WinServiceConfiguration.cs" />
+    <Compile Include="Credentials.cs" />
+    <Compile Include="Exceptions\ConfigurationException.cs" />
+    <Compile Include="HostServiceInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Hosts\ConsoleHost.cs" />
+    <Compile Include="Hosts\ServiceHost.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Hosts\WinFormHost.cs" />
+    <Compile Include="IAction.cs" />
+    <Compile Include="IApplicationLifeCycle.cs" />
+    <Compile Include="IHostedService.cs" />
+    <Compile Include="IInstallationConfiguration.cs" />
+    <Compile Include="IStartUpTime.cs" />
+    <Compile Include="KnownServiceNames.cs" />
+    <Compile Include="LifeCycles\HostedLifecycle.cs" />
+    <Compile Include="Parser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runner.cs" />
+    <Compile Include="WinServiceSettings.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
