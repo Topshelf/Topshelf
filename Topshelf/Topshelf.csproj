@@ -45,6 +45,10 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Instrumentation">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
@@ -82,6 +86,7 @@
     <Compile Include="IApplicationLifeCycle.cs" />
     <Compile Include="IHostedService.cs" />
     <Compile Include="IInstallationConfiguration.cs" />
+    <Compile Include="Insturmentation\BasicServiceInstrumentation.cs" />
     <Compile Include="IStartUpTime.cs" />
     <Compile Include="KnownServiceNames.cs" />
     <Compile Include="LifeCycles\HostedLifecycle.cs" />
