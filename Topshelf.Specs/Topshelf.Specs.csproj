@@ -55,6 +55,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BddExtensions.cs" />
     <Compile Include="Configuration\Host.cs" />
     <Compile Include="Configuration\HostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurator_Specs.cs">
@@ -65,6 +66,8 @@
     <Compile Include="Configuration\IServiceConfigurator.cs" />
     <Compile Include="Configuration\Service.cs" />
     <Compile Include="Configuration\ServiceConfigurator.cs" />
+    <Compile Include="Configuration\ServiceState.cs" />
+    <Compile Include="Configuration\Service_Specs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

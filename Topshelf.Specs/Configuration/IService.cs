@@ -6,6 +6,7 @@ namespace Topshelf.Specs.Configuration
     {
         Type ServiceType { get; }
         string Name { get; }
+        ServiceState State { get; }
         void Start();
         void Stop();
         void Pause();

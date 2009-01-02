@@ -10,7 +10,6 @@ namespace Topshelf.Specs.Configuration
         private readonly IDictionary<string, IService> _services = new Dictionary<string, IService>();
         private Type _formType;
         private NamedAction _action;
-
         public WinServiceSettings WinServiceSettings { get; set; }
         public Credentials Credentials { get; set; }
 
@@ -74,10 +73,23 @@ namespace Topshelf.Specs.Configuration
             }
         }
 
+        public int HostedServiceCount
+        {
+            get
+            {
+                return _services.Count;
+            }
+        }
+
         public void SetRunnerAction(NamedAction action, Type form)
         {
             _action = action;
             _formType = form;
+        }
+
+        public IService GetService(string name)
+        {
+            return _services[name];
         }
     }
 }
