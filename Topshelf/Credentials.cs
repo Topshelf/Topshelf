@@ -71,6 +71,11 @@ namespace Topshelf
             }
         }
 
+        public static Credentials Custom(string username, string password)
+        {
+            return new Credentials(username, password, ServiceAccount.User);
+        }
+
         #region System.String Overrides
 
         public bool Equals(Credentials obj)

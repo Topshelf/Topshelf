@@ -48,7 +48,7 @@ namespace Topshelf.Configurations
             installer.ServiceName = Settings.ServiceName;
             installer.Description = Settings.Description;
             installer.DisplayName = Settings.DisplayName;
-            installer.ServicesDependedOn = Settings.Dependencies;
+            installer.ServicesDependedOn = Settings.Dependencies.ToArray();
             installer.StartType = ServiceStartMode.Automatic;
         }
         public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)

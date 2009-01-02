@@ -12,38 +12,50 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    using System.Collections.Generic;
     using System.Configuration;
+    using System.ServiceProcess;
 
     public class WinServiceSettings
     {
+        public ServiceStartMode StartMode { get; set; }
         public string ServiceName { get; set; }
         public string DisplayName { get; set; }
         public string Description { get; set; }
-        public string[] Dependencies { get; set; }
+        public List<string> Dependencies { get; set; }
+
+        public WinServiceSettings()
+        {
+            StartMode = ServiceStartMode.Automatic;
+            Dependencies = new List<string>();
+        }
 
         public static WinServiceSettings DotNetConfig
         {
             get
             {
-                return new WinServiceSettings()
+                WinServiceSettings settings = new WinServiceSettings()
                            {
                                ServiceName = ConfigurationManager.AppSettings["serviceName"],
                                DisplayName = ConfigurationManager.AppSettings["displayName"],
                                Description = ConfigurationManager.AppSettings["description"],
-                               Dependencies = ConfigurationManager.AppSettings["dependencies"].Split(',')
                            };
+
+                settings.Dependencies.AddRange(ConfigurationManager.AppSettings["dependencies"].Split(','));
+                return settings;
             }
         }
 
         public static WinServiceSettings Custom(string serviceName, string displayName, string description, params string[] dependencies)
         {
-            return new WinServiceSettings()
+            var settings = new WinServiceSettings()
                        {
                            ServiceName = serviceName,
                            DisplayName = displayName,
                            Description = description,
-                           Dependencies = dependencies
                        };
+            settings.Dependencies.AddRange(dependencies);
+            return settings;
         }
     }
 }
