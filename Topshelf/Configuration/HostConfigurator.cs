@@ -109,14 +109,14 @@ namespace Topshelf.Configuration
         }
         #endregion
 
-        public void UseWinFormRunner<T>() where T : Form
+        public void UseWinFormHost<T>() where T : Form
         {
             _runnerAction = NamedAction.Gui;
             _winForm = typeof (T);
         }
 
 
-        public static IHost New(Action<IHostConfigurator> action)
+        public static IServiceCoordinator New(Action<IHostConfigurator> action)
         {
 
             using (var configurator = new HostConfigurator())
@@ -127,16 +127,16 @@ namespace Topshelf.Configuration
             }
         }
 
-        public IHost Create()
+        public IServiceCoordinator Create()
         {
-            Host host = new Host
+            ServiceCoordinator serviceCoordinator = new ServiceCoordinator
                             {
                                 WinServiceSettings = _winServiceSettings, 
                                 Credentials = _credentials
                             };
-            host.RegisterServices(_services);
-            host.SetRunnerAction(_runnerAction, _winForm);
-            return host;
+            serviceCoordinator.RegisterServices(_services);
+            serviceCoordinator.SetRunnerAction(_runnerAction, _winForm);
+            return serviceCoordinator;
         }
 
         #region Dispose Crap

@@ -31,10 +31,16 @@ namespace Topshelf.Configuration
 
         void RunAsLocalSystem();
         void RunAs(string username, string password);
+        void RunAsFromInteractive();
+
         void DependsOn(string serviceName);
         void DependencyOnMsmq();
         void DependencyOnMsSql();
-        void RunAsFromInteractive();
-        void UseWinFormRunner<T>() where T : Form;
+
+        /// <summary>
+        /// By default we use a console/winservice host. By executing this method you state you prefer the winformhost.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        void UseWinFormHost<T>() where T : Form;
     }
 }

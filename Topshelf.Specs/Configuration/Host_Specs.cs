@@ -8,7 +8,7 @@ namespace Topshelf.Specs.Configuration
     [TestFixture]
     public class A_service_should_control_its_subservices
     {
-        private Host _host;
+        private ServiceCoordinator _serviceCoordinator;
         private TestService _service;
         private TestService2 _service2;
 
@@ -23,7 +23,7 @@ namespace Topshelf.Specs.Configuration
             sl.Stub(x => x.GetInstance<TestService>()).Return(_service).Repeat.Any();
             sl.Stub(x => x.GetInstance<TestService2>()).Return(_service2).Repeat.Any();
 
-            _host = (Host)HostConfigurator.New(x =>
+            _serviceCoordinator = (ServiceCoordinator)HostConfigurator.New(x =>
             {
                 x.ConfigureService<TestService>(c =>
                 {
@@ -47,7 +47,7 @@ namespace Topshelf.Specs.Configuration
         [TearDown]
         public void TeardownContext()
         {
-            _host = null;
+            _serviceCoordinator = null;
             _service = null;
             _service2 = null;
         }
@@ -55,7 +55,7 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_start_all_services()
         {
-            _host.Start();
+            _serviceCoordinator.Start();
 
             _service.Started
                 .ShouldBeTrue();
@@ -66,8 +66,8 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_stop_all_services()
         {
-            _host.Start();
-            _host.Stop();
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Stop();
 
             _service.Stopped
                 .ShouldBeTrue();
@@ -83,7 +83,7 @@ namespace Topshelf.Specs.Configuration
             _service2.Started
                 .ShouldBeFalse();
 
-            _host.StartService("my_service");
+            _serviceCoordinator.StartService("my_service");
 
             _service.Started
                 .ShouldBeTrue();
@@ -94,9 +94,9 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Stop_individual_services()
         {
-            _host.Start();
+            _serviceCoordinator.Start();
 
-            _host.StopService("my_service");
+            _serviceCoordinator.StopService("my_service");
 
             _service.Started
                 .ShouldBeFalse();

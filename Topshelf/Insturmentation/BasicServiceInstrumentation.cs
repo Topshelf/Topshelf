@@ -13,6 +13,7 @@
 namespace Topshelf.Insturmentation
 {
     using System.Management.Instrumentation;
+    using Configuration;
     using Microsoft.Practices.ServiceLocation;
 
     //http://blogs.microsoft.co.il/blogs/sasha/archive/tags/WMI/default.aspx
@@ -32,7 +33,7 @@ namespace Topshelf.Insturmentation
             get
             {
                 var count = 0;
-                foreach(var x in ServiceLocator.Current.GetAllInstances<IHostedService>())
+                foreach(var x in ServiceLocator.Current.GetAllInstances<IService>())
                 {
                     count++;
                 }

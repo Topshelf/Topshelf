@@ -16,8 +16,8 @@ namespace Topshelf.Configuration
     using System.Collections.Generic;
     using Actions;
 
-    public class Host :
-        IHost
+    public class ServiceCoordinator :
+        IServiceCoordinator
     {
         private readonly IDictionary<string, IService> _services = new Dictionary<string, IService>();
         private Type _formType;
@@ -103,5 +103,30 @@ namespace Topshelf.Configuration
         {
             return _services[name];
         }
+
+        #region Dispose Crap
+
+        private bool _disposed;
+        ~ServiceCoordinator()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                Stop();
+            }
+            _disposed = true;
+        }
+        #endregion
     }
 }

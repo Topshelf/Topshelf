@@ -9,11 +9,11 @@ namespace Topshelf.Specs.Configuration
     [TestFixture]
     public class HostConfigurator_Specs
     {
-        private Host _host;
+        private ServiceCoordinator _serviceCoordinator;
         [SetUp]
         public void EstablishContext()
         {
-            _host = (Host)HostConfigurator.New(x =>
+            _serviceCoordinator = (ServiceCoordinator)HostConfigurator.New(x =>
             {
                 x.SetDisplayName("chris");
                 x.SetServiceName("chris");
@@ -34,7 +34,7 @@ namespace Topshelf.Specs.Configuration
 
                 x.RunAs("dru", "pass");
 
-                //x.UseWinFormRunner<MyForm>();
+                //x.UseWinFormHost<MyForm>();
 
                 x.DependsOn("ServiceName");
                 x.DependencyOnMsmq();
@@ -44,7 +44,7 @@ namespace Topshelf.Specs.Configuration
         //[Test]
         public void Syntax_Play()
         {
-            IHost host = HostConfigurator.New(x =>
+            IServiceCoordinator serviceCoordinator = HostConfigurator.New(x =>
                       {
                           x.SetDisplayName("chris");
                           x.SetServiceName("chris");
@@ -68,7 +68,7 @@ namespace Topshelf.Specs.Configuration
                           //x.RunAs(AppConfig("username"), AppConfig("password"));
                           x.RunAsFromInteractive();
 
-                          //x.UseWinFormRunner<MyForm>();
+                          //x.UseWinFormHost<MyForm>();
 
                           x.DependsOn("ServiceName");
                           x.DependencyOnMsmq();
@@ -76,71 +76,71 @@ namespace Topshelf.Specs.Configuration
                       });
 
 
-            //host.TakeAction(args);
+            //serviceCoordinator.TakeAction(args);
         }
 
         [Test]
         public void A_pretend_void_main()
         {
             string[] args = new string[0];
-            IHost host = HostConfigurator.New(x => { });
+            IServiceCoordinator serviceCoordinator = HostConfigurator.New(x => { });
             //some thing parses the args
-            //Dispatch(args, host);
+            //Dispatch(args, serviceCoordinator);
         }
 
         [Test]
         public void Should_depend_on_Msmq_MsSql_and_Custom()
         {
-            _host.WinServiceSettings.Dependencies
+            _serviceCoordinator.WinServiceSettings.Dependencies
                 .ShouldContain(KnownServiceNames.Msmq);
 
-            _host.WinServiceSettings.Dependencies
+            _serviceCoordinator.WinServiceSettings.Dependencies
                 .ShouldContain(KnownServiceNames.SqlServer);
 
-            _host.WinServiceSettings.Dependencies
+            _serviceCoordinator.WinServiceSettings.Dependencies
                 .ShouldContain("ServiceName");
         }
 
         [Test]
         public void Names_should_be_correct()
         {
-            _host.WinServiceSettings.DisplayName
+            _serviceCoordinator.WinServiceSettings.DisplayName
                 .ShouldEqual("chris");
 
-            _host.WinServiceSettings.ServiceName
+            _serviceCoordinator.WinServiceSettings.ServiceName
                 .ShouldEqual("chris");
 
-            _host.WinServiceSettings.Description
+            _serviceCoordinator.WinServiceSettings.Description
                 .ShouldEqual("chris's pants");
         }
 
         [Test]
         public void Should_not_be_set_to_start_automatically()
         {
-            _host.WinServiceSettings.StartMode
+            _serviceCoordinator.WinServiceSettings.StartMode
                 .ShouldEqual(ServiceStartMode.Manual);
         }
 
         [Test]
         public void Credentials()
         {
-            _host.Credentials.Username
+            _serviceCoordinator.Credentials.Username
                 .ShouldEqual("dru");
 
-            _host.Credentials.Password
+            _serviceCoordinator.Credentials.Password
                 .ShouldEqual("pass");
 
-            _host.Credentials.AccountType
+            _serviceCoordinator.Credentials.AccountType
                 .ShouldEqual(ServiceAccount.User);
         }
 
         [Test]
         public void Hosted_service_configuration()
         {
-            _host.HostedServiceCount
+            _serviceCoordinator.HostedServiceCount
                 .ShouldEqual(2);
 
-            IService service = _host.GetService("my_service");
+            IService service = _serviceCoordinator.GetService("my_service");
 
             service.Name
                 .ShouldEqual("my_service");

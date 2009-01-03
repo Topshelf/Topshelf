@@ -31,10 +31,7 @@ namespace Topshelf.LifeCycles
 
         public void Initialize()
         {
-            foreach (IHostedService hs in _serviceLocator.GetAllInstances<IHostedService>())
-            {
-                hs.Start();
-            }
+            
         }
 
         public abstract void Start();
@@ -48,16 +45,6 @@ namespace Topshelf.LifeCycles
 
         public void Dispose()
         {
-            foreach (IHostedService hs in _serviceLocator.GetAllInstances<IHostedService>())
-            {
-                hs.Stop();
-            }
-
-            //foreach (IServiceBus bus in _serviceLocator.GetAllInstances<IServiceBus>())
-            //{
-            //    bus.Dispose();
-            //}
-
             Action<IApplicationLifecycle> handler = Completed;
             if (handler != null)
             {
