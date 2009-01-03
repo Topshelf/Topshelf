@@ -40,7 +40,7 @@ namespace Topshelf.Actions
                 throw new ConfigurationException(message);
             }
 
-            var inServiceHost = new ServiceHost(configuration.Lifecycle);
+            var inServiceHost = new ServiceHost(configuration.Coordinator);
             inServiceHost.Run();
         }
 

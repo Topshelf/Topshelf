@@ -19,12 +19,12 @@ namespace Topshelf.Hosts
         ServiceBase //TODO: Is this what you would InstallUtil?
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceHost));
-        private readonly IApplicationLifecycle _lifecycle;
+        private readonly IServiceCoordinator _coordinator;
 
 
-        public ServiceHost(IApplicationLifecycle lifecycle)
+        public ServiceHost(IServiceCoordinator coordinator)
         {
-            _lifecycle = lifecycle;
+            _coordinator = coordinator;
         }
 
         public void Run()
@@ -39,16 +39,15 @@ namespace Topshelf.Hosts
             _log.Info("Received service start notification");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-            _lifecycle.Start();
-            _lifecycle.Initialize();
+            _coordinator.Start();
         }
 
         protected override void OnStop()
         {
             _log.Info("Received service stop notification");
 
-            _lifecycle.Stop();
-            _lifecycle.Dispose();
+            _coordinator.Stop();
+            _coordinator.Dispose();
         }
     }
 }

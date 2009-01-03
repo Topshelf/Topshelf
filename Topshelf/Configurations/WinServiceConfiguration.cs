@@ -19,13 +19,13 @@ namespace Topshelf.Configurations
     {
         private readonly Credentials _credentials;
         private readonly WinServiceSettings _settings;
-        private readonly IApplicationLifecycle _lifecycle;
+        private readonly IServiceCoordinator _coordinator;
 
-        public WinServiceConfiguration(Credentials credentials, WinServiceSettings settings, IApplicationLifecycle lifecycle)
+        public WinServiceConfiguration(Credentials credentials, WinServiceSettings settings, IServiceCoordinator coordinator)
         {
             _credentials = credentials;
             _settings = settings;
-            _lifecycle = lifecycle;
+            _coordinator = coordinator;
         }
 
         public Credentials Credentials
@@ -38,9 +38,9 @@ namespace Topshelf.Configurations
             get { return _settings; }
         }
 
-        public IApplicationLifecycle Lifecycle
+        public IServiceCoordinator Coordinator
         {
-            get { return _lifecycle; }
+            get { return _coordinator; }
         }
 
         public virtual void ConfigureServiceInstaller(ServiceInstaller installer)

@@ -23,12 +23,12 @@ namespace Topshelf.Hosts
     public class WinFormHost
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (ConsoleHost));
-        private readonly IApplicationLifecycle _lifecycle;
+        private readonly IServiceCoordinator _coordinator;
         private readonly IServiceLocator _serviceLocator;
 
-        public WinFormHost(IApplicationLifecycle lifecycle, IServiceLocator serviceLocator)
+        public WinFormHost(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
         {
-            _lifecycle = lifecycle;
+            _coordinator = coordinator;
             _serviceLocator = serviceLocator;
         }
 
@@ -40,19 +40,18 @@ namespace Topshelf.Hosts
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            _lifecycle.Start(); //user code starts
-            _lifecycle.Initialize();
+            _coordinator.Start(); //user code starts
 
             Form winForm = _serviceLocator.GetInstance<Form>(); //TODO: probably want a specific form here, could be many
 
-            _lifecycle.Completed += delegate { winForm.Close(); }; //TODO: this would force the app to close
+            _coordinator.Stopped += winForm.Close; //TODO: this would force the app to close
 
             Application.Run(winForm);
 
             _log.Info("Stopping the service");
 
-            _lifecycle.Stop(); //user stop
-            _lifecycle.Dispose();
+            _coordinator.Stop(); //user stop
+            _coordinator.Dispose();
         }
     }
 }

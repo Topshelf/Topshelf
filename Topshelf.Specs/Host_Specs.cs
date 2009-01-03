@@ -1,5 +1,6 @@
 namespace Topshelf.Specs.Configuration
 {
+    using Internal;
     using MbUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;

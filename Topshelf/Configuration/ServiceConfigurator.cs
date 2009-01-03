@@ -13,6 +13,7 @@
 namespace Topshelf.Configuration
 {
     using System;
+    using Internal;
 
     public class ServiceConfigurator<TService> :
         IServiceConfigurator<TService>

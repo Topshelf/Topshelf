@@ -19,7 +19,7 @@ namespace Topshelf
         Credentials Credentials { get; }
 
         //life cycle
-        IApplicationLifecycle Lifecycle { get; }
+        IServiceCoordinator Coordinator { get; }
 
         //winservice stuff
         WinServiceSettings Settings { get; }

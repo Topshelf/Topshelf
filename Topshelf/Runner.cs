@@ -46,19 +46,19 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Run(Credentials credentials, WinServiceSettings settings, IApplicationLifecycle lifecycle, params string[] args)
+        public static void Run(Credentials credentials, WinServiceSettings settings, IServiceCoordinator coordinator, params string[] args)
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-            var configuration = new WinServiceConfiguration(credentials, settings, lifecycle);
+            var configuration = new WinServiceConfiguration(credentials, settings, coordinator);
 
-            NamedAction actionKey;
+            NamedAction actionKey = NamedAction.Console;
             var arguments = Parser.ParseArgs(args);
 
             if (arguments.IsDefault)
             {
-                actionKey = configuration.Lifecycle.DefaultAction;
+                //actionKey = configuration.Coordinator.DefaultAction;
             }
             else
             {

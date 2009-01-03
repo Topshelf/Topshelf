@@ -17,6 +17,7 @@ namespace Topshelf.Configuration
     using System.ServiceProcess;
     using System.Windows.Forms;
     using Actions;
+    using Internal;
 
     public class HostConfigurator :
         IHostConfigurator

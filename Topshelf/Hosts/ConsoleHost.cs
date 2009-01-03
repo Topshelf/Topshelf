@@ -19,12 +19,12 @@ namespace Topshelf.Hosts
     public class ConsoleHost
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (ConsoleHost));
-        private readonly IApplicationLifecycle _lifecycle;
+        private readonly IServiceCoordinator _coordinator;
 
 
-        public ConsoleHost(IApplicationLifecycle lifecycle)
+        public ConsoleHost(IServiceCoordinator coordinator)
         {
-            _lifecycle = lifecycle;
+            _coordinator = coordinator;
         }
 
         public void Run()
@@ -36,19 +36,19 @@ namespace Topshelf.Hosts
 
             var waitHandles = new WaitHandle[] {internalallyTriggeredTermination, externalTriggeredTerminatation};
 
-            _lifecycle.Completed += delegate { internalallyTriggeredTermination.Set(); };
+            _coordinator.Stopped += (() => internalallyTriggeredTermination.Set());
 
             Console.CancelKeyPress += delegate
                                           {
                                               _log.Info("Control+C detected, exiting.");
                                               _log.Info("Stopping the service");
 
-                                              _lifecycle.Stop(); //user stop
-                                              _lifecycle.Dispose();
+                                              _coordinator.Stop(); //user stop
+                                              _coordinator.Dispose();
                                               externalTriggeredTerminatation.Set();
                                           };
-            _lifecycle.Start(); //user code starts
-            _lifecycle.Initialize();
+
+            _coordinator.Start(); //user code starts
 
             _log.InfoFormat("The service is running, press Control+C to exit.");
 

@@ -28,7 +28,7 @@ namespace Topshelf.Actions
         {
             _log.Info("Received console start notification");
 
-            ConsoleHost inConsoleHost = new ConsoleHost(configuration.Lifecycle);
+            ConsoleHost inConsoleHost = new ConsoleHost(configuration.Coordinator);
             inConsoleHost.Run();
         }
     }
