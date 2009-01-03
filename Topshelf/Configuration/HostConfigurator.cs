@@ -1,4 +1,4 @@
-namespace Topshelf.Specs.Configuration
+namespace Topshelf.Configuration
 {
     using System;
     using System.Collections.Generic;
@@ -129,9 +129,9 @@ namespace Topshelf.Specs.Configuration
 
         #region Dispose Crap
         ~HostConfigurator()
-		{
-			Dispose(false);
-		}
+        {
+            Dispose(false);
+        }
 
         public void Dispose()
         {
@@ -139,14 +139,14 @@ namespace Topshelf.Specs.Configuration
             GC.SuppressFinalize(this);
         }
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (_disposed) return;
-			if (disposing)
-			{
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
 
-			}
-			_disposed = true;
+            }
+            _disposed = true;
         }
         #endregion
     }

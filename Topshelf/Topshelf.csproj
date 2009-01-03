@@ -72,6 +72,15 @@
     <Compile Include="ArgumentParsing\IArgumentMapFactory.cs" />
     <Compile Include="ArgumentParsing\IArgumentParser.cs" />
     <Compile Include="Configurations\WinServiceConfiguration.cs" />
+    <Compile Include="Configuration\Host.cs" />
+    <Compile Include="Configuration\HostConfigurator.cs" />
+    <Compile Include="Configuration\IHost.cs" />
+    <Compile Include="Configuration\IHostConfigurator.cs" />
+    <Compile Include="Configuration\IService.cs" />
+    <Compile Include="Configuration\IServiceConfigurator.cs" />
+    <Compile Include="Configuration\Service.cs" />
+    <Compile Include="Configuration\ServiceConfigurator.cs" />
+    <Compile Include="Configuration\ServiceState.cs" />
     <Compile Include="Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="HostServiceInstaller.cs">

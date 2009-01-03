@@ -56,18 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BddExtensions.cs" />
-    <Compile Include="Configuration\Host.cs" />
-    <Compile Include="Configuration\HostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurator_Specs.cs">
     </Compile>
     <Compile Include="Configuration\Host_Specs.cs" />
-    <Compile Include="Configuration\IHost.cs" />
-    <Compile Include="Configuration\IHostConfigurator.cs" />
-    <Compile Include="Configuration\IService.cs" />
-    <Compile Include="Configuration\IServiceConfigurator.cs" />
-    <Compile Include="Configuration\Service.cs" />
-    <Compile Include="Configuration\ServiceConfigurator.cs" />
-    <Compile Include="Configuration\ServiceState.cs" />
     <Compile Include="Configuration\Service_Specs.cs" />
     <Compile Include="Configuration\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

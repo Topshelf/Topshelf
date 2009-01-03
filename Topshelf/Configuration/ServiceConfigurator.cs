@@ -1,4 +1,4 @@
-namespace Topshelf.Specs.Configuration
+namespace Topshelf.Configuration
 {
     using System;
 

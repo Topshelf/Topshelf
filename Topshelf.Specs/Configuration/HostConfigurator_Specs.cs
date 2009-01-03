@@ -4,6 +4,7 @@ namespace Topshelf.Specs.Configuration
     using MbUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;
+    using Topshelf.Configuration;
 
     [TestFixture]
     public class HostConfigurator_Specs

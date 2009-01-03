@@ -1,7 +1,5 @@
-namespace Topshelf.Specs.Configuration
+namespace Topshelf.Configuration
 {
-    using System.Collections.Generic;
-
     public interface IHost
     {
         void Start();
