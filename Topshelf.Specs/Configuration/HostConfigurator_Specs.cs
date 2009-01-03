@@ -2,6 +2,8 @@ namespace Topshelf.Specs.Configuration
 {
     using System.ServiceProcess;
     using MbUnit.Framework;
+    using Microsoft.Practices.ServiceLocation;
+    using Rhino.Mocks;
 
     [TestFixture]
     public class HostConfigurator_Specs
@@ -146,27 +148,4 @@ namespace Topshelf.Specs.Configuration
         }
 
     }
-
-    public class TestService
-    {
-        public bool Started;
-        public bool Stopped;
-
-        public void Start()
-        {
-            Started = true;
-            Stopped = false;
-        }
-
-        public void Stop()
-        {
-            Started = false;
-            Stopped = true;
-        }
-    }
-
-    //public class MyForm : 
-    //    Form
-    //{
-    //}
 }
