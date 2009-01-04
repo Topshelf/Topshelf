@@ -24,11 +24,11 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (RunAsConsoleAction));
 
-        public void Do(IServiceCoordinator configuration, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator configuration)
         {
             _log.Info("Received winform start notification");
 
-            var inWinFormHost = new WinFormHost(configuration, serviceLocator);
+            var inWinFormHost = new WinFormHost(configuration);
             inWinFormHost.Run();
         }
     }

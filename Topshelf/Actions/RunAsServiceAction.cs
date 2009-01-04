@@ -28,7 +28,7 @@ namespace Topshelf.Actions
 
         #region IAction Members
 
-        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator)
         {
             _log.Info("Received service start notification");
 

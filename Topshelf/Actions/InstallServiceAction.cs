@@ -23,7 +23,7 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (InstallServiceAction));
 
-        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator)
         {
             _log.Info("Received service install notification");
 

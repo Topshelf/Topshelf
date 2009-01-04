@@ -26,9 +26,16 @@ namespace Topshelf.Internal
         private NamedAction _action;
         public WinServiceSettings WinServiceSettings { get; set; }
         public Credentials Credentials { get; set; }
+        private readonly Action<IServiceCoordinator> _beforeStart;
+
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStart)
+        {
+            _beforeStart = beforeStart;
+        }
 
         public void Start()
         {
+            _beforeStart(this);
             foreach (var service in _services.Values)
             {
                 service.Start();

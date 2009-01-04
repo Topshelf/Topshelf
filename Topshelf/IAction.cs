@@ -12,8 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    using Microsoft.Practices.ServiceLocation;
-
     /// <summary>
     /// A host action
     /// </summary>
@@ -23,7 +21,6 @@ namespace Topshelf
         /// The action to be taken
         /// </summary>
         /// <param name="coordinator"></param>
-        /// <param name="serviceLocator"></param>
-        void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator);
+        void Do(IServiceCoordinator coordinator);
     }
 }

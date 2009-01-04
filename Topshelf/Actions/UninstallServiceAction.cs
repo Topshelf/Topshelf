@@ -23,7 +23,7 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof(UninstallServiceAction));
 
-        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator)
         {
             if(!HostServiceInstaller.IsInstalled(coordinator))
             {

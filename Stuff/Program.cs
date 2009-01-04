@@ -1,7 +1,11 @@
 ﻿namespace Stuff
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Timers;
+    using Microsoft.Practices.ServiceLocation;
+    using StructureMap;
     using Topshelf;
     using Topshelf.Configuration;
 
@@ -9,8 +13,17 @@
     {
         static void Main(string[] args)
         {
+
             var host = HostConfigurator.New(x=>
                                                 {
+                                                    x.BeforeStart(h =>
+                                                      {
+                                                          ObjectFactory.Initialize(i=>
+                                                           {
+                                                               i.ForConcreteType<TownCrier>();
+                                                           });
+                                                          ServiceLocator.SetLocatorProvider(()=>new  StructureMapObjectBuilder());
+                                                      });
                                                     x.ConfigureService<TownCrier>(s=>
                                                                                       {
                                                                                           s.WhenStarted(tc => tc.Start());
@@ -54,6 +67,46 @@
         public void Stop()
         {
             _timer.Stop();
+        }
+    }
+
+    public class StructureMapObjectBuilder :
+        IServiceLocator
+    {
+        public object GetService(Type serviceType)
+        {
+            return ObjectFactory.GetInstance(serviceType);
+        }
+
+        public object GetInstance(Type serviceType)
+        {
+            return ObjectFactory.GetInstance(serviceType);
+        }
+
+        public object GetInstance(Type serviceType, string key)
+        {
+            return ObjectFactory.GetNamedInstance(serviceType, key);
+        }
+
+        public IEnumerable<object> GetAllInstances(Type serviceType)
+        {
+            var result = new ArrayList(ObjectFactory.GetAllInstances(serviceType));
+            return result.ToArray();
+        }
+
+        public TService GetInstance<TService>()
+        {
+            return ObjectFactory.GetInstance<TService>();
+        }
+
+        public TService GetInstance<TService>(string key)
+        {
+            return ObjectFactory.GetNamedInstance<TService>(key);
+        }
+
+        public IEnumerable<TService> GetAllInstances<TService>()
+        {
+            return ObjectFactory.GetAllInstances<TService>();
         }
     }
 }

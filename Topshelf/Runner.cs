@@ -67,7 +67,7 @@ namespace Topshelf
 
             IAction action = _actions[actionKey];
             _log.DebugFormat("Running action: {0}", action);
-            action.Do(coordinator, ServiceLocator.Current);
+            action.Do(coordinator);
         }
     }
 }

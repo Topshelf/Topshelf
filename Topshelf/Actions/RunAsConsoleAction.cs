@@ -24,7 +24,7 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (RunAsConsoleAction));
 
-        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator)
         {
             _log.Info("Received console start notification");
 

@@ -26,10 +26,10 @@ namespace Topshelf.Hosts
         private readonly IServiceCoordinator _coordinator;
         private readonly IServiceLocator _serviceLocator;
 
-        public WinFormHost(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
+        public WinFormHost(IServiceCoordinator coordinator)
         {
             _coordinator = coordinator;
-            _serviceLocator = serviceLocator;
+            _serviceLocator = ServiceLocator.Current;
         }
 
         [STAThread]

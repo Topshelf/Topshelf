@@ -42,5 +42,7 @@ namespace Topshelf.Configuration
         /// </summary>
         /// <typeparam name="T"></typeparam>
         void UseWinFormHost<T>() where T : Form;
+
+        void BeforeStart(Action<IServiceCoordinator> action);
     }
 }

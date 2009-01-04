@@ -28,6 +28,7 @@ namespace Topshelf.Configuration
         private readonly IList<IService> _services;
         private NamedAction _runnerAction;
         private Type _winForm;
+        private Action<IServiceCoordinator> _beforeStart;
 
 
         private HostConfigurator()
@@ -130,7 +131,7 @@ namespace Topshelf.Configuration
 
         public IServiceCoordinator Create()
         {
-            ServiceCoordinator serviceCoordinator = new ServiceCoordinator
+            ServiceCoordinator serviceCoordinator = new ServiceCoordinator(_beforeStart)
                             {
                                 WinServiceSettings = _winServiceSettings, 
                                 Credentials = _credentials
@@ -138,6 +139,11 @@ namespace Topshelf.Configuration
             serviceCoordinator.RegisterServices(_services);
             serviceCoordinator.SetRunnerAction(_runnerAction, _winForm);
             return serviceCoordinator;
+        }
+
+        public void BeforeStart(Action<IServiceCoordinator> action)
+        {
+            _beforeStart = action;
         }
 
         #region Dispose Crap
