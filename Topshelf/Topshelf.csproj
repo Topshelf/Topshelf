@@ -71,11 +71,12 @@
     <Compile Include="ArgumentParsing\IArgumentMap.cs" />
     <Compile Include="ArgumentParsing\IArgumentMapFactory.cs" />
     <Compile Include="ArgumentParsing\IArgumentParser.cs" />
-    <Compile Include="Configuration\WinServiceConfiguration.cs" />
+    <Compile Include="Configuration\IRunConfiguration.cs" />
+    <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Internal\ServiceCoordinator.cs" />
-    <Compile Include="Configuration\HostConfigurator.cs" />
+    <Compile Include="Configuration\RunnerConfigurator.cs" />
     <Compile Include="IServiceCoordinator.cs" />
-    <Compile Include="Configuration\IHostConfigurator.cs" />
+    <Compile Include="Configuration\IRunnerConfigurator.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Configuration\IServiceConfigurator.cs" />
     <Compile Include="Internal\Service.cs" />

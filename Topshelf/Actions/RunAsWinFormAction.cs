@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Actions
 {
+    using Configuration;
     using Hosts;
     using log4net;
     using Microsoft.Practices.ServiceLocation;
@@ -24,11 +25,11 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (RunAsConsoleAction));
 
-        public void Do(IServiceCoordinator configuration)
+        public void Do(IRunConfiguration configuration)
         {
             _log.Info("Received winform start notification");
 
-            var inWinFormHost = new WinFormHost(configuration);
+            var inWinFormHost = new WinFormHost(configuration.Coordinator);
             inWinFormHost.Run();
         }
     }

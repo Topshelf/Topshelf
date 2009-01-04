@@ -12,36 +12,46 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
+    using System;
     using System.ServiceProcess;
+    using Actions;
 
-    public class WinServiceConfiguration :
-        IInstallationConfiguration
+    public class RunConfiguration :
+        IRunConfiguration
     {
-        private readonly IServiceCoordinator _coordinator;
+        public WinServiceSettings WinServiceSettings { get; set; }
+        public Credentials Credentials { get; set; }
+        public IServiceCoordinator Coordinator { get; set; }
 
-        public WinServiceConfiguration(IServiceCoordinator coordinator)
+        public int HostedServiceCount
         {
-            _coordinator = coordinator;
+            get { return Coordinator.HostedServiceCount; }
         }
 
-        public IServiceCoordinator Coordinator
+        private Type _formType;
+        private NamedAction _action;
+
+
+
+        public void SetRunnerAction(NamedAction action, Type form)
         {
-            get { return _coordinator; }
+            _action = action;
+            _formType = form;
         }
 
         public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
         {
-            installer.ServiceName = Coordinator.WinServiceSettings.ServiceName;
-            installer.Description = Coordinator.WinServiceSettings.Description;
-            installer.DisplayName = Coordinator.WinServiceSettings.DisplayName;
-            installer.ServicesDependedOn = Coordinator.WinServiceSettings.Dependencies.ToArray();
+            installer.ServiceName = WinServiceSettings.ServiceName;
+            installer.Description = WinServiceSettings.Description;
+            installer.DisplayName = WinServiceSettings.DisplayName;
+            installer.ServicesDependedOn = WinServiceSettings.Dependencies.ToArray();
             installer.StartType = ServiceStartMode.Automatic;
         }
         public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)
         {
-            installer.Username = Coordinator.Credentials.Username;
-            installer.Password = Coordinator.Credentials.Password;
-            installer.Account = Coordinator.Credentials.AccountType;
+            installer.Username = Credentials.Username;
+            installer.Password = Credentials.Password;
+            installer.Account = Credentials.AccountType;
         }
     }
 }

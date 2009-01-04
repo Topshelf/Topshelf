@@ -12,6 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Actions
 {
+    using Configuration;
+    using Hosts;
     using log4net;
     using Microsoft.Practices.ServiceLocation;
 
@@ -23,19 +25,19 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (InstallServiceAction));
 
-        public void Do(IServiceCoordinator coordinator)
+        public void Do(IRunConfiguration configuration)
         {
             _log.Info("Received service install notification");
 
-            if (HostServiceInstaller.IsInstalled(coordinator))
+            if (HostServiceInstaller.IsInstalled(configuration))
             {
-                string message = string.Format("The {0} service has already been installed.", coordinator.WinServiceSettings.ServiceName);
+                string message = string.Format("The {0} service has already been installed.", configuration.WinServiceSettings.ServiceName);
                 _log.Error(message);
 
                 return;
             }
 
-            new HostServiceInstaller(coordinator)
+            new HostServiceInstaller(configuration)
                 .Register();
         }
     }

@@ -14,18 +14,12 @@ namespace Topshelf.Internal
 {
     using System;
     using System.Collections.Generic;
-    using System.ServiceProcess;
-    using Actions;
     using Configuration;
 
     public class ServiceCoordinator :
         IServiceCoordinator
     {
         private readonly IDictionary<string, IService> _services = new Dictionary<string, IService>();
-        private Type _formType;
-        private NamedAction _action;
-        public WinServiceSettings WinServiceSettings { get; set; }
-        public Credentials Credentials { get; set; }
         private readonly Action<IServiceCoordinator> _beforeStart;
 
         public ServiceCoordinator(Action<IServiceCoordinator> beforeStart)
@@ -48,6 +42,7 @@ namespace Topshelf.Internal
             {
                 service.Stop();
             }
+            OnStopped();
         }
 
         public void Pause()
@@ -102,12 +97,6 @@ namespace Topshelf.Internal
             }
         }
 
-        public void SetRunnerAction(NamedAction action, Type form)
-        {
-            _action = action;
-            _formType = form;
-        }
-
         public IService GetService(string name)
         {
             return _services[name];
@@ -146,21 +135,6 @@ namespace Topshelf.Internal
             {
                 handler();
             }
-        }
-
-        public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
-        {
-            installer.ServiceName = WinServiceSettings.ServiceName;
-            installer.Description = WinServiceSettings.Description;
-            installer.DisplayName = WinServiceSettings.DisplayName;
-            installer.ServicesDependedOn = WinServiceSettings.Dependencies.ToArray();
-            installer.StartType = ServiceStartMode.Automatic;
-        }
-        public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)
-        {
-            installer.Username = Credentials.Username;
-            installer.Password = Credentials.Password;
-            installer.Account = Credentials.AccountType;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Topshelf.Specs.Configuration
             sl.Stub(x => x.GetInstance<TestService>()).Return(_service).Repeat.Any();
             sl.Stub(x => x.GetInstance<TestService2>()).Return(_service2).Repeat.Any();
 
-            _serviceCoordinator = (ServiceCoordinator)HostConfigurator.New(x =>
+            _serviceCoordinator = (ServiceCoordinator)RunnerConfigurator.New(x =>
             {
                 x.ConfigureService<TestService>(c =>
                 {

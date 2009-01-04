@@ -19,8 +19,8 @@ namespace Topshelf.Configuration
     using Actions;
     using Internal;
 
-    public class HostConfigurator :
-        IHostConfigurator
+    public class RunnerConfigurator :
+        IRunnerConfigurator
     {
         private bool _disposed;
         private readonly WinServiceSettings _winServiceSettings;
@@ -31,7 +31,7 @@ namespace Topshelf.Configuration
         private Action<IServiceCoordinator> _beforeStart;
 
 
-        private HostConfigurator()
+        private RunnerConfigurator()
         {
             _winServiceSettings = new WinServiceSettings();
             _credentials = Credentials.LocalSystem;
@@ -77,6 +77,8 @@ namespace Topshelf.Configuration
         }
         #endregion
 
+
+        //winservice configuration
         public void ConfigureService<TService>()
         {
             using (var configurator = new ServiceConfigurator<TService>())
@@ -85,6 +87,7 @@ namespace Topshelf.Configuration
             }
         }
 
+        //winservice configuration
         public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action)
         {
             using(var configurator = new ServiceConfigurator<TService>())
@@ -118,10 +121,10 @@ namespace Topshelf.Configuration
         }
 
 
-        public static IServiceCoordinator New(Action<IHostConfigurator> action)
+        public static IRunConfiguration New(Action<IRunnerConfigurator> action)
         {
 
-            using (var configurator = new HostConfigurator())
+            using (var configurator = new RunnerConfigurator())
             {
                 action(configurator);
 
@@ -129,16 +132,20 @@ namespace Topshelf.Configuration
             }
         }
 
-        public IServiceCoordinator Create()
+        public IRunConfiguration Create()
         {
-            ServiceCoordinator serviceCoordinator = new ServiceCoordinator(_beforeStart)
-                            {
-                                WinServiceSettings = _winServiceSettings, 
-                                Credentials = _credentials
-                            };
+            ServiceCoordinator serviceCoordinator = new ServiceCoordinator(_beforeStart);
             serviceCoordinator.RegisterServices(_services);
-            serviceCoordinator.SetRunnerAction(_runnerAction, _winForm);
-            return serviceCoordinator;
+
+            RunConfiguration cfg = new RunConfiguration()
+            {
+                WinServiceSettings = _winServiceSettings,
+                Credentials = _credentials,
+                Coordinator = serviceCoordinator
+            };
+            cfg.SetRunnerAction(_runnerAction, _winForm);
+
+            return cfg;
         }
 
         public void BeforeStart(Action<IServiceCoordinator> action)
@@ -147,7 +154,7 @@ namespace Topshelf.Configuration
         }
 
         #region Dispose Crap
-        ~HostConfigurator()
+        ~RunnerConfigurator()
         {
             Dispose(false);
         }

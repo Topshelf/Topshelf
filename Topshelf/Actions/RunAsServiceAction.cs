@@ -13,6 +13,7 @@
 namespace Topshelf.Actions
 {
     using System.Reflection;
+    using Configuration;
     using Exceptions;
     using Hosts;
     using log4net;
@@ -28,19 +29,19 @@ namespace Topshelf.Actions
 
         #region IAction Members
 
-        public void Do(IServiceCoordinator coordinator)
+        public void Do(IRunConfiguration configuration)
         {
             _log.Info("Received service start notification");
 
-            if (!HostServiceInstaller.IsInstalled(coordinator))
+            if (!HostServiceInstaller.IsInstalled(configuration))
             {
                 string message = string.Format("The {0} service has not been installed yet. Please run {1} -install.",
-                                               coordinator.WinServiceSettings.ServiceName, Assembly.GetEntryAssembly().GetName());
+                                               configuration.WinServiceSettings.ServiceName, Assembly.GetEntryAssembly().GetName());
                 _log.Fatal(message);
                 throw new ConfigurationException(message);
             }
 
-            var inServiceHost = new ServiceHost(coordinator);
+            var inServiceHost = new ServiceHost(configuration.Coordinator);
             inServiceHost.Run();
         }
 

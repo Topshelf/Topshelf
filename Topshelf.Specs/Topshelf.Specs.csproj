@@ -56,9 +56,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BddExtensions.cs" />
-    <Compile Include="Configuration\HostConfigurator_Specs.cs">
+    <Compile Include="Configuration\RunnerConfigurator_Specs.cs">
     </Compile>
     <Compile Include="Host_Specs.cs" />
+    <Compile Include="ServiceCoordinator_Specs.cs" />
     <Compile Include="Service_Specs.cs" />
     <Compile Include="Configuration\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

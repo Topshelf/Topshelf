@@ -10,13 +10,14 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Hosts
 {
     using System;
     using System.Collections;
     using System.Configuration.Install;
     using System.Reflection;
     using System.ServiceProcess;
+    using Configuration;
     using log4net;
     using Microsoft.Win32;
 
@@ -26,9 +27,9 @@ namespace Topshelf
         private static readonly ILog _log = LogManager.GetLogger(typeof (HostServiceInstaller));
         private readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
         private readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
-        private readonly IServiceCoordinator _config;
+        private readonly IRunConfiguration _config;
 
-        public HostServiceInstaller(IServiceCoordinator configuration)
+        public HostServiceInstaller(IRunConfiguration configuration)
         {
             _log.DebugFormat("Attempting to install with {0} configuration", configuration);
             _config = configuration;
@@ -91,7 +92,7 @@ namespace Topshelf
             }
         }
 
-        public static bool IsInstalled(IServiceCoordinator configuration)
+        public static bool IsInstalled(IRunConfiguration configuration)
         {
             foreach (ServiceController service in ServiceController.GetServices())
             {

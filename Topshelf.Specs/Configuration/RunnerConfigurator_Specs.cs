@@ -8,13 +8,13 @@ namespace Topshelf.Specs.Configuration
     using Topshelf.Configuration;
 
     [TestFixture]
-    public class HostConfigurator_Specs
+    public class RunnerConfigurator_Specs
     {
-        private ServiceCoordinator _serviceCoordinator;
+        private RunConfiguration _runConfiguration;
         [SetUp]
         public void EstablishContext()
         {
-            _serviceCoordinator = (ServiceCoordinator)HostConfigurator.New(x =>
+            _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
             {
                 x.SetDisplayName("chris");
                 x.SetServiceName("chris");
@@ -45,7 +45,7 @@ namespace Topshelf.Specs.Configuration
         //[Test]
         public void Syntax_Play()
         {
-            IServiceCoordinator serviceCoordinator = HostConfigurator.New(x =>
+            IRunConfiguration cfg = RunnerConfigurator.New(x =>
                       {
                           x.SetDisplayName("chris");
                           x.SetServiceName("chris");
@@ -84,7 +84,7 @@ namespace Topshelf.Specs.Configuration
         public void A_pretend_void_main()
         {
             string[] args = new string[0];
-            IServiceCoordinator serviceCoordinator = HostConfigurator.New(x => { });
+            IRunConfiguration cfg = RunnerConfigurator.New(x => { });
             //some thing parses the args
             //Dispatch(args, serviceCoordinator);
         }
@@ -92,62 +92,61 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_depend_on_Msmq_MsSql_and_Custom()
         {
-            _serviceCoordinator.WinServiceSettings.Dependencies
+            _runConfiguration.WinServiceSettings.Dependencies
                 .ShouldContain(KnownServiceNames.Msmq);
 
-            _serviceCoordinator.WinServiceSettings.Dependencies
+            _runConfiguration.WinServiceSettings.Dependencies
                 .ShouldContain(KnownServiceNames.SqlServer);
 
-            _serviceCoordinator.WinServiceSettings.Dependencies
+            _runConfiguration.WinServiceSettings.Dependencies
                 .ShouldContain("ServiceName");
         }
 
         [Test]
         public void Names_should_be_correct()
         {
-            _serviceCoordinator.WinServiceSettings.DisplayName
+            _runConfiguration.WinServiceSettings.DisplayName
                 .ShouldEqual("chris");
 
-            _serviceCoordinator.WinServiceSettings.ServiceName
+            _runConfiguration.WinServiceSettings.ServiceName
                 .ShouldEqual("chris");
 
-            _serviceCoordinator.WinServiceSettings.Description
+            _runConfiguration.WinServiceSettings.Description
                 .ShouldEqual("chris's pants");
         }
 
         [Test]
         public void Should_not_be_set_to_start_automatically()
         {
-            _serviceCoordinator.WinServiceSettings.StartMode
+            _runConfiguration.WinServiceSettings.StartMode
                 .ShouldEqual(ServiceStartMode.Manual);
         }
 
         [Test]
         public void Credentials()
         {
-            _serviceCoordinator.Credentials.Username
+            _runConfiguration.Credentials.Username
                 .ShouldEqual("dru");
 
-            _serviceCoordinator.Credentials.Password
+            _runConfiguration.Credentials.Password
                 .ShouldEqual("pass");
 
-            _serviceCoordinator.Credentials.AccountType
+            _runConfiguration.Credentials.AccountType
                 .ShouldEqual(ServiceAccount.User);
         }
 
         [Test]
         public void Hosted_service_configuration()
         {
-            _serviceCoordinator.HostedServiceCount
+            _runConfiguration.Coordinator.HostedServiceCount
                 .ShouldEqual(2);
 
-            IService service = _serviceCoordinator.GetService("my_service");
+            IService service = _runConfiguration.Coordinator.GetService("my_service");
 
             service.Name
                 .ShouldEqual("my_service");
             service.State
                 .ShouldEqual(ServiceState.Stopped);
         }
-
     }
 }

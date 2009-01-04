@@ -14,7 +14,7 @@
         static void Main(string[] args)
         {
 
-            var host = HostConfigurator.New(x=>
+            var cfg = RunnerConfigurator.New(x=>
                                                 {
                                                     x.BeforeStart(h =>
                                                       {
@@ -22,7 +22,7 @@
                                                            {
                                                                i.ForConcreteType<TownCrier>();
                                                            });
-                                                          ServiceLocator.SetLocatorProvider(()=>new  StructureMapObjectBuilder());
+                                                          ServiceLocator.SetLocatorProvider(()=>new  StructureMapServiceLocator());
                                                       });
                                                     x.ConfigureService<TownCrier>(s=>
                                                                                       {
@@ -39,24 +39,18 @@
                                                     x.SetServiceName("stuff");
                                                 });
 
-            Runner.Run(host, args);
+            Runner.Host(cfg, args);
         }
     }
 
     public class TownCrier
     {
-        private Timer _timer;
+        private readonly Timer _timer;
 
         public TownCrier()
         {
-            _timer = new Timer(1000);
-            _timer.AutoReset = true;
-            _timer.Elapsed += Bob;
-        }
-
-        private void Bob(object sender, ElapsedEventArgs e)
-        {
-            Console.WriteLine(DateTime.Now);
+            _timer = new Timer(1000) {AutoReset = true};
+            _timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now); 
         }
 
         public void Start()
@@ -70,7 +64,7 @@
         }
     }
 
-    public class StructureMapObjectBuilder :
+    public class StructureMapServiceLocator :
         IServiceLocator
     {
         public object GetService(Type serviceType)

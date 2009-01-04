@@ -15,7 +15,8 @@ namespace Topshelf.Configuration
     using System;
     using System.Windows.Forms;
 
-    public interface IHostConfigurator : IDisposable
+    public interface IRunnerConfigurator :
+        IDisposable
     {
         void ConfigureService<TService>();
         void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action);

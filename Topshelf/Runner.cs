@@ -17,7 +17,6 @@ namespace Topshelf
     using Actions;
     using Configuration;
     using log4net;
-    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Entry point into the Host infrastructure
@@ -46,12 +45,10 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Run(IServiceCoordinator coordinator, params string[] args)
+        public static void Host(IRunConfiguration coordinator, params string[] args)
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
-
-            var configuration = new WinServiceConfiguration(coordinator);
 
             NamedAction actionKey = NamedAction.Console;
             var arguments = Parser.ParseArgs(args);
