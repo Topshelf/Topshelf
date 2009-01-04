@@ -23,18 +23,18 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof(UninstallServiceAction));
 
-        public void Do(IInstallationConfiguration configuration, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
         {
-            if(!HostServiceInstaller.IsInstalled(configuration))
+            if(!HostServiceInstaller.IsInstalled(coordinator))
             {
-                string message = string.Format("The {0} service has not been installed.", configuration.Settings.ServiceName);
+                string message = string.Format("The {0} service has not been installed.", coordinator.WinServiceSettings.ServiceName);
                 _log.Error(message);
 
                 return;
             }
 
             _log.Info("Received serice uninstall notification");
-            new HostServiceInstaller(configuration)
+            new HostServiceInstaller(coordinator)
                 .Unregister();
         }
     }

@@ -13,6 +13,7 @@
 namespace Topshelf
 {
     using System;
+    using System.ServiceProcess;
 
     public interface IServiceCoordinator :
         IDisposable
@@ -26,6 +27,12 @@ namespace Topshelf
         void StopService(string name);
         void PauseService(string name);
         void ContinueService(string name);
+
+        //pull these out to somethnig else
+        Credentials Credentials { get; }
+        WinServiceSettings WinServiceSettings { get; }
+        void ConfigureServiceInstaller(ServiceInstaller installer);
+        void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer);
 
         //void Install();
         //void Uninstall();

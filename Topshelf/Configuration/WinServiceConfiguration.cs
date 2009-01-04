@@ -10,32 +10,18 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Configurations
+namespace Topshelf.Configuration
 {
     using System.ServiceProcess;
 
     public class WinServiceConfiguration :
         IInstallationConfiguration
     {
-        private readonly Credentials _credentials;
-        private readonly WinServiceSettings _settings;
         private readonly IServiceCoordinator _coordinator;
 
-        public WinServiceConfiguration(Credentials credentials, WinServiceSettings settings, IServiceCoordinator coordinator)
+        public WinServiceConfiguration(IServiceCoordinator coordinator)
         {
-            _credentials = credentials;
-            _settings = settings;
             _coordinator = coordinator;
-        }
-
-        public Credentials Credentials
-        {
-            get { return _credentials; }
-        }
-
-        public WinServiceSettings Settings
-        {
-            get { return _settings; }
         }
 
         public IServiceCoordinator Coordinator
@@ -45,17 +31,17 @@ namespace Topshelf.Configurations
 
         public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
         {
-            installer.ServiceName = Settings.ServiceName;
-            installer.Description = Settings.Description;
-            installer.DisplayName = Settings.DisplayName;
-            installer.ServicesDependedOn = Settings.Dependencies.ToArray();
+            installer.ServiceName = Coordinator.WinServiceSettings.ServiceName;
+            installer.Description = Coordinator.WinServiceSettings.Description;
+            installer.DisplayName = Coordinator.WinServiceSettings.DisplayName;
+            installer.ServicesDependedOn = Coordinator.WinServiceSettings.Dependencies.ToArray();
             installer.StartType = ServiceStartMode.Automatic;
         }
         public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)
         {
-            installer.Username = Credentials.Username;
-            installer.Password = Credentials.Password;
-            installer.Account = Credentials.AccountType;
+            installer.Username = Coordinator.Credentials.Username;
+            installer.Password = Coordinator.Credentials.Password;
+            installer.Account = Coordinator.Credentials.AccountType;
         }
     }
 }

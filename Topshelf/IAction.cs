@@ -22,8 +22,8 @@ namespace Topshelf
         /// <summary>
         /// The action to be taken
         /// </summary>
-        /// <param name="configuration"></param>
+        /// <param name="coordinator"></param>
         /// <param name="serviceLocator"></param>
-        void Do(IInstallationConfiguration configuration, IServiceLocator serviceLocator);
+        void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator);
     }
 }

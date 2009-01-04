@@ -15,7 +15,7 @@ namespace Topshelf
     using System;
     using System.Collections.Generic;
     using Actions;
-    using Configurations;
+    using Configuration;
     using log4net;
     using Microsoft.Practices.ServiceLocation;
 
@@ -46,12 +46,12 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Run(Credentials credentials, WinServiceSettings settings, IServiceCoordinator coordinator, params string[] args)
+        public static void Run(IServiceCoordinator coordinator, params string[] args)
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-            var configuration = new WinServiceConfiguration(credentials, settings, coordinator);
+            var configuration = new WinServiceConfiguration(coordinator);
 
             NamedAction actionKey = NamedAction.Console;
             var arguments = Parser.ParseArgs(args);
@@ -67,7 +67,7 @@ namespace Topshelf
 
             IAction action = _actions[actionKey];
             _log.DebugFormat("Running action: {0}", action);
-            action.Do(configuration, ServiceLocator.Current);
+            action.Do(coordinator, ServiceLocator.Current);
         }
     }
 }

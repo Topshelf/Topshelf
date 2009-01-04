@@ -24,11 +24,11 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (RunAsConsoleAction));
 
-        public void Do(IInstallationConfiguration configuration, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
         {
             _log.Info("Received console start notification");
 
-            ConsoleHost inConsoleHost = new ConsoleHost(configuration.Coordinator);
+            ConsoleHost inConsoleHost = new ConsoleHost(coordinator);
             inConsoleHost.Run();
         }
     }

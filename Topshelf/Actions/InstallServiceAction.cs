@@ -23,19 +23,19 @@ namespace Topshelf.Actions
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (InstallServiceAction));
 
-        public void Do(IInstallationConfiguration configuration, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
         {
             _log.Info("Received service install notification");
 
-            if (HostServiceInstaller.IsInstalled(configuration))
+            if (HostServiceInstaller.IsInstalled(coordinator))
             {
-                string message = string.Format("The {0} service has already been installed.", configuration.Settings.ServiceName);
+                string message = string.Format("The {0} service has already been installed.", coordinator.WinServiceSettings.ServiceName);
                 _log.Error(message);
 
                 return;
             }
 
-            new HostServiceInstaller(configuration)
+            new HostServiceInstaller(coordinator)
                 .Register();
         }
     }

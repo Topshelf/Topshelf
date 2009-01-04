@@ -16,14 +16,8 @@ namespace Topshelf
 
     public interface IInstallationConfiguration
     {
-        Credentials Credentials { get; }
-
         //life cycle
         IServiceCoordinator Coordinator { get; }
-
-        //winservice stuff
-        WinServiceSettings Settings { get; }
-
 
         void ConfigureServiceInstaller(ServiceInstaller installer);
         void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer);

@@ -28,19 +28,19 @@ namespace Topshelf.Actions
 
         #region IAction Members
 
-        public void Do(IInstallationConfiguration configuration, IServiceLocator serviceLocator)
+        public void Do(IServiceCoordinator coordinator, IServiceLocator serviceLocator)
         {
             _log.Info("Received service start notification");
 
-            if (!HostServiceInstaller.IsInstalled(configuration))
+            if (!HostServiceInstaller.IsInstalled(coordinator))
             {
                 string message = string.Format("The {0} service has not been installed yet. Please run {1} -install.",
-                                               configuration.Settings.ServiceName, Assembly.GetEntryAssembly().GetName());
+                                               coordinator.WinServiceSettings.ServiceName, Assembly.GetEntryAssembly().GetName());
                 _log.Fatal(message);
                 throw new ConfigurationException(message);
             }
 
-            var inServiceHost = new ServiceHost(configuration.Coordinator);
+            var inServiceHost = new ServiceHost(coordinator);
             inServiceHost.Run();
         }
 

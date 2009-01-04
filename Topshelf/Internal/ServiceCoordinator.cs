@@ -14,6 +14,7 @@ namespace Topshelf.Internal
 {
     using System;
     using System.Collections.Generic;
+    using System.ServiceProcess;
     using Actions;
     using Configuration;
 
@@ -138,6 +139,21 @@ namespace Topshelf.Internal
             {
                 handler();
             }
+        }
+
+        public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
+        {
+            installer.ServiceName = WinServiceSettings.ServiceName;
+            installer.Description = WinServiceSettings.Description;
+            installer.DisplayName = WinServiceSettings.DisplayName;
+            installer.ServicesDependedOn = WinServiceSettings.Dependencies.ToArray();
+            installer.StartType = ServiceStartMode.Automatic;
+        }
+        public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)
+        {
+            installer.Username = Credentials.Username;
+            installer.Password = Credentials.Password;
+            installer.Account = Credentials.AccountType;
         }
     }
 }

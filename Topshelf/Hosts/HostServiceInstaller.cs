@@ -26,9 +26,9 @@ namespace Topshelf
         private static readonly ILog _log = LogManager.GetLogger(typeof (HostServiceInstaller));
         private readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
         private readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
-        private readonly IInstallationConfiguration _config;
+        private readonly IServiceCoordinator _config;
 
-        public HostServiceInstaller(IInstallationConfiguration configuration)
+        public HostServiceInstaller(IServiceCoordinator configuration)
         {
             _log.DebugFormat("Attempting to install with {0} configuration", configuration);
             _config = configuration;
@@ -91,11 +91,11 @@ namespace Topshelf
             }
         }
 
-        public static bool IsInstalled(IInstallationConfiguration configuration)
+        public static bool IsInstalled(IServiceCoordinator configuration)
         {
             foreach (ServiceController service in ServiceController.GetServices())
             {
-                if (service.ServiceName == configuration.Settings.ServiceName)
+                if (service.ServiceName == configuration.WinServiceSettings.ServiceName)
                     return true;
             }
 
