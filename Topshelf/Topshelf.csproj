@@ -45,14 +45,23 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Management.Instrumentation">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\ServiceConsole.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Configuration\ServiceConsole.Designer.cs">
+      <DependentUpon>ServiceConsole.cs</DependentUpon>
+    </Compile>
     <Compile Include="Internal\Actions\InstallServiceAction.cs" />
     <Compile Include="Internal\Actions\NamedAction.cs" />
     <Compile Include="Internal\Actions\RunAsConsoleAction.cs" />
@@ -81,6 +90,7 @@
     <Compile Include="Configuration\IServiceConfigurator.cs" />
     <Compile Include="Internal\Service.cs" />
     <Compile Include="Configuration\ServiceConfigurator.cs" />
+    <Compile Include="ServiceInformation.cs" />
     <Compile Include="ServiceState.cs" />
     <Compile Include="Configuration\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
@@ -99,6 +109,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runner.cs" />
     <Compile Include="Configuration\WinServiceSettings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\ServiceConsole.resx">
+      <DependentUpon>ServiceConsole.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

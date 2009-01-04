@@ -14,6 +14,7 @@ namespace Topshelf.Internal.Hosts
 {
     using System;
     using System.Windows.Forms;
+    using Configuration;
     using log4net;
     using Microsoft.Practices.ServiceLocation;
 
@@ -24,12 +25,12 @@ namespace Topshelf.Internal.Hosts
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (ConsoleHost));
         private readonly IServiceCoordinator _coordinator;
-        private readonly IServiceLocator _serviceLocator;
+        private readonly IRunConfiguration _cfg;
 
-        public WinFormHost(IServiceCoordinator coordinator)
+        public WinFormHost(IServiceCoordinator coordinator, IRunConfiguration cfg)
         {
             _coordinator = coordinator;
-            _serviceLocator = ServiceLocator.Current;
+            _cfg = cfg;
         }
 
         [STAThread]
@@ -40,17 +41,22 @@ namespace Topshelf.Internal.Hosts
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            _coordinator.Start(); //user code starts
+            _coordinator.Start();
 
-            Form winForm = _serviceLocator.GetInstance<Form>(); //TODO: probably want a specific form here, could be many
+            Form winForm = (Form)ServiceLocator.Current.GetInstance(_cfg.FormType);
+            if(winForm is ServiceConsole)
+            {
+                //TODO: There has to be a better way than this
+                ((ServiceConsole) winForm).RegisterCoordinator(_coordinator);
+            }
 
-            _coordinator.Stopped += winForm.Close; //TODO: this would force the app to close
+            _coordinator.Stopped += winForm.Close;
 
             Application.Run(winForm);
 
             _log.Info("Stopping the service");
 
-            _coordinator.Stop(); //user stop
+            _coordinator.Stop();
             _coordinator.Dispose();
         }
     }

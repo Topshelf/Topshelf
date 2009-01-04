@@ -28,7 +28,7 @@ namespace Topshelf.Internal.Actions
         {
             _log.Info("Received winform start notification");
 
-            var inWinFormHost = new WinFormHost(configuration.Coordinator);
+            var inWinFormHost = new WinFormHost(configuration.Coordinator, configuration);
             inWinFormHost.Run();
         }
     }

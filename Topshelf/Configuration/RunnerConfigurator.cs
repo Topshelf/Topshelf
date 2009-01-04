@@ -38,7 +38,7 @@ namespace Topshelf.Configuration
             _credentials = Credentials.LocalSystem;
             _services = new List<IService>();
             _runnerAction = NamedAction.Console;
-            _winForm = null;
+            _winForm = typeof(ServiceConsole);
         }
 
         #region WinServiceSettings

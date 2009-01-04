@@ -21,6 +21,7 @@
                                                           ObjectFactory.Initialize(i=>
                                                            {
                                                                i.ForConcreteType<TownCrier>();
+                                                               i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
                                                            });
                                                           ServiceLocator.SetLocatorProvider(()=>new  StructureMapServiceLocator());
                                                       });

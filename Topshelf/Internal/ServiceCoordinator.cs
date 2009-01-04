@@ -100,6 +100,23 @@ namespace Topshelf.Internal
             }
         }
 
+        public IList<ServiceInformation> GetServiceInfo()
+        {
+            var result = new List<ServiceInformation>();
+
+            foreach (var value in _services.Values)
+            {
+                result.Add(new ServiceInformation()
+                               {
+                                   Name = value.Name,
+                                   State = value.State,
+                                   Type = value.ServiceType.Name
+                               });
+            }
+
+            return result;
+        }
+
         public IService GetService(string name)
         {
             return _services[name];

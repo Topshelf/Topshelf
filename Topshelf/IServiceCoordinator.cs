@@ -13,6 +13,7 @@
 namespace Topshelf
 {
     using System;
+    using System.Collections.Generic;
     using System.ServiceProcess;
     using Internal;
 
@@ -35,5 +36,6 @@ namespace Topshelf
         event Action Stopped;
         int HostedServiceCount { get; }
         IService GetService(string s);
+        IList<ServiceInformation> GetServiceInfo();
     }
 }
