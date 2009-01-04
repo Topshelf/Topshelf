@@ -19,12 +19,15 @@ namespace Topshelf.Internal
     public class ServiceCoordinator :
         IServiceCoordinator
     {
-        private readonly IDictionary<string, IService> _services = new Dictionary<string, IService>();
+        private readonly Dictionary<string, IService> _services = new Dictionary<string, IService>();
         private readonly Action<IServiceCoordinator> _beforeStart;
+        private readonly Action<IServiceCoordinator> _afterStop;
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStart)
+
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
         {
             _beforeStart = beforeStart;
+            _afterStop = afterStop;
         }
 
         public void Start()
@@ -42,6 +45,7 @@ namespace Topshelf.Internal
             {
                 service.Stop();
             }
+            _afterStop(this);
             OnStopped();
         }
 

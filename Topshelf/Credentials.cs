@@ -82,7 +82,7 @@ namespace Topshelf
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return Equals(obj._username, _username) && Equals(obj._password, _password);
+            return Equals(obj._username, _username) && Equals(obj._password, _password) && Equals(obj._accountType, _accountType);
         }
 
         public override bool Equals(object obj)
@@ -97,7 +97,10 @@ namespace Topshelf
         {
             unchecked
             {
-                return ((_username != null ? _username.GetHashCode() : 0)*397) ^ (_password != null ? _password.GetHashCode() : 0);
+                int result = (_username != null ? _username.GetHashCode() : 0);
+                result = (result*397) ^ (_password != null ? _password.GetHashCode() : 0);
+                result = (result*397) ^ _accountType.GetHashCode();
+                return result;
             }
         }
 

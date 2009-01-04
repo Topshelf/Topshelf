@@ -24,6 +24,10 @@
                                                            });
                                                           ServiceLocator.SetLocatorProvider(()=>new  StructureMapServiceLocator());
                                                       });
+                                                    x.AfterStop(h =>
+                                                                    {
+                                                                        Console.WriteLine("stopping");
+                                                                    });
                                                     x.ConfigureService<TownCrier>(s=>
                                                                                       {
                                                                                           s.WhenStarted(tc => tc.Start());

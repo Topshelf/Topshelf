@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Configuration
 {
     using System.Collections.Generic;
     using System.Configuration;
@@ -35,11 +35,11 @@ namespace Topshelf
             get
             {
                 WinServiceSettings settings = new WinServiceSettings()
-                           {
-                               ServiceName = ConfigurationManager.AppSettings["serviceName"],
-                               DisplayName = ConfigurationManager.AppSettings["displayName"],
-                               Description = ConfigurationManager.AppSettings["description"],
-                           };
+                                                  {
+                                                      ServiceName = ConfigurationManager.AppSettings["serviceName"],
+                                                      DisplayName = ConfigurationManager.AppSettings["displayName"],
+                                                      Description = ConfigurationManager.AppSettings["description"],
+                                                  };
 
                 settings.Dependencies.AddRange(ConfigurationManager.AppSettings["dependencies"].Split(','));
                 return settings;
@@ -49,11 +49,11 @@ namespace Topshelf
         public static WinServiceSettings Custom(string serviceName, string displayName, string description, params string[] dependencies)
         {
             var settings = new WinServiceSettings()
-                       {
-                           ServiceName = serviceName,
-                           DisplayName = displayName,
-                           Description = description,
-                       };
+                               {
+                                   ServiceName = serviceName,
+                                   DisplayName = displayName,
+                                   Description = description,
+                               };
             settings.Dependencies.AddRange(dependencies);
             return settings;
         }

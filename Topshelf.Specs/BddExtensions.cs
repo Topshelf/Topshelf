@@ -25,9 +25,19 @@ namespace Topshelf.Specs
             Assert.IsTrue(actual);
         }
 
+        public static void ShouldBeTrue(this bool actual, string message)
+        {
+            Assert.IsTrue(actual, message);
+        }
+
         public static void ShouldBeFalse(this bool actual)
         {
             Assert.IsFalse(actual);
+        }
+
+        public static void ShouldBeFalse(this bool actual, string message)
+        {
+            Assert.IsFalse(actual, message);
         }
     }
 }
