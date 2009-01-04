@@ -16,8 +16,8 @@ namespace Topshelf.Configuration
     using System.Collections.Generic;
     using System.ServiceProcess;
     using System.Windows.Forms;
-    using Actions;
     using Internal;
+    using Internal.Actions;
 
     public class RunnerConfigurator :
         IRunnerConfigurator

@@ -17,6 +17,7 @@ namespace Topshelf
     using Actions;
     using Configuration;
     using Internal;
+    using Internal.Actions;
     using log4net;
 
     /// <summary>

@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,39 +12,34 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Actions
 {
-    using System.Reflection;
     using Configuration;
-    using Exceptions;
     using Hosts;
+    using Internal;
     using log4net;
     using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
-    /// Runs the host as a service (must be installed first)
+    /// Install the host as a windows service
     /// </summary>
-    public class RunAsServiceAction :
+    public class InstallServiceAction :
         IAction
     {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (RunAsServiceAction));
-
-        #region IAction Members
+        private static readonly ILog _log = LogManager.GetLogger(typeof (InstallServiceAction));
 
         public void Do(IRunConfiguration configuration)
         {
-            _log.Info("Received service start notification");
+            _log.Info("Received service install notification");
 
-            if (!HostServiceInstaller.IsInstalled(configuration))
+            if (HostServiceInstaller.IsInstalled(configuration))
             {
-                string message = string.Format("The {0} service has not been installed yet. Please run {1} -install.",
-                                               configuration.WinServiceSettings.ServiceName, Assembly.GetEntryAssembly().GetName());
-                _log.Fatal(message);
-                throw new ConfigurationException(message);
+                string message = string.Format("The {0} service has already been installed.", configuration.WinServiceSettings.ServiceName);
+                _log.Error(message);
+
+                return;
             }
 
-            var inServiceHost = new ServiceHost(configuration.Coordinator);
-            inServiceHost.Run();
+            new HostServiceInstaller(configuration)
+                .Register();
         }
-
-        #endregion
     }
 }

@@ -14,7 +14,7 @@ namespace Topshelf.Configuration
 {
     using System;
     using System.ServiceProcess;
-    using Actions;
+    using Internal.Actions;
 
     public class RunConfiguration :
         IRunConfiguration

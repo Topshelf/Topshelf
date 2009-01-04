@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -10,27 +10,33 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Actions
+namespace Topshelf.Internal.Actions
 {
     using Configuration;
     using Hosts;
     using log4net;
-    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
-    /// Action to run the host as a win form
+    /// Uninstalls the host as a win service
     /// </summary>
-    public class RunAsWinFormAction :
+    public class UninstallServiceAction :
         IAction
     {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (RunAsConsoleAction));
+        private static readonly ILog _log = LogManager.GetLogger(typeof(UninstallServiceAction));
 
         public void Do(IRunConfiguration configuration)
         {
-            _log.Info("Received winform start notification");
+            if(!HostServiceInstaller.IsInstalled(configuration))
+            {
+                string message = string.Format("The {0} service has not been installed.", configuration.WinServiceSettings.ServiceName);
+                _log.Error(message);
 
-            var inWinFormHost = new WinFormHost(configuration.Coordinator);
-            inWinFormHost.Run();
+                return;
+            }
+
+            _log.Info("Received serice uninstall notification");
+            new HostServiceInstaller(configuration)
+                .Unregister();
         }
     }
 }
