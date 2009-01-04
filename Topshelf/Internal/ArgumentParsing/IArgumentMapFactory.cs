@@ -10,18 +10,15 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.ArgumentParsing
+namespace Topshelf.Internal.ArgumentParsing
 {
-    /// <summary>
-    /// Base interface for an individual argument
-    /// </summary>
-    public interface IArgument
+    public interface IArgumentMapFactory
     {
-        string Key { get; }
-
         /// <summary>
-        /// The value of the argument
+        /// Creates an argument map for an object using reflection to identify the target properties
         /// </summary>
-        string Value { get; }
+        /// <param name="obj">An object of the class to map</param>
+        /// <returns>A reusable <c ref="ArgumentMap" /> object</returns>
+        IArgumentMap CreateMap(object obj);
     }
 }

@@ -13,7 +13,7 @@
 namespace Topshelf.Insturmentation
 {
     using System.Management.Instrumentation;
-    using Configuration;
+    using Internal;
     using Microsoft.Practices.ServiceLocation;
 
     //http://blogs.microsoft.co.il/blogs/sasha/archive/tags/WMI/default.aspx

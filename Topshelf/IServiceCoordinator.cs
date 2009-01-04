@@ -14,7 +14,7 @@ namespace Topshelf
 {
     using System;
     using System.ServiceProcess;
-    using Configuration;
+    using Internal;
 
     public interface IServiceCoordinator :
         IDisposable

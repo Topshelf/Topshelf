@@ -13,7 +13,6 @@
 namespace Topshelf.Internal
 {
     using System;
-    using Configuration;
     using Microsoft.Practices.ServiceLocation;
 
     public class Service<TService> :

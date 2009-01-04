@@ -6,7 +6,6 @@ namespace Topshelf.Specs
     using MbUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;
-    using Topshelf.Configuration;
 
     [TestFixture]
     public class ServiceCoordinator_Specs

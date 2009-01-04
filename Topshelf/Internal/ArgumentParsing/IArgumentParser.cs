@@ -10,28 +10,12 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.ArgumentParsing
+namespace Topshelf.Internal.ArgumentParsing
 {
-    using System;
-    using System.Runtime.Serialization;
+    using System.Collections.Generic;
 
-    public class ArgumentParsingException :
-        Exception
+    public interface IArgumentParser
     {
-        public ArgumentParsingException()
-        {
-        }
-
-        public ArgumentParsingException(string message) : base(message)
-        {
-        }
-
-        public ArgumentParsingException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected ArgumentParsingException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+        IList<IArgument> Parse(string[] args);
     }
 }

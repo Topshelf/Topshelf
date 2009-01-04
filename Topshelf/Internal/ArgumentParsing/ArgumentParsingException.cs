@@ -10,18 +10,28 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.ArgumentParsing
+namespace Topshelf.Internal.ArgumentParsing
 {
-    public class ArgumentMapFactory :
-        IArgumentMapFactory
-    {
-        #region IArgumentMapFactory Members
+    using System;
+    using System.Runtime.Serialization;
 
-        public IArgumentMap CreateMap(object obj)
+    public class ArgumentParsingException :
+        Exception
+    {
+        public ArgumentParsingException()
         {
-            return new ArgumentMap(obj.GetType());
         }
 
-        #endregion
+        public ArgumentParsingException(string message) : base(message)
+        {
+        }
+
+        public ArgumentParsingException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected ArgumentParsingException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
     }
 }
