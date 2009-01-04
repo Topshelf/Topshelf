@@ -84,14 +84,14 @@
     <Compile Include="ServiceState.cs" />
     <Compile Include="Configuration\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
-    <Compile Include="Hosts\HostServiceInstaller.cs">
+    <Compile Include="Internal\Hosts\HostServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Hosts\ConsoleHost.cs" />
-    <Compile Include="Hosts\ServiceHost.cs">
+    <Compile Include="Internal\Hosts\ConsoleHost.cs" />
+    <Compile Include="Internal\Hosts\ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Hosts\WinFormHost.cs" />
+    <Compile Include="Internal\Hosts\WinFormHost.cs" />
     <Compile Include="Internal\IAction.cs" />
     <Compile Include="Insturmentation\BasicServiceInstrumentation.cs" />
     <Compile Include="KnownServiceNames.cs" />

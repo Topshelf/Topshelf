@@ -14,7 +14,6 @@ namespace Topshelf
 {
     using System;
     using System.Collections.Generic;
-    using Actions;
     using Configuration;
     using Internal;
     using Internal.Actions;
@@ -52,20 +51,11 @@ namespace Topshelf
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-            NamedAction actionKey = NamedAction.Console;
-            var arguments = Parser.ParseArgs(args);
-
-            if (arguments.IsDefault)
-            {
-                //actionKey = configuration.Coordinator.DefaultAction;
-            }
-            else
-            {
-                actionKey = arguments.GetActionKey();
-            }
+            NamedAction actionKey = Parser.GetAtionKey(args, coordinator.DefaultAction);
 
             IAction action = _actions[actionKey];
             _log.DebugFormat("Running action: {0}", action);
+
             action.Do(coordinator);
         }
     }

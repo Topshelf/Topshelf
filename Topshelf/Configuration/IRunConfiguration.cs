@@ -12,13 +12,18 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
+    using System;
     using System.ServiceProcess;
+    using Internal.Actions;
 
     public interface IRunConfiguration
     {
         IServiceCoordinator Coordinator { get; }
         Credentials Credentials { get; }
         WinServiceSettings WinServiceSettings { get; }
+        Type FormType { get; }
+        NamedAction DefaultAction { get; }
+
         void ConfigureServiceInstaller(ServiceInstaller installer);
         void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer);
     }

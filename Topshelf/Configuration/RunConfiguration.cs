@@ -19,24 +19,21 @@ namespace Topshelf.Configuration
     public class RunConfiguration :
         IRunConfiguration
     {
+        public RunConfiguration()
+        {
+            DefaultAction = NamedAction.Console;
+        }
+
         public WinServiceSettings WinServiceSettings { get; set; }
         public Credentials Credentials { get; set; }
         public IServiceCoordinator Coordinator { get; set; }
-
-        public int HostedServiceCount
-        {
-            get { return Coordinator.HostedServiceCount; }
-        }
-
-        private Type _formType;
-        private NamedAction _action;
-
-
+        public Type FormType { get; private set; }
+        public NamedAction DefaultAction { get; private set; }
 
         public void SetRunnerAction(NamedAction action, Type form)
         {
-            _action = action;
-            _formType = form;
+            DefaultAction = action;
+            FormType = form;
         }
 
         public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
