@@ -14,10 +14,12 @@ namespace Topshelf.Internal
 {
     using System;
     using System.Collections.Generic;
+    using log4net;
 
     public class ServiceCoordinator :
         IServiceCoordinator
     {
+        private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceCoordinator));
         private readonly Dictionary<string, IService> _services = new Dictionary<string, IService>();
         private readonly Action<IServiceCoordinator> _beforeStart;
         private readonly Action<IServiceCoordinator> _afterStop;
@@ -31,9 +33,13 @@ namespace Topshelf.Internal
 
         public void Start()
         {
+            _log.Debug("pre before start");
             _beforeStart(this);
+            _log.Info("BeforeStart complete");
+
             foreach (var service in _services.Values)
             {
+                _log.InfoFormat("Starting sub service '{0}'", service.Name);
                 service.Start();
             }
         }
@@ -42,9 +48,13 @@ namespace Topshelf.Internal
         {
             foreach (var service in _services.Values)
             {
+                _log.InfoFormat("Stopping sub service '{0}'", service.Name);
                 service.Stop();
             }
+
+            _log.Debug("pre after stop");
             _afterStop(this);
+            _log.Info("AfterStop complete");
             OnStopped();
         }
 
@@ -52,6 +62,7 @@ namespace Topshelf.Internal
         {
             foreach (var service in _services.Values)
             {
+                _log.InfoFormat("Pausing sub service '{0}'", service.Name);
                 service.Pause();
             }
         }
@@ -60,6 +71,7 @@ namespace Topshelf.Internal
         {
             foreach (var service in _services.Values)
             {
+                _log.InfoFormat("Continuing sub service '{0}'", service.Name);
                 service.Continue();
             }
         }
