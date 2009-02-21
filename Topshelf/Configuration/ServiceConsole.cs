@@ -2,6 +2,8 @@
 
 namespace Topshelf.Configuration
 {
+    using Internal;
+
     public partial class ServiceConsole : 
         Form
     {

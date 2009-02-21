@@ -14,6 +14,7 @@ namespace Topshelf.Configuration
 {
     using System;
     using System.Windows.Forms;
+    using Internal;
 
     public interface IRunnerConfigurator :
         IDisposable

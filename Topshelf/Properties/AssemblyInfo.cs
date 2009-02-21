@@ -1,4 +1,5 @@
-﻿using System.Management.Instrumentation;
+﻿using System;
+using System.Management.Instrumentation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -13,6 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: CLSCompliant(true)]
 
 [assembly: Instrumented("root/topshelf")]
 

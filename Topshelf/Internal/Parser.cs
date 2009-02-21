@@ -16,7 +16,7 @@ namespace Topshelf.Internal
     using Actions;
     using ArgumentParsing;
 
-    public class Parser
+    public static class Parser
     {
         private static bool _isDefault;
 
@@ -29,6 +29,7 @@ namespace Topshelf.Internal
 
             return actionKey;
         }
+
         public static Args ParseArgs(string[] args)
         {
             if (args == null) args = new string[0];

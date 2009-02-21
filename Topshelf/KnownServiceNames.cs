@@ -29,5 +29,13 @@ namespace Topshelf
                 return "MSSQLSERVER";
             }
         }
+
+        public static string IIS
+        {
+            get
+            {
+                return "W3SVC";
+            }
+        }
     }
 }
