@@ -132,12 +132,6 @@ namespace Topshelf.Internal.Hosts
                 imagePath += " -service";
 
                 service.SetValue("ImagePath", imagePath);
-
-
-                service.Close();
-                services.Close();
-                currentControlSet.Close();
-                system.Close();
             }
         }
     }
