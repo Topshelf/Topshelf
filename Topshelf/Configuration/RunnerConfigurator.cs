@@ -28,8 +28,8 @@ namespace Topshelf.Configuration
         private readonly IList<IService> _services;
         private NamedAction _runnerAction;
         private Type _winForm;
-        private Action<IServiceCoordinator> _beforeStart;
-        private Action<IServiceCoordinator> _afterStop;
+        private Action<IServiceCoordinator> _beforeStart = (c)=> { };
+        private Action<IServiceCoordinator> _afterStop = (c) => { };
 
 
         private RunnerConfigurator()
