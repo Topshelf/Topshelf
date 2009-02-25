@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="the compile step" default="go">
+	
+	<target name="go" depends="build_code" description="begining the compilation" />
+	
+	<target name="build_code" description="Building Main Library">
+		<delete  dir="${dirs.build}" failonerror="false" />
+		
+		<msbuild project="${dirs.root}\Topshelf.sln" verbosity="quiet">
+			<property name="Configuration" value="${msbuild.configuration}" />
+		</msbuild>
+	</target>
+	
+	
+	<!-- sensible defaults -->
+	<property name="dirs.root" value=".\..\..\src" overwrite="false" />
+	<property name="dirs.build" value="${dirs.root}\bin" overwrite="false" />
+	<property name="msbuild.configuration" value="Release" overwrite="false" />
+	<property name="nant.settings.currentframework" value="net-3.5" overwrite="false" />
+</project>

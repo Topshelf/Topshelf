@@ -1,0 +1,1 @@
+.\tools\nant-0.85\nant /f:.\tools\BuildScripts\topshelf.build
