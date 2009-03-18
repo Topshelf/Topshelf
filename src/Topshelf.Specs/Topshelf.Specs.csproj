@@ -33,11 +33,11 @@
   <ItemGroup>
     <Reference Include="Gallio, Version=3.0.4.485, Culture=neutral, PublicKeyToken=eb9cfa67ee6ab36e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\MbUnit\Gallio.dll</HintPath>
+      <HintPath>..\..\lib\MbUnit\Gallio.dll</HintPath>
     </Reference>
     <Reference Include="MbUnit, Version=3.0.4.485, Culture=neutral, PublicKeyToken=eb9cfa67ee6ab36e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\MbUnit\MbUnit.dll</HintPath>
+      <HintPath>..\..\lib\MbUnit\MbUnit.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
