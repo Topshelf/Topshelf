@@ -89,4 +89,30 @@ namespace Topshelf.Specs.Configuration
 
         //TODO: state transition tests
     }
+
+	[TestFixture]
+	public class SimpleServiceContainerStuff
+	{
+		[Test]
+		public void Should_work()
+		{
+            var c = new ServiceConfigurator<TestService>();
+            c.WithName("my_service");
+            c.WhenStarted(s => s.Start());
+            c.WhenStopped(s => s.Stop());
+            c.CreateServiceLocator(()=>
+                                   {
+                                       TestService srv = new TestService();
+                                       var sl = MockRepository.GenerateStub<IServiceLocator>();
+                                       sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(srv);
+                                       return sl;
+                                   });
+
+            var service = c.Create();
+            service.Start();
+
+			service.State
+                .ShouldEqual(ServiceState.Started);
+		}
+	}
 }
