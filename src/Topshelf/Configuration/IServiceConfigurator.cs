@@ -13,6 +13,7 @@
 namespace Topshelf.Configuration
 {
     using System;
+    using Microsoft.Practices.ServiceLocation;
 
     public interface IServiceConfigurator<TService> :
         IDisposable
@@ -21,6 +22,11 @@ namespace Topshelf.Configuration
         void WhenStopped(Action<TService> stopAction);
         void WhenPaused(Action<TService> pauseAction);
         void WhenContinued(Action<TService> continueAction);
+        /// <summary>
+        /// The name of the instance to be used when locating the service in the container
+        /// </summary>
+        /// <param name="name">ioc name of the instance</param>
         void WithName(string name);
+        void CreateServiceLocator(Func<IServiceLocator> fun);
     }
 }

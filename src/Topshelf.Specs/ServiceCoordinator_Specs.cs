@@ -25,7 +25,7 @@ namespace Topshelf.Specs
             _serviceCoordinator = new ServiceCoordinator((x)=> { }, (x) => { });
             IList<IService> services = new List<IService>
                                            {
-                                               new Service<TestService>()
+                                               new Service<TestService>(sl)
                                                    {
                                                        Name = "test",
                                                        StartAction = (x) => x.Start(),
@@ -126,7 +126,7 @@ namespace Topshelf.Specs
             _serviceCoordinator = new ServiceCoordinator((x) => { }, (x) => { });
             IList<IService> services = new List<IService>
                                            {
-                                               new Service<TestService>()
+                                               new Service<TestService>(sl)
                                                    {
                                                        Name = "test",
                                                        StartAction = (x) => x.Start(),
@@ -134,7 +134,7 @@ namespace Topshelf.Specs
                                                        ContinueAction = (x) => x.Continue(),
                                                        PauseAction = (x) => x.Pause()
                                                    },
-                                                   new Service<TestService2>()
+                                                   new Service<TestService2>(sl)
                                                    {
                                                        Name = "test2",
                                                        StartAction = (x) => x.Start(),

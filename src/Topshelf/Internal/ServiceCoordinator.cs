@@ -15,6 +15,7 @@ namespace Topshelf.Internal
     using System;
     using System.Collections.Generic;
     using log4net;
+    using System.Linq;
 
     public class ServiceCoordinator :
         IServiceCoordinator
@@ -46,7 +47,7 @@ namespace Topshelf.Internal
 
         public void Stop()
         {
-            foreach (var service in _services.Values)
+            foreach (var service in _services.Values.Reverse())
             {
                 _log.InfoFormat("Stopping sub service '{0}'", service.Name);
                 service.Stop();

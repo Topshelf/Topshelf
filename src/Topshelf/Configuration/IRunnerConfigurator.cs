@@ -22,6 +22,9 @@ namespace Topshelf.Configuration
         void ConfigureService<TService>();
         void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action);
 
+        void ConfigureServiceInIsolation<TService>() where TService : MarshalByRefObject;
+        void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action) where TService : MarshalByRefObject;
+
         void SetDisplayName(string displayName);
         void SetServiceName(string serviceName);
         void SetDescription(string description);
@@ -47,5 +50,7 @@ namespace Topshelf.Configuration
 
         void BeforeStart(Action<IServiceCoordinator> action);
         void AfterStop(Action<IServiceCoordinator> action);
+        
+        
     }
 }

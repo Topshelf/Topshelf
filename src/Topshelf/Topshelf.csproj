@@ -56,6 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppDomainExtensions.cs" />
+    <Compile Include="Configuration\IIsolatedServiceConfigurator.cs" />
+    <Compile Include="Configuration\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\ServiceConsole.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -69,6 +72,8 @@
     <Compile Include="Internal\Actions\RunAsWinFormAction.cs" />
     <Compile Include="Internal\Actions\ServiceNamedAction.cs" />
     <Compile Include="Internal\Actions\UninstallServiceAction.cs" />
+    <Compile Include="Internal\IsolatedService.cs" />
+    <Compile Include="Internal\FacadeToIsolatedService.cs" />
     <Compile Include="Internal\ArgumentParsing\Argument.cs" />
     <Compile Include="Internal\ArgumentParsing\ArgumentAttribute.cs" />
     <Compile Include="Internal\ArgumentParsing\ArgumentMap.cs" />

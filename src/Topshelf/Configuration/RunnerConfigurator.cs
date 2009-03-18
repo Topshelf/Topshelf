@@ -98,6 +98,23 @@ namespace Topshelf.Configuration
             }
         }
 
+        public void ConfigureServiceInIsolation<TService>() where TService : MarshalByRefObject
+        {
+            using(var configurator = new IsolatedServiceConfigurator<TService>())
+            {
+                _services.Add(configurator.Create());
+            }
+        }
+
+        public void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action) where TService : MarshalByRefObject
+        {
+            using (var configurator = new IsolatedServiceConfigurator<TService>())
+            {
+                action(configurator);
+                _services.Add(configurator.Create());
+            }
+        }
+
         #region Credentials
         public void RunAsLocalSystem()
         {

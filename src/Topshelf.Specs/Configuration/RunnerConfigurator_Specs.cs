@@ -20,6 +20,7 @@ namespace Topshelf.Specs.Configuration
                 x.SetServiceName("chris");
                 x.SetDescription("chris's pants");
 
+                x.ConfigureService<TestService>(); //defaults
                 x.ConfigureService<TestService>(c =>
                 {
                     c.WithName("my_service");
@@ -27,9 +28,18 @@ namespace Topshelf.Specs.Configuration
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
-                    //WhenRestarted (stop / start)
                 });
-                x.ConfigureService<TestService>(); //defaults
+
+                x.ConfigureServiceInIsolation<TestService>(); //defaults
+                x.ConfigureServiceInIsolation<TestService>(c=>
+                                                                   {
+                                                                       c.WithName("my_service");
+                                                                       c.WhenStarted(s => s.Start());
+                                                                       c.WhenStopped(s => s.Stop());
+                                                                       c.WhenPaused(s => { });
+                                                                       c.WhenContinued(s => { });
+                                                                   });
+                
 
                 x.DoNotStartAutomatically();
 

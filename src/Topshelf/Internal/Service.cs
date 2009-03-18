@@ -17,9 +17,11 @@ namespace Topshelf.Internal
 
     public class Service<TService> :
         IService
+        
     {
-        public Service()
+        public Service(IServiceLocator serviceLocator)
         {
+            ServiceLocator = serviceLocator;
             State = ServiceState.Stopped;
         }
 
@@ -31,6 +33,7 @@ namespace Topshelf.Internal
             }
         }
 
+        public IServiceLocator ServiceLocator { get; set; }
         public ServiceState State { get; private set; }
         public string Name { get; set; }
         public Action<TService> StartAction{ get; set;}
@@ -38,30 +41,31 @@ namespace Topshelf.Internal
         public Action<TService> PauseAction{ get; set;}
         public Action<TService> ContinueAction{ get; set;}
 
+
         public void Start()
         {
-            TService instance = ServiceLocator.Current.GetInstance<TService>();
+            var instance = ServiceLocator.GetInstance<TService>(Name);
             StartAction(instance);
             State = ServiceState.Started;
         }
 
         public void Stop()
         {
-            TService instance = ServiceLocator.Current.GetInstance<TService>();
+            var instance = ServiceLocator.GetInstance<TService>(Name);
             StopAction(instance);
             State = ServiceState.Stopped;
         }
 
         public void Pause()
         {
-            TService instance = ServiceLocator.Current.GetInstance<TService>();
+            var instance = ServiceLocator.GetInstance<TService>(Name);
             PauseAction(instance);
             State = ServiceState.Paused;
         }
 
         public void Continue()
         {
-            TService instance = ServiceLocator.Current.GetInstance<TService>();
+            var instance = ServiceLocator.GetInstance<TService>(Name);
             ContinueAction(instance);
             State = ServiceState.Started;
         }

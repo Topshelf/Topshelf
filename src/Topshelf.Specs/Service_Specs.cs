@@ -20,7 +20,7 @@ namespace Topshelf.Specs.Configuration
             _srv = new TestService();
             IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(()=>sl);
-            sl.Stub(x => x.GetInstance<TestService>()).Return(_srv);
+            sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
 
             ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>();
             c.WithName("my_service");

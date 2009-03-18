@@ -1,6 +1,8 @@
 namespace Topshelf.Specs.Configuration
 {
-    public class TestService
+    using System;
+
+    public class TestService : MarshalByRefObject
     {
         public bool Started;
         public bool Stopped;
