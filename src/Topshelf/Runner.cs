@@ -51,7 +51,7 @@ namespace Topshelf
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-            NamedAction actionKey = Parser.GetAtionKey(args, coordinator.DefaultAction);
+            NamedAction actionKey = Parser.GetActionKey(args, coordinator.DefaultAction);
 
             IAction action = _actions[actionKey];
             _log.DebugFormat("Running action: {0}", action);

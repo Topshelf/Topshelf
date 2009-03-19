@@ -12,8 +12,14 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
+	/// <summary>
+	/// A selection of commonly-used Windows services.
+	/// </summary>
     public static class KnownServiceNames
     {
+		/// <summary>
+		/// The Microsoft Message Queue service.
+		/// </summary>
         public static string Msmq
         {
             get
@@ -22,6 +28,9 @@ namespace Topshelf.Configuration
             }
         }
 
+		/// <summary>
+		/// The Microsoft SQL Server service.
+		/// </summary>
         public static string SqlServer
         {
             get
@@ -30,6 +39,9 @@ namespace Topshelf.Configuration
             }
         }
 
+		/// <summary>
+		/// The Internet Information Server service.
+		/// </summary>
         public static string IIS
         {
             get
@@ -37,5 +49,16 @@ namespace Topshelf.Configuration
                 return "W3SVC";
             }
         }
+
+		/// <summary>
+		/// The Event Log service.
+		/// </summary>
+		public static string EventLog
+		{
+			get 
+			{
+				return "Eventlog";
+			}
+		}
     }
 }

@@ -20,7 +20,7 @@ namespace Topshelf.Internal
     {
         private static bool _isDefault;
 
-        public static NamedAction GetAtionKey(string[] args, NamedAction defaultAction)
+        public static NamedAction GetActionKey(string[] args, NamedAction defaultAction)
         {
             var arguments = Parser.ParseArgs(args);
 
