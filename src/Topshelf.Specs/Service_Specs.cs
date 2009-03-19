@@ -22,8 +22,7 @@ namespace Topshelf.Specs.Configuration
             ServiceLocator.SetLocatorProvider(()=>sl);
             sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
 
-            ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>();
-            c.WithName("my_service");
+            ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
             c.WhenPaused(s => { _wasPaused = true; });
@@ -96,8 +95,7 @@ namespace Topshelf.Specs.Configuration
 		[Test]
 		public void Should_work()
 		{
-            var c = new ServiceConfigurator<TestService>();
-            c.WithName("my_service");
+            var c = new ServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
             c.CreateServiceLocator(()=>

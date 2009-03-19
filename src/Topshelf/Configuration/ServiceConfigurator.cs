@@ -18,7 +18,11 @@ namespace Topshelf.Configuration
 		ServiceConfiguratorBase<TService>,
 		IServiceConfigurator<TService>
 	{
-		public IService Create()
+	    public ServiceConfigurator(string name) : base(name)
+	    {
+	    }
+
+	    public IService Create()
 		{
 			IService service = new Service<TService>
 				{

@@ -20,7 +20,11 @@ namespace Topshelf.Configuration
 		IIsolatedServiceConfigurator<TService>
 		where TService : MarshalByRefObject
 	{
-		public IService Create()
+	    public IsolatedServiceConfigurator(string name) : base(name)
+	    {
+	    }
+
+	    public IService Create()
 		{
 			IService service = new FacadeToIsolatedService<TService>
 				{

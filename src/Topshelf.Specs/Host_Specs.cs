@@ -26,17 +26,15 @@ namespace Topshelf.Specs.Configuration
 
             _serviceCoordinator = (ServiceCoordinator)RunnerConfigurator.New(x =>
             {
-                x.ConfigureService<TestService>(c =>
+                x.ConfigureService<TestService>("my_service", c =>
                 {
-                    c.WithName("my_service");
                     c.WhenStarted(s => s.Start());
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
                 });
-                x.ConfigureService<TestService2>(c =>
+                x.ConfigureService<TestService2>("my_service2",c =>
                 {
-                    c.WithName("my_service2");
                     c.WhenStarted(s => s.Start());
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });

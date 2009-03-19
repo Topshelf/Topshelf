@@ -26,7 +26,12 @@ namespace Topshelf.Configuration
 		protected Action<TService> _startAction = NoOp;
 		protected Action<TService> _stopAction = NoOp;
 
-		public void Dispose()
+        public ServiceConfiguratorBase(string name)
+        {
+            _name = name;
+        }
+
+	    public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
@@ -50,11 +55,6 @@ namespace Topshelf.Configuration
 		public void WhenContinued(Action<TService> continueAction)
 		{
 			_continueAction = continueAction;
-		}
-
-		public void WithName(string name)
-		{
-			_name = name;
 		}
 
 		public void CreateServiceLocator(Func<IServiceLocator> createServiceLocator)

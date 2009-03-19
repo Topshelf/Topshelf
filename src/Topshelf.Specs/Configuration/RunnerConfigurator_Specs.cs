@@ -19,9 +19,8 @@ namespace Topshelf.Specs.Configuration
                 x.SetDescription("chris's pants");
 
                 x.ConfigureService<TestService>(); //defaults
-                x.ConfigureService<TestService>(c =>
+                x.ConfigureService<TestService>("my_service", c =>
                 {
-                    c.WithName("my_service");
                     c.WhenStarted(s => s.Start());
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
@@ -29,9 +28,8 @@ namespace Topshelf.Specs.Configuration
                 });
 
                 x.ConfigureServiceInIsolation<TestService>(); //defaults
-                x.ConfigureServiceInIsolation<TestService>(c=>
+                x.ConfigureServiceInIsolation<TestService>("my_service", c=>
                                                                    {
-                                                                       c.WithName("my_service");
                                                                        c.WhenStarted(s => s.Start());
                                                                        c.WhenStopped(s => s.Stop());
                                                                        c.WhenPaused(s => { });
@@ -59,9 +57,8 @@ namespace Topshelf.Specs.Configuration
                           x.SetServiceName("chris");
                           x.SetDescription("chris's pants");
                               
-                          x.ConfigureService<TestService>(c=>
+                          x.ConfigureService<TestService>("my_service", c=>
                               {
-                                  c.WithName("my_service");
                                   c.WhenStarted(s => s.Start());
                                   c.WhenStopped(s => s.Stop());
                                   c.WhenPaused(s => { });

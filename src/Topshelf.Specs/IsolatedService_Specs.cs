@@ -22,8 +22,7 @@ namespace Topshelf.Specs
             
             
 
-            var c = new IsolatedServiceConfigurator<TestService>();
-            c.WithName("my_service");
+            var c = new IsolatedServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
             c.WhenPaused(s => { _wasPaused = true; }); //need to change these

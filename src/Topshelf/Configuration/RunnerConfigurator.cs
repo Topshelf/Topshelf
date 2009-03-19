@@ -148,18 +148,18 @@ namespace Topshelf.Configuration
 		/// <typeparam name="TService">The type of the service that will be configured.</typeparam>
 		public void ConfigureService<TService>()
 		{
-			var configurator = new ServiceConfigurator<TService>();
-			_serviceConfigurators.Add(configurator.Create);
+            ConfigureService<TService>(typeof(TService).Name, x=> { });
 		}
 
 		/// <summary>
 		/// Configures a service using the specified configuration action or set of configuration actions.
 		/// </summary>
 		/// <typeparam name="TService">The type of the service that will be configured.</typeparam>
+		/// <param name="name">The name used to identify the service</param>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action)
+		public void ConfigureService<TService>(string name, Action<IServiceConfigurator<TService>> action)
 		{
-			var configurator = new ServiceConfigurator<TService>();
+			var configurator = new ServiceConfigurator<TService>(name);
 			_serviceConfigurators.Add(() =>
 				{
 					action(configurator);
@@ -174,19 +174,19 @@ namespace Topshelf.Configuration
 		public void ConfigureServiceInIsolation<TService>()
 			where TService : MarshalByRefObject
 		{
-			var configurator = new IsolatedServiceConfigurator<TService>();
-			_serviceConfigurators.Add(() => { return configurator.Create(); });
+			ConfigureServiceInIsolation<TService>(typeof(TService).Name, x=> { });
 		}
 
 		/// <summary>
 		/// Configures an isolated service using the specified configuration action or set of configuration actions.
 		/// </summary>
 		/// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
+		/// <param name="name">The name used to identify the service</param>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-		public void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action)
+		public void ConfigureServiceInIsolation<TService>(string name, Action<IIsolatedServiceConfigurator<TService>> action)
 			where TService : MarshalByRefObject
 		{
-			var configurator = new IsolatedServiceConfigurator<TService>();
+			var configurator = new IsolatedServiceConfigurator<TService>(name);
 			_serviceConfigurators.Add(() =>
 				{
 					action(configurator);

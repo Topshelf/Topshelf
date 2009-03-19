@@ -37,11 +37,10 @@ namespace Stuff
 						});
 					x.AfterStop(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-					x.ConfigureService<TownCrier>(s =>
+					x.ConfigureService<TownCrier>("tc", s =>
 						{
 							s.WhenStarted(tc => tc.Start());
 							s.WhenStopped(tc => tc.Stop());
-							s.WithName("tc");
 						});
 
 					x.RunAsLocalSystem();
