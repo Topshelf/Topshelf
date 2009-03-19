@@ -12,98 +12,88 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System;
-    using System.Configuration;
-    using System.ServiceProcess;
+	using System;
+	using System.Configuration;
+	using System.ServiceProcess;
 
-    public class Credentials : 
-        IEquatable<Credentials>
-    {
-        private readonly string _username;
-        private readonly string _password;
-        private readonly ServiceAccount _accountType;
+	public class Credentials :
+		IEquatable<Credentials>
+	{
+		private readonly ServiceAccount _accountType;
+		private readonly string _password;
+		private readonly string _username;
 
-        public Credentials(string username, string password, ServiceAccount accountType)
-        {
-            _username = username;
-            _accountType = accountType;
-            _password = password;
-        }
+		public Credentials(string username, string password, ServiceAccount accountType)
+		{
+			_username = username;
+			_accountType = accountType;
+			_password = password;
+		}
 
-        public string Username
-        {
-            get { return _username; }
-        }
+		public static Credentials LocalSystem
+		{
+			get { return new Credentials("", "", ServiceAccount.LocalSystem); }
+		}
 
-        public string Password
-        {
-            get { return _password; }
-        }
+		public static Credentials Interactive
+		{
+			get { return new Credentials(null, null, ServiceAccount.User); }
+		}
 
-        public ServiceAccount AccountType
-        {
-            get { return _accountType; }
-        }
+		public static Credentials DotNetConfig
+		{
+			get
+			{
+				return new Credentials(ConfigurationManager.AppSettings["username"],
+					ConfigurationManager.AppSettings["password"],
+					ServiceAccount.User);
+			}
+		}
 
-        public static Credentials LocalSystem
-        {
-            get
-            {
-                return new Credentials("","", ServiceAccount.LocalSystem);
-            }
-        }
+		public string Username
+		{
+			get { return _username; }
+		}
 
-        public static Credentials Interactive
-        {
-            get
-            {
-                return new Credentials(null,null,ServiceAccount.User);
-            }
-        }
+		public string Password
+		{
+			get { return _password; }
+		}
 
-        public static Credentials DotNetConfig
-        {
-            get
-            {
-                return new Credentials(ConfigurationManager.AppSettings["username"],
-                                       ConfigurationManager.AppSettings["password"],
-                                       ServiceAccount.User);
-            }
-        }
+		public ServiceAccount AccountType
+		{
+			get { return _accountType; }
+		}
 
-        public static Credentials Custom(string username, string password)
-        {
-            return new Credentials(username, password, ServiceAccount.User);
-        }
+		public bool Equals(Credentials obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			return Equals(obj._username, _username) && Equals(obj._password, _password) && Equals(obj._accountType, _accountType);
+		}
 
-        #region System.String Overrides
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != typeof (Credentials)) return false;
+			return Equals((Credentials) obj);
+		}
 
-        public bool Equals(Credentials obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            return Equals(obj._username, _username) && Equals(obj._password, _password) && Equals(obj._accountType, _accountType);
-        }
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int result = (_username != null ? _username.GetHashCode() : 0);
+				result = (result*397) ^ (_password != null ? _password.GetHashCode() : 0);
+				result = (result*397) ^ _accountType.GetHashCode();
+				return result;
+			}
+		}
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (Credentials)) return false;
-            return Equals((Credentials) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                int result = (_username != null ? _username.GetHashCode() : 0);
-                result = (result*397) ^ (_password != null ? _password.GetHashCode() : 0);
-                result = (result*397) ^ _accountType.GetHashCode();
-                return result;
-            }
-        }
-
-        #endregion
-    }
+		public static Credentials Custom(string username, string password)
+		{
+			return new Credentials(username, password, ServiceAccount.User);
+		}
+	}
 }

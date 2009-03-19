@@ -12,62 +12,47 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Internal
 {
-    using System;
-    using Microsoft.Practices.ServiceLocation;
+	public class Service<TService> :
+		ServiceBase<TService>,
+		IService
+	{
+		private TService _instance;
 
-    public class Service<TService> :
-        IService
-        
-    {
-        public Service(IServiceLocator serviceLocator)
-        {
-            ServiceLocator = serviceLocator;
-            State = ServiceState.Stopped;
-        }
+		public Service()
+		{
+			State = ServiceState.Stopped;
+		}
 
-        public Type ServiceType
-        {
-            get
-            {
-                return typeof(TService);
-            }
-        }
+		public void Start()
+		{
+			_instance = ServiceLocator.GetInstance<TService>();
+			StartAction(_instance);
+			State = ServiceState.Started;
+		}
 
-        public IServiceLocator ServiceLocator { get; set; }
-        public ServiceState State { get; private set; }
-        public string Name { get; set; }
-        public Action<TService> StartAction{ get; set;}
-        public Action<TService> StopAction{ get; set;}
-        public Action<TService> PauseAction{ get; set;}
-        public Action<TService> ContinueAction{ get; set;}
+		public void Stop()
+		{
+			StopAction(_instance);
+			State = ServiceState.Stopped;
+		}
 
+		public void Pause()
+		{
+			PauseAction(_instance);
+			State = ServiceState.Paused;
+		}
 
-        public void Start()
-        {
-            var instance = ServiceLocator.GetInstance<TService>(Name);
-            StartAction(instance);
-            State = ServiceState.Started;
-        }
+		public void Continue()
+		{
+			ContinueAction(_instance);
+			State = ServiceState.Started;
+		}
 
-        public void Stop()
-        {
-            var instance = ServiceLocator.GetInstance<TService>(Name);
-            StopAction(instance);
-            State = ServiceState.Stopped;
-        }
-
-        public void Pause()
-        {
-            var instance = ServiceLocator.GetInstance<TService>(Name);
-            PauseAction(instance);
-            State = ServiceState.Paused;
-        }
-
-        public void Continue()
-        {
-            var instance = ServiceLocator.GetInstance<TService>(Name);
-            ContinueAction(instance);
-            State = ServiceState.Started;
-        }
-    }
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+			if (disposing && _instance != null )
+				_instance = default(TService);
+		}
+	}
 }

@@ -3,8 +3,6 @@ namespace Topshelf.Specs.Configuration
     using System.ServiceProcess;
     using Internal;
     using MbUnit.Framework;
-    using Microsoft.Practices.ServiceLocation;
-    using Rhino.Mocks;
     using Topshelf.Configuration;
 
     [TestFixture]

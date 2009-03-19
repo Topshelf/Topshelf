@@ -1,72 +1,71 @@
+// Copyright 2007-2008 The Apache Software Foundation.
+//  
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
+// this file except in compliance with the License. You may obtain a copy of the 
+// License at 
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 namespace Topshelf.Internal
 {
-    using System;
-    using Microsoft.Practices.ServiceLocation;
+	using System;
 
-    [Serializable]
-    public class FacadeToIsolatedService<TService> :
-        IService
-    {
-        public Type ServiceType { get { return _remoteService.ServiceType; } }
-        public ServiceState State { get
-        {
-            return _remoteService.State;
-        } }
-        public string Name { get { return _remoteService.Name; } }
-        private AppDomain _domain;
-        private IsolatedService<TService> _remoteService;
+	[Serializable]
+	public class FacadeToIsolatedService<TService> :
+		ServiceBase<TService>,
+		IService
+	{
+		private AppDomain _domain;
+		private IsolatedService<TService> _remoteService;
 
-        //what to do with these
-        Func<IServiceLocator> createServiceLocator;
-        Action<TService> startAction;
-        Action<TService> stopAction;
-        Action<TService> pauseAction;
-        Action<TService> continueAction;
-        string _name; 
+		public void Start()
+		{
+			var settings = AppDomain.CurrentDomain.SetupInformation;
+			settings.ShadowCopyFiles = "true";
+			_domain = AppDomain.CreateDomain(typeof (TService).AssemblyQualifiedName, null, settings);
 
-        public FacadeToIsolatedService(Func<IServiceLocator> sl, string name, Action<TService> startAction, Action<TService> stopAction, Action<TService> pauseAction, Action<TService> continueAction)
-        {
-            _name = name;
-            this.createServiceLocator = sl;
-            this.startAction = startAction;
-            this.stopAction = stopAction;
-            this.pauseAction = pauseAction;
-            this.continueAction = continueAction;
-        }
+			_remoteService = _domain.CreateInstanceAndUnwrap<IsolatedService<TService>>();
+			if (_remoteService == null)
+				throw new ApplicationException("Unable to create service proxy for " + typeof (TService).Name);
 
-        public void Start()
-        {
-            var settings = AppDomain.CurrentDomain.SetupInformation;
-            settings.ShadowCopyFiles = "true";
-            _domain = AppDomain.CreateDomain(typeof (TService).AssemblyQualifiedName, null, settings);
-            
-            _remoteService = _domain.CreateInstanceAndUnwrap<IsolatedService<TService>>(createServiceLocator, _name, startAction, stopAction, pauseAction, continueAction);
-            _remoteService.Start();
-        }
+			_remoteService.CreateServiceLocator = CreateServiceLocator;
+			_remoteService.StartAction = StartAction;
+			_remoteService.StopAction = StopAction;
+			_remoteService.PauseAction = PauseAction;
+			_remoteService.ContinueAction = ContinueAction;
+			_remoteService.Name = Name;
 
-        public void Stop()
-        {
-            _remoteService.IfNotNull(x=>x.Stop());
-            AppDomain.Unload(_domain);
-        }
+			_remoteService.Start();
+		}
 
-        public void Pause()
-        {
-            _remoteService.IfNotNull(x => x.Pause());
-        }
+		public void Stop()
+		{
+			_remoteService.IfNotNull(x => x.Stop());
 
-        public void Continue()
-        {
-            _remoteService.IfNotNull(x => x.Continue());
-        }
-    }
+			AppDomain.Unload(_domain);
+		}
 
-    public static class ObjectExtensions
-    {
-        public static void IfNotNull<TService>(this IsolatedService<TService> service, Action<IsolatedService<TService>> action)
-        {
-            if (service != null)
-                action(service);
-        }
-    }
+		public void Pause()
+		{
+			_remoteService.IfNotNull(x => x.Pause());
+		}
+
+		public void Continue()
+		{
+			_remoteService.IfNotNull(x => x.Continue());
+		}
+	}
+
+	public static class ObjectExtensions
+	{
+		public static void IfNotNull(this IService service, Action<IService> action)
+		{
+			if (service != null)
+				action(service);
+		}
+	}
 }

@@ -59,6 +59,7 @@
     <Compile Include="AppDomainExtensions.cs" />
     <Compile Include="Configuration\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\IsolatedServiceConfigurator.cs" />
+    <Compile Include="Configuration\ServiceConfiguratorBase.cs" />
     <Compile Include="Configuration\ServiceConsole.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +88,7 @@
     <Compile Include="Internal\ArgumentParsing\IArgumentParser.cs" />
     <Compile Include="Configuration\IRunConfiguration.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
+    <Compile Include="Internal\ServiceBase.cs" />
     <Compile Include="Internal\ServiceCoordinator.cs" />
     <Compile Include="Configuration\RunnerConfigurator.cs" />
     <Compile Include="Internal\IServiceCoordinator.cs" />

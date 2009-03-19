@@ -12,21 +12,23 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System;
-    using Microsoft.Practices.ServiceLocation;
+	using System;
+	using Microsoft.Practices.ServiceLocation;
 
-    public interface IServiceConfigurator<TService> :
-        IDisposable
-    {
-        void WhenStarted(Action<TService> startAction);
-        void WhenStopped(Action<TService> stopAction);
-        void WhenPaused(Action<TService> pauseAction);
-        void WhenContinued(Action<TService> continueAction);
-        /// <summary>
-        /// The name of the instance to be used when locating the service in the container
-        /// </summary>
-        /// <param name="name">ioc name of the instance</param>
-        void WithName(string name);
-        void CreateServiceLocator(Func<IServiceLocator> fun);
-    }
+	public interface IServiceConfigurator<TService> :
+		IDisposable
+	{
+		void WhenStarted(Action<TService> startAction);
+		void WhenStopped(Action<TService> stopAction);
+		void WhenPaused(Action<TService> pauseAction);
+		void WhenContinued(Action<TService> continueAction);
+
+		/// <summary>
+		/// The name of the instance to be used when locating the service in the container
+		/// </summary>
+		/// <param name="name">ioc name of the instance</param>
+		void WithName(string name);
+
+		void CreateServiceLocator(Func<IServiceLocator> createServiceLocator);
+	}
 }

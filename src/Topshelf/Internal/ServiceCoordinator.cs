@@ -12,162 +12,204 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Internal
 {
-    using System;
-    using System.Collections.Generic;
-    using log4net;
-    using System.Linq;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using log4net;
 
-    public class ServiceCoordinator :
-        IServiceCoordinator
-    {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceCoordinator));
-        private readonly Dictionary<string, IService> _services = new Dictionary<string, IService>();
-        private readonly Action<IServiceCoordinator> _beforeStart;
-        private readonly Action<IServiceCoordinator> _afterStop;
+	public class ServiceCoordinator :
+		IServiceCoordinator
+	{
+		private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceCoordinator));
+		private readonly Action<IServiceCoordinator> _afterStop;
+		private readonly Action<IServiceCoordinator> _beforeStart;
+		private readonly Action<IServiceCoordinator> _beforeStartingServices;
+		private readonly Dictionary<string, IService> _services = new Dictionary<string, IService>();
+
+		public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices, Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
+		{
+			_beforeStartingServices = beforeStartingServices;
+			_beforeStart = beforeStart;
+			_afterStop = afterStop;
+			_serviceConfigurators = new List<Func<IService>>();
+		}
+
+		public void Start()
+		{
+			_log.Debug("Calling BeforeStartingServices");
+			_beforeStartingServices(this);
+			_log.Info("BeforeStart complete");
 
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
-        {
-            _beforeStart = beforeStart;
-            _afterStop = afterStop;
-        }
+			_log.Debug("Start is now starting any subordinate services");
 
-        public void Start()
-        {
-            _log.Debug("pre before start");
-            _beforeStart(this);
-            _log.Info("BeforeStart complete");
+			foreach (Func<IService> serviceConfigurator in _serviceConfigurators)
+			{
+				IService service = serviceConfigurator();
+				_services.Add(service.Name, service);
 
-            foreach (var service in _services.Values)
-            {
-                _log.InfoFormat("Starting sub service '{0}'", service.Name);
-                service.Start();
-            }
-        }
+				_log.InfoFormat("Starting subordinate service '{0}'", service.Name);
+				service.Start();
+			}
 
-        public void Stop()
-        {
-            foreach (var service in _services.Values.Reverse())
-            {
-                _log.InfoFormat("Stopping sub service '{0}'", service.Name);
-                service.Stop();
-            }
+			_log.Debug("Calling BeforeStart");
+			_beforeStart(this);
+			_log.Info("BeforeStart complete");
+		}
 
-            _log.Debug("pre after stop");
-            _afterStop(this);
-            _log.Info("AfterStop complete");
-            OnStopped();
-        }
+		public void Stop()
+		{
+			foreach (var service in _services.Values.Reverse())
+			{
+				try
+				{
+					_log.InfoFormat("Stopping sub service '{0}'", service.Name);
+					service.Stop();
+				}
+				catch (Exception ex)
+				{
+					_log.Error("Exception stopping sub service " + service.Name, ex);
+				}
+			}
 
-        public void Pause()
-        {
-            foreach (var service in _services.Values)
-            {
-                _log.InfoFormat("Pausing sub service '{0}'", service.Name);
-                service.Pause();
-            }
-        }
+			_log.Debug("pre after stop");
+			_afterStop(this);
+			_log.Info("AfterStop complete");
+			OnStopped();
+		}
 
-        public void Continue()
-        {
-            foreach (var service in _services.Values)
-            {
-                _log.InfoFormat("Continuing sub service '{0}'", service.Name);
-                service.Continue();
-            }
-        }
+		public void Pause()
+		{
+			foreach (var service in _services.Values)
+			{
+				_log.InfoFormat("Pausing sub service '{0}'", service.Name);
+				service.Pause();
+			}
+		}
 
-        public void StartService(string name)
-        {
-            _services[name].Start();
-        }
+		public void Continue()
+		{
+			foreach (var service in _services.Values)
+			{
+				_log.InfoFormat("Continuing sub service '{0}'", service.Name);
+				service.Continue();
+			}
+		}
 
-        public void StopService(string name)
-        {
-            _services[name].Stop();
-        }
+		public void StartService(string name)
+		{
+			if (_services.Count == 0)
+				CreateServices();
 
-        public void PauseService(string name)
-        {
-            _services[name].Pause();
-        }
+			_services[name].Start();
+		}
 
-        public void ContinueService(string name)
-        {
-            _services[name].Continue();
-        }
+		public void StopService(string name)
+		{
+			if (_services.Count == 0)
+				CreateServices();
 
-        public void RegisterServices(IList<IService> services)
-        {
-            foreach (var service in services)
-            {
-                _services.Add(service.Name, service);
-            }
-        }
+			_services[name].Stop();
+		}
 
-        public int HostedServiceCount
-        {
-            get
-            {
-                return _services.Count;
-            }
-        }
+		public void PauseService(string name)
+		{
+			if (_services.Count == 0)
+				CreateServices();
 
-        public IList<ServiceInformation> GetServiceInfo()
-        {
-            var result = new List<ServiceInformation>();
+			_services[name].Pause();
+		}
 
-            foreach (var value in _services.Values)
-            {
-                result.Add(new ServiceInformation()
-                               {
-                                   Name = value.Name,
-                                   State = value.State,
-                                   Type = value.ServiceType.Name
-                               });
-            }
+		public void ContinueService(string name)
+		{
+			if (_services.Count == 0)
+				CreateServices();
 
-            return result;
-        }
+			_services[name].Continue();
+		}
 
-        public IService GetService(string name)
-        {
-            return _services[name];
-        }
+		public int HostedServiceCount
+		{
+			get { return _services.Count; }
+		}
 
-        #region Dispose Crap
+		public IList<ServiceInformation> GetServiceInfo()
+		{
+			var result = new List<ServiceInformation>();
 
-        private bool _disposed;
-        ~ServiceCoordinator()
-        {
-            Dispose(false);
-        }
+			foreach (var value in _services.Values)
+			{
+				result.Add(new ServiceInformation
+					{
+						Name = value.Name,
+						State = value.State,
+						Type = value.ServiceType.Name
+					});
+			}
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+			return result;
+		}
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed) return;
-            if (disposing)
-            {
-                Stop();
-            }
-            _disposed = true;
-        }
-        #endregion
+		public IService GetService(string name)
+		{
+			return _services[name];
+		}
 
-        public event Action Stopped;
-        private void OnStopped()
-        {
-            Action handler = Stopped;
-            if (handler != null)
-            {
-                handler();
-            }
-        }
-    }
+		public event Action Stopped;
+
+		#region Dispose Crap
+
+		private readonly List<Func<IService>> _serviceConfigurators;
+		private bool _disposed;
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		private void Dispose(bool disposing)
+		{
+			if (_disposed) return;
+			if (disposing)
+			{
+				foreach (var service in _services.Values)
+				{
+					service.Dispose();
+				}
+				_services.Clear();
+			}
+			_disposed = true;
+		}
+
+		~ServiceCoordinator()
+		{
+			Dispose(false);
+		}
+
+		#endregion
+
+		public void RegisterServices(IList<Func<IService>> services)
+		{
+			_serviceConfigurators.AddRange(services);
+		}
+
+		private void CreateServices()
+		{
+			foreach (Func<IService> serviceConfigurator in _serviceConfigurators)
+			{
+				IService service = serviceConfigurator();
+				_services.Add(service.Name, service);
+			}
+		}
+
+		private void OnStopped()
+		{
+			Action handler = Stopped;
+			if (handler != null)
+			{
+				handler();
+			}
+		}
+	}
 }

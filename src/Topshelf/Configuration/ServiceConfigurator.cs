@@ -12,91 +12,25 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System;
-    using Internal;
-    using Microsoft.Practices.ServiceLocation;
+	using Internal;
 
-    public class ServiceConfigurator<TService> :
-        IServiceConfigurator<TService>
+	public class ServiceConfigurator<TService> :
+		ServiceConfiguratorBase<TService>,
+		IServiceConfigurator<TService>
+	{
+		public IService Create()
+		{
+			IService service = new Service<TService>
+				{
+					CreateServiceLocator = _createServiceLocator,
+					StartAction = _startAction,
+					StopAction = _stopAction,
+					PauseAction = _pauseAction,
+					ContinueAction = _continueAction,
+					Name = _name,
+				};
 
-    {
-        private string _name = typeof (TService).Name;
-
-        private Action<TService> _startAction = service => { };
-        private Action<TService> _stopAction = service => { };
-        private Action<TService> _pauseAction = service => { };
-        private Action<TService> _continueAction = service => { };
-        private Func<IServiceLocator> _createServiceLocator = () => ServiceLocator.Current;
-
-        public void WhenStarted(Action<TService> startAction)
-        {
-            _startAction = startAction;
-        }
-
-        public void WhenStopped(Action<TService> stopAction)
-        {
-            _stopAction = stopAction;
-        }
-
-        public void WhenPaused(Action<TService> pauseAction)
-        {
-            _pauseAction = pauseAction;
-        }
-
-        public void WhenContinued(Action<TService> continueAction)
-        {
-            _continueAction = continueAction;
-        }
-
-        public void WithName(string name)
-        {
-            _name = name;
-        }
-
-        public void CreateServiceLocator(Func<IServiceLocator> fun)
-        {
-            _createServiceLocator = fun;
-        }
-
-        public IService Create()
-        {
-            IService service = new Service<TService>(_createServiceLocator())
-                                   {
-                                       Name = _name,
-                                       StartAction = _startAction,
-                                       StopAction = _stopAction,
-                                       PauseAction = _pauseAction,
-                                       ContinueAction = _continueAction,
-                                   };
-
-
-            return service;
-        }
-
-        #region Dispose Crap
-        private bool _disposed;
-        
-
-        ~ServiceConfigurator()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed) return;
-            if (disposing)
-            {
-
-            }
-            _disposed = true;
-        }
-        #endregion
-    }
+			return service;
+		}
+	}
 }

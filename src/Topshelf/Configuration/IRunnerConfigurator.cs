@@ -150,6 +150,12 @@ namespace Topshelf.Configuration
         void UseWinFormHost<T>() where T : Form;
 
 		/// <summary>
+		/// Defines an action or a set of actions to perform before starting the services
+		/// </summary>
+		/// <param name="action"></param>
+    	void BeforeStartingServices(Action<IServiceCoordinator> action);
+
+		/// <summary>
 		/// Defines an action or a set of actions to perform before the service starts.
 		/// </summary>
 		/// <remarks>
@@ -163,7 +169,5 @@ namespace Topshelf.Configuration
 		/// </summary>
 		/// <param name="action">The action or actions that will be performed after the service stops.</param>
 		void AfterStop(Action<IServiceCoordinator> action);
-        
-        
     }
 }

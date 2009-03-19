@@ -15,19 +15,10 @@ namespace Topshelf.Internal
 	using System;
 	using Microsoft.Practices.ServiceLocation;
 
-	public class IsolatedService<TService> :
-		MarshalByRefObject,
-		IService
+	public class ServiceBase<TService>
 	{
 		private bool _disposed;
-		private TService _instance;
 		private IServiceLocator _serviceLocator;
-
-		public IsolatedService()
-		{
-			State = ServiceState.Stopped;
-		}
-
 		public Action<TService> StartAction { get; set; }
 		public Action<TService> StopAction { get; set; }
 		public Action<TService> PauseAction { get; set; }
@@ -61,31 +52,6 @@ namespace Topshelf.Internal
 			GC.SuppressFinalize(this);
 		}
 
-		public void Start()
-		{
-			_instance = ServiceLocator.GetInstance<TService>();
-			StartAction(_instance);
-			State = ServiceState.Started;
-		}
-
-		public void Stop()
-		{
-			StopAction(_instance);
-			State = ServiceState.Stopped;
-		}
-
-		public void Pause()
-		{
-			PauseAction(_instance);
-			State = ServiceState.Paused;
-		}
-
-		public void Continue()
-		{
-			ContinueAction(_instance);
-			State = ServiceState.Started;
-		}
-
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposing) return;
@@ -97,11 +63,10 @@ namespace Topshelf.Internal
 			ContinueAction = null;
 			CreateServiceLocator = null;
 			_serviceLocator = null;
-			_instance = default(TService);
 			_disposed = true;
 		}
 
-		~IsolatedService()
+		~ServiceBase()
 		{
 			Dispose(false);
 		}

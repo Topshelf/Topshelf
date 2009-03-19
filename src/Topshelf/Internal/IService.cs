@@ -13,13 +13,16 @@
 namespace Topshelf.Internal
 {
     using System;
+    using Microsoft.Practices.ServiceLocation;
 
-    public interface IService
+	public interface IService :
+		IDisposable
     {
         Type ServiceType { get; }
         string Name { get; }
         ServiceState State { get; }
-        void Start();
+		IServiceLocator ServiceLocator { get; }
+		void Start();
         void Stop();
         void Pause();
         void Continue();
