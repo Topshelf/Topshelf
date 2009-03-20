@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>Rhino.Mocks</name>
+        <name>Rhino.Mocks.Partial</name>
     </assembly>
     <members>
         <member name="T:Rhino.Mocks.Constraints.AbstractConstraint">
@@ -420,6 +420,29 @@
             </summary>
         </member>
         <member name="P:Rhino.Mocks.Constraints.ListElement.Message">
+            <summary>
+            Gets the message for this constraint
+            </summary>
+            <value></value>
+        </member>
+        <member name="T:Rhino.Mocks.Constraints.KeyedListElement`1">
+            <summary>
+            Applies another AbstractConstraint to a specific generic keyed list element.
+            </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Constraints.KeyedListElement`1.#ctor(`0,Rhino.Mocks.Constraints.AbstractConstraint)">
+            <summary>
+            Creates a new <see cref="T:KeyedListElement"/> instance.
+            </summary>
+            <param name="key">The key of the list element.</param>
+            <param name="constraint">The constraint that should be applied to the list element.</param>
+        </member>
+        <member name="M:Rhino.Mocks.Constraints.KeyedListElement`1.Eval(System.Object)">
+            <summary>
+            Determines if the parameter conforms to this constraint.
+            </summary>
+        </member>
+        <member name="P:Rhino.Mocks.Constraints.KeyedListElement`1.Message">
             <summary>
             Gets the message for this constraint
             </summary>
@@ -883,6 +906,13 @@
             <param name="index">The zero-based index of the list element.</param>
             <param name="constraint">The constraint which should be applied to the list element.</param>
         </member>
+        <member name="M:Rhino.Mocks.Constraints.List.Element``1(``0,Rhino.Mocks.Constraints.AbstractConstraint)">
+            <summary>
+            Determines that an element of the parameter collections conforms to another AbstractConstraint.
+            </summary>
+            <param name="key">The key of the element.</param>
+            <param name="constraint">The constraint which should be applied to the element.</param>
+        </member>
         <member name="M:Rhino.Mocks.Constraints.List.ContainsAll(System.Collections.IEnumerable)">
             <summary>
              Determines that all elements of the specified collection are in the the parameter collection 
@@ -1243,6 +1273,12 @@
             Allow to set the return value in the future, if it was already set.
             </summary>
         </member>
+        <member name="M:Rhino.Mocks.Interfaces.IExpectation.BuildVerificationFailureMessage">
+            <summary>
+            Builds the verification failure message.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="P:Rhino.Mocks.Interfaces.IExpectation.ErrorMessage">
             <summary>
             Gets the error message.
@@ -1327,6 +1363,11 @@
             </summary>
             <value>The invocation.</value>
         </member>
+        <member name="E:Rhino.Mocks.Interfaces.IExpectation.WhenCalled">
+            <summary>
+            Occurs when the exceptation is match on a method call
+            </summary>
+        </member>
         <member name="F:Rhino.Mocks.Expectations.AbstractExpectation.actualCallsCount">
             <summary>
             Number of actuall calls made that passed this expectation
@@ -1393,6 +1434,12 @@
             <summary>
             Add an actual actualMethodCall call to this expectation
             </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Expectations.AbstractExpectation.BuildVerificationFailureMessage">
+            <summary>
+            Builds the verification failure message.
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:Rhino.Mocks.Expectations.AbstractExpectation.IgnoreMissingReturnValueUntilExecuteTime">
             <summary>
@@ -1517,6 +1564,11 @@
         <member name="P:Rhino.Mocks.Expectations.AbstractExpectation.Message">
             <summary>
             Documentation message
+            </summary>
+        </member>
+        <member name="E:Rhino.Mocks.Expectations.AbstractExpectation.WhenCalled">
+            <summary>
+            Occurs when the exceptation is match on a method call
             </summary>
         </member>
         <member name="P:Rhino.Mocks.Expectations.AbstractExpectation.ErrorMessage">
@@ -1984,6 +2036,12 @@
             The delegate return value will be returned from the expectation.
             </summary>
         </member>
+        <member name="M:Rhino.Mocks.Interfaces.IMethodOptions`1.WhenCalled(System.Action{Rhino.Mocks.MethodInvocation})">
+            <summary>
+            Set a delegate to be called when the expectation is matched
+            and allow to optionally modify the invocation as needed
+            </summary>
+        </member>
         <member name="M:Rhino.Mocks.Interfaces.IMethodOptions`1.CallOriginalMethod">
             <summary>
             Call the original method on the class, bypassing the mocking layers.
@@ -2001,6 +2059,19 @@
             Use the property as a simple property, getting/setting the values without
             causing mock expectations.
             </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Interfaces.IMethodOptions`1.SetPropertyAndIgnoreArgument">
+            <summary>
+            Expect last (property) call as property setting, ignore the argument given
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Rhino.Mocks.Interfaces.IMethodOptions`1.SetPropertyWithArgument(`0)">
+            <summary>
+            Expect last (property) call as property setting with a given argument.
+            </summary>
+            <param name="argument"></param>
+            <returns></returns>
         </member>
         <member name="M:Rhino.Mocks.Interfaces.IMethodOptions`1.GetEventRaiser">
             <summary>
@@ -2068,15 +2139,14 @@
             This has special affects in that this method would now ignore orderring.
             </summary>
         </member>
-        <member name="M:Rhino.Mocks.Impl.MethodOptions`1.#ctor(Rhino.Mocks.MockRepository,Rhino.Mocks.Impl.RecordMockState,Rhino.Mocks.Interfaces.IMockedObject,Rhino.Mocks.Interfaces.IExpectation,System.Boolean)">
+        <member name="M:Rhino.Mocks.Impl.MethodOptions`1.#ctor(Rhino.Mocks.MockRepository,Rhino.Mocks.Impl.RecordMockState,Rhino.Mocks.Interfaces.IMockedObject,Rhino.Mocks.Interfaces.IExpectation)">
             <summary>
-            Creates a new <see cref="T:MethodOptions`1"/> instance.
+            Creates a new <see cref="T:Rhino.Mocks.Interfaces.IMethodOptions`1"/> instance.
             </summary>
             <param name="repository">the repository for this expectation</param>
             <param name="record">the recorder for this proxy</param>
             <param name="proxy">the proxy for this expectation</param>
             <param name="expectation">Expectation.</param>
-            <param name="expectationReplacable">If the expectation still can be replaced by a Constraint call</param>
         </member>
         <member name="M:Rhino.Mocks.Impl.MethodOptions`1.Constraints(Rhino.Mocks.Constraints.AbstractConstraint[])">
             <summary>
@@ -2149,6 +2219,12 @@
             The delegate return value will be returned from the expectation.
             </summary>
         </member>
+        <member name="M:Rhino.Mocks.Impl.MethodOptions`1.WhenCalled(System.Action{Rhino.Mocks.MethodInvocation})">
+            <summary>
+            Set a delegate to be called when the expectation is matched.
+            The delegate return value will be returned from the expectation.
+            </summary>
+        </member>
         <member name="M:Rhino.Mocks.Impl.MethodOptions`1.Return(`0)">
             <summary>
             Set the return value for the method.
@@ -2191,6 +2267,19 @@
             Use the property as a simple property, getting/setting the values without
             causing mock expectations.
             </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Impl.MethodOptions`1.SetPropertyAndIgnoreArgument">
+            <summary>
+            Expect last (property) call as property setting, ignore the argument given
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Rhino.Mocks.Impl.MethodOptions`1.SetPropertyWithArgument(`0)">
+            <summary>
+            Expect last (property) call as property setting with a given argument.
+            </summary>
+            <param name="argument"></param>
+            <returns></returns>
         </member>
         <member name="M:Rhino.Mocks.Impl.MethodOptions`1.GetEventRaiser">
             <summary>
@@ -2454,6 +2543,7 @@
         <member name="M:Rhino.Mocks.Impl.ProxyInstance.RegisterPropertyBehaviorFor(System.Reflection.PropertyInfo)">
             <summary>
             Register a property on the object that will behave as a simple property
+            Return true if there is already a value for the property
             </summary>
         </member>
         <member name="M:Rhino.Mocks.Impl.ProxyInstance.IsPropertyMethod(System.Reflection.MethodInfo)">
@@ -2610,6 +2700,13 @@
             This way, they are reported anyway when Verify() is called.
             </summary>
         </member>
+        <member name="M:Rhino.Mocks.Interfaces.IMockState.NotifyCallOnPropertyBehavior">
+            <summary>
+            This method is called to indicate that a property behavior call.
+            This is done so we generate good error message in the common case of people using
+            Stubbed properties with Return().
+            </summary>
+        </member>
         <member name="P:Rhino.Mocks.Interfaces.IMockState.VerifyState">
             <summary>
             Gets the matching verify state for this state
@@ -2630,6 +2727,13 @@
             Set the exception to throw when Verify is called.
             This is used to report exception that may have happened but where caught in the code.
             This way, they are reported anyway when Verify() is called.
+            </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Impl.RecordMockState.NotifyCallOnPropertyBehavior">
+            <summary>
+            This method is called to indicate that a property behavior call.
+            This is done so we generate good error message in the common case of people using
+            Stubbed properties with Return().
             </summary>
         </member>
         <member name="M:Rhino.Mocks.Impl.RecordMockState.#ctor(Rhino.Mocks.Interfaces.IMockedObject,Rhino.Mocks.MockRepository)">
@@ -2827,6 +2931,11 @@
             Set the exception to throw when Verify is called.
             This is used to report exception that may have happened but where caught in the code.
             This way, they are reported anyway when Verify() is called.
+            </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Impl.ReplayMockState.NotifyCallOnPropertyBehavior">
+            <summary>
+            not relevant
             </summary>
         </member>
         <member name="M:Rhino.Mocks.Impl.ReplayMockState.Verify">
@@ -3148,6 +3257,11 @@
             Set the exception to throw when Verify is called.
             This is used to report exception that may have happened but where caught in the code.
             This way, they are reported anyway when Verify() is called.
+            </summary>
+        </member>
+        <member name="M:Rhino.Mocks.Impl.VerifiedMockState.NotifyCallOnPropertyBehavior">
+            <summary>
+            not relevant
             </summary>
         </member>
         <member name="P:Rhino.Mocks.Impl.VerifiedMockState.VerifyState">
@@ -3876,6 +3990,12 @@
             Use the Arg class (without generic) to define Text constraints
             </summary>
         </member>
+        <member name="M:Rhino.Mocks.Arg.Is``1(``0)">
+            <summary>
+            Evaluate an equal constraint for <see cref="T:System.IComparable"/>.
+            </summary>
+            <param name="arg">The object the parameter should equal to</param>
+        </member>
         <member name="P:Rhino.Mocks.Arg.Text">
             <summary>
             Define constraints on text arguments.
@@ -3939,6 +4059,12 @@
         <member name="F:Rhino.Mocks.BackToRecordOptions.All">
             <summary>
             Remove all the behavior of the object
+            </summary>
+        </member>
+        <member name="T:Rhino.Mocks.Function`2">
+            <summary>
+            This delegate is compatible with the System.Func{T,R} signature
+            We have to define our own to get compatability with 2.0
             </summary>
         </member>
         <member name="T:Rhino.Mocks.Delegates">
@@ -4264,6 +4390,30 @@
             <summary>
             Better syntax to define repeats. 
             </summary>
+        </member>
+        <member name="T:Rhino.Mocks.MethodInvocation">
+            <summary>
+            This is a data structure that is used by 
+            <seealso cref="M:Rhino.Mocks.Interfaces.IMethodOptions`1.WhenCalled(System.Action{Rhino.Mocks.MethodInvocation})"/> to pass
+            the current method to the relevant delegate
+            </summary>
+        </member>
+        <member name="M:Rhino.Mocks.MethodInvocation.#ctor(Castle.Core.Interceptor.IInvocation)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Rhino.Mocks.MethodInvocation"/> class.
+            </summary>
+            <param name="invocation">The invocation.</param>
+        </member>
+        <member name="P:Rhino.Mocks.MethodInvocation.Arguments">
+            <summary>
+            Gets the args for this method invocation
+            </summary>
+        </member>
+        <member name="P:Rhino.Mocks.MethodInvocation.ReturnValue">
+            <summary>
+            Gets or sets the return value for this method invocation
+            </summary>
+            <value>The return value.</value>
         </member>
         <member name="T:Rhino.Mocks.Mocker">
             <summary>
@@ -4715,7 +4865,7 @@
             <param name="mock">The mock to test.</param>
             <returns>True if the mock is in replay mode, false otherwise.</returns>
         </member>
-        <member name="M:Rhino.Mocks.MockRepository.GenerateMock``1">
+        <member name="M:Rhino.Mocks.MockRepository.GenerateMock``1(System.Object[])">
             <summary>
             Generate a mock object without needing the mock repository
             </summary>
@@ -4725,6 +4875,12 @@
             Determines whether the specified proxy is a stub.
             </summary>
             <param name="proxy">The proxy.</param>
+        </member>
+        <member name="M:Rhino.Mocks.MockRepository.RegisterPropertyBehaviorOn(Rhino.Mocks.Interfaces.IMockedObject)">
+            <summary>
+            Register a call on a prperty behavior 
+            </summary>
+            <param name="instance"></param>
         </member>
         <member name="M:Rhino.Mocks.MockRepository.Record">
             <summary>
@@ -4825,7 +4981,7 @@
             <param name="mock">The mock.</param>
             <returns></returns>
         </member>
-        <member name="M:Rhino.Mocks.RhinoMocksExtensions.Expect``2(``0,System.Func{``0,``1})">
+        <member name="M:Rhino.Mocks.RhinoMocksExtensions.Expect``2(``0,Rhino.Mocks.Function{``0,``1})">
             <summary>
             Create an expectation on this mock for this action to occur
             </summary>
@@ -4846,7 +5002,7 @@
             <param name="action">The action.</param>
             <returns></returns>
         </member>
-        <member name="M:Rhino.Mocks.RhinoMocksExtensions.Stub``2(``0,System.Func{``0,``1})">
+        <member name="M:Rhino.Mocks.RhinoMocksExtensions.Stub``2(``0,Rhino.Mocks.Function{``0,``1})">
             <summary>
             Tell the mock object to perform a certain action when a matching
             method is called.
@@ -4926,6 +5082,14 @@
             <param name="mock">The mock.</param>
             <param name="action">The action.</param>
             <param name="setupConstraints">The setup constraints.</param>
+        </member>
+        <member name="M:Rhino.Mocks.RhinoMocksExtensions.FindAppropriteType(Rhino.Mocks.Interfaces.IMockedObject)">
+            <summary>
+            Finds the approprite implementation type of this item.
+            This is the class or an interface outside of the rhino mocks.
+            </summary>
+            <param name="mockedObj">The mocked obj.</param>
+            <returns></returns>
         </member>
         <member name="M:Rhino.Mocks.RhinoMocksExtensions.VerifyAllExpectations(System.Object)">
             <summary>
