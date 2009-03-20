@@ -20,23 +20,11 @@ namespace Topshelf.Configuration
         IDisposable
     {
 		/// <summary>
-		/// Configures a service using the default configuration.
-		/// </summary>
-		/// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-		void ConfigureService<TService>();
-
-		/// <summary>
 		/// Configures a service using the specified configuration action or set of configuration actions.
 		/// </summary>
 		/// <typeparam name="TService">The type of the service that will be configured.</typeparam>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
 		void ConfigureService<TService>(string name, Action<IServiceConfigurator<TService>> action);
-
-		/// <summary>
-		/// Configures an isolated service using the default configuration.
-		/// </summary>
-		/// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
-		void ConfigureServiceInIsolation<TService>() where TService : MarshalByRefObject;
 
 		/// <summary>
 		/// Configures an isolated service using the specified configuration action or set of configuration actions.

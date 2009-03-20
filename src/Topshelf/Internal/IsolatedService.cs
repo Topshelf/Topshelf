@@ -70,7 +70,8 @@ namespace Topshelf.Internal
 
 		public void Stop()
 		{
-			StopAction(_instance);
+            if(_instance != null)
+			    StopAction(_instance);
 			State = ServiceState.Stopped;
 		}
 

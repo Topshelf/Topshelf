@@ -9,7 +9,8 @@ namespace Topshelf.Specs.Configuration
     [TestFixture]
     public class A_service_should_control_its_subservices
     {
-        private ServiceCoordinator _serviceCoordinator;
+        private RunConfiguration _runConfiguration;
+        private IServiceCoordinator _serviceCoordinator;
         private TestService _service;
         private TestService2 _service2;
 
@@ -21,10 +22,10 @@ namespace Topshelf.Specs.Configuration
 
             IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => sl);
-            sl.Stub(x => x.GetInstance<TestService>()).Return(_service).Repeat.Any();
-            sl.Stub(x => x.GetInstance<TestService2>()).Return(_service2).Repeat.Any();
+            sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_service).Repeat.Any();
+            sl.Stub(x => x.GetInstance<TestService2>("my_service2")).Return(_service2).Repeat.Any();
 
-            _serviceCoordinator = (ServiceCoordinator)RunnerConfigurator.New(x =>
+            _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
             {
                 x.ConfigureService<TestService>("my_service", c =>
                 {
@@ -32,6 +33,7 @@ namespace Topshelf.Specs.Configuration
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
+                    c.CreateServiceLocator(()=>sl);
                 });
                 x.ConfigureService<TestService2>("my_service2",c =>
                 {
@@ -39,14 +41,16 @@ namespace Topshelf.Specs.Configuration
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
+                    c.CreateServiceLocator(() => sl);
                 });
             });
+            _serviceCoordinator = _runConfiguration.Coordinator;
         }
 
         [TearDown]
         public void TeardownContext()
         {
-            _serviceCoordinator = null;
+            _runConfiguration = null;
             _service = null;
             _service2 = null;
         }

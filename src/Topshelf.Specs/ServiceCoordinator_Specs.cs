@@ -33,7 +33,7 @@ namespace Topshelf.Specs
 			IServiceLocator sl = MockRepository.GenerateMock<IServiceLocator>();
 			ServiceLocator.SetLocatorProvider(() => sl);
 
-			sl.Stub(x => x.GetInstance<TestService>()).Return(_service).Repeat.Any();
+			sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
 
 			_serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
 			IList<Func<IService>> services = new List<Func<IService>>
@@ -135,8 +135,8 @@ namespace Topshelf.Specs
 			IServiceLocator sl = MockRepository.GenerateMock<IServiceLocator>();
 			ServiceLocator.SetLocatorProvider(() => sl);
 
-			sl.Stub(x => x.GetInstance<TestService>()).Return(_service).Repeat.Any();
-			sl.Stub(x => x.GetInstance<TestService2>()).Return(_service2).Repeat.Any();
+			sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
+			sl.Stub(x => x.GetInstance<TestService2>("test2")).Return(_service2).Repeat.Any();
 
 			_serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
 			IList<Func<IService>> services = new List<Func<IService>>

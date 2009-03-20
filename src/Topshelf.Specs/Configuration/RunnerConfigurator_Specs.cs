@@ -1,40 +1,51 @@
 namespace Topshelf.Specs.Configuration
 {
+    using System;
     using System.ServiceProcess;
     using Internal;
     using MbUnit.Framework;
+    using Microsoft.Practices.ServiceLocation;
+    using Rhino.Mocks;
     using Topshelf.Configuration;
 
     [TestFixture]
     public class RunnerConfigurator_Specs
     {
         private RunConfiguration _runConfiguration;
+
         [SetUp]
         public void EstablishContext()
         {
+            IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
+            TestService s1 = new TestService();
+            TestService s2 = new TestService();
+            sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(s1);
+            sl.Stub(x => x.GetInstance<TestService>("my_service2")).Return(s2);
+
             _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
             {
                 x.SetDisplayName("chris");
                 x.SetServiceName("chris");
                 x.SetDescription("chris's pants");
 
-                x.ConfigureService<TestService>(); //defaults
                 x.ConfigureService<TestService>("my_service", c =>
                 {
                     c.WhenStarted(s => s.Start());
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
+                    c.CreateServiceLocator(()=>sl);
                 });
 
-                x.ConfigureServiceInIsolation<TestService>(); //defaults
-                x.ConfigureServiceInIsolation<TestService>("my_service", c=>
-                                                                   {
-                                                                       c.WhenStarted(s => s.Start());
-                                                                       c.WhenStopped(s => s.Stop());
-                                                                       c.WhenPaused(s => { });
-                                                                       c.WhenContinued(s => { });
-                                                                   });
+                //needs to moved to a custom area for testing
+                //x.ConfigureServiceInIsolation<TestService>("my_service2", c=>
+                //                                                   {
+                //                                                       c.WhenStarted(s => s.Start());
+                //                                                       c.WhenStopped(s => s.Stop());
+                //                                                       c.WhenPaused(s => { });
+                //                                                       c.WhenContinued(s => { });
+                //                                                       c.CreateServiceLocator(()=>sl);
+                //                                                   });
                 
 
                 x.DoNotStartAutomatically();
@@ -48,42 +59,7 @@ namespace Topshelf.Specs.Configuration
                 x.DependencyOnMsSql();
             });
         }
-        //[Test]
-        public void Syntax_Play()
-        {
-            IRunConfiguration cfg = RunnerConfigurator.New(x =>
-                      {
-                          x.SetDisplayName("chris");
-                          x.SetServiceName("chris");
-                          x.SetDescription("chris's pants");
-                              
-                          x.ConfigureService<TestService>("my_service", c=>
-                              {
-                                  c.WhenStarted(s => s.Start());
-                                  c.WhenStopped(s => s.Stop());
-                                  c.WhenPaused(s => { });
-                                  c.WhenContinued(s => { });
-                                  //WhenRestarted (stop / start)
-                              });
-                          x.ConfigureService<TestService>(); //defaults
 
-                          x.DoNotStartAutomatically();
-
-                          x.RunAs("dru", "pass");
-                          x.RunAsLocalSystem();
-                          //x.RunAs(AppConfig("username"), AppConfig("password"));
-                          x.RunAsFromInteractive();
-
-                          //x.UseWinFormHost<MyForm>();
-
-                          x.DependsOn("ServiceName");
-                          x.DependencyOnMsmq();
-                          x.DependencyOnMsSql();
-                      });
-
-
-            //serviceCoordinator.TakeAction(args);
-        }
 
         [Test]
         public void A_pretend_void_main()
@@ -143,15 +119,16 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Hosted_service_configuration()
         {
+            _runConfiguration.Coordinator.Start();
             _runConfiguration.Coordinator.HostedServiceCount
-                .ShouldEqual(2);
+                .ShouldEqual(1);
 
             IService service = _runConfiguration.Coordinator.GetService("my_service");
 
             service.Name
                 .ShouldEqual("my_service");
             service.State
-                .ShouldEqual(ServiceState.Stopped);
+                .ShouldEqual(ServiceState.Started);
         }
     }
 }

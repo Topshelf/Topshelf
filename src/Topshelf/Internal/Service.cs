@@ -12,7 +12,10 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Internal
 {
-	public class Service<TService> :
+    using System;
+    using System.Runtime.Serialization;
+
+    public class Service<TService> :
 		ServiceBase<TService>,
 		IService
 	{
@@ -25,14 +28,16 @@ namespace Topshelf.Internal
 
 		public void Start()
 		{
-			_instance = ServiceLocator.GetInstance<TService>();
+			_instance = ServiceLocator.GetInstance<TService>(Name);
+            if (_instance == null) throw new CouldntFindServiceException(Name, typeof(TService));
 			StartAction(_instance);
 			State = ServiceState.Started;
 		}
 
 		public void Stop()
 		{
-			StopAction(_instance);
+            if(_instance != null)
+			    StopAction(_instance);
 			State = ServiceState.Stopped;
 		}
 
@@ -55,4 +60,31 @@ namespace Topshelf.Internal
 				_instance = default(TService);
 		}
 	}
+
+    public class CouldntFindServiceException : 
+        Exception
+    {
+        public CouldntFindServiceException(string name) : base(string.Format("Couldn't find '{0}' in the ServiceLocator", name))
+        {
+            
+        }
+
+        public CouldntFindServiceException(string name, Type serviceType)
+            : base(string.Format("Couldn't find service '{0}' named '{1}' in the ServiceLocator", serviceType.Name, name))
+        {
+
+        }
+
+        public CouldntFindServiceException()
+        {
+        }
+
+        public CouldntFindServiceException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected CouldntFindServiceException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
 }

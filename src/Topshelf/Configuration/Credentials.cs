@@ -50,6 +50,18 @@ namespace Topshelf.Configuration
 			}
 		}
 
+        public static Credentials Custom(string username, string password)
+        {
+            return new Credentials(username, password, ServiceAccount.User);
+        }
+
+        public static Credentials CommandLine()
+        {
+            return _commandLine;
+        }
+
+	    
+        
 		public string Username
 		{
 			get { return _username; }
@@ -91,9 +103,14 @@ namespace Topshelf.Configuration
 			}
 		}
 
-		public static Credentials Custom(string username, string password)
-		{
-			return new Credentials(username, password, ServiceAccount.User);
-		}
+
+
+        //command line
+        private static Credentials _commandLine;
+        public static void SetCommandLine(string username, string password)
+        {
+            _commandLine = new Credentials(username, password, ServiceAccount.User);
+        }
+
 	}
 }

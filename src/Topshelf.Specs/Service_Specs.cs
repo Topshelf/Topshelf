@@ -18,16 +18,21 @@ namespace Topshelf.Specs.Configuration
         public void EstablishContext()
         {
             _srv = new TestService();
-            IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(()=>sl);
-            sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
 
             ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
             c.WhenPaused(s => { _wasPaused = true; });
             c.WhenContinued(s => { _wasContinued = true; });
+            c.CreateServiceLocator(()=>
+                                   {
+                                       IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
+                                       ServiceLocator.SetLocatorProvider(() => sl);
+                                       sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
+                                       return sl;
+                                   });
             _service = c.Create();
+            _service.Start();
         }
 
         [Test]
@@ -45,7 +50,7 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_start()
         {
-            _service.Start();
+            //_service.Start();
 
             _service.State
                 .ShouldEqual(ServiceState.Started);
