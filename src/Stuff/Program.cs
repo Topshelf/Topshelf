@@ -35,7 +35,7 @@ namespace Stuff
 								});
 							ServiceLocator.SetLocatorProvider(() => new StructureMapServiceLocator());
 						});
-					x.AfterStop(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
+					x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
 					x.ConfigureService<TownCrier>("tc", s =>
 						{

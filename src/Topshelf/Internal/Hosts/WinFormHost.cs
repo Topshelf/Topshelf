@@ -26,11 +26,13 @@ namespace Topshelf.Internal.Hosts
         private static readonly ILog _log = LogManager.GetLogger(typeof (ConsoleHost));
         private readonly IServiceCoordinator _coordinator;
         private readonly IRunConfiguration _cfg;
+        private readonly IServiceLocator _serviceLocator;
 
         public WinFormHost(IServiceCoordinator coordinator, IRunConfiguration cfg)
         {
             _coordinator = coordinator;
             _cfg = cfg;
+            _serviceLocator = ServiceLocator.Current;
         }
 
         [STAThread]
@@ -43,7 +45,7 @@ namespace Topshelf.Internal.Hosts
 
             _coordinator.Start();
 
-            Form winForm = (Form)ServiceLocator.Current.GetInstance(_cfg.FormType);
+            Form winForm = (Form)_serviceLocator.GetInstance(_cfg.FormType);
             if(winForm is ServiceConsole)
             {
                 //TODO: There has to be a better way than this

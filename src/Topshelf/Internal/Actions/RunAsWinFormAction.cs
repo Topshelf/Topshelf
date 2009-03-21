@@ -15,6 +15,7 @@ namespace Topshelf.Internal.Actions
     using Configuration;
     using Hosts;
     using log4net;
+    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Action to run the host as a win form

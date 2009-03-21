@@ -212,7 +212,7 @@ namespace Topshelf.Configuration
 		/// This is the best place to set up, for example, any IoC containers.
 		/// </remarks>
 		/// <param name="action">The action or actions that will be performed before the service starts.</param>
-		public void BeforeStart(Action<IServiceCoordinator> action)
+		public void BeforeStartingTheHost(Action<IServiceCoordinator> action)
 		{
 			_beforeStart = action;
 		}
@@ -221,7 +221,7 @@ namespace Topshelf.Configuration
 		/// Defines an action or a set of actions to perform after the service stops.
 		/// </summary>
 		/// <param name="action">The action or actions that will be performed after the service stops.</param>
-		public void AfterStop(Action<IServiceCoordinator> action)
+		public void AfterStoppingTheHost(Action<IServiceCoordinator> action)
 		{
 			_afterStop = action;
 		}
