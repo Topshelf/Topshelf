@@ -10,13 +10,12 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Insturmentation
+namespace Topshelf.Instrumentatation
 {
     using System.Management.Instrumentation;
     using Internal;
     using Microsoft.Practices.ServiceLocation;
 
-    //http://blogs.microsoft.co.il/blogs/sasha/archive/tags/WMI/default.aspx
     [ManagementEntity(Singleton = true)]
     [ManagementQualifier("Description", Value = "Obtain processor information.")]
     public class BasicServiceInstrumentation
