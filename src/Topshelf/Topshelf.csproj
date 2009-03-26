@@ -110,7 +110,7 @@
     </Compile>
     <Compile Include="Internal\Hosts\WinFormHost.cs" />
     <Compile Include="Internal\IAction.cs" />
-    <Compile Include="Insturmentation\BasicServiceInstrumentation.cs" />
+    <Compile Include="Instrumentatation\BasicServiceInstrumentation.cs" />
     <Compile Include="Configuration\KnownServiceNames.cs" />
     <Compile Include="Internal\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
