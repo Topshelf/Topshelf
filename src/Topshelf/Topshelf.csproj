@@ -56,7 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppDomainExtensions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\ServiceConfiguratorBase.cs" />

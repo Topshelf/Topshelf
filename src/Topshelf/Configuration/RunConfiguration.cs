@@ -39,9 +39,9 @@ namespace Topshelf.Configuration
 
         public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
         {
-            installer.ServiceName = WinServiceSettings.ServiceName;
+            installer.ServiceName = WinServiceSettings.FullServiceName;
             installer.Description = WinServiceSettings.Description;
-            installer.DisplayName = WinServiceSettings.DisplayName;
+            installer.DisplayName = WinServiceSettings.FullDisplayName;
             installer.ServicesDependedOn = WinServiceSettings.Dependencies.ToArray();
             installer.StartType = ServiceStartMode.Automatic;
         }

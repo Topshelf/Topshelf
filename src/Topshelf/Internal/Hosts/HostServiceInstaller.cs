@@ -96,7 +96,7 @@ namespace Topshelf.Internal.Hosts
         {
             foreach (ServiceController service in ServiceController.GetServices())
             {
-                if (service.ServiceName == configuration.WinServiceSettings.ServiceName)
+                if (service.ServiceName == configuration.WinServiceSettings.FullServiceName)
                     return true;
             }
 

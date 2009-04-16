@@ -12,34 +12,59 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
+    using System;
     using System.Collections.Generic;
     using System.Configuration;
     using System.ServiceProcess;
 
     public class WinServiceSettings
     {
-        public ServiceStartMode StartMode { get; set; }
-        public string ServiceName { get; set; }
-        public string DisplayName { get; set; }
-        public string Description { get; set; }
-        public List<string> Dependencies { get; set; }
-
+        private const string _instanceChar = "$";
+        
         public WinServiceSettings()
         {
             StartMode = ServiceStartMode.Automatic;
             Dependencies = new List<string>();
         }
 
+        public ServiceStartMode StartMode { get; set; }
+        
+
+        public string ServiceName { private get; set; }
+        public string DisplayName { private get; set; }
+        public string Description { get; set; }
+        public string InstanceName { get; set; }
+
+        public string FullServiceName
+        {
+            get
+            {
+                return InstanceName == null
+                           ? ServiceName : "{0}{1}{2}".FormatWith(ServiceName, _instanceChar, InstanceName);
+            }
+        }
+
+        public string FullDisplayName
+        {
+            get
+            {
+                return InstanceName == null
+                           ? DisplayName : "{0} (Instance: {1})".FormatWith(DisplayName, InstanceName);
+            }
+        }
+
+        public List<string> Dependencies { get; set; }
+
         public static WinServiceSettings DotNetConfig
         {
             get
             {
-                WinServiceSettings settings = new WinServiceSettings()
-                                                  {
-                                                      ServiceName = ConfigurationManager.AppSettings["serviceName"],
-                                                      DisplayName = ConfigurationManager.AppSettings["displayName"],
-                                                      Description = ConfigurationManager.AppSettings["description"],
-                                                  };
+                var settings = new WinServiceSettings
+                               {
+                                   ServiceName = ConfigurationManager.AppSettings["serviceName"],
+                                   DisplayName = ConfigurationManager.AppSettings["displayName"],
+                                   Description = ConfigurationManager.AppSettings["description"],
+                               };
 
                 settings.Dependencies.AddRange(ConfigurationManager.AppSettings["dependencies"].Split(','));
                 return settings;
@@ -48,12 +73,12 @@ namespace Topshelf.Configuration
 
         public static WinServiceSettings Custom(string serviceName, string displayName, string description, params string[] dependencies)
         {
-            var settings = new WinServiceSettings()
-                               {
-                                   ServiceName = serviceName,
-                                   DisplayName = displayName,
-                                   Description = description,
-                               };
+            var settings = new WinServiceSettings
+                           {
+                               ServiceName = serviceName,
+                               DisplayName = displayName,
+                               Description = description,
+                           };
             settings.Dependencies.AddRange(dependencies);
             return settings;
         }

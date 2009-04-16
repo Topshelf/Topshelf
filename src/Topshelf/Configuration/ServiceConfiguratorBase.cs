@@ -12,78 +12,82 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-	using System;
-	using Microsoft.Practices.ServiceLocation;
+    using System;
+    using Microsoft.Practices.ServiceLocation;
 
-	public class ServiceConfiguratorBase<TService> :
-		IDisposable
-	{
-		protected Action<TService> _continueAction = NoOp;
-		protected Func<IServiceLocator> _createServiceLocator = () => ServiceLocator.Current;
-		private bool _disposed;
-		protected string _name = typeof (TService).Name;
-		protected Action<TService> _pauseAction = NoOp;
-		protected Action<TService> _startAction = NoOp;
-		protected Action<TService> _stopAction = NoOp;
+    public class ServiceConfiguratorBase<TService> :
+        IDisposable
+    {
+        protected Action<TService> _continueAction = NoOp;
+        protected Func<IServiceLocator> _createServiceLocator = () => ServiceLocator.Current;
+        bool _disposed;
+        protected string _name = typeof (TService).Name;
+        protected Action<TService> _pauseAction = NoOp;
+        protected Action<TService> _startAction = NoOp;
+        protected Action<TService> _stopAction = NoOp;
 
         public ServiceConfiguratorBase(string name)
         {
             _name = name;
         }
 
-	    public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        #region IDisposable Members
 
-		public void WhenStarted(Action<TService> startAction)
-		{
-			_startAction = startAction;
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		public void WhenStopped(Action<TService> stopAction)
-		{
-			_stopAction = stopAction;
-		}
+        #endregion
 
-		public void WhenPaused(Action<TService> pauseAction)
-		{
-			_pauseAction = pauseAction;
-		}
+        public void WhenStarted(Action<TService> startAction)
+        {
+            _startAction = startAction;
+        }
 
-		public void WhenContinued(Action<TService> continueAction)
-		{
-			_continueAction = continueAction;
-		}
+        public void WhenStopped(Action<TService> stopAction)
+        {
+            _stopAction = stopAction;
+        }
 
-		public void CreateServiceLocator(Func<IServiceLocator> createServiceLocator)
-		{
-			_createServiceLocator = createServiceLocator;
-		}
+        public void WhenPaused(Action<TService> pauseAction)
+        {
+            _pauseAction = pauseAction;
+        }
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposing) return;
-			if (_disposed) return;
+        public void WhenContinued(Action<TService> continueAction)
+        {
+            _continueAction = continueAction;
+        }
 
-			_startAction = null;
-			_stopAction = null;
-			_pauseAction = null;
-			_continueAction = null;
+        public void CreateServiceLocator(Func<IServiceLocator> createServiceLocator)
+        {
+            _createServiceLocator = createServiceLocator;
+        }
 
-			_createServiceLocator = null;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            if (_disposed) return;
 
-			_disposed = true;
-		}
+            _startAction = null;
+            _stopAction = null;
+            _pauseAction = null;
+            _continueAction = null;
 
-		~ServiceConfiguratorBase()
-		{
-			Dispose(false);
-		}
+            _createServiceLocator = null;
 
-		private static void NoOp(TService instance)
-		{
-		}
-	}
+            _disposed = true;
+        }
+
+        ~ServiceConfiguratorBase()
+        {
+            Dispose(false);
+        }
+
+        static void NoOp(TService instance)
+        {
+        }
+    }
 }

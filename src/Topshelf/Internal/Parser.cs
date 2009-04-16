@@ -18,14 +18,13 @@ namespace Topshelf.Internal
 
     public static class Parser
     {
-        private static bool _isDefault;
+        static bool _isDefault;
 
-        public static NamedAction GetActionKey(string[] args, NamedAction defaultAction)
+
+        public static NamedAction GetActionKey(Args arguments, NamedAction defaultAction)
         {
-            var arguments = Parser.ParseArgs(args);
-
-            NamedAction actionKey = arguments.IsDefault ? 
-                defaultAction : arguments.GetActionKey();
+            NamedAction actionKey = arguments.IsDefault ?
+                                                            defaultAction : arguments.GetActionKey();
 
             return actionKey;
         }
@@ -33,11 +32,11 @@ namespace Topshelf.Internal
         public static Args ParseArgs(string[] args)
         {
             if (args == null) args = new string[0];
-            if(args.Length == 0)
+            if (args.Length == 0)
                 _isDefault = true;
-            
 
-            Args result = new Args();
+
+            var result = new Args();
             IArgumentMapFactory _argumentMapFactory = new ArgumentMapFactory();
             IArgumentParser _argumentParser = new ArgumentParser();
             IEnumerable<IArgument> arguments = _argumentParser.Parse(args);
@@ -47,54 +46,32 @@ namespace Topshelf.Internal
             return result;
         }
 
+        #region Nested type: Args
+
         public class Args
         {
-            private bool _console;
-            private bool _gui;
-            private bool _install;
-            private bool _service;
-            private bool _uninstall;
-
-
             [Argument(Key = "install")]
-            public bool Install
-            {
-                get { return _install; }
-                set { _install = value; }
-            }
+            public bool Install { get; set; }
 
             [Argument(Key = "uninstall")]
-            public bool Uninstall
-            {
-                get { return _uninstall; }
-                set { _uninstall = value; }
-            }
+            public bool Uninstall { get; set; }
 
             [Argument(Key = "console")]
-            public bool Console
-            {
-                get { return _console; }
-                set { _console = value; }
-            }
+            public bool Console { get; set; }
 
             [Argument(Key = "gui")]
-            public bool Gui
-            {
-                get { return _gui; }
-                set { _gui = value; }
-            }
+            public bool Gui { get; set; }
 
             [Argument(Key = "service")]
-            public bool Service
-            {
-                get { return _service; }
-                set { _service = value; }
-            }
+            public bool Service { get; set; }
 
             public bool IsDefault
             {
                 get { return _isDefault; }
             }
+
+            [Argument(Key="instance")]
+            public string InstanceName { get; set; }
 
 
             public NamedAction GetActionKey()
@@ -106,5 +83,7 @@ namespace Topshelf.Internal
                 return NamedAction.Console;
             }
         }
+
+        #endregion
     }
 }

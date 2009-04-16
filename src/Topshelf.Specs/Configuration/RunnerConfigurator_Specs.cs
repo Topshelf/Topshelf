@@ -86,10 +86,10 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Names_should_be_correct()
         {
-            _runConfiguration.WinServiceSettings.DisplayName
+            _runConfiguration.WinServiceSettings.FullDisplayName
                 .ShouldEqual("chris");
 
-            _runConfiguration.WinServiceSettings.ServiceName
+            _runConfiguration.WinServiceSettings.FullServiceName
                 .ShouldEqual("chris");
 
             _runConfiguration.WinServiceSettings.Description

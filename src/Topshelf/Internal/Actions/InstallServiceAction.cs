@@ -30,7 +30,7 @@ namespace Topshelf.Internal.Actions
 
             if (HostServiceInstaller.IsInstalled(configuration))
             {
-                string message = string.Format("The {0} service has already been installed.", configuration.WinServiceSettings.ServiceName);
+                string message = string.Format("The {0} service has already been installed.", configuration.WinServiceSettings.FullServiceName);
                 _log.Error(message);
 
                 return;

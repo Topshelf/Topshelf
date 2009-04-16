@@ -55,6 +55,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgParsing_Specs.cs" />
     <Compile Include="IsolatedService_Specs.cs" />
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />

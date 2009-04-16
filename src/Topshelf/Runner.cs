@@ -46,17 +46,20 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Host(IRunConfiguration coordinator, params string[] args)
+        public static void Host(IRunConfiguration configuration, params string[] args)
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
+            var a = Parser.ParseArgs(args);
+            
+            if (a.InstanceName != null) configuration.WinServiceSettings.InstanceName = a.InstanceName;
 
-            NamedAction actionKey = Parser.GetActionKey(args, coordinator.DefaultAction);
+            NamedAction actionKey = Parser.GetActionKey(a, configuration.DefaultAction);
 
             IAction action = _actions[actionKey];
             _log.DebugFormat("Running action: {0}", action);
 
-            action.Do(coordinator);
+            action.Do(configuration);
         }
     }
 }
