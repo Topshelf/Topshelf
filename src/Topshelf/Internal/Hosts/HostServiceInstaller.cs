@@ -115,8 +115,7 @@ namespace Topshelf.Internal.Hosts
 
             base.Install(stateSaver);
 
-            if (_log.IsInfoEnabled)
-                _log.InfoFormat("Opening Registry");
+            if (_log.IsDebugEnabled) _log.Debug("Opening Registry");
 
             using (RegistryKey system = Registry.LocalMachine.OpenSubKey("System"))
             using (RegistryKey currentControlSet = system.OpenSubKey("CurrentControlSet"))
@@ -127,12 +126,17 @@ namespace Topshelf.Internal.Hosts
 
                 string imagePath = (string)service.GetValue("ImagePath");
 
-                _log.InfoFormat("Service Path {0}", imagePath);
+                _log.DebugFormat("Service Path {0}", imagePath);
 
-                imagePath += " -service";
+                imagePath += _config.WinServiceSettings.InstanceName == null ?
+                    " -service" : " -service -instance:{0}".FormatWith(_config.WinServiceSettings.InstanceName);
+
+                _log.DebugFormat("ImagePath '{0}'", imagePath);
 
                 service.SetValue("ImagePath", imagePath);
             }
+
+            if(_log.IsDebugEnabled) _log.Debug("Closing Registry");
         }
     }
 }
