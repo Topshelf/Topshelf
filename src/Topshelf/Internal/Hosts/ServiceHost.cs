@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Internal.Hosts
 {
+    using System;
     using System.ServiceProcess;
     using log4net;
 
@@ -36,18 +37,35 @@ namespace Topshelf.Internal.Hosts
 
         protected override void OnStart(string[] args)
         {
-            _log.Info("Received service start notification");
-            _log.DebugFormat("Arguments: {0}", string.Join(",", args));
+            try
+            {
+                _log.Info("Received service start notification");
+                _log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-            _coordinator.Start();
+                _coordinator.Start();
+            }
+            catch (Exception ex)
+            {
+                _log.Fatal(ex);
+                throw;
+            }
+            
         }
 
         protected override void OnStop()
         {
-            _log.Info("Received service stop notification");
+            try
+            {
+                _log.Info("Received service stop notification");
 
-            _coordinator.Stop();
-            _coordinator.Dispose();
+                _coordinator.Stop();
+                _coordinator.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _log.Fatal(ex);
+                throw;
+            }
         }
     }
 }
