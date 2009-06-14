@@ -13,9 +13,11 @@
 namespace Topshelf.Internal
 {
 	using System;
+	using System.Diagnostics;
 	using Microsoft.Practices.ServiceLocation;
 
-	public class IsolatedService<TService> :
+    [DebuggerDisplay("Isolated Service({Name}) - {State}")]
+	public class IsolatedServiceController<TService> :
 		MarshalByRefObject,
 		IServiceController where TService : class
 	{

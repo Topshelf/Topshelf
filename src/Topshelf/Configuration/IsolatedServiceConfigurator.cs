@@ -12,31 +12,30 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-	using System;
-	using Internal;
+    using Internal;
 
-	public class IsolatedServiceConfigurator<TService> :
-		ServiceConfiguratorBase<TService>,
-		IIsolatedServiceConfigurator<TService>
+    public class IsolatedServiceConfigurator<TService> :
+        ServiceConfiguratorBase<TService>,
+        IIsolatedServiceConfigurator<TService>
         where TService : class
-	{
-	    public IsolatedServiceConfigurator(string name) : base(name)
-	    {
-	    }
+    {
+        public IsolatedServiceConfigurator(string name) : base(name)
+        {
+        }
 
-	    public IServiceController Create()
-		{
-			IServiceController serviceController = new FacadeToIsolatedService<TService>
-				{
-					CreateServiceLocator = _createServiceLocator,
-					StartAction = _startAction,
-					StopAction = _stopAction,
-					PauseAction = _pauseAction,
-					ContinueAction = _continueAction,
-					Name = _name
-				};
+        public IServiceController Create()
+        {
+            IServiceController serviceController = new FacadeToIsolatedServiceController<TService>
+                                                   {
+                                                       CreateServiceLocator = _createServiceLocator,
+                                                       StartAction = _startAction,
+                                                       StopAction = _stopAction,
+                                                       PauseAction = _pauseAction,
+                                                       ContinueAction = _continueAction,
+                                                       Name = _name
+                                                   };
 
-			return serviceController;
-		}
-	}
+            return serviceController;
+        }
+    }
 }

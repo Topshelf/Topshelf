@@ -13,14 +13,16 @@
 namespace Topshelf.Internal
 {
 	using System;
+	using System.Diagnostics;
 	using Microsoft.Practices.ServiceLocation;
 
-    public class FacadeToIsolatedService<TService> :
+    [DebuggerDisplay("Isolated Service({Name}) - {State}")]
+    public class FacadeToIsolatedServiceController<TService> :
 		IServiceController
         where TService : class
 	{
 		private AppDomain _domain;
-		private IsolatedService<TService> _remoteService;
+		private IsolatedServiceController<TService> _remoteServiceController;
 
 		public void Start()
 		{
@@ -28,18 +30,18 @@ namespace Topshelf.Internal
 			settings.ShadowCopyFiles = "true";
 			_domain = AppDomain.CreateDomain(typeof (TService).AssemblyQualifiedName, null, settings);
 
-			_remoteService = _domain.CreateInstanceAndUnwrap<IsolatedService<TService>>();
-			if (_remoteService == null)
+			_remoteServiceController = _domain.CreateInstanceAndUnwrap<IsolatedServiceController<TService>>();
+			if (_remoteServiceController == null)
 				throw new ApplicationException("Unable to create service proxy for " + typeof (TService).Name);
 
-			_remoteService.CreateServiceLocator = CreateServiceLocator;
-			_remoteService.StartAction = StartAction;
-			_remoteService.StopAction = StopAction;
-			_remoteService.PauseAction = PauseAction;
-			_remoteService.ContinueAction = ContinueAction;
-			_remoteService.Name = Name;
+			_remoteServiceController.CreateServiceLocator = CreateServiceLocator;
+			_remoteServiceController.StartAction = StartAction;
+			_remoteServiceController.StopAction = StopAction;
+			_remoteServiceController.PauseAction = PauseAction;
+			_remoteServiceController.ContinueAction = ContinueAction;
+			_remoteServiceController.Name = Name;
 
-			_remoteService.Start();
+			_remoteServiceController.Start();
 		}
 
         //figure out a way to get rid of these?
@@ -52,19 +54,19 @@ namespace Topshelf.Internal
 
 		public void Stop()
 		{
-			_remoteService.IfNotNull(x => x.Stop());
+			_remoteServiceController.IfNotNull(x => x.Stop());
 
 			AppDomain.Unload(_domain);
 		}
 
 		public void Pause()
 		{
-			_remoteService.IfNotNull(x => x.Pause());
+			_remoteServiceController.IfNotNull(x => x.Pause());
 		}
 
 		public void Continue()
 		{
-			_remoteService.IfNotNull(x => x.Continue());
+			_remoteServiceController.IfNotNull(x => x.Continue());
 		}
 
         public void Dispose()
@@ -74,17 +76,17 @@ namespace Topshelf.Internal
 
         public Type ServiceType
         {
-            get { return _remoteService.IfNotNull(x=>x.ServiceType, typeof(object)); }
+            get { return _remoteServiceController.IfNotNull(x=>x.ServiceType, typeof(object)); }
         }
 
         public ServiceState State
         {
-            get { return _remoteService.IfNotNull(x => x.State, ServiceState.Stopped); }
+            get { return _remoteServiceController.IfNotNull(x => x.State, ServiceState.Stopped); }
         }
 
         public IServiceLocator ServiceLocator
         {
-            get { return _remoteService.ServiceLocator; }
+            get { return _remoteServiceController.ServiceLocator; }
         }
 	}
 }

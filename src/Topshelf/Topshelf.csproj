@@ -74,8 +74,8 @@
     <Compile Include="Internal\Actions\ServiceNamedAction.cs" />
     <Compile Include="Internal\Actions\UninstallServiceAction.cs" />
     <Compile Include="Internal\CouldntFindServiceException.cs" />
-    <Compile Include="Internal\IsolatedService.cs" />
-    <Compile Include="Internal\FacadeToIsolatedService.cs" />
+    <Compile Include="Internal\IsolatedServiceController.cs" />
+    <Compile Include="Internal\FacadeToIsolatedServiceController.cs" />
     <Compile Include="Internal\ArgumentParsing\Argument.cs" />
     <Compile Include="Internal\ArgumentParsing\ArgumentAttribute.cs" />
     <Compile Include="Internal\ArgumentParsing\ArgumentMap.cs" />
