@@ -14,9 +14,11 @@ namespace Topshelf.Internal
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using log4net;
 
+    [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
 	public class ServiceCoordinator :
 		IServiceCoordinator
 	{
