@@ -30,7 +30,7 @@ namespace Stuff
 						{
 							ObjectFactory.Initialize(i =>
 								{
-									i.ForConcreteType<TownCrier>();
+								    i.ForConcreteType<TownCrier>().Configure.WithName("tc");
 									i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
 								});
 							ServiceLocator.SetLocatorProvider(() => new StructureMapServiceLocator());
