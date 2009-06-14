@@ -31,7 +31,7 @@ namespace Topshelf.Configuration
 		/// </summary>
 		/// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-		void ConfigureServiceInIsolation<TService>(string name, Action<IIsolatedServiceConfigurator<TService>> action) where TService : MarshalByRefObject;
+		void ConfigureServiceInIsolation<TService>(string name, Action<IIsolatedServiceConfigurator<TService>> action);
 
 		/// <summary>
 		/// Sets the display name of the service within the Service Control Manager.

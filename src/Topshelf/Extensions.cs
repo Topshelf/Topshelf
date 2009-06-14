@@ -1,6 +1,7 @@
 namespace Topshelf
 {
     using System;
+    using Internal;
 
     public static class Extensions
     {
@@ -18,6 +19,12 @@ namespace Topshelf
         public static string FormatWith(this string format, params string[] args)
         {
             return string.Format(format, args);
+        }
+
+        public static void IfNotNull(this IServiceController serviceController, Action<IServiceController> action)
+        {
+            if (serviceController != null)
+                action(serviceController);
         }
     }
 }

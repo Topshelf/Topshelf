@@ -12,110 +12,130 @@
 // specific language governing permissions and limitations under the License.
 namespace Stuff
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Timers;
-	using Microsoft.Practices.ServiceLocation;
-	using StructureMap;
-	using Topshelf;
-	using Topshelf.Configuration;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Timers;
+    using log4net.Config;
+    using Microsoft.Practices.ServiceLocation;
+    using StructureMap;
+    using Topshelf;
+    using Topshelf.Configuration;
 
-	internal class Program
-	{
-		private static void Main(string[] args)
-		{
-            log4net.Config.BasicConfigurator.Configure();
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
+            IRunConfiguration cfg = RunnerConfigurator.New(x =>
+            {
+                x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-			var cfg = RunnerConfigurator.New(x =>
-				{
-					x.BeforeStartingServices(h =>
-						{
-							ObjectFactory.Initialize(i =>
-								{
-								    i.ForConcreteType<TownCrier>().Configure.WithName("tc");
-									i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
-								});
-							ServiceLocator.SetLocatorProvider(() => new StructureMapServiceLocator());
-						});
-					x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
+                //x.ConfigureServiceInIsolation<TownCrier>("tc", s =>
+                //{
+                //    s.CreateServiceLocator(()=>
+                //    {
+                //        ObjectFactory.Initialize(i =>
+                //        {
+                //            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
+                //            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
+                //        });
 
-					x.ConfigureService<TownCrier>("tc", s =>
-						{
-							s.WhenStarted(tc => tc.Start());
-							s.WhenStopped(tc => tc.Stop());
-						});
+                //        return new StructureMapServiceLocator();
+                //    });
+                //    s.WhenStarted(tc => tc.Start());
+                //    s.WhenStopped(tc => tc.Stop());
+                //});
+                x.ConfigureService<TownCrier>("tc", s =>
+                {
+                    s.CreateServiceLocator(() =>
+                    {
+                        ObjectFactory.Initialize(i =>
+                        {
+                            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
+                            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
+                        });
+                        return new StructureMapServiceLocator();
+                    });
+                    s.WhenStarted(tc => tc.Start());
+                    s.WhenStopped(tc => tc.Stop());
+                });
 
-					x.RunAsLocalSystem();
+                x.RunAsLocalSystem();
 
-					x.SetDescription("Sample Topshelf Host");
-					x.SetDisplayName("Stuff");
-					x.SetServiceName("stuff");
-				});
+                x.SetDescription("Sample Topshelf Host");
+                x.SetDisplayName("Stuff");
+                x.SetServiceName("stuff");
+            });
 
-			Runner.Host(cfg, args);
-		}
-	}
+            Runner.Host(cfg, args);
+        }
+    }
 
-	public class TownCrier
-	{
-		private readonly Timer _timer;
+    public class TownCrier
+    {
+        readonly Timer _timer;
 
-		public TownCrier()
-		{
-			_timer = new Timer(1000) {AutoReset = true};
-			_timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now);
-		}
+        public TownCrier()
+        {
+            _timer = new Timer(1000) {AutoReset = true};
+            _timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now);
+        }
 
-		public void Start()
-		{
-			_timer.Start();
-		}
+        public void Start()
+        {
+            _timer.Start();
+        }
 
-		public void Stop()
-		{
-			_timer.Stop();
-		}
-	}
+        public void Stop()
+        {
+            _timer.Stop();
+        }
+    }
 
-	public class StructureMapServiceLocator :
-		IServiceLocator
-	{
-		public object GetService(Type serviceType)
-		{
-			return ObjectFactory.GetInstance(serviceType);
-		}
+    public class StructureMapServiceLocator :
+        IServiceLocator
+    {
+        #region IServiceLocator Members
 
-		public object GetInstance(Type serviceType)
-		{
-			return ObjectFactory.GetInstance(serviceType);
-		}
+        public object GetService(Type serviceType)
+        {
+            return ObjectFactory.GetInstance(serviceType);
+        }
 
-		public object GetInstance(Type serviceType, string key)
-		{
-			return ObjectFactory.GetNamedInstance(serviceType, key);
-		}
+        public object GetInstance(Type serviceType)
+        {
+            return ObjectFactory.GetInstance(serviceType);
+        }
 
-		public IEnumerable<object> GetAllInstances(Type serviceType)
-		{
-			foreach (object instance in ObjectFactory.GetAllInstances(serviceType))
-			{
-				yield return instance;
-			}
-		}
+        public object GetInstance(Type serviceType, string key)
+        {
+            return ObjectFactory.GetNamedInstance(serviceType, key);
+        }
 
-		public TService GetInstance<TService>()
-		{
-			return ObjectFactory.GetInstance<TService>();
-		}
+        public IEnumerable<object> GetAllInstances(Type serviceType)
+        {
+            foreach (object instance in ObjectFactory.GetAllInstances(serviceType))
+            {
+                yield return instance;
+            }
+        }
 
-		public TService GetInstance<TService>(string key)
-		{
-			return ObjectFactory.GetNamedInstance<TService>(key);
-		}
+        public TService GetInstance<TService>()
+        {
+            return ObjectFactory.GetInstance<TService>();
+        }
 
-		public IEnumerable<TService> GetAllInstances<TService>()
-		{
-			return ObjectFactory.GetAllInstances<TService>();
-		}
-	}
+        public TService GetInstance<TService>(string key)
+        {
+            return ObjectFactory.GetNamedInstance<TService>(key);
+        }
+
+        public IEnumerable<TService> GetAllInstances<TService>()
+        {
+            return ObjectFactory.GetAllInstances<TService>();
+        }
+
+        #endregion
+    }
 }

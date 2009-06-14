@@ -59,13 +59,4 @@ namespace Topshelf.Internal
 			_remoteService.IfNotNull(x => x.Continue());
 		}
 	}
-
-	public static class ObjectExtensions
-	{
-		public static void IfNotNull(this IServiceController serviceController, Action<IServiceController> action)
-		{
-			if (serviceController != null)
-				action(serviceController);
-		}
-	}
 }

@@ -19,92 +19,84 @@ namespace Topshelf.Internal
 		MarshalByRefObject,
 		IServiceController
 	{
-		private bool _disposed;
-		private TService _instance;
-		private IServiceLocator _serviceLocator;
+	    ServiceController<TService> _serviceController = new ServiceController<TService>();
 
-		public IsolatedService()
-		{
-			State = ServiceState.Stopped;
-		}
+		
+	    public ServiceState State
+	    {
+	        get { return _serviceController.State; }
+	    }
 
-		public Action<TService> StartAction { get; set; }
-		public Action<TService> StopAction { get; set; }
-		public Action<TService> PauseAction { get; set; }
-		public Action<TService> ContinueAction { get; set; }
-		public Func<IServiceLocator> CreateServiceLocator { get; set; }
+	    public Type ServiceType
+	    {
+            get { return _serviceController.ServiceType; }
+	    }
 
-		public Type ServiceType
-		{
-			get { return typeof (TService); }
-		}
+	    public IServiceLocator ServiceLocator
+	    {
+	        get { return _serviceController.ServiceLocator; }
+	    }
 
-		public IServiceLocator ServiceLocator
-		{
-			get
-			{
-				if (_serviceLocator == null)
-				{
-					_serviceLocator = CreateServiceLocator();
-				}
 
-				return _serviceLocator;
-			}
-		}
+	    public string Name
+	    {
+	        get { return _serviceController.Name; }
+            set { _serviceController.Name = value; }
+	    }
 
-		public ServiceState State { get; protected set; }
-		public string Name { get; set; }
+	    public void Start()
+	    {
+	        _serviceController.Start();
+	    }
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+	    public void Stop()
+	    {
+	        _serviceController.Stop();
+	    }
 
-		public void Start()
-		{
-			_instance = ServiceLocator.GetInstance<TService>();
-			StartAction(_instance);
-			State = ServiceState.Started;
-		}
+	    public void Pause()
+	    {
+	        _serviceController.Pause();
+	    }
 
-		public void Stop()
-		{
-            if(_instance != null)
-			    StopAction(_instance);
-			State = ServiceState.Stopped;
-		}
+	    public void Continue()
+	    {
+	        _serviceController.Continue();
+	    }
 
-		public void Pause()
-		{
-			PauseAction(_instance);
-			State = ServiceState.Paused;
-		}
+	    public void Dispose()
+	    {
+	        _serviceController.Dispose();
+	    }
 
-		public void Continue()
-		{
-			ContinueAction(_instance);
-			State = ServiceState.Started;
-		}
+	    public Action<TService> StartAction
+	    {
+	        get { return _serviceController.StartAction; }
+	        set { _serviceController.StartAction = value; }
+	    }
 
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposing) return;
-			if (!_disposed) return;
+	    public Action<TService> StopAction
+	    {
+	        get { return _serviceController.StopAction; }
+	        set { _serviceController.StopAction = value; }
+	    }
 
-			StartAction = null;
-			StopAction = null;
-			PauseAction = null;
-			ContinueAction = null;
-			CreateServiceLocator = null;
-			_serviceLocator = null;
-			_instance = default(TService);
-			_disposed = true;
-		}
+	    public Action<TService> PauseAction
+	    {
+	        get { return _serviceController.PauseAction; }
+	        set { _serviceController.PauseAction = value; }
+	    }
 
-		~IsolatedService()
-		{
-			Dispose(false);
-		}
+	    public Action<TService> ContinueAction
+	    {
+	        get { return _serviceController.ContinueAction; }
+	        set { _serviceController.ContinueAction = value; }
+	    }
+
+	    public Func<IServiceLocator> CreateServiceLocator
+	    {
+	        get { return _serviceController.CreateServiceLocator; }
+	        set { _serviceController.CreateServiceLocator = value; }
+	    }
 	}
 }

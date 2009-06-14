@@ -184,7 +184,6 @@ namespace Topshelf.Configuration
 		/// <param name="name">The name used to identify the service</param>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
 		public void ConfigureServiceInIsolation<TService>(string name, Action<IIsolatedServiceConfigurator<TService>> action)
-			where TService : MarshalByRefObject
 		{
 			var configurator = new IsolatedServiceConfigurator<TService>(name);
 			_serviceConfigurators.Add(() =>
