@@ -13,11 +13,9 @@
 namespace Topshelf.Internal
 {
     using System;
-    using System.Runtime.Serialization;
+    using Microsoft.Practices.ServiceLocation;
 
-    public class ServiceController<TService> :
-		ServiceControllerBase<TService>,
-		IServiceController
+    public class ServiceController<TService> : IServiceController
 	{
 		private TService _instance;
 
@@ -53,38 +51,64 @@ namespace Topshelf.Internal
 			State = ServiceState.Started;
 		}
 
-		protected override void Dispose(bool disposing)
+		
+
+        private bool _disposed;
+        private IServiceLocator _serviceLocator;
+        public Action<TService> StartAction { get; set; }
+        public Action<TService> StopAction { get; set; }
+        public Action<TService> PauseAction { get; set; }
+        public Action<TService> ContinueAction { get; set; }
+        public Func<IServiceLocator> CreateServiceLocator { get; set; }
+
+        public Type ServiceType
+        {
+            get { return typeof(TService); }
+        }
+
+        public IServiceLocator ServiceLocator
+        {
+            get
+            {
+                if (_serviceLocator == null)
+                {
+                    _serviceLocator = CreateServiceLocator();
+                }
+
+                return _serviceLocator;
+            }
+        }
+
+        public ServiceState State { get; protected set; }
+        public string Name { get; set; }
+
+        #region Dispose Shit
+        public void Dispose()
 		{
-			base.Dispose(disposing);
-			if (disposing && _instance != null )
-				_instance = default(TService);
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
-	}
 
-    public class CouldntFindServiceException : 
-        Exception
-    {
-        public CouldntFindServiceException(string name) : base(string.Format("Couldn't find '{0}' in the ServiceLocator", name))
-        {
+		protected void Dispose(bool disposing)
+		{
+			if (!disposing) return;
+            if (!_disposed) return;
+
             
-        }
+			_instance = default(TService);
+            StartAction = null;
+            StopAction = null;
+            PauseAction = null;
+            ContinueAction = null;
+            CreateServiceLocator = null;
+            _serviceLocator = null;
+            _disposed = true;
+		}
 
-        public CouldntFindServiceException(string name, Type serviceType)
-            : base(string.Format("Couldn't find service '{0}' named '{1}' in the ServiceLocator", serviceType.Name, name))
-        {
-
-        }
-
-        public CouldntFindServiceException()
-        {
-        }
-
-        public CouldntFindServiceException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected CouldntFindServiceException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+		~ServiceController()
+		{
+			Dispose(false);
+		}
+        #endregion
     }
 }

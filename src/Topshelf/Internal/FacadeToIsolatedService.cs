@@ -13,10 +13,9 @@
 namespace Topshelf.Internal
 {
 	using System;
+	using Microsoft.Practices.ServiceLocation;
 
-	[Serializable]
-	public class FacadeToIsolatedService<TService> :
-		ServiceControllerBase<TService>,
+    public class FacadeToIsolatedService<TService> :
 		IServiceController
 	{
 		private AppDomain _domain;
@@ -42,6 +41,14 @@ namespace Topshelf.Internal
 			_remoteService.Start();
 		}
 
+        //figure out a way to get rid of these?
+        public Action<TService> StartAction { get; set; }
+        public Action<TService> StopAction { get; set; }
+        public Action<TService> PauseAction { get; set; }
+        public Action<TService> ContinueAction { get; set; }
+        public Func<IServiceLocator> CreateServiceLocator { get; set; }
+        public string Name { get; set; }
+
 		public void Stop()
 		{
 			_remoteService.IfNotNull(x => x.Stop());
@@ -58,5 +65,25 @@ namespace Topshelf.Internal
 		{
 			_remoteService.IfNotNull(x => x.Continue());
 		}
+
+        public void Dispose()
+        {
+            //do nothing?
+        }
+
+        public Type ServiceType
+        {
+            get { return _remoteService.IfNotNull(x=>x.ServiceType, typeof(object)); }
+        }
+
+        public ServiceState State
+        {
+            get { return _remoteService.IfNotNull(x => x.State, ServiceState.Stopped); }
+        }
+
+        public IServiceLocator ServiceLocator
+        {
+            get { return _remoteService.ServiceLocator; }
+        }
 	}
 }

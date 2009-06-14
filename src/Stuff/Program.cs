@@ -31,35 +31,35 @@ namespace Stuff
             {
                 x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-                //x.ConfigureServiceInIsolation<TownCrier>("tc", s =>
-                //{
-                //    s.CreateServiceLocator(()=>
-                //    {
-                //        ObjectFactory.Initialize(i =>
-                //        {
-                //            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
-                //            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
-                //        });
-
-                //        return new StructureMapServiceLocator();
-                //    });
-                //    s.WhenStarted(tc => tc.Start());
-                //    s.WhenStopped(tc => tc.Stop());
-                //});
-                x.ConfigureService<TownCrier>("tc", s =>
+                x.ConfigureServiceInIsolation<TownCrier>("tc", s =>
                 {
-                    s.CreateServiceLocator(() =>
+                    s.CreateServiceLocator(()=>
                     {
                         ObjectFactory.Initialize(i =>
                         {
                             i.ForConcreteType<TownCrier>().Configure.WithName("tc");
                             i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
                         });
+
                         return new StructureMapServiceLocator();
                     });
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());
                 });
+                //x.ConfigureService<TownCrier>("tc", s =>
+                //{
+                //    s.CreateServiceLocator(() =>
+                //    {
+                //        ObjectFactory.Initialize(i =>
+                //        {
+                //            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
+                //            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
+                //        });
+                //        return new StructureMapServiceLocator();
+                //    });
+                //    s.WhenStarted(tc => tc.Start());
+                //    s.WhenStopped(tc => tc.Stop());
+                //});
 
                 x.RunAsLocalSystem();
 
