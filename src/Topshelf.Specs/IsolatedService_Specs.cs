@@ -12,7 +12,7 @@ namespace Topshelf.Specs
     [Serializable] //because of the lambda
     public class IsolatedService_Specs
     {
-        private IService _service;
+        private IServiceController _serviceController;
         private bool _wasPaused;
         private bool _wasContinued;
 
@@ -35,24 +35,24 @@ namespace Topshelf.Specs
                                        return sl;
                                    });
 
-            _service = c.Create();
-            _service.Start();
+            _serviceController = c.Create();
+            _serviceController.Start();
 
         }
 
         [Test(Order = 1)]
         public void Should_start()
         {
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Started);
         }
 
         [Test(Order = 2)]
         public void Should_pause()
         {
-            _service.Pause();
+            _serviceController.Pause();
 
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Paused);
 
             //probably can't do this as the cross domain
@@ -63,9 +63,9 @@ namespace Topshelf.Specs
         [Test(Order = 3)]
         public void Should_continue()
         {
-            _service.Continue();
+            _serviceController.Continue();
 
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Started);
 
             //probably can't do this as the cross domain
@@ -77,10 +77,10 @@ namespace Topshelf.Specs
         [ExpectedException(typeof(AppDomainUnloadedException))]
         public void Should_stop()
         {
-            _service.Stop();
+            _serviceController.Stop();
 
             //this throws the exception
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Stopped);
 
         }
@@ -88,7 +88,7 @@ namespace Topshelf.Specs
         [Test(Order = 5)]
         public void Should_expose_contained_type()
         {
-            _service.ServiceType
+            _serviceController.ServiceType
                 .ShouldEqual(typeof(TestService));
         }
 

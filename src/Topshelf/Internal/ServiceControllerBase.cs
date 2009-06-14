@@ -15,7 +15,7 @@ namespace Topshelf.Internal
 	using System;
 	using Microsoft.Practices.ServiceLocation;
 
-	public class ServiceBase<TService>
+	public class ServiceControllerBase<TService>
 	{
 		private bool _disposed;
 		private IServiceLocator _serviceLocator;
@@ -66,7 +66,7 @@ namespace Topshelf.Internal
 			_disposed = true;
 		}
 
-		~ServiceBase()
+		~ServiceControllerBase()
 		{
 			Dispose(false);
 		}

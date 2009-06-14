@@ -36,10 +36,10 @@ namespace Topshelf.Specs
 			sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
 
 			_serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
-			IList<Func<IService>> services = new List<Func<IService>>
+			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
 					() => 
-					new Service<TestService>
+					new ServiceController<TestService>
 						{
 							CreateServiceLocator = () => sl,
 							Name = "test",
@@ -139,10 +139,10 @@ namespace Topshelf.Specs
 			sl.Stub(x => x.GetInstance<TestService2>("test2")).Return(_service2).Repeat.Any();
 
 			_serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
-			IList<Func<IService>> services = new List<Func<IService>>
+			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
 					()=>
-					new Service<TestService>
+					new ServiceController<TestService>
 						{
 							CreateServiceLocator = () => sl,
 							Name = "test",
@@ -152,7 +152,7 @@ namespace Topshelf.Specs
 							PauseAction = x => x.Pause()
 						},
 						()=>
-					new Service<TestService2>
+					new ServiceController<TestService2>
 						{
 							CreateServiceLocator = () => sl,
 							Name = "test2",

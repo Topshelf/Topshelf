@@ -88,14 +88,14 @@
     <Compile Include="Internal\ArgumentParsing\IArgumentParser.cs" />
     <Compile Include="Configuration\IRunConfiguration.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
-    <Compile Include="Internal\ServiceBase.cs" />
+    <Compile Include="Internal\ServiceControllerBase.cs" />
     <Compile Include="Internal\ServiceCoordinator.cs" />
     <Compile Include="Configuration\RunnerConfigurator.cs" />
     <Compile Include="Internal\IServiceCoordinator.cs" />
     <Compile Include="Configuration\IRunnerConfigurator.cs" />
-    <Compile Include="Internal\IService.cs" />
+    <Compile Include="Internal\IServiceController.cs" />
     <Compile Include="Configuration\IServiceConfigurator.cs" />
-    <Compile Include="Internal\Service.cs" />
+    <Compile Include="Internal\ServiceController.cs" />
     <Compile Include="Configuration\ServiceConfigurator.cs" />
     <Compile Include="ServiceInformation.cs" />
     <Compile Include="ServiceState.cs" />

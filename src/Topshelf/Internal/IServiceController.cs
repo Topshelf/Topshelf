@@ -15,7 +15,7 @@ namespace Topshelf.Internal
     using System;
     using Microsoft.Practices.ServiceLocation;
 
-	public interface IService :
+	public interface IServiceController :
 		IDisposable
     {
         Type ServiceType { get; }

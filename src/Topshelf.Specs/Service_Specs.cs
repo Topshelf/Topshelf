@@ -9,7 +9,7 @@ namespace Topshelf.Specs.Configuration
     [TestFixture]
     public class Service_Specs
     {
-        private IService _service;
+        private IServiceController _serviceController;
         private TestService _srv;
         private bool _wasPaused;
         private bool _wasContinued;
@@ -31,16 +31,16 @@ namespace Topshelf.Specs.Configuration
                                        sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
                                        return sl;
                                    });
-            _service = c.Create();
-            _service.Start();
+            _serviceController = c.Create();
+            _serviceController.Start();
         }
 
         [Test]
         public void Should_stop()
         {
-            _service.Stop();
+            _serviceController.Stop();
 
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Stopped);
 
             _srv.Stopped
@@ -52,7 +52,7 @@ namespace Topshelf.Specs.Configuration
         {
             //_service.Start();
 
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Started);
 
             _srv.Stopped
@@ -64,9 +64,9 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_pause()
         {
-            _service.Pause();
+            _serviceController.Pause();
 
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Paused);
 
             _wasPaused
@@ -76,9 +76,9 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_continue()
         {
-            _service.Continue();
+            _serviceController.Continue();
 
-            _service.State
+            _serviceController.State
                 .ShouldEqual(ServiceState.Started);
             _wasContinued
                 .ShouldBeTrue();
@@ -87,7 +87,7 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_expose_contained_type()
         {
-            _service.ServiceType
+            _serviceController.ServiceType
                 .ShouldEqual(typeof(TestService));
         }
 

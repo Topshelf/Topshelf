@@ -24,9 +24,9 @@ namespace Topshelf.Configuration
 	    {
 	    }
 
-	    public IService Create()
+	    public IServiceController Create()
 		{
-			IService service = new FacadeToIsolatedService<TService>
+			IServiceController serviceController = new FacadeToIsolatedService<TService>
 				{
 					CreateServiceLocator = _createServiceLocator,
 					StartAction = _startAction,
@@ -36,7 +36,7 @@ namespace Topshelf.Configuration
 					Name = _name
 				};
 
-			return service;
+			return serviceController;
 		}
 	}
 }

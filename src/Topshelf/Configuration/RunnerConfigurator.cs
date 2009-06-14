@@ -22,7 +22,7 @@ namespace Topshelf.Configuration
 	public class RunnerConfigurator :
 		IRunnerConfigurator
 	{
-		private readonly IList<Func<IService>> _serviceConfigurators;
+		private readonly IList<Func<IServiceController>> _serviceConfigurators;
 		private readonly WinServiceSettings _winServiceSettings;
 		private Action<IServiceCoordinator> _afterStop = c => { };
 		private Action<IServiceCoordinator> _beforeStart = c => { };
@@ -40,7 +40,7 @@ namespace Topshelf.Configuration
 		{
 			_winServiceSettings = new WinServiceSettings();
 			_credentials = Credentials.LocalSystem;
-			_serviceConfigurators = new List<Func<IService>>();
+			_serviceConfigurators = new List<Func<IServiceController>>();
 			_runnerAction = NamedAction.Console;
 			_winForm = typeof (ServiceConsole);
 		}

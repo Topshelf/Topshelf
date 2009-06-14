@@ -17,7 +17,7 @@ namespace Topshelf.Internal
 
 	public class IsolatedService<TService> :
 		MarshalByRefObject,
-		IService
+		IServiceController
 	{
 		private bool _disposed;
 		private TService _instance;

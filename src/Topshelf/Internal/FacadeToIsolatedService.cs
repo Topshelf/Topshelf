@@ -16,8 +16,8 @@ namespace Topshelf.Internal
 
 	[Serializable]
 	public class FacadeToIsolatedService<TService> :
-		ServiceBase<TService>,
-		IService
+		ServiceControllerBase<TService>,
+		IServiceController
 	{
 		private AppDomain _domain;
 		private IsolatedService<TService> _remoteService;
@@ -62,10 +62,10 @@ namespace Topshelf.Internal
 
 	public static class ObjectExtensions
 	{
-		public static void IfNotNull(this IService service, Action<IService> action)
+		public static void IfNotNull(this IServiceController serviceController, Action<IServiceController> action)
 		{
-			if (service != null)
-				action(service);
+			if (serviceController != null)
+				action(serviceController);
 		}
 	}
 }

@@ -32,7 +32,7 @@ namespace Topshelf.Instrumentation
             get
             {
                 var count = 0;
-                foreach(var x in ServiceLocator.Current.GetAllInstances<IService>())
+                foreach(var x in ServiceLocator.Current.GetAllInstances<IServiceController>())
                 {
                     count++;
                 }

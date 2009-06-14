@@ -24,14 +24,14 @@ namespace Topshelf.Internal
 		private readonly Action<IServiceCoordinator> _afterStop;
 		private readonly Action<IServiceCoordinator> _beforeStart;
 		private readonly Action<IServiceCoordinator> _beforeStartingServices;
-		private readonly Dictionary<string, IService> _services = new Dictionary<string, IService>();
+		private readonly Dictionary<string, IServiceController> _services = new Dictionary<string, IServiceController>();
 
 		public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices, Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
 		{
 			_beforeStartingServices = beforeStartingServices;
 			_beforeStart = beforeStart;
 			_afterStop = afterStop;
-			_serviceConfigurators = new List<Func<IService>>();
+			_serviceConfigurators = new List<Func<IServiceController>>();
 		}
 
 		public void Start()
@@ -43,13 +43,13 @@ namespace Topshelf.Internal
 
 			_log.Debug("Start is now starting any subordinate services");
 
-			foreach (Func<IService> serviceConfigurator in _serviceConfigurators)
+			foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
 			{
-				IService service = serviceConfigurator();
-				_services.Add(service.Name, service);
+				IServiceController serviceController = serviceConfigurator();
+				_services.Add(serviceController.Name, serviceController);
 
-				_log.InfoFormat("Starting subordinate service '{0}'", service.Name);
-				service.Start();
+				_log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
+				serviceController.Start();
 			}
 
 			_log.Debug("Calling BeforeStart");
@@ -150,7 +150,7 @@ namespace Topshelf.Internal
 			return result;
 		}
 
-		public IService GetService(string name)
+		public IServiceController GetService(string name)
 		{
 			return _services[name];
 		}
@@ -159,7 +159,7 @@ namespace Topshelf.Internal
 
 		#region Dispose Crap
 
-		private readonly List<Func<IService>> _serviceConfigurators;
+		private readonly List<Func<IServiceController>> _serviceConfigurators;
 		private bool _disposed;
 
 		public void Dispose()
@@ -189,17 +189,17 @@ namespace Topshelf.Internal
 
 		#endregion
 
-		public void RegisterServices(IList<Func<IService>> services)
+		public void RegisterServices(IList<Func<IServiceController>> services)
 		{
 			_serviceConfigurators.AddRange(services);
 		}
 
 		private void CreateServices()
 		{
-			foreach (Func<IService> serviceConfigurator in _serviceConfigurators)
+			foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
 			{
-				IService service = serviceConfigurator();
-				_services.Add(service.Name, service);
+				IServiceController serviceController = serviceConfigurator();
+				_services.Add(serviceController.Name, serviceController);
 			}
 		}
 

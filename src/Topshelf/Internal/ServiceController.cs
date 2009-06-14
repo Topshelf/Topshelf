@@ -15,13 +15,13 @@ namespace Topshelf.Internal
     using System;
     using System.Runtime.Serialization;
 
-    public class Service<TService> :
-		ServiceBase<TService>,
-		IService
+    public class ServiceController<TService> :
+		ServiceControllerBase<TService>,
+		IServiceController
 	{
 		private TService _instance;
 
-		public Service()
+		public ServiceController()
 		{
 			State = ServiceState.Stopped;
 		}

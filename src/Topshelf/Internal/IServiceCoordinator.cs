@@ -33,7 +33,7 @@ namespace Topshelf.Internal
 
         event Action Stopped;
         int HostedServiceCount { get; }
-        IService GetService(string s);
+        IServiceController GetService(string s);
         IList<ServiceInformation> GetServiceInfo();
     }
 }
