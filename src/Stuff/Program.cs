@@ -46,20 +46,20 @@ namespace Stuff
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());
                 });
-                //x.ConfigureService<TownCrier>("tc", s =>
-                //{
-                //    s.CreateServiceLocator(() =>
-                //    {
-                //        ObjectFactory.Initialize(i =>
-                //        {
-                //            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
-                //            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
-                //        });
-                //        return new StructureMapServiceLocator();
-                //    });
-                //    s.WhenStarted(tc => tc.Start());
-                //    s.WhenStopped(tc => tc.Stop());
-                //});
+//                x.ConfigureService<TownCrier>("tc", s =>
+//                {
+//                    s.CreateServiceLocator(() =>
+//                    {
+//                        ObjectFactory.Initialize(i =>
+//                        {
+//                            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
+//                            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
+//                        });
+//                        return new StructureMapServiceLocator();
+//                    });
+//                    s.WhenStarted(tc => tc.Start());
+//                    s.WhenStopped(tc => tc.Stop());
+//                });
 
                 x.RunAsLocalSystem();
 

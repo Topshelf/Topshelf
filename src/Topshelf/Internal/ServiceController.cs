@@ -14,60 +14,87 @@ namespace Topshelf.Internal
 {
     using System;
     using System.Diagnostics;
+    using Magnum.StateMachine;
     using Microsoft.Practices.ServiceLocation;
 
     [DebuggerDisplay("Service({Name}) is {State}")]
-    public class ServiceController<TService> : IServiceController where TService : class
-	{
-		private TService _instance;
+    public class ServiceController<TService> : 
+        StateMachine<ServiceController<TService>>,
+        IServiceController
+        where TService : class
+    {
+        #region StateMachine
+        static ServiceController()
+        {
+            Define(()=>
+            {
+                Initially(
+                    When(OnStart)
+                    .Then(sc=>sc.BuildInstance() )
+                        .Then(sc=>sc.StartAction(sc._instance))
+                        .TransitionTo(Started)
+                    );
 
-		public ServiceController()
+                During(Started,
+                       When(OnPause)
+                           .Then(sc => sc.PauseAction(sc._instance))
+                           .TransitionTo(Paused));
+
+                During(Paused,
+                       When(OnContinue)
+                           .Then(sc => sc.ContinueAction(sc._instance)));
+
+                Anytime(
+                    When(OnStop)
+                        .Then(sc=> sc.StopAction(sc._instance))
+                    );
+            });
+        }
+
+        public static Event OnStart{ get; set;}
+        public static Event OnStop { get; set; }
+        public static Event OnPause { get; set; }
+        public static Event OnContinue { get; set; }
+
+        public static State Initial { get; set; }
+        public static State Started { get; set; }
+        public static State Stopped { get; set; }
+        public static State Paused { get; set; }
+        public static State Completed { get; set; }
+        #endregion
+        
+        private TService _instance;
+        private IServiceLocator _serviceLocator;
+
+
+        public void Start()
 		{
-			State = ServiceState.Stopped;
+		    RaiseEvent(OnStart);
 		}
-
-		public void Start()
-		{
-			_instance = ServiceLocator.GetInstance<TService>(Name);
-            if (_instance == null) throw new CouldntFindServiceException(Name, typeof(TService));
-			StartAction(_instance);
-			State = ServiceState.Started;
-		}
-
 		public void Stop()
 		{
-            if(_instance != null)
-			    StopAction(_instance);
-			State = ServiceState.Stopped;
+            RaiseEvent(OnStop);
 		}
-
 		public void Pause()
 		{
-			PauseAction(_instance);
-			State = ServiceState.Paused;
+		    RaiseEvent(OnPause);
 		}
-
 		public void Continue()
 		{
-			ContinueAction(_instance);
-			State = ServiceState.Started;
+		    RaiseEvent(OnContinue);
 		}
+        private void BuildInstance()
+        {
+            _instance = ServiceLocator.GetInstance<TService>(Name);
+            if (_instance == null) throw new CouldntFindServiceException(Name, typeof(TService));
+        }
 
-		
 
-        private bool _disposed;
-        private IServiceLocator _serviceLocator;
-        public Action<TService> StartAction { get; set; }
-        public Action<TService> StopAction { get; set; }
-        public Action<TService> PauseAction { get; set; }
-        public Action<TService> ContinueAction { get; set; }
-        public Func<IServiceLocator> CreateServiceLocator { get; set; }
-
+        public string Name { get; set; }
         public Type ServiceType
         {
             get { return typeof(TService); }
         }
-
         public IServiceLocator ServiceLocator
         {
             get
@@ -80,11 +107,24 @@ namespace Topshelf.Internal
                 return _serviceLocator;
             }
         }
+        public ServiceState State
+        {
+            get
+            {
+                return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true);
+            }
+        }
 
-        public ServiceState State { get; protected set; }
-        public string Name { get; set; }
+        public Action<TService> StartAction { get; set; }
+        public Action<TService> StopAction { get; set; }
+        public Action<TService> PauseAction { get; set; }
+        public Action<TService> ContinueAction { get; set; }
+        public Func<IServiceLocator> CreateServiceLocator { get; set; }
+
+        
 
         #region Dispose Shit
+        private bool _disposed;
         public void Dispose()
 		{
 			Dispose(true);

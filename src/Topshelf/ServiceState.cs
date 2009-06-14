@@ -14,8 +14,10 @@ namespace Topshelf
 {
     public enum ServiceState
     {
+        //Initial
         Stopped,
         Started,
         Paused
+        //Complete
     }
 }
