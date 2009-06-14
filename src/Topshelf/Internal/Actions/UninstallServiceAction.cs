@@ -38,5 +38,10 @@ namespace Topshelf.Internal.Actions
             new HostServiceInstaller(configuration)
                 .Unregister();
         }
+
+        public override string ToString()
+        {
+            return "Uninstall";
+        }
     }
 }

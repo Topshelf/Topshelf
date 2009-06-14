@@ -32,5 +32,10 @@ namespace Topshelf.Internal.Actions
             var inWinFormHost = new WinFormHost(configuration.Coordinator, configuration);
             inWinFormHost.Run();
         }
+
+        public override string ToString()
+        {
+            return "Run As WinForm";
+        }
     }
 }

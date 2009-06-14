@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Internal.Actions
 {
+    using System;
     using Configuration;
     using Hosts;
     using log4net;
@@ -38,6 +39,11 @@ namespace Topshelf.Internal.Actions
 
             new HostServiceInstaller(configuration)
                 .Register();
+        }
+
+        public override string ToString()
+        {
+            return "Install";
         }
     }
 }

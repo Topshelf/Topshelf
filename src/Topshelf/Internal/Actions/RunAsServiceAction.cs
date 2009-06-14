@@ -45,5 +45,10 @@ namespace Topshelf.Internal.Actions
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return "Run As Service";
+        }
     }
 }

@@ -24,8 +24,8 @@ namespace Topshelf
     /// </summary>
     public static class Runner
     {
-        private static readonly IDictionary<NamedAction, IAction> _actions = new Dictionary<NamedAction, IAction>();
-        private static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
+        static readonly IDictionary<NamedAction, IAction> _actions = new Dictionary<NamedAction, IAction>();
+        static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
 
         static Runner()
         {
@@ -38,9 +38,9 @@ namespace Topshelf
             _actions.Add(ServiceNamedAction.Service, new RunAsServiceAction());
         }
 
-        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            _log.Fatal("Host encountered an unhandled exception on the AppDomain", (Exception)e.ExceptionObject);
+            _log.Fatal("Host encountered an unhandled exception on the AppDomain", (Exception) e.ExceptionObject);
         }
 
         /// <summary>
@@ -50,14 +50,14 @@ namespace Topshelf
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
-            var a = Parser.ParseArgs(args);
-            
+            Parser.Args a = Parser.ParseArgs(args);
+
             if (a.InstanceName != null) configuration.WinServiceSettings.InstanceName = a.InstanceName;
 
             NamedAction actionKey = Parser.GetActionKey(a, configuration.DefaultAction);
 
             IAction action = _actions[actionKey];
-            _log.DebugFormat("Running action: {0}", action);
+            _log.DebugFormat("Running action: '{0}'", action);
 
             action.Do(configuration);
         }

@@ -31,5 +31,10 @@ namespace Topshelf.Internal.Actions
             ConsoleHost inConsoleHost = new ConsoleHost(configuration.Coordinator);
             inConsoleHost.Run();
         }
+
+        public override string ToString()
+        {
+            return "Run As Console";
+        }
     }
 }
