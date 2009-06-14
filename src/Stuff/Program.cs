@@ -24,6 +24,8 @@ namespace Stuff
 	{
 		private static void Main(string[] args)
 		{
+            log4net.Config.BasicConfigurator.Configure();
+
 			var cfg = RunnerConfigurator.New(x =>
 				{
 					x.BeforeStartingServices(h =>
