@@ -17,7 +17,7 @@ namespace Topshelf.Internal
 
 	public class IsolatedService<TService> :
 		MarshalByRefObject,
-		IServiceController
+		IServiceController where TService : class
 	{
 	    ServiceController<TService> _serviceController = new ServiceController<TService>();
 

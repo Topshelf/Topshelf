@@ -17,7 +17,7 @@ namespace Topshelf.Internal
     using Microsoft.Practices.ServiceLocation;
 
     [DebuggerDisplay("Service({Name}) is {State}")]
-    public class ServiceController<TService> : IServiceController
+    public class ServiceController<TService> : IServiceController where TService : class
 	{
 		private TService _instance;
 

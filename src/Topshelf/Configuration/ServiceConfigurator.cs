@@ -17,6 +17,7 @@ namespace Topshelf.Configuration
 	public class ServiceConfigurator<TService> :
 		ServiceConfiguratorBase<TService>,
 		IServiceConfigurator<TService>
+        where TService : class
 	{
 	    public ServiceConfigurator(string name) : base(name)
 	    {

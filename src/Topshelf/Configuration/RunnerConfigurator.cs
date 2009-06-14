@@ -146,7 +146,7 @@ namespace Topshelf.Configuration
 		/// Configures a service using the default configuration.
 		/// </summary>
 		/// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-		public void ConfigureService<TService>()
+		public void ConfigureService<TService>() where  TService : class
 		{
             ConfigureService<TService>(typeof(TService).Name, x=> { });
 		}
@@ -157,7 +157,7 @@ namespace Topshelf.Configuration
 		/// <typeparam name="TService">The type of the service that will be configured.</typeparam>
 		/// <param name="name">The name used to identify the service</param>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-		public void ConfigureService<TService>(string name, Action<IServiceConfigurator<TService>> action)
+		public void ConfigureService<TService>(string name, Action<IServiceConfigurator<TService>> action) where TService : class
 		{
 			var configurator = new ServiceConfigurator<TService>(name);
 			_serviceConfigurators.Add(() =>
@@ -183,7 +183,7 @@ namespace Topshelf.Configuration
 		/// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
 		/// <param name="name">The name used to identify the service</param>
 		/// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-		public void ConfigureServiceInIsolation<TService>(string name, Action<IIsolatedServiceConfigurator<TService>> action)
+		public void ConfigureServiceInIsolation<TService>(string name, Action<IIsolatedServiceConfigurator<TService>> action) where TService : class
 		{
 			var configurator = new IsolatedServiceConfigurator<TService>(name);
 			_serviceConfigurators.Add(() =>

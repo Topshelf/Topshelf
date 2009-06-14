@@ -17,6 +17,7 @@ namespace Topshelf.Internal
 
     public class FacadeToIsolatedService<TService> :
 		IServiceController
+        where TService : class
 	{
 		private AppDomain _domain;
 		private IsolatedService<TService> _remoteService;
