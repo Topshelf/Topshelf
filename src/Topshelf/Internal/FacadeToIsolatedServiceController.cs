@@ -28,6 +28,12 @@ namespace Topshelf.Internal
 		{
 			var settings = AppDomain.CurrentDomain.SetupInformation;
 			settings.ShadowCopyFiles = "true";
+
+            if (!string.IsNullOrEmpty(PathToConfigurationFile))
+            {
+                settings.ConfigurationFile = PathToConfigurationFile;
+            }
+
 			_domain = AppDomain.CreateDomain(typeof (TService).AssemblyQualifiedName, null, settings);
 
 			_remoteServiceController = _domain.CreateInstanceAndUnwrap<IsolatedServiceController<TService>>();
@@ -51,6 +57,7 @@ namespace Topshelf.Internal
         public Action<TService> ContinueAction { get; set; }
         public Func<IServiceLocator> CreateServiceLocator { get; set; }
         public string Name { get; set; }
+        public string PathToConfigurationFile { get; set; }
 
 		public void Stop()
 		{
@@ -88,5 +95,6 @@ namespace Topshelf.Internal
         {
             get { return _remoteServiceController.ServiceLocator; }
         }
+
 	}
 }

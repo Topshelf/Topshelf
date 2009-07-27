@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
+	using System;
     using Internal;
 
     public class IsolatedServiceConfigurator<TService> :
@@ -19,6 +20,8 @@ namespace Topshelf.Configuration
         IIsolatedServiceConfigurator<TService>
         where TService : class
     {
+        private string _pathToConfigurationFile;
+
         public IsolatedServiceConfigurator(string name) : base(name)
         {
         }
@@ -32,10 +35,16 @@ namespace Topshelf.Configuration
                                                        StopAction = _stopAction,
                                                        PauseAction = _pauseAction,
                                                        ContinueAction = _continueAction,
-                                                       Name = _name
+                                                       Name = _name,
+                                                       PathToConfigurationFile = _pathToConfigurationFile
                                                    };
 
             return serviceController;
+        }
+
+        public void ConfigurationFile(string pathToConfigurationFile)
+        {
+            _pathToConfigurationFile = pathToConfigurationFile;
         }
     }
 }
