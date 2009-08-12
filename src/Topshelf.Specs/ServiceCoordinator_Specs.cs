@@ -181,8 +181,8 @@ namespace Topshelf.Specs
 		[Test]
 		public void Start_individual_service()
 		{
-			_serviceCoordinator.Pause();
-			_serviceCoordinator.StartService("test");
+			_serviceCoordinator.Pause(); //should pause them all?
+			_serviceCoordinator.ContinueService("test");
 
 			_service.Started
 				.ShouldBeTrue();
@@ -202,7 +202,7 @@ namespace Topshelf.Specs
 		}
 
 		[Test]
-		public void Continue_individual_service()
+		public void D_Continue_individual_service()
 		{
 			_serviceCoordinator.PauseService("test");
 			_serviceCoordinator.ContinueService("test");

@@ -30,23 +30,28 @@ namespace Topshelf.Internal
             {
                 Initially(
                     When(OnStart)
-                    .Then(sc=>sc.BuildInstance() )
-                        .Then(sc=>sc.StartAction(sc._instance))
-                        .TransitionTo(Started)
-                    );
+                        .Then(sc=>sc.BuildInstance() )
+                            .Then(sc=>sc.StartAction(sc._instance))
+                            .TransitionTo(Started)
+                        );
 
                 During(Started,
                        When(OnPause)
                            .Then(sc => sc.PauseAction(sc._instance))
-                           .TransitionTo(Paused));
+                           .TransitionTo(Paused),
+                       When(OnStop)
+                           .Then(sc=>sc.StopAction(sc._instance))
+                           .TransitionTo(Stopped));
 
                 During(Paused,
                        When(OnContinue)
                            .Then(sc => sc.ContinueAction(sc._instance)));
 
+                
                 Anytime(
                     When(OnStop)
                         .Then(sc=> sc.StopAction(sc._instance))
+                        .TransitionTo(Stopped)
                     );
             });
         }
