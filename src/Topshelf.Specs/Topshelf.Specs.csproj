@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParsing_Specs.cs" />
+    <Compile Include="BasicContext.cs" />
     <Compile Include="IsolatedService_Specs.cs" />
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="Host_Specs.cs" />
     <Compile Include="ServiceCoordinator_Specs.cs" />
     <Compile Include="Service_Specs.cs" />
-    <Compile Include="Configuration\TestService.cs" />
+    <Compile Include="TestObject\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
