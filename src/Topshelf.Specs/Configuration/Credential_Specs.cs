@@ -13,7 +13,7 @@
 namespace Topshelf.Specs.Configuration
 {
     using System.ServiceProcess;
-    using MbUnit.Framework;
+    using NUnit.Framework;
     using Topshelf.Configuration;
 
     [TestFixture]

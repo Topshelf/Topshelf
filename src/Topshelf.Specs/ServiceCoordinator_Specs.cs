@@ -16,7 +16,7 @@ namespace Topshelf.Specs
 	using System.Collections.Generic;
 	using Configuration;
 	using Internal;
-	using MbUnit.Framework;
+	using NUnit.Framework;
 	using Microsoft.Practices.ServiceLocation;
 	using Rhino.Mocks;
 

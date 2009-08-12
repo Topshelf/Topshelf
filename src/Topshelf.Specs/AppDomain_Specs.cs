@@ -1,8 +1,22 @@
+// Copyright 2007-2008 The Apache Software Foundation.
+//  
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
+// this file except in compliance with the License. You may obtain a copy of the 
+// License at 
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
     using System;
-    using MbUnit.Framework;
+    using NUnit.Framework;
 
+    //a place to learn about app-domains
+    [TestFixture]
     public class AppDomain_Specs
     {
         [Test]
@@ -18,8 +32,9 @@ namespace Topshelf.Specs
             bill.ShouldNotBeNull();
             bill.Yo.ShouldEqual(3);
             bill.AppDomainName.ShouldEqual("bob");
+            bill.ThreadInfo.ShouldEqual("STA");
             Bill.Sup.ShouldEqual(2);
-            AppDomain.CurrentDomain.FriendlyName.ShouldEqual("IsolatedAppDomainHost");
+            AppDomain.CurrentDomain.FriendlyName.ShouldEqual("domain-nunit.addin.dll");
         }
     }
 
@@ -34,6 +49,14 @@ namespace Topshelf.Specs
         public string AppDomainName
         {
             get { return AppDomain.CurrentDomain.FriendlyName; }
+        }
+        public string ThreadInfo
+        {
+            get
+            {
+                var a = System.Threading.Thread.CurrentThread.GetApartmentState();
+                return a.ToString();
+            }
         }
     }
 
