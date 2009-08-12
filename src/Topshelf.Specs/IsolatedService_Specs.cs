@@ -25,8 +25,6 @@ namespace Topshelf.Specs
     public class IsolatedService_Specs
     {
         private IServiceController _serviceController;
-        private bool _wasPaused;
-        private bool _wasContinued;
 
         [SetUp]
         public void EstablishContext()
@@ -37,8 +35,8 @@ namespace Topshelf.Specs
             var c = new IsolatedServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
-            c.WhenPaused(s => { _wasPaused = true; }); //need to change these
-            c.WhenContinued(s => { _wasContinued = true; }); //need to change these
+            //c.WhenPaused(s => { _wasPaused = true; }); //need to change these
+            //c.WhenContinued(s => { _wasContinued = true; }); //need to change these
             c.CreateServiceLocator(()=>
                                    {
                                        TestService srv = new TestService();
@@ -63,7 +61,7 @@ namespace Topshelf.Specs
         public void Should_pause()
         {
             _serviceController.Pause();
-
+            
             _serviceController.State
                 .ShouldEqual(ServiceState.Paused);
 

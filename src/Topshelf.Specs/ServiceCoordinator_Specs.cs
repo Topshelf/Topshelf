@@ -12,111 +12,134 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-	using System;
-	using System.Collections.Generic;
-	using Configuration;
-	using Internal;
-	using NUnit.Framework;
-	using Microsoft.Practices.ServiceLocation;
-	using Rhino.Mocks;
+    using System;
+    using System.Collections.Generic;
+    using Configuration;
+    using Internal;
+    using Microsoft.Practices.ServiceLocation;
+    using NUnit.Framework;
+    using Rhino.Mocks;
 
-	[TestFixture]
-	public class ServiceCoordinator_Specs
-	{
-		private TestService _service;
-		private ServiceCoordinator _serviceCoordinator;
+    [TestFixture]
+    public class ServiceCoordinator_Specs
+    {
+        #region Setup/Teardown
 
-		[SetUp]
-		public void EstablishContext()
-		{
-			_service = new TestService();
-			IServiceLocator sl = MockRepository.GenerateMock<IServiceLocator>();
-			ServiceLocator.SetLocatorProvider(() => sl);
+        [SetUp]
+        public void EstablishContext()
+        {
+            _service = new TestService();
+            _service2 = new TestService2();
 
-			sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
+            var sl = MockRepository.GenerateMock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => sl);
 
-			_serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
-			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-				{
-					() => 
-					new ServiceController<TestService>
-						{
-							CreateServiceLocator = () => sl,
-							Name = "test",
-							StartAction = x => x.Start(),
-							StopAction = x => x.Stop(),
-							ContinueAction = x => x.Continue(),
-							PauseAction = x => x.Pause()
-						}
-				};
+            sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
+            sl.Stub(x => x.GetInstance<TestService2>("test2")).Return(_service2).Repeat.Any();
 
-			_serviceCoordinator.RegisterServices(services);
-		}
+            _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
+            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
+                                                       {
+                                                           () => new ServiceController<TestService>
+                                                                 {
+                                                                     CreateServiceLocator = () => sl,
+                                                                     Name = "test",
+                                                                     StartAction = x => x.Start(),
+                                                                     StopAction = x => x.Stop(),
+                                                                     ContinueAction = x => x.Continue(),
+                                                                     PauseAction = x => x.Pause()
+                                                                 },
+                                                           () => new ServiceController<TestService2>
+                                                                 {
+                                                                     CreateServiceLocator = () => sl,
+                                                                     Name = "test2",
+                                                                     StartAction = x => x.Start(),
+                                                                     StopAction = x => x.Stop(),
+                                                                     ContinueAction = x => x.Continue(),
+                                                                     PauseAction = x => x.Pause()
+                                                                 }
+                                                       };
 
-		[Test]
-		public void Unstarted_coordinator_should_not_start_services()
-		{
-			_service.HasBeenStarted
-				.ShouldBeFalse();
-		}
+            _serviceCoordinator.RegisterServices(services);
+        }
 
-		[Test]
-		public void Starting_the_coordinator_should_start_services()
-		{
-			_serviceCoordinator.Start();
-			_service.HasBeenStarted
-				.ShouldBeTrue();
-		}
+        #endregion
 
-		[Test]
-		public void Stopping_the_coordinator_should_stop_services()
-		{
-			_serviceCoordinator.Start();
-			_serviceCoordinator.Stop();
+        private TestService _service;
+        private TestService2 _service2;
+        private ServiceCoordinator _serviceCoordinator;
 
-			_service.HasBeenStarted
-				.ShouldBeTrue();
-			_service.Stopped
-				.ShouldBeTrue();
-		}
+        [Test]
+        public void Continueing_the_coordintaro_should_continue_services()
+        {
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Pause();
+            _serviceCoordinator.Continue();
 
-		[Test]
-		public void Pausing_the_coordinator_should_pause_services()
-		{
-			_serviceCoordinator.Start();
-			_serviceCoordinator.Pause();
+            _service.HasBeenStarted
+                .ShouldBeTrue();
+            _service.HasBeenContinued
+                .ShouldBeTrue();
+            _service.Started
+                .ShouldBeTrue();
+        }
 
-			_service.HasBeenStarted
-				.ShouldBeTrue();
-			_service.Paused
-				.ShouldBeTrue();
-		}
+        [Test]
+        public void Pausing_the_coordinator_should_pause_services()
+        {
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Pause();
 
-		[Test]
-		public void Continueing_the_coordintaro_should_continue_services()
-		{
-			_serviceCoordinator.Start();
-			_serviceCoordinator.Pause();
-			_serviceCoordinator.Continue();
+            _service.HasBeenStarted
+                .ShouldBeTrue();
+            _service.Paused
+                .ShouldBeTrue();
+        }
 
-			_service.HasBeenStarted
-				.ShouldBeTrue();
-			_service.HasBeenContinued
-				.ShouldBeTrue();
-			_service.Started
-				.ShouldBeTrue();
-		}
+        [Test]
+        public void Starting_the_coordinator_should_start_all_services()
+        {
+            _serviceCoordinator.Start();
+            _service.HasBeenStarted
+                .ShouldBeTrue();
+            _service2.HasBeenStarted
+                .ShouldBeTrue();
+        }
 
-		[Test, Ignore]
-		public void You_cant_pause_if_you_havent_started()
-		{
-			Assert.Fail();
-		}
+        [Test]
+        public void Stopping_the_coordinator_should_stop_all_services()
+        {
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Stop();
 
-		[Test, Ignore]
-		public void You_cant_continue_if_you_arent_currently_paused()
-		{
-			Assert.Fail();
-		}
-	}
+            _service.HasBeenStarted
+                .ShouldBeTrue();
+            _service.Stopped
+                .ShouldBeTrue();
+
+            _service2.HasBeenStarted
+                .ShouldBeTrue();
+            _service2.Stopped
+                .ShouldBeTrue();
+        }
+
+        [Test]
+        public void Unstarted_coordinator_should_not_start_services()
+        {
+            _service.HasBeenStarted
+                .ShouldBeFalse();
+        }
+
+        [Test, Ignore]
+        public void You_cant_continue_if_you_arent_currently_paused()
+        {
+            Assert.Fail();
+        }
+
+        [Test, Ignore]
+        public void You_cant_pause_if_you_havent_started()
+        {
+            Assert.Fail();
+        }
+    }
 }

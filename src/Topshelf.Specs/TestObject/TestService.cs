@@ -47,9 +47,4 @@ namespace Topshelf.Specs.Configuration
             HasBeenContinued = true;
         }
     }
-
-    public class TestService2 : TestService
-    {
-        
-    }
 }
