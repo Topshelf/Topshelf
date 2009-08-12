@@ -65,7 +65,8 @@
     <Compile Include="Configuration\Credential_Specs.cs" />
     <Compile Include="Host_Specs.cs" />
     <Compile Include="ServiceCoordinator_Specs.cs" />
-    <Compile Include="Service_Specs.cs" />
+    <Compile Include="ServiceController_Specs.cs" />
+    <Compile Include="ServiceCoordinator_Singles_Specs.cs" />
     <Compile Include="TestObject\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

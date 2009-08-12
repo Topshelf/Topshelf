@@ -45,7 +45,8 @@ namespace Topshelf.Internal
 
                 During(Paused,
                        When(OnContinue)
-                           .Then(sc => sc.ContinueAction(sc._instance)));
+                           .Then(sc => sc.ContinueAction(sc._instance))
+                           .TransitionTo(Started));
 
                 
                 Anytime(

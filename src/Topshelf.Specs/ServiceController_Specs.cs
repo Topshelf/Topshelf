@@ -19,7 +19,7 @@ namespace Topshelf.Specs.Configuration
     using Topshelf.Configuration;
 
     [TestFixture]
-    public class Service_Specs
+    public class ServiceController_Specs
     {
         private IServiceController _serviceController;
         private TestService _srv;
@@ -88,6 +88,8 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Should_continue()
         {
+            _serviceController.Pause();
+
             _serviceController.Continue();
 
             _serviceController.State
