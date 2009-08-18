@@ -50,10 +50,18 @@ namespace Topshelf
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", string.Join(",", args));
+
             Parser.Args a = Parser.ParseArgs(args);
 
+            
+            
+            //smell (one should delegate to the other
+            //violation of demeter here
+            //args are just that they should not have behaviour
+            //how much should configuration no about the darn args though?
             if (a.InstanceName != null) configuration.WinServiceSettings.InstanceName = a.InstanceName;
 
+            //smell?
             NamedAction actionKey = Parser.GetActionKey(a, configuration.DefaultAction);
 
             IAction action = _actions[actionKey];

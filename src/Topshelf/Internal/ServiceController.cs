@@ -14,6 +14,7 @@ namespace Topshelf.Internal
 {
     using System;
     using System.Diagnostics;
+    using Exceptions;
     using Magnum.StateMachine;
     using Microsoft.Practices.ServiceLocation;
 

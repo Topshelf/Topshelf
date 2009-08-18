@@ -1,4 +1,4 @@
-namespace Topshelf.Internal
+namespace Topshelf.Exceptions
 {
     using System;
     using System.Runtime.Serialization;
