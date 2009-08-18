@@ -34,6 +34,11 @@ namespace Topshelf.Internal
                 settings.ConfigurationFile = PathToConfigurationFile;
             }
 
+            if (Args != null)
+                settings.AppDomainInitializerArguments = Args;
+            if (ConfigureArgsAction != null)
+                settings.AppDomainInitializer = new AppDomainInitializer(ConfigureArgsAction());
+
 			_domain = AppDomain.CreateDomain(typeof (TService).AssemblyQualifiedName, null, settings);
 
 			_remoteServiceController = _domain.CreateInstanceAndUnwrap<IsolatedServiceController<TService>>();
@@ -58,6 +63,8 @@ namespace Topshelf.Internal
         public Func<IServiceLocator> CreateServiceLocator { get; set; }
         public string Name { get; set; }
         public string PathToConfigurationFile { get; set; }
+        public string[] Args { get; set; }
+        public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
 
 		public void Stop()
 		{

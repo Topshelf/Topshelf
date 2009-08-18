@@ -21,6 +21,8 @@ namespace Topshelf.Configuration
         where TService : class
     {
         private string _pathToConfigurationFile;
+        private string[] _args;
+        private Func<AppDomainInitializer> _callback;
 
         public IsolatedServiceConfigurator(string name) : base(name)
         {
@@ -36,7 +38,9 @@ namespace Topshelf.Configuration
                                                        PauseAction = _pauseAction,
                                                        ContinueAction = _continueAction,
                                                        Name = _name,
-                                                       PathToConfigurationFile = _pathToConfigurationFile
+                                                       PathToConfigurationFile = _pathToConfigurationFile,
+                                                       Args = _args,
+                                                       ConfigureArgsAction = _callback
                                                    };
 
             return serviceController;
@@ -45,6 +49,12 @@ namespace Topshelf.Configuration
         public void ConfigurationFile(string pathToConfigurationFile)
         {
             _pathToConfigurationFile = pathToConfigurationFile;
+        }
+
+        public void CommandLineArguments(string[] args, Func<AppDomainInitializer> callback)
+        {
+            _args = args;
+            _callback = callback;
         }
     }
 }

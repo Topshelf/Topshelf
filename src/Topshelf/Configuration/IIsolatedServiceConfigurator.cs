@@ -10,11 +10,14 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+using System;
+
 namespace Topshelf.Configuration
 {
 	public interface IIsolatedServiceConfigurator<TService> :
 		IServiceConfigurator<TService>
 	{
 	    void ConfigurationFile(string pathToConfigurationFile);
+        void CommandLineArguments(string[] args, Func<AppDomainInitializer> callback);
 	}
 }
