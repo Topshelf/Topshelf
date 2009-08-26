@@ -19,7 +19,7 @@ namespace Topshelf.Configuration
         IDisposable
     {
         protected Action<TService> _continueAction = NoOp;
-        protected Func<IServiceLocator> _createServiceLocator = () => ServiceLocator.Current;
+        protected Func<IServiceLocator> _createServiceLocator = () => new ActivatorServiceLocator();
         bool _disposed;
         protected string _name = typeof (TService).Name;
         protected Action<TService> _pauseAction = NoOp;

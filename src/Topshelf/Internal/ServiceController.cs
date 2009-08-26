@@ -39,10 +39,7 @@ namespace Topshelf.Internal
                 During(Started,
                        When(OnPause)
                            .Then(sc => sc.PauseAction(sc._instance))
-                           .TransitionTo(Paused),
-                       When(OnStop)
-                           .Then(sc=>sc.StopAction(sc._instance))
-                           .TransitionTo(Stopped));
+                           .TransitionTo(Paused));
 
                 During(Paused,
                        When(OnContinue)
