@@ -10,10 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Internal
 {
     using System;
     using System.Collections.Generic;
+    using Magnum.Reflection;
     using Microsoft.Practices.ServiceLocation;
 
     public class ActivatorServiceLocator :
@@ -23,37 +24,37 @@ namespace Topshelf
 
         public object GetService(Type serviceType)
         {
-            return Activator.CreateInstance(serviceType);
+            return ClassFactory.New(serviceType);
         }
 
         public object GetInstance(Type serviceType)
         {
-            return Activator.CreateInstance(serviceType);
+            return ClassFactory.New(serviceType);
         }
 
         public object GetInstance(Type serviceType, string key)
         {
-            return Activator.CreateInstance(serviceType);
+            return ClassFactory.New(serviceType);
         }
 
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            return new[] {Activator.CreateInstance(serviceType)};
+            return new[] {ClassFactory.New(serviceType)};
         }
 
         public TService GetInstance<TService>()
         {
-            return (TService) Activator.CreateInstance(typeof(TService));
+            return ClassFactory.New<TService>();
         }
 
         public TService GetInstance<TService>(string key)
         {
-            return (TService) Activator.CreateInstance(typeof(TService));
+            return ClassFactory.New<TService>();
         }
 
         public IEnumerable<TService> GetAllInstances<TService>()
         {
-            return new[] {(TService) Activator.CreateInstance(typeof(TService))};
+            return new[] {ClassFactory.New<TService>()};
         }
 
         #endregion
