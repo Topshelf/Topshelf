@@ -89,6 +89,7 @@ namespace Topshelf.Internal
 		}
         private void BuildInstance()
         {
+            //TODO: do I need to pull it out by name?
             _instance = ServiceLocator.GetInstance<TService>(Name);
             if (_instance == null) throw new CouldntFindServiceException(Name, typeof(TService));
         }
