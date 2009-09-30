@@ -60,6 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SolutionVersion.cs">
+      <Link>SolutionVersion.cs</Link>
+    </Compile>
     <Compile Include="Internal\ActivatorServiceLocator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\IIsolatedServiceConfigurator.cs" />
