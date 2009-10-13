@@ -15,16 +15,14 @@ namespace Topshelf.Internal
     using System;
     using Microsoft.Practices.ServiceLocation;
 
-	public interface IServiceController :
-		IDisposable
+    public interface IServiceControllerOf<TService> : 
+        IServiceController
     {
-        Type ServiceType { get; }
-        string Name { get; set; }
-        ServiceState State { get; }
-		IServiceLocator ServiceLocator { get; }
-	    void Start();
-        void Stop();
-        void Pause();
-        void Continue();
+
+        Action<TService> StartAction { get; set; }
+        Action<TService> StopAction { get; set; }
+        Action<TService> PauseAction { get; set; }
+        Action<TService> ContinueAction { get; set; }
+        Func<IServiceLocator> CreateServiceLocator { get; set; }
     }
 }

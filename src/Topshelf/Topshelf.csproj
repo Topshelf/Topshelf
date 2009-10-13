@@ -35,7 +35,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Magnum, Version=0.1.0.300, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Magnum, Version=0.8.0.383, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum.dll</HintPath>
     </Reference>
@@ -82,6 +82,8 @@
     <Compile Include="Internal\Actions\ServiceNamedAction.cs" />
     <Compile Include="Internal\Actions\UninstallServiceAction.cs" />
     <Compile Include="Exceptions\CouldntFindServiceException.cs" />
+    <Compile Include="Internal\ControllerDelegates.cs" />
+    <Compile Include="Internal\IServiceControllerOf.cs" />
     <Compile Include="Internal\IsolatedServiceController.cs" />
     <Compile Include="Internal\FacadeToIsolatedServiceController.cs" />
     <Compile Include="Internal\ArgumentParsing\Argument.cs" />
@@ -97,6 +99,8 @@
     <Compile Include="Internal\ArgumentParsing\IArgumentParser.cs" />
     <Compile Include="Configuration\IRunConfiguration.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
+    <Compile Include="Internal\IsolatedServiceControllerWrapper.cs" />
+    <Compile Include="Internal\ServiceControllerProxy.cs" />
     <Compile Include="Internal\ServiceCoordinator.cs" />
     <Compile Include="Configuration\RunnerConfigurator.cs" />
     <Compile Include="Internal\IServiceCoordinator.cs" />

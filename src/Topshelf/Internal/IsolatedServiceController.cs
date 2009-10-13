@@ -19,9 +19,9 @@ namespace Topshelf.Internal
     [DebuggerDisplay("Isolated Service({Name}) - {State}")]
 	public class IsolatedServiceController<TService> :
 		MarshalByRefObject,
-		IServiceController where TService : class
+		IServiceControllerOf<TService> where TService : class
 	{
-	    ServiceController<TService> _serviceController = new ServiceController<TService>();
+        readonly ServiceController<TService> _serviceController = new ServiceController<TService>();
 
 		
 	    public ServiceState State
@@ -71,7 +71,12 @@ namespace Topshelf.Internal
 	        _serviceController.Dispose();
 	    }
 
-	    public Action<TService> StartAction
+      public void ChangeName(string value)
+      {
+        _serviceController.Name = value;
+      }
+
+      public Action<TService> StartAction
 	    {
 	        get { return _serviceController.StartAction; }
 	        set { _serviceController.StartAction = value; }
