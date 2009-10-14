@@ -67,7 +67,7 @@ namespace Stuff
                 x.SetServiceName("stuff");
             });
 
-            Runner.Host(cfg, args);
+            Runner.Host(cfg, Environment.CommandLine);
         }
     }
 

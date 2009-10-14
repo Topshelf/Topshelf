@@ -46,28 +46,14 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Host(IRunConfiguration configuration, params string[] args)
+        public static void Host(IRunConfiguration configuration, string args)
         {
             _log.Info("Starting Host");
-            _log.DebugFormat("Arguments: {0}", string.Join(",", args));
+            _log.DebugFormat("Arguments: {0}", args);
 
-            Parser.Args a = Parser.ParseArgs(args);
-
-            
-            
-            //smell (one should delegate to the other
-            //violation of demeter here
-            //args are just that they should not have behaviour
-            //how much should configuration no about the darn args though?
-            if (a.InstanceName != null) configuration.WinServiceSettings.InstanceName = a.InstanceName;
-
-            //smell?
-            NamedAction actionKey = Parser.GetActionKey(a, configuration.DefaultAction);
-
-            IAction action = _actions[actionKey];
-            _log.DebugFormat("Running action: '{0}'", action);
-
-            action.Do(configuration);
+            //make it so this can be passed in
+            var a = TopshelfArgumentParser.Parse(Environment.CommandLine);
+            TopshelfDispatcher.Dispatch(configuration, a);
         }
     }
 }

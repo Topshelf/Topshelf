@@ -18,20 +18,19 @@ namespace Topshelf.Specs
     [TestFixture]
     public class ArgParsing_Specs
     {
-        string[] _args;
+        string _args;
 
         [SetUp]
         public void Establish_Context()
         {
-            _args = new[] {"/install", "/instance:bob"};
+            _args = "service /instance:bob";
         }
 
         [Test]
         public void InstanceName()
         {
-            Parser.Args a = Parser.ParseArgs(_args);
-            a.Install.ShouldBeTrue();
-            a.InstanceName.ShouldEqual("bob");
+            TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
+            a.Command.ShouldEqual("service");
         }
     }
 }
