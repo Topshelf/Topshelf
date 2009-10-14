@@ -15,6 +15,7 @@ namespace Topshelf.Internal
     using System;
     using Microsoft.Practices.ServiceLocation;
 
+    //TODO: Work to merge this back down into IServiceController
     public interface IServiceControllerOf<TService> : 
         IServiceController
     {

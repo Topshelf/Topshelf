@@ -63,6 +63,10 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\WinService\RunCommand.cs" />
+    <Compile Include="Commands\WinService\SubCommands\InstallService.cs" />
+    <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
     <Compile Include="Internal\ActivatorServiceLocator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\IIsolatedServiceConfigurator.cs" />
@@ -109,6 +113,8 @@
     <Compile Include="Configuration\IServiceConfigurator.cs" />
     <Compile Include="Internal\ServiceController.cs" />
     <Compile Include="Configuration\ServiceConfigurator.cs" />
+    <Compile Include="Internal\TopshelfArgumentParser.cs" />
+    <Compile Include="Internal\TopshelfArguments.cs" />
     <Compile Include="ServiceInformation.cs" />
     <Compile Include="ServiceState.cs" />
     <Compile Include="Configuration\Credentials.cs" />
@@ -133,6 +139,9 @@
     <EmbeddedResource Include="Configuration\ServiceConsole.resx">
       <DependentUpon>ServiceConsole.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\CommandLine\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
