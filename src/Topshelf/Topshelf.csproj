@@ -64,20 +64,15 @@
       <Link>SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandLine\RunCommand.cs" />
     <Compile Include="Commands\WinService\RunCommand.cs" />
     <Compile Include="Commands\WinService\SubCommands\InstallService.cs" />
     <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
     <Compile Include="Internal\ActivatorServiceLocator.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Configuration\IIsolatedServiceConfigurator.cs" />
-    <Compile Include="Configuration\IsolatedServiceConfigurator.cs" />
-    <Compile Include="Configuration\ServiceConfiguratorBase.cs" />
-    <Compile Include="Configuration\ServiceConsole.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Configuration\ServiceConsole.Designer.cs">
-      <DependentUpon>ServiceConsole.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
     <Compile Include="Internal\Actions\InstallServiceAction.cs" />
     <Compile Include="Internal\Actions\NamedAction.cs" />
     <Compile Include="Internal\Actions\RunAsConsoleAction.cs" />
@@ -101,23 +96,23 @@
     <Compile Include="Internal\ArgumentParsing\IArgumentMap.cs" />
     <Compile Include="Internal\ArgumentParsing\IArgumentMapFactory.cs" />
     <Compile Include="Internal\ArgumentParsing\IArgumentParser.cs" />
-    <Compile Include="Configuration\IRunConfiguration.cs" />
-    <Compile Include="Configuration\RunConfiguration.cs" />
+    <Compile Include="Configuration\Dsl\IRunConfiguration.cs" />
+    <Compile Include="Configuration\Dsl\RunConfiguration.cs" />
     <Compile Include="Internal\IsolatedServiceControllerWrapper.cs" />
     <Compile Include="Internal\ServiceControllerProxy.cs" />
     <Compile Include="Internal\ServiceCoordinator.cs" />
-    <Compile Include="Configuration\RunnerConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Internal\IServiceCoordinator.cs" />
-    <Compile Include="Configuration\IRunnerConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
     <Compile Include="Internal\IServiceController.cs" />
-    <Compile Include="Configuration\IServiceConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Internal\ServiceController.cs" />
-    <Compile Include="Configuration\ServiceConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
     <Compile Include="Internal\TopshelfArgumentParser.cs" />
     <Compile Include="Internal\TopshelfArguments.cs" />
     <Compile Include="ServiceInformation.cs" />
     <Compile Include="ServiceState.cs" />
-    <Compile Include="Configuration\Credentials.cs" />
+    <Compile Include="Configuration\Dsl\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Internal\Hosts\HostServiceInstaller.cs">
       <SubType>Component</SubType>
@@ -129,19 +124,11 @@
     <Compile Include="Internal\Hosts\WinFormHost.cs" />
     <Compile Include="Internal\IAction.cs" />
     <Compile Include="Instrumentation\BasicServiceInstrumentation.cs" />
-    <Compile Include="Configuration\KnownServiceNames.cs" />
+    <Compile Include="Configuration\Dsl\KnownServiceNames.cs" />
     <Compile Include="Internal\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runner.cs" />
-    <Compile Include="Configuration\WinServiceSettings.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Configuration\ServiceConsole.resx">
-      <DependentUpon>ServiceConsole.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\CommandLine\" />
+    <Compile Include="Configuration\Dsl\WinServiceSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

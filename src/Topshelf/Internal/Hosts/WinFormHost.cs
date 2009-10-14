@@ -44,11 +44,6 @@ namespace Topshelf.Internal.Hosts
             _coordinator.Start();
 
             Form winForm = (Form)ServiceLocator.Current.GetInstance(_cfg.FormType);
-            if(winForm is ServiceConsole)
-            {
-                //TODO: There has to be a better way than this
-                ((ServiceConsole) winForm).RegisterCoordinator(_coordinator);
-            }
 
             _coordinator.Stopped += winForm.Close;
 
