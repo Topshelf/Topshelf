@@ -13,8 +13,8 @@
 namespace Topshelf.Instrumentation
 {
     using System.Management.Instrumentation;
-    using Internal;
     using Microsoft.Practices.ServiceLocation;
+    using Model;
 
     [ManagementEntity(Singleton = true)]
     [ManagementQualifier("Description", Value = "Obtain processor information.")]

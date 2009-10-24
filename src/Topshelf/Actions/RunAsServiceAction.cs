@@ -10,10 +10,10 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Internal.Actions
+namespace Topshelf.Actions
 {
     using System.Reflection;
-    using Configuration;
+    using Configuration.Dsl;
     using Exceptions;
     using Hosts;
     using log4net;

@@ -20,7 +20,7 @@ namespace Stuff
     using Microsoft.Practices.ServiceLocation;
     using StructureMap;
     using Topshelf;
-    using Topshelf.Configuration;
+    using Topshelf.Configuration.Dsl;
 
     internal class Program
     {

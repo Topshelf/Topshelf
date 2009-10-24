@@ -13,7 +13,7 @@
 namespace Topshelf
 {
     using System;
-    using Internal;
+    using Model;
 
     public static class Extensions
     {

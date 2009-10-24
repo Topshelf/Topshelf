@@ -10,14 +10,14 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Internal.Hosts
+namespace Topshelf.Hosts
 {
     using System;
     using System.Collections;
     using System.Configuration.Install;
     using System.Reflection;
     using System.ServiceProcess;
-    using Configuration;
+    using Configuration.Dsl;
     using log4net;
     using Microsoft.Win32;
 
@@ -129,7 +129,7 @@ namespace Topshelf.Internal.Hosts
                 _log.DebugFormat("Service Path {0}", imagePath);
 
                 imagePath += _config.WinServiceSettings.InstanceName == null ?
-                    " -service" : " -service -instance:{0}".FormatWith(_config.WinServiceSettings.InstanceName);
+                                                                                 " -service" : " -service -instance:{0}".FormatWith(_config.WinServiceSettings.InstanceName);
 
                 _log.DebugFormat("ImagePath '{0}'", imagePath);
 

@@ -10,11 +10,12 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Internal.Hosts
+namespace Topshelf.Hosts
 {
     using System;
     using System.Threading;
     using log4net;
+    using Model;
 
     public class ConsoleHost
     {
@@ -39,14 +40,14 @@ namespace Topshelf.Internal.Hosts
             _coordinator.Stopped += (() => internalallyTriggeredTermination.Set());
 
             Console.CancelKeyPress += delegate
-                                          {
-                                              _log.Info("Control+C detected, exiting.");
-                                              _log.Info("Stopping the service");
+            {
+                _log.Info("Control+C detected, exiting.");
+                _log.Info("Stopping the service");
 
-                                              _coordinator.Stop(); //user stop
-                                              _coordinator.Dispose();
-                                              externalTriggeredTerminatation.Set();
-                                          };
+                _coordinator.Stop(); //user stop
+                _coordinator.Dispose();
+                externalTriggeredTerminatation.Set();
+            };
 
             _coordinator.Start(); //user code starts
 

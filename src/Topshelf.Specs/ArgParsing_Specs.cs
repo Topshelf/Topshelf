@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using Internal;
     using NUnit.Framework;
 
     [TestFixture]

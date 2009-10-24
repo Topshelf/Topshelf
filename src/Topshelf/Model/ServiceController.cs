@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Internal
+namespace Topshelf.Model
 {
     using System;
     using System.Diagnostics;
@@ -32,9 +32,9 @@ namespace Topshelf.Internal
                 Initially(
                     When(OnStart)
                         .Then(sc=>sc.BuildInstance() )
-                            .Then(sc=>sc.StartAction(sc._instance))
-                            .TransitionTo(Started)
-                        );
+                        .Then(sc=>sc.StartAction(sc._instance))
+                        .TransitionTo(Started)
+                    );
 
                 During(Started,
                        When(OnPause)
@@ -72,21 +72,21 @@ namespace Topshelf.Internal
 
 
         public void Start()
-		{
-		    RaiseEvent(OnStart);
-		}
-		public void Stop()
-		{
+        {
+            RaiseEvent(OnStart);
+        }
+        public void Stop()
+        {
             RaiseEvent(OnStop);
-		}
-		public void Pause()
-		{
-		    RaiseEvent(OnPause);
-		}
-		public void Continue()
-		{
-		    RaiseEvent(OnContinue);
-		}
+        }
+        public void Pause()
+        {
+            RaiseEvent(OnPause);
+        }
+        public void Continue()
+        {
+            RaiseEvent(OnContinue);
+        }
         private void BuildInstance()
         {
             //TODO: do I need to pull it out by name?
@@ -131,18 +131,18 @@ namespace Topshelf.Internal
         #region Dispose Shit
         private bool _disposed;
         public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		protected void Dispose(bool disposing)
-		{
-			if (!disposing) return;
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing) return;
             if (!_disposed) return;
 
             
-			_instance = default(TService);
+            _instance = default(TService);
             StartAction = null;
             StopAction = null;
             PauseAction = null;
@@ -150,12 +150,12 @@ namespace Topshelf.Internal
             CreateServiceLocator = null;
             _serviceLocator = null;
             _disposed = true;
-		}
+        }
 
-		~ServiceController()
-		{
-			Dispose(false);
-		}
+        ~ServiceController()
+        {
+            Dispose(false);
+        }
         #endregion
     }
 }

@@ -10,13 +10,14 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Specs.Configuration
+namespace Topshelf.Specs
 {
-    using Internal;
-    using NUnit.Framework;
+    using Configuration;
     using Microsoft.Practices.ServiceLocation;
+    using Model;
+    using NUnit.Framework;
     using Rhino.Mocks;
-    using Topshelf.Configuration;
+    using Topshelf.Configuration.Dsl;
 
     [TestFixture]
     public class ServiceController_Specs
@@ -37,12 +38,12 @@ namespace Topshelf.Specs.Configuration
             c.WhenPaused(s => { _wasPaused = true; });
             c.WhenContinued(s => { _wasContinued = true; });
             c.CreateServiceLocator(()=>
-                                   {
-                                       IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
-                                       ServiceLocator.SetLocatorProvider(() => sl);
-                                       sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
-                                       return sl;
-                                   });
+            {
+                IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
+                ServiceLocator.SetLocatorProvider(() => sl);
+                sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
+                return sl;
+            });
             _serviceController = c.Create();
             _serviceController.Start();
         }
@@ -108,28 +109,28 @@ namespace Topshelf.Specs.Configuration
         //TODO: state transition tests
     }
 
-	[TestFixture]
-	public class SimpleServiceContainerStuff
-	{
-		[Test]
-		public void Should_work()
-		{
+    [TestFixture]
+    public class SimpleServiceContainerStuff
+    {
+        [Test]
+        public void Should_work()
+        {
             var c = new ServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
             c.CreateServiceLocator(()=>
-                                   {
-                                       TestService srv = new TestService();
-                                       var sl = MockRepository.GenerateStub<IServiceLocator>();
-                                       sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(srv);
-                                       return sl;
-                                   });
+            {
+                TestService srv = new TestService();
+                var sl = MockRepository.GenerateStub<IServiceLocator>();
+                sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(srv);
+                return sl;
+            });
 
             var service = c.Create();
             service.Start();
 
-			service.State
+            service.State
                 .ShouldEqual(ServiceState.Started);
-		}
-	}
+        }
+    }
 }

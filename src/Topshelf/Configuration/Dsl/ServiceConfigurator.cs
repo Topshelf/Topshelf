@@ -10,32 +10,32 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Configuration
+namespace Topshelf.Configuration.Dsl
 {
-	using Internal;
+    using Model;
 
-	public class ServiceConfigurator<TService> :
-		ServiceConfiguratorBase<TService>,
-		IServiceConfigurator<TService>
+    public class ServiceConfigurator<TService> :
+        ServiceConfiguratorBase<TService>,
+        IServiceConfigurator<TService>
         where TService : class
-	{
-	    public ServiceConfigurator(string name) : base(name)
-	    {
-	    }
+    {
+        public ServiceConfigurator(string name) : base(name)
+        {
+        }
 
-	    public IServiceController Create()
-		{
-			IServiceController serviceController = new ServiceController<TService>
-				{
-					CreateServiceLocator = _createServiceLocator,
-					StartAction = _startAction,
-					StopAction = _stopAction,
-					PauseAction = _pauseAction,
-					ContinueAction = _continueAction,
-					Name = _name,
-				};
+        public IServiceController Create()
+        {
+            IServiceController serviceController = new ServiceController<TService>
+                                                   {
+                                                       CreateServiceLocator = _createServiceLocator,
+                                                       StartAction = _startAction,
+                                                       StopAction = _stopAction,
+                                                       PauseAction = _pauseAction,
+                                                       ContinueAction = _continueAction,
+                                                       Name = _name,
+                                                   };
 
-			return serviceController;
-		}
-	}
+            return serviceController;
+        }
+    }
 }

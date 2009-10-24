@@ -10,100 +10,100 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Internal
+namespace Topshelf.Model
 {
-	using System;
-	using System.Diagnostics;
-	using Microsoft.Practices.ServiceLocation;
+    using System;
+    using System.Diagnostics;
+    using Microsoft.Practices.ServiceLocation;
 
     [DebuggerDisplay("Isolated Service({Name}) - {State}")]
-	public class IsolatedServiceController<TService> :
-		MarshalByRefObject,
-		IServiceControllerOf<TService> where TService : class
-	{
+    public class IsolatedServiceController<TService> :
+        MarshalByRefObject,
+        IServiceControllerOf<TService> where TService : class
+    {
         readonly ServiceController<TService> _serviceController = new ServiceController<TService>();
 
 		
-	    public ServiceState State
-	    {
-	        get { return _serviceController.State; }
-	    }
+        public ServiceState State
+        {
+            get { return _serviceController.State; }
+        }
 
-	    public Type ServiceType
-	    {
+        public Type ServiceType
+        {
             get { return _serviceController.ServiceType; }
-	    }
+        }
 
-	    public IServiceLocator ServiceLocator
-	    {
-	        get { return _serviceController.ServiceLocator; }
-	    }
+        public IServiceLocator ServiceLocator
+        {
+            get { return _serviceController.ServiceLocator; }
+        }
 
 
-	    public string Name
-	    {
-	        get { return _serviceController.Name; }
+        public string Name
+        {
+            get { return _serviceController.Name; }
             set { _serviceController.Name = value; }
-	    }
+        }
 
-	    public void Start()
-	    {
-	        _serviceController.Start();
-	    }
+        public void Start()
+        {
+            _serviceController.Start();
+        }
 
-	    public void Stop()
-	    {
-	        _serviceController.Stop();
-	    }
+        public void Stop()
+        {
+            _serviceController.Stop();
+        }
 
-	    public void Pause()
-	    {
-	        _serviceController.Pause();
-	    }
+        public void Pause()
+        {
+            _serviceController.Pause();
+        }
 
-	    public void Continue()
-	    {
-	        _serviceController.Continue();
-	    }
+        public void Continue()
+        {
+            _serviceController.Continue();
+        }
 
-	    public void Dispose()
-	    {
-	        _serviceController.Dispose();
-	    }
+        public void Dispose()
+        {
+            _serviceController.Dispose();
+        }
 
-      public void ChangeName(string value)
-      {
-        _serviceController.Name = value;
-      }
+        public void ChangeName(string value)
+        {
+            _serviceController.Name = value;
+        }
 
-      public Action<TService> StartAction
-	    {
-	        get { return _serviceController.StartAction; }
-	        set { _serviceController.StartAction = value; }
-	    }
+        public Action<TService> StartAction
+        {
+            get { return _serviceController.StartAction; }
+            set { _serviceController.StartAction = value; }
+        }
 
-	    public Action<TService> StopAction
-	    {
-	        get { return _serviceController.StopAction; }
-	        set { _serviceController.StopAction = value; }
-	    }
+        public Action<TService> StopAction
+        {
+            get { return _serviceController.StopAction; }
+            set { _serviceController.StopAction = value; }
+        }
 
-	    public Action<TService> PauseAction
-	    {
-	        get { return _serviceController.PauseAction; }
-	        set { _serviceController.PauseAction = value; }
-	    }
+        public Action<TService> PauseAction
+        {
+            get { return _serviceController.PauseAction; }
+            set { _serviceController.PauseAction = value; }
+        }
 
-	    public Action<TService> ContinueAction
-	    {
-	        get { return _serviceController.ContinueAction; }
-	        set { _serviceController.ContinueAction = value; }
-	    }
+        public Action<TService> ContinueAction
+        {
+            get { return _serviceController.ContinueAction; }
+            set { _serviceController.ContinueAction = value; }
+        }
 
-	    public Func<IServiceLocator> CreateServiceLocator
-	    {
-	        get { return _serviceController.CreateServiceLocator; }
-	        set { _serviceController.CreateServiceLocator = value; }
-	    }
-	}
+        public Func<IServiceLocator> CreateServiceLocator
+        {
+            get { return _serviceController.CreateServiceLocator; }
+            set { _serviceController.CreateServiceLocator = value; }
+        }
+    }
 }

@@ -14,8 +14,8 @@ namespace Topshelf
 {
     using System;
     using System.Collections.Generic;
-    using Configuration;
-    using Internal;
+    using Actions;
+    using Configuration.Dsl;
     using Internal.Actions;
     using log4net;
 
