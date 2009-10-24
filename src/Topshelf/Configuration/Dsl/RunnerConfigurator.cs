@@ -15,7 +15,6 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using System.Collections.Generic;
     using System.ServiceProcess;
-    using System.Windows.Forms;
     using Internal.Actions;
     using Model;
 
@@ -173,12 +172,6 @@ namespace Topshelf.Configuration.Dsl
                 action(configurator);
                 return configurator.Create();
             });
-        }
-
-        public void UseWinFormHost<T>() where T : Form
-        {
-            _runnerAction = NamedAction.Gui;
-            _winForm = typeof (T);
         }
 
         public void BeforeStartingServices(Action<IServiceCoordinator> action)

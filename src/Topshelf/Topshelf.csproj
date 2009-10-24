@@ -56,7 +56,6 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -77,7 +76,6 @@
     <Compile Include="Actions\NamedAction.cs" />
     <Compile Include="Actions\RunAsConsoleAction.cs" />
     <Compile Include="Actions\RunAsServiceAction.cs" />
-    <Compile Include="Actions\RunAsWinFormAction.cs" />
     <Compile Include="Actions\ServiceNamedAction.cs" />
     <Compile Include="Actions\UninstallServiceAction.cs" />
     <Compile Include="Exceptions\CouldntFindServiceException.cs" />
@@ -100,8 +98,8 @@
     <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
     <Compile Include="TopshelfArgumentParser.cs" />
     <Compile Include="TopshelfArguments.cs" />
-    <Compile Include="ServiceInformation.cs" />
-    <Compile Include="ServiceState.cs" />
+    <Compile Include="Model\ServiceInformation.cs" />
+    <Compile Include="Model\ServiceState.cs" />
     <Compile Include="Configuration\Dsl\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Hosts\HostServiceInstaller.cs">
@@ -111,7 +109,6 @@
     <Compile Include="Hosts\ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Hosts\WinFormHost.cs" />
     <Compile Include="IAction.cs" />
     <Compile Include="Instrumentation\BasicServiceInstrumentation.cs" />
     <Compile Include="Configuration\Dsl\KnownServiceNames.cs" />

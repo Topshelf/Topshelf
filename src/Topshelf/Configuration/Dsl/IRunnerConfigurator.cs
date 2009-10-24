@@ -13,7 +13,6 @@
 namespace Topshelf.Configuration.Dsl
 {
     using System;
-    using System.Windows.Forms;
     using Model;
 
     public interface IRunnerConfigurator :
@@ -130,12 +129,6 @@ namespace Topshelf.Configuration.Dsl
         /// Registers a dependency on the Event Log service.
         /// </summary>
         void DependencyOnEventLog();
-
-        /// <summary>
-        /// By default we use a console/winservice host. By executing this method you state you prefer the winformhost.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        void UseWinFormHost<T>() where T : Form;
 
         /// <summary>
         /// Defines an action or a set of actions to perform before starting the services

@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -13,10 +13,7 @@
 namespace Topshelf
 {
     using System;
-    using System.Collections.Generic;
-    using Actions;
     using Configuration.Dsl;
-    using Internal.Actions;
     using log4net;
 
     /// <summary>
@@ -24,18 +21,11 @@ namespace Topshelf
     /// </summary>
     public static class Runner
     {
-        static readonly IDictionary<NamedAction, IAction> _actions = new Dictionary<NamedAction, IAction>();
-        static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
+        static readonly ILog _log = LogManager.GetLogger(typeof(Runner));
 
         static Runner()
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
-
-            _actions.Add(ServiceNamedAction.Install, new InstallServiceAction());
-            _actions.Add(ServiceNamedAction.Uninstall, new UninstallServiceAction());
-            _actions.Add(NamedAction.Console, new RunAsConsoleAction());
-            _actions.Add(NamedAction.Gui, new RunAsWinFormAction());
-            _actions.Add(ServiceNamedAction.Service, new RunAsServiceAction());
         }
 
         static void UnhandledException(object sender, UnhandledExceptionEventArgs e)

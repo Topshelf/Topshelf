@@ -21,6 +21,7 @@ namespace Topshelf
 
     public static class TopshelfDispatcher
     {
+        //convert actions to commands
         static readonly List<Command> _commands = new List<Command>
                                                   {
                                                       new RunCommand(null) // how to get the service coordinator in here
