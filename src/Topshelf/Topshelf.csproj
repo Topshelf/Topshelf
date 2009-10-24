@@ -68,20 +68,20 @@
     <Compile Include="Commands\WinService\RunCommand.cs" />
     <Compile Include="Commands\WinService\SubCommands\InstallService.cs" />
     <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
-    <Compile Include="Internal\ActivatorServiceLocator.cs" />
+    <Compile Include="ActivatorServiceLocator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
-    <Compile Include="Internal\Actions\InstallServiceAction.cs" />
-    <Compile Include="Internal\Actions\NamedAction.cs" />
-    <Compile Include="Internal\Actions\RunAsConsoleAction.cs" />
-    <Compile Include="Internal\Actions\RunAsServiceAction.cs" />
-    <Compile Include="Internal\Actions\RunAsWinFormAction.cs" />
-    <Compile Include="Internal\Actions\ServiceNamedAction.cs" />
-    <Compile Include="Internal\Actions\UninstallServiceAction.cs" />
+    <Compile Include="Actions\InstallServiceAction.cs" />
+    <Compile Include="Actions\NamedAction.cs" />
+    <Compile Include="Actions\RunAsConsoleAction.cs" />
+    <Compile Include="Actions\RunAsServiceAction.cs" />
+    <Compile Include="Actions\RunAsWinFormAction.cs" />
+    <Compile Include="Actions\ServiceNamedAction.cs" />
+    <Compile Include="Actions\UninstallServiceAction.cs" />
     <Compile Include="Exceptions\CouldntFindServiceException.cs" />
-    <Compile Include="Internal\TopshelfDispatcher.cs" />
+    <Compile Include="TopshelfDispatcher.cs" />
     <Compile Include="Model\ControllerDelegates.cs" />
     <Compile Include="Model\IServiceControllerOf.cs" />
     <Compile Include="Model\IsolatedServiceController.cs" />
@@ -98,21 +98,21 @@
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Model\ServiceController.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
-    <Compile Include="Internal\TopshelfArgumentParser.cs" />
-    <Compile Include="Internal\TopshelfArguments.cs" />
+    <Compile Include="TopshelfArgumentParser.cs" />
+    <Compile Include="TopshelfArguments.cs" />
     <Compile Include="ServiceInformation.cs" />
     <Compile Include="ServiceState.cs" />
     <Compile Include="Configuration\Dsl\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
-    <Compile Include="Internal\Hosts\HostServiceInstaller.cs">
+    <Compile Include="Hosts\HostServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Internal\Hosts\ConsoleHost.cs" />
-    <Compile Include="Internal\Hosts\ServiceHost.cs">
+    <Compile Include="Hosts\ConsoleHost.cs" />
+    <Compile Include="Hosts\ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Internal\Hosts\WinFormHost.cs" />
-    <Compile Include="Internal\IAction.cs" />
+    <Compile Include="Hosts\WinFormHost.cs" />
+    <Compile Include="IAction.cs" />
     <Compile Include="Instrumentation\BasicServiceInstrumentation.cs" />
     <Compile Include="Configuration\Dsl\KnownServiceNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
