@@ -41,7 +41,7 @@ namespace Topshelf.Internal
             IArgumentParser _argumentParser = new ArgumentParser();
             IEnumerable<IArgument> arguments = _argumentParser.Parse(args);
             IArgumentMap mapper = _argumentMapFactory.CreateMap(result);
-            IEnumerable<IArgument> remaining = mapper.ApplyTo(result, arguments);
+            result.CustomArguments = mapper.ApplyTo(result, arguments);
 
             return result;
         }
@@ -73,6 +73,7 @@ namespace Topshelf.Internal
             [Argument(Key="instance")]
             public string InstanceName { get; set; }
 
+            public IEnumerable<IArgument> CustomArguments { get; set; }
 
             public NamedAction GetActionKey()
             {

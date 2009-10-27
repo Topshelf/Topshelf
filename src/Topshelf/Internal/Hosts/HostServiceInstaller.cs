@@ -50,6 +50,7 @@ namespace Topshelf.Internal.Hosts
                     ti.Installers.Add(this);
 
                     string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
+
                     string[] commandLine = {path};
 
                     InstallContext context = new InstallContext(null, commandLine);
@@ -67,6 +68,7 @@ namespace Topshelf.Internal.Hosts
                     _log.Info("Service is already installed");
             }
         }
+
         public void Unregister()
         {
             if (IsInstalled(_config))
@@ -130,6 +132,11 @@ namespace Topshelf.Internal.Hosts
 
                 imagePath += _config.WinServiceSettings.InstanceName == null ?
                     " -service" : " -service -instance:{0}".FormatWith(_config.WinServiceSettings.InstanceName);
+
+                if (!string.IsNullOrEmpty(_config.WinServiceSettings.CommandLine))
+                {
+                    imagePath += " " + _config.WinServiceSettings.CommandLine;
+                }
 
                 _log.DebugFormat("ImagePath '{0}'", imagePath);
 

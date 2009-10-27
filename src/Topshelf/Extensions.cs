@@ -13,19 +13,23 @@
 namespace Topshelf
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using Internal;
+    using Internal.ArgumentParsing;
 
     public static class Extensions
     {
         public static T CreateInstanceAndUnwrap<T>(this AppDomain domain)
         {
             var type = typeof(T);
-            return (T)domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName);
+            return (T) domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName);
         }
+
         public static T CreateInstanceAndUnwrap<T>(this AppDomain domain, params object[] args)
         {
             var type = typeof(T);
-            return (T)domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, args, null, null, null);
+            return (T) domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, args, null, null, null);
         }
 
         public static string FormatWith(this string format, params string[] args)
@@ -45,6 +49,17 @@ namespace Topshelf
                 return action(serviceController);
 
             return ifNull;
+        }
+
+        public static string AsCommandLine(this IEnumerable<IArgument> arguments)
+        {
+            var keyValueArguments = arguments.Where(x => !string.IsNullOrEmpty(x.Key));
+
+            var commandLine = keyValueArguments.Select(x => "/{0}:{1}".FormatWith(x.Key, x.Value));
+
+            commandLine = commandLine.Union(arguments.Except(keyValueArguments).Select(x => x.Value));
+
+            return string.Join(" ", commandLine.ToArray());
         }
     }
 }

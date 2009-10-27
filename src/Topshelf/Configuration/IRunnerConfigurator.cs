@@ -69,6 +69,12 @@ namespace Topshelf.Configuration
 		void SetDescription(string description);
 
         /// <summary>
+        /// Sets the command line arguments for the service executable.
+        /// </summary>
+        /// <param name="commandLine">The service command line arguments.</param>
+        void SetServiceCommandLine(string commandLine);
+
+        /// <summary>
         /// We set the service to start automatically by default. This sets the service to manual instead.
         /// </summary>
         void DoNotStartAutomatically();
