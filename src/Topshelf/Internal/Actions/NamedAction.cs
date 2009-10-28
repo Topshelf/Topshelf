@@ -29,11 +29,6 @@ namespace Topshelf.Internal.Actions
             get { return new NamedAction("console"); }
         }
 
-        public static NamedAction Gui
-        {
-            get { return new NamedAction("gui"); }
-        }
-
         public bool Equals(NamedAction obj)
         {
             if (ReferenceEquals(null, obj)) return false;

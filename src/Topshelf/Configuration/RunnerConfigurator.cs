@@ -15,7 +15,6 @@ namespace Topshelf.Configuration
     using System;
     using System.Collections.Generic;
     using System.ServiceProcess;
-    using System.Windows.Forms;
     using Internal;
     using Internal.Actions;
 
@@ -42,7 +41,6 @@ namespace Topshelf.Configuration
             _credentials = Credentials.LocalSystem;
             _serviceConfigurators = new List<Func<IServiceController>>();
             _runnerAction = NamedAction.Console;
-            _winForm = typeof (ServiceConsole);
         }
 
         #region WinServiceSettings
@@ -183,12 +181,6 @@ namespace Topshelf.Configuration
                 action(configurator);
                 return configurator.Create();
             });
-        }
-
-        public void UseWinFormHost<T>() where T : Form
-        {
-            _runnerAction = NamedAction.Gui;
-            _winForm = typeof (T);
         }
 
         public void BeforeStartingServices(Action<IServiceCoordinator> action)

@@ -34,7 +34,6 @@ namespace Topshelf
             _actions.Add(ServiceNamedAction.Install, new InstallServiceAction());
             _actions.Add(ServiceNamedAction.Uninstall, new UninstallServiceAction());
             _actions.Add(NamedAction.Console, new RunAsConsoleAction());
-            _actions.Add(NamedAction.Gui, new RunAsWinFormAction());
             _actions.Add(ServiceNamedAction.Service, new RunAsServiceAction());
         }
 

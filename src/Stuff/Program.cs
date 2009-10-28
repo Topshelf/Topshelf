@@ -38,7 +38,6 @@ namespace Stuff
                         ObjectFactory.Initialize(i =>
                         {
                             i.ForConcreteType<TownCrier>().Configure.WithName("tc");
-                            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
                         });
 
                         return new StructureMapServiceLocator();

@@ -59,9 +59,6 @@ namespace Topshelf.Internal
             [Argument(Key = "console")]
             public bool Console { get; set; }
 
-            [Argument(Key = "gui")]
-            public bool Gui { get; set; }
-
             [Argument(Key = "service")]
             public bool Service { get; set; }
 
@@ -80,7 +77,6 @@ namespace Topshelf.Internal
                 if (Install) return ServiceNamedAction.Install;
                 if (Uninstall) return ServiceNamedAction.Uninstall;
                 if (Service) return ServiceNamedAction.Service;
-                if (Gui) return NamedAction.Gui;
                 return NamedAction.Console;
             }
         }
