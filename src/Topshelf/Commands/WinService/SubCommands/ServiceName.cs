@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -10,35 +10,36 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Internal.Actions
+namespace Topshelf.Commands.WinService.SubCommands
 {
-    public class ServiceNamedAction :
-        NamedAction
+    public class ServiceName
     {
-        protected ServiceNamedAction(string key) : base(key)
+        readonly string _instanceName;
+        readonly string _name;
+
+        public ServiceName(string name) : this(name, "")
         {
         }
 
-        public static NamedAction Service
+        public ServiceName(string name, string instanceName)
         {
-            get { return new ServiceNamedAction("service"); }
-        }
-        public static NamedAction Install
-        {
-            get
-            {
-                return new ServiceNamedAction("install");
-
-            }
+            _name = name;
+            _instanceName = instanceName;
         }
 
-        public static NamedAction Uninstall
+        public string Name
         {
-            get
-            {
-                return new ServiceNamedAction("uninstall");
-            }
+            get { return _name; }
         }
 
+        public string InstanceName
+        {
+            get { return _instanceName; }
+        }
+
+        public string FullName
+        {
+            get { return "{0}@{1}".FormatWith(_name, _instanceName); }
+        }
     }
 }

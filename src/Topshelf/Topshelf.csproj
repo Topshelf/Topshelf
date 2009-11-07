@@ -66,6 +66,7 @@
     <Compile Include="Commands\CommandLine\RunCommand.cs" />
     <Compile Include="Commands\WinService\RunCommand.cs" />
     <Compile Include="Commands\WinService\SubCommands\InstallService.cs" />
+    <Compile Include="Commands\WinService\SubCommands\ServiceName.cs" />
     <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
     <Compile Include="ActivatorServiceLocator.cs" />
     <Compile Include="Extensions.cs" />
@@ -76,7 +77,6 @@
     <Compile Include="Actions\NamedAction.cs" />
     <Compile Include="Actions\RunAsConsoleAction.cs" />
     <Compile Include="Actions\RunAsServiceAction.cs" />
-    <Compile Include="Actions\ServiceNamedAction.cs" />
     <Compile Include="Actions\UninstallServiceAction.cs" />
     <Compile Include="Exceptions\CouldntFindServiceException.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
@@ -102,7 +102,7 @@
     <Compile Include="Model\ServiceState.cs" />
     <Compile Include="Configuration\Dsl\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
-    <Compile Include="Hosts\HostServiceInstaller.cs">
+    <Compile Include="Commands\WinService\SubCommands\HostServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Hosts\ConsoleHost.cs" />

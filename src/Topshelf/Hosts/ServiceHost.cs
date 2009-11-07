@@ -31,6 +31,7 @@ namespace Topshelf.Hosts
 
         public void Run()
         {
+            _log.Debug("Starting up as a windows service application");
             var servicesToRun = new ServiceBase[] {this};
 
             Run(servicesToRun);

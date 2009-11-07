@@ -14,7 +14,7 @@ namespace Topshelf.Configuration.Dsl
 {
     using System;
     using System.ServiceProcess;
-    using Internal.Actions;
+    using Actions;
     using Model;
 
     public class RunConfiguration :

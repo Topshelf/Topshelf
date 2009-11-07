@@ -29,6 +29,8 @@ namespace Topshelf.Hosts
         private readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
         private readonly IRunConfiguration _config;
 
+       
+
         public HostServiceInstaller(IRunConfiguration configuration)
         {
             _log.DebugFormat("Attempting to install with {0} configuration", configuration);
@@ -41,9 +43,9 @@ namespace Topshelf.Hosts
         }
 
 
-        public void Register()
+        public void Register(string fullServiceName)
         {
-            if (!IsInstalled(_config))
+            if (!IsInstalled(fullServiceName))
             {
                 using (TransactedInstaller ti = new TransactedInstaller())
                 {
@@ -67,9 +69,9 @@ namespace Topshelf.Hosts
                     _log.Info("Service is already installed");
             }
         }
-        public void Unregister()
+        public void Unregister(string fullServiceName)
         {
-            if (IsInstalled(_config))
+            if (IsInstalled(fullServiceName))
             {
                 using (TransactedInstaller ti = new TransactedInstaller())
                 {
@@ -92,11 +94,11 @@ namespace Topshelf.Hosts
             }
         }
 
-        public static bool IsInstalled(IRunConfiguration configuration)
+        public static bool IsInstalled(string fullServiceName)
         {
             foreach (ServiceController service in ServiceController.GetServices())
             {
-                if (service.ServiceName == configuration.WinServiceSettings.FullServiceName)
+                if (service.ServiceName == fullServiceName)
                     return true;
             }
 

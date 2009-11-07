@@ -10,7 +10,10 @@ namespace Topshelf.Commands.WinService
     {
         public string Name
         {
-            get; set;
+            get
+            {
+                return "run winservice";
+            }
         }
 
         public void Execute(IEnumerable<ICommandLineElement> args)

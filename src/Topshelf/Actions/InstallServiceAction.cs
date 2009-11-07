@@ -28,7 +28,7 @@ namespace Topshelf.Actions
         {
             _log.Info("Received service install notification");
 
-            if (HostServiceInstaller.IsInstalled(configuration))
+            if (HostServiceInstaller.IsInstalled(configuration.WinServiceSettings.FullServiceName))
             {
                 string message = string.Format("The {0} service has already been installed.", configuration.WinServiceSettings.FullServiceName);
                 _log.Error(message);

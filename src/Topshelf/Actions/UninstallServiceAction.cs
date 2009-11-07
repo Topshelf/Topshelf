@@ -26,7 +26,7 @@ namespace Topshelf.Actions
 
         public void Do(IRunConfiguration configuration)
         {
-            if(!HostServiceInstaller.IsInstalled(configuration))
+            if(!HostServiceInstaller.IsInstalled(configuration.WinServiceSettings.FullServiceName))
             {
                 string message = string.Format("The {0} service has not been installed.", configuration.WinServiceSettings.FullServiceName);
                 _log.Error(message);
