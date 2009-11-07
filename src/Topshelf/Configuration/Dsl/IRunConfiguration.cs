@@ -14,7 +14,6 @@ namespace Topshelf.Configuration.Dsl
 {
     using System;
     using System.ServiceProcess;
-    using Actions;
     using Model;
 
     public interface IRunConfiguration
@@ -22,8 +21,6 @@ namespace Topshelf.Configuration.Dsl
         IServiceCoordinator Coordinator { get; }
         Credentials Credentials { get; }
         WinServiceSettings WinServiceSettings { get; }
-        Type FormType { get; }
-        NamedAction DefaultAction { get; }
 
         void ConfigureServiceInstaller(ServiceInstaller installer);
         void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer);

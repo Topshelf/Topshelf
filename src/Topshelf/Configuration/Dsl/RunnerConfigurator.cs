@@ -15,7 +15,6 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using System.Collections.Generic;
     using System.ServiceProcess;
-    using Actions;
     using Model;
 
     public class RunnerConfigurator :
@@ -28,8 +27,6 @@ namespace Topshelf.Configuration.Dsl
         Action<IServiceCoordinator> _beforeStartingServices = c => { };
         Credentials _credentials;
         bool _disposed;
-        readonly NamedAction _runnerAction;
-        Type _winForm;
 
 
         /// <summary>
@@ -40,7 +37,6 @@ namespace Topshelf.Configuration.Dsl
             _winServiceSettings = new WinServiceSettings();
             _credentials = Credentials.LocalSystem;
             _serviceConfigurators = new List<Func<IServiceController>>();
-            _runnerAction = NamedAction.Console;
         }
 
         #region WinServiceSettings
@@ -255,8 +251,6 @@ namespace Topshelf.Configuration.Dsl
                           Credentials = _credentials,
                           Coordinator = serviceCoordinator
                       };
-
-            cfg.SetRunnerAction(_runnerAction, _winForm);
 
             return cfg;
         }

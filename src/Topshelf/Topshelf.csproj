@@ -73,11 +73,6 @@
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
-    <Compile Include="Actions\InstallServiceAction.cs" />
-    <Compile Include="Actions\NamedAction.cs" />
-    <Compile Include="Actions\RunAsConsoleAction.cs" />
-    <Compile Include="Actions\RunAsServiceAction.cs" />
-    <Compile Include="Actions\UninstallServiceAction.cs" />
     <Compile Include="Exceptions\CouldntFindServiceException.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
     <Compile Include="Model\ControllerDelegates.cs" />

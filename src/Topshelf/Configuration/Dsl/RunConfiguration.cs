@@ -14,7 +14,6 @@ namespace Topshelf.Configuration.Dsl
 {
     using System;
     using System.ServiceProcess;
-    using Actions;
     using Model;
 
     public class RunConfiguration :
@@ -22,20 +21,13 @@ namespace Topshelf.Configuration.Dsl
     {
         public RunConfiguration()
         {
-            DefaultAction = NamedAction.Console;
         }
 
         public WinServiceSettings WinServiceSettings { get; set; }
         public Credentials Credentials { get; set; }
         public IServiceCoordinator Coordinator { get; set; }
         public Type FormType { get; private set; }
-        public NamedAction DefaultAction { get; private set; }
 
-        public void SetRunnerAction(NamedAction action, Type form)
-        {
-            DefaultAction = action;
-            FormType = form;
-        }
 
         public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
         {

@@ -40,6 +40,7 @@ namespace Topshelf.Commands.CommandLine
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
+            //TODO: hijacked the host
             //TODO: feels hacky
             var servicesToStart = args.Where(x => x is IDefinitionElement)
                 .Select(x => x as IDefinitionElement)
