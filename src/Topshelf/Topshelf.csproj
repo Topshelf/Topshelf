@@ -104,7 +104,6 @@
     <Compile Include="Hosts\ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="IAction.cs" />
     <Compile Include="Instrumentation\BasicServiceInstrumentation.cs" />
     <Compile Include="Configuration\Dsl\KnownServiceNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
