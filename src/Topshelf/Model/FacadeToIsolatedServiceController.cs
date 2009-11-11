@@ -43,7 +43,9 @@ namespace Topshelf.Model
 
             _domain = AppDomain.CreateDomain(typeof(TService).AssemblyQualifiedName, null, settings);
 
-            _remoteServiceController = _domain.CreateInstanceAndUnwrap<ServiceControllerProxy>(typeof(TService));
+            var type = typeof(ServiceControllerProxy);
+            _remoteServiceController = (ServiceControllerProxy)_domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[]{ typeof(TService)}, null, null, null);
+
             if (_remoteServiceController == null)
                 throw new ApplicationException("Unable to create service proxy for " + typeof(TService).Name);
 

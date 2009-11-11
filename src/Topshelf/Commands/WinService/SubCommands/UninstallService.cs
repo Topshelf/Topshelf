@@ -1,9 +1,19 @@
+// Copyright 2007-2008 The Apache Software Foundation.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
+// this file except in compliance with the License. You may obtain a copy of the 
+// License at 
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 namespace Topshelf.Commands.WinService.SubCommands
 {
-    using System;
     using System.Collections.Generic;
     using Configuration.Dsl;
-    using Hosts;
     using log4net;
     using Magnum.CommandLineParser;
 
@@ -11,14 +21,16 @@ namespace Topshelf.Commands.WinService.SubCommands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(UninstallService));
-        readonly string _fullServiceName = "";
         readonly IRunConfiguration _configuration = null;
+        readonly string _fullServiceName = "";
 
         public UninstallService(IRunConfiguration configuration)
         {
-            this._fullServiceName = configuration.WinServiceSettings.FullServiceName;
-            this._configuration = configuration;
+            _fullServiceName = configuration.WinServiceSettings.FullServiceName;
+            _configuration = configuration;
         }
+
+        #region Command Members
 
         public string Name
         {
@@ -27,7 +39,6 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
-
             if (!WinServiceHelper.IsInstalled(_fullServiceName))
             {
                 string message = string.Format("The {0} service has not been installed.", _fullServiceName);
@@ -39,5 +50,7 @@ namespace Topshelf.Commands.WinService.SubCommands
             _log.Info("Received serice uninstall notification");
             WinServiceHelper.Unregister(_fullServiceName, new HostServiceInstaller(_configuration.WinServiceSettings));
         }
+
+        #endregion
     }
 }

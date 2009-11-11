@@ -15,7 +15,6 @@ namespace Topshelf.Commands.WinService.SubCommands
     using System.Collections.Generic;
     using Configuration;
     using Configuration.Dsl;
-    using Hosts;
     using log4net;
     using Magnum.CommandLineParser;
 

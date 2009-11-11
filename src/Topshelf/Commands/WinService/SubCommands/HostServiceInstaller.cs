@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -10,26 +10,22 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Hosts
+namespace Topshelf.Commands.WinService.SubCommands
 {
-    using System;
     using System.Collections;
     using System.Configuration.Install;
-    using System.Reflection;
     using System.ServiceProcess;
-    using Commands.WinService.SubCommands;
     using Configuration;
-    using Configuration.Dsl;
     using log4net;
     using Microsoft.Win32;
 
     public class HostServiceInstaller :
         Installer
     {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (HostServiceInstaller));
-        private readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
-        private readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
-        WinServiceSettings _settings;
+        static readonly ILog _log = LogManager.GetLogger(typeof(HostServiceInstaller));
+        readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
+        readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
+        readonly WinServiceSettings _settings;
 
 
         public HostServiceInstaller(WinServiceSettings settings)
@@ -39,10 +35,8 @@ namespace Topshelf.Hosts
             WinServiceHelper.ConfigureServiceInstaller(_serviceInstaller, settings);
             WinServiceHelper.ConfigureServiceProcessInstaller(_serviceProcessInstaller, _settings.Credentials);
 
-            Installers.AddRange(new Installer[] {_serviceProcessInstaller, _serviceInstaller});            
+            Installers.AddRange(new Installer[] {_serviceProcessInstaller, _serviceInstaller});
         }
-
-
 
 
         /// <summary>
@@ -65,19 +59,19 @@ namespace Topshelf.Hosts
             {
                 service.SetValue("Description", _serviceInstaller.Description);
 
-                string imagePath = (string)service.GetValue("ImagePath");
+                var imagePath = (string) service.GetValue("ImagePath");
 
                 _log.DebugFormat("Service Path {0}", imagePath);
 
                 imagePath += _settings.InstanceName == null ?
-                                                                                 " -service" : " -service -instance:{0}".FormatWith(_settings.InstanceName);
+                                                                " -service" : " -service -instance:{0}".FormatWith(_settings.InstanceName);
 
                 _log.DebugFormat("ImagePath '{0}'", imagePath);
 
                 service.SetValue("ImagePath", imagePath);
             }
 
-            if(_log.IsDebugEnabled) _log.Debug("Closing Registry");
+            if (_log.IsDebugEnabled) _log.Debug("Closing Registry");
         }
     }
 }

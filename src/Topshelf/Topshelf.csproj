@@ -68,13 +68,14 @@
     <Compile Include="Commands\WinService\SubCommands\InstallService.cs" />
     <Compile Include="Commands\WinService\SubCommands\ServiceName.cs" />
     <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
-    <Compile Include="ActivatorServiceLocator.cs" />
+    <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
     <Compile Include="Commands\WinService\SubCommands\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
     <Compile Include="Exceptions\CouldntFindServiceException.cs" />
+    <Compile Include="Model\Extensions.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
     <Compile Include="Model\ControllerDelegates.cs" />
     <Compile Include="Model\IServiceControllerOf.cs" />
