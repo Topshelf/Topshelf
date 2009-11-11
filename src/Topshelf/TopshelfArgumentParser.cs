@@ -17,24 +17,17 @@ namespace Topshelf
 
         static void Set(TopshelfArguments args, IEnumerable<ICommandLineElement> commandLineElements)
         {
-            var command = commandLineElements.Where(x => x is IArgumentElement)
+            var command = commandLineElements
+                .Take(1)
                 .Select(x => (IArgumentElement)x)
-                .DefaultIfEmpty(new ArgumentElement("commandline"))
                 .Select(x => x.Id)
+                .DefaultIfEmpty("commandline")
                 .SingleOrDefault();
 
+
             args.Command = command;
-
-
-            //services to start
-            var servicesToStart = commandLineElements.Where(x => x is IDefinitionElement)
-                .Select(x => x as IDefinitionElement)
-                .Where(x => x.Key == "start")
-                .Select(x => x.Value)
-                .DefaultIfEmpty("ALL");
-
-
-
+            //leftovers
+            args.CommandArgs = commandLineElements.Skip(1);
         }
 
         static IEnumerable<ICommandLineElement> P(string commandLine)

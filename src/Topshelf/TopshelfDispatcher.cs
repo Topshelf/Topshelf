@@ -33,6 +33,7 @@ namespace Topshelf
         {
             //find the command by the args 'Command'
             Command command = _commands.Where(x => x.Name == args.Command)
+                .DefaultIfEmpty(new RunCommand(config.Coordinator))
                 .Single();
 
             _log.DebugFormat("Running command: '{0}'", command.Name);

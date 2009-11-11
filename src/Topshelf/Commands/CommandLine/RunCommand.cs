@@ -35,18 +35,21 @@ namespace Topshelf.Commands.CommandLine
 
         public string Name
         {
-            get { return "Run as Command"; }
+            get { return "command"; }
         }
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
             //TODO: hijacked the host
             //TODO: feels hacky
-            var servicesToStart = args.Where(x => x is IDefinitionElement)
-                .Select(x => x as IDefinitionElement)
-                .Where(x => x.Key == "service")
-                .Select(x => x.Key)
-                .DefaultIfEmpty("ALL");
+            var servicesToStart = (IEnumerable<string>)new string[]{"ALL"};
+            
+            if(args != null) // this is start all
+                servicesToStart = args.Where(x => x is IDefinitionElement)
+                    .Select(x => x as IDefinitionElement)
+                    .Where(x => x.Key == "service")
+                    .Select(x => x.Key)
+                    .DefaultIfEmpty("ALL");
 
             //all
             var startAll = servicesToStart.Count() == 1 &&
