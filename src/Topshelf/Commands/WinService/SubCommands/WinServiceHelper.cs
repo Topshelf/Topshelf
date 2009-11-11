@@ -24,20 +24,41 @@ namespace Topshelf.Commands.WinService.SubCommands
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(WinServiceHelper));
 
-        public static void ConfigureServiceInstaller(ServiceInstaller installer, WinServiceSettings settings)
+        public static Installer[] BuildInstallers(WinServiceSettings settings)
         {
-            installer.ServiceName = settings.FullServiceName;
-            installer.Description = settings.Description;
-            installer.DisplayName = settings.FullDisplayName;
-            installer.ServicesDependedOn = settings.Dependencies.ToArray();
-            installer.StartType = ServiceStartMode.Automatic;
+            var result = new Installer[]
+                         {
+                             ConfigureServiceInstaller(settings),
+                             ConfigureServiceProcessInstaller(settings)
+                         };
+            return result;
         }
 
-        public static void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer, Credentials credentials)
+        public static ServiceInstaller ConfigureServiceInstaller(WinServiceSettings settings)
         {
-            installer.Username = credentials.Username;
-            installer.Password = credentials.Password;
-            installer.Account = credentials.AccountType;
+            var installer = new ServiceInstaller
+                            {
+                                ServiceName = settings.FullServiceName,
+                                Description = settings.Description,
+                                DisplayName = settings.FullDisplayName,
+                                ServicesDependedOn = settings.Dependencies.ToArray(),
+                                StartType = ServiceStartMode.Automatic
+                            };
+
+            return installer;
+        }
+
+        public static ServiceProcessInstaller ConfigureServiceProcessInstaller(WinServiceSettings settings)
+        {
+            var credentials = settings.Credentials;
+            var installer = new ServiceProcessInstaller
+                            {
+                                Username = credentials.Username,
+                                Password = credentials.Password,
+                                Account = credentials.AccountType
+                            };
+
+            return installer;
         }
 
 

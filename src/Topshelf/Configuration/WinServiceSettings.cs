@@ -72,6 +72,14 @@ namespace Topshelf.Configuration
             }
         }
 
+        public string ImagePath
+        {
+            get
+            {
+                return InstanceName == null ? " -service" : " -service -instance:{0}".FormatWith(InstanceName);
+            }
+        }
+
         public static WinServiceSettings Custom(string serviceName, string displayName, string description, params string[] dependencies)
         {
             var settings = new WinServiceSettings

@@ -14,7 +14,6 @@ namespace Topshelf.Commands.WinService.SubCommands
 {
     using System.Collections;
     using System.Configuration.Install;
-    using System.ServiceProcess;
     using Configuration;
     using log4net;
     using Microsoft.Win32;
@@ -23,8 +22,6 @@ namespace Topshelf.Commands.WinService.SubCommands
         Installer
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(HostServiceInstaller));
-        readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
-        readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
         readonly WinServiceSettings _settings;
 
 
@@ -32,10 +29,7 @@ namespace Topshelf.Commands.WinService.SubCommands
         {
             _settings = settings;
 
-            WinServiceHelper.ConfigureServiceInstaller(_serviceInstaller, settings);
-            WinServiceHelper.ConfigureServiceProcessInstaller(_serviceProcessInstaller, _settings.Credentials);
-
-            Installers.AddRange(new Installer[] {_serviceProcessInstaller, _serviceInstaller});
+            //Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
         }
 
 
@@ -45,8 +39,10 @@ namespace Topshelf.Commands.WinService.SubCommands
         /// <param name="stateSaver"></param>
         public override void Install(IDictionary stateSaver)
         {
+            Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
+
             if (_log.IsInfoEnabled)
-                _log.InfoFormat("Installing Service {0}", _serviceInstaller.ServiceName);
+                _log.InfoFormat("Installing Service {0}", _settings.FullServiceName);
 
             base.Install(stateSaver);
 
@@ -55,16 +51,15 @@ namespace Topshelf.Commands.WinService.SubCommands
             using (RegistryKey system = Registry.LocalMachine.OpenSubKey("System"))
             using (RegistryKey currentControlSet = system.OpenSubKey("CurrentControlSet"))
             using (RegistryKey services = currentControlSet.OpenSubKey("Services"))
-            using (RegistryKey service = services.OpenSubKey(_serviceInstaller.ServiceName, true))
+            using (RegistryKey service = services.OpenSubKey(_settings.FullServiceName, true))
             {
-                service.SetValue("Description", _serviceInstaller.Description);
+                service.SetValue("Description", _settings.Description);
 
                 var imagePath = (string) service.GetValue("ImagePath");
 
                 _log.DebugFormat("Service Path {0}", imagePath);
 
-                imagePath += _settings.InstanceName == null ?
-                                                                " -service" : " -service -instance:{0}".FormatWith(_settings.InstanceName);
+                imagePath += _settings.ImagePath;
 
                 _log.DebugFormat("ImagePath '{0}'", imagePath);
 
