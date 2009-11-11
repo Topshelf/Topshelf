@@ -18,7 +18,6 @@ namespace Topshelf.Specs.Configuration
     using NUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;
-    using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
 
     [TestFixture]

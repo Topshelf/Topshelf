@@ -10,16 +10,16 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Configuration
+namespace Topshelf.Configuration.Dsl
 {
-	/// <summary>
-	/// A selection of commonly-used Windows services.
-	/// </summary>
+    /// <summary>
+    /// A selection of commonly-used Windows services.
+    /// </summary>
     public static class KnownServiceNames
     {
-		/// <summary>
-		/// The Microsoft Message Queue service.
-		/// </summary>
+        /// <summary>
+        /// The Microsoft Message Queue service.
+        /// </summary>
         public static string Msmq
         {
             get
@@ -28,9 +28,9 @@ namespace Topshelf.Configuration
             }
         }
 
-		/// <summary>
-		/// The Microsoft SQL Server service.
-		/// </summary>
+        /// <summary>
+        /// The Microsoft SQL Server service.
+        /// </summary>
         public static string SqlServer
         {
             get
@@ -39,9 +39,9 @@ namespace Topshelf.Configuration
             }
         }
 
-		/// <summary>
-		/// The Internet Information Server service.
-		/// </summary>
+        /// <summary>
+        /// The Internet Information Server service.
+        /// </summary>
         public static string IIS
         {
             get
@@ -50,15 +50,15 @@ namespace Topshelf.Configuration
             }
         }
 
-		/// <summary>
-		/// The Event Log service.
-		/// </summary>
-		public static string EventLog
-		{
-			get 
-			{
-				return "Eventlog";
-			}
-		}
+        /// <summary>
+        /// The Event Log service.
+        /// </summary>
+        public static string EventLog
+        {
+            get 
+            {
+                return "Eventlog";
+            }
+        }
     }
 }
