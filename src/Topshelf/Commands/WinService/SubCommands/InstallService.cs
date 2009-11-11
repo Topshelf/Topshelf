@@ -13,6 +13,7 @@
 namespace Topshelf.Commands.WinService.SubCommands
 {
     using System.Collections.Generic;
+    using Configuration;
     using Configuration.Dsl;
     using Hosts;
     using log4net;
@@ -23,12 +24,12 @@ namespace Topshelf.Commands.WinService.SubCommands
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(InstallService));
         string _fullServiceName;
-        IRunConfiguration _configuration;
+        WinServiceSettings _settings;
 
-        public InstallService(string fullServiceName, IRunConfiguration runConfiguration)
+        public InstallService( IRunConfiguration configuration)
         {
-            _fullServiceName = fullServiceName;
-            _configuration = runConfiguration;
+            _fullServiceName = configuration.WinServiceSettings.FullServiceName;
+            _settings = configuration.WinServiceSettings;
         }
 
         #region Command Members
@@ -50,8 +51,7 @@ namespace Topshelf.Commands.WinService.SubCommands
                 return;
             }
 
-            new HostServiceInstaller(_configuration)
-                .Register(_configuration.WinServiceSettings.FullServiceName);
+            WinServiceHelper.Register(_fullServiceName, new HostServiceInstaller(_settings));
         }
 
         #endregion

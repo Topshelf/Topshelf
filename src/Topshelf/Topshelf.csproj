@@ -101,7 +101,7 @@
     <Compile Include="Commands\WinService\SubCommands\HostServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Hosts\ServiceHost.cs">
+    <Compile Include="Commands\WinService\ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Instrumentation\BasicServiceInstrumentation.cs" />

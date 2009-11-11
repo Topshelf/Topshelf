@@ -11,6 +11,14 @@ namespace Topshelf.Commands.WinService.SubCommands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(UninstallService));
+        readonly string _fullServiceName = "";
+        readonly IRunConfiguration _configuration = null;
+
+        public UninstallService(IRunConfiguration configuration)
+        {
+            this._fullServiceName = configuration.WinServiceSettings.FullServiceName;
+            this._configuration = configuration;
+        }
 
         public string Name
         {
@@ -19,20 +27,17 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
-            string fullServiceName = "";
-            IRunConfiguration configuration = null;
 
-            if (!WinServiceHelper.IsInstalled(fullServiceName))
+            if (!WinServiceHelper.IsInstalled(_fullServiceName))
             {
-                string message = string.Format("The {0} service has not been installed.", fullServiceName);
+                string message = string.Format("The {0} service has not been installed.", _fullServiceName);
                 _log.Error(message);
 
                 return;
             }
 
             _log.Info("Received serice uninstall notification");
-            new HostServiceInstaller(configuration)
-                .Unregister(fullServiceName);
+            WinServiceHelper.Unregister(_fullServiceName, new HostServiceInstaller(_configuration.WinServiceSettings));
         }
     }
 }

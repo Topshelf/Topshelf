@@ -15,9 +15,9 @@ namespace Topshelf.Commands.WinService
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.ServiceProcess;
     using Configuration.Dsl;
     using Exceptions;
-    using Hosts;
     using log4net;
     using Magnum.CommandLineParser;
     using Model;
@@ -28,6 +28,7 @@ namespace Topshelf.Commands.WinService
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCommand));
         readonly IServiceCoordinator _coordinator = null;
+        readonly IRunConfiguration _config;
 
         public ServiceCommand(IServiceCoordinator coordinator)
         {
@@ -46,11 +47,12 @@ namespace Topshelf.Commands.WinService
             var shouldInstall = args.Where(x => x is ITokenElement)
                 .Select(x => x as ITokenElement)
                 .Where(x => x.Token == "install");
-            Install("", args);
+            Install(args, _config);
 
             var shouldUninstall = args.Where(x => x is ITokenElement)
                 .Select(x => x as ITokenElement)
                 .Where(x => x.Token == "uninstall");
+            Uninstall(args, _config);
 
             //some kind of if?
             RunAsService("full service name");
@@ -58,10 +60,15 @@ namespace Topshelf.Commands.WinService
 
         #endregion
 
-        void Install(string fullServiceName, IEnumerable<ICommandLineElement> args)
+        static void Install(IEnumerable<ICommandLineElement> args, IRunConfiguration config)
         {
-            IRunConfiguration config = null;
-            var i = new InstallService(fullServiceName, config);
+            var i = new InstallService(config);
+            i.Execute(args);
+        }
+
+        static void Uninstall(IEnumerable<ICommandLineElement> args, IRunConfiguration config)
+        {
+            var i = new UninstallService(config);
             i.Execute(args);
         }
 

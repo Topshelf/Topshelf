@@ -119,13 +119,13 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Credentials()
         {
-            _runConfiguration.Credentials.Username
+            _runConfiguration.WinServiceSettings.Credentials.Username
                 .ShouldEqual("dru");
 
-            _runConfiguration.Credentials.Password
+            _runConfiguration.WinServiceSettings.Credentials.Password
                 .ShouldEqual("pass");
 
-            _runConfiguration.Credentials.AccountType
+            _runConfiguration.WinServiceSettings.Credentials.AccountType
                 .ShouldEqual(ServiceAccount.User);
         }
 

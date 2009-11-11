@@ -17,7 +17,6 @@ namespace Topshelf.Configuration.Dsl
     public interface IRunConfiguration
     {
         IServiceCoordinator Coordinator { get; }
-        Credentials Credentials { get; }
         WinServiceSettings WinServiceSettings { get; }
     }
 }

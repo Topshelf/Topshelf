@@ -18,6 +18,7 @@ namespace Topshelf.Hosts
     using System.Reflection;
     using System.ServiceProcess;
     using Commands.WinService.SubCommands;
+    using Configuration;
     using Configuration.Dsl;
     using log4net;
     using Microsoft.Win32;
@@ -28,74 +29,20 @@ namespace Topshelf.Hosts
         private static readonly ILog _log = LogManager.GetLogger(typeof (HostServiceInstaller));
         private readonly ServiceInstaller _serviceInstaller = new ServiceInstaller();
         private readonly ServiceProcessInstaller _serviceProcessInstaller = new ServiceProcessInstaller();
-        private readonly IRunConfiguration _config;
+        WinServiceSettings _settings;
 
-       
 
-        public HostServiceInstaller(IRunConfiguration configuration)
+        public HostServiceInstaller(WinServiceSettings settings)
         {
-            _config = configuration;
+            _settings = settings;
 
-            WinServiceHelper.ConfigureServiceInstaller(_serviceInstaller, _config.WinServiceSettings);
-            WinServiceHelper.ConfigureServiceProcessInstaller(_serviceProcessInstaller, _config.Credentials);
+            WinServiceHelper.ConfigureServiceInstaller(_serviceInstaller, settings);
+            WinServiceHelper.ConfigureServiceProcessInstaller(_serviceProcessInstaller, _settings.Credentials);
 
             Installers.AddRange(new Installer[] {_serviceProcessInstaller, _serviceInstaller});            
         }
 
 
-        public void Register(string fullServiceName)
-        {
-            _log.DebugFormat("Attempting to install {0}", fullServiceName);
-            if (!WinServiceHelper.IsInstalled(fullServiceName))
-            {
-                using (var ti = new TransactedInstaller())
-                {
-                    ti.Installers.Add(this);
-
-                    string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
-                    string[] commandLine = {path};
-
-                    var context = new InstallContext(null, commandLine);
-                    ti.Context = context;
-
-                    var savedState = new Hashtable();
-
-                    ti.Install(savedState);
-                }
-            }
-            else
-            {
-                Console.WriteLine("Service is already installed");
-                if (_log.IsInfoEnabled)
-                    _log.Info("Service is already installed");
-            }
-        }
-        public void Unregister(string fullServiceName)
-        {
-            _log.DebugFormat("Attempting to uninstall {0}", fullServiceName);
-
-            if (WinServiceHelper.IsInstalled(fullServiceName))
-            {
-                using (var ti = new TransactedInstaller())
-                {
-                    ti.Installers.Add(this);
-
-                    string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
-                    string[] commandLine = {path};
-
-                    var context = new InstallContext(null, commandLine);
-                    ti.Context = context;
-
-                    ti.Uninstall(null);
-                }
-            }
-            else
-            {
-                Console.WriteLine("Service is not installed");
-                if (_log.IsInfoEnabled)
-                    _log.Info("Service is not installed");
-            }
-        }
 
 
         /// <summary>
@@ -122,8 +69,8 @@ namespace Topshelf.Hosts
 
                 _log.DebugFormat("Service Path {0}", imagePath);
 
-                imagePath += _config.WinServiceSettings.InstanceName == null ?
-                                                                                 " -service" : " -service -instance:{0}".FormatWith(_config.WinServiceSettings.InstanceName);
+                imagePath += _settings.InstanceName == null ?
+                                                                                 " -service" : " -service -instance:{0}".FormatWith(_settings.InstanceName);
 
                 _log.DebugFormat("ImagePath '{0}'", imagePath);
 

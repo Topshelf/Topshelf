@@ -244,11 +244,10 @@ namespace Topshelf.Configuration.Dsl
         {
             var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, _beforeStart, _afterStop);
             serviceCoordinator.RegisterServices(_serviceConfigurators);
-
+            _winServiceSettings.Credentials = _credentials;
             var cfg = new RunConfiguration
                       {
                           WinServiceSettings = _winServiceSettings,
-                          Credentials = _credentials,
                           Coordinator = serviceCoordinator
                       };
 

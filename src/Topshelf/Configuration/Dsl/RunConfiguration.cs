@@ -19,12 +19,7 @@ namespace Topshelf.Configuration.Dsl
     public class RunConfiguration :
         IRunConfiguration
     {
-        public RunConfiguration()
-        {
-        }
-
         public WinServiceSettings WinServiceSettings { get; set; }
-        public Credentials Credentials { get; set; }
         public IServiceCoordinator Coordinator { get; set; }
     }
 }

@@ -34,6 +34,7 @@ namespace Topshelf.Configuration
         public string DisplayName { private get; set; }
         public string Description { get; set; }
         public string InstanceName { get; set; }
+        public Credentials Credentials { get; set; }
 
         public string FullServiceName
         {
