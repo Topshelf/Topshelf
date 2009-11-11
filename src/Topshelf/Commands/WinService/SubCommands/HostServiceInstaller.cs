@@ -17,6 +17,7 @@ namespace Topshelf.Hosts
     using System.Configuration.Install;
     using System.Reflection;
     using System.ServiceProcess;
+    using Commands.WinService.SubCommands;
     using Configuration.Dsl;
     using log4net;
     using Microsoft.Win32;
@@ -33,11 +34,10 @@ namespace Topshelf.Hosts
 
         public HostServiceInstaller(IRunConfiguration configuration)
         {
-            _log.DebugFormat("Attempting to install with {0} configuration", configuration);
             _config = configuration;
 
-            configuration.ConfigureServiceInstaller(_serviceInstaller);
-            configuration.ConfigureServiceProcessInstaller(_serviceProcessInstaller);
+            WinServiceHelper.ConfigureServiceInstaller(_serviceInstaller, _config.WinServiceSettings);
+            WinServiceHelper.ConfigureServiceProcessInstaller(_serviceProcessInstaller, _config.Credentials);
 
             Installers.AddRange(new Installer[] {_serviceProcessInstaller, _serviceInstaller});            
         }
@@ -45,19 +45,20 @@ namespace Topshelf.Hosts
 
         public void Register(string fullServiceName)
         {
-            if (!IsInstalled(fullServiceName))
+            _log.DebugFormat("Attempting to install {0}", fullServiceName);
+            if (!WinServiceHelper.IsInstalled(fullServiceName))
             {
-                using (TransactedInstaller ti = new TransactedInstaller())
+                using (var ti = new TransactedInstaller())
                 {
                     ti.Installers.Add(this);
 
                     string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
                     string[] commandLine = {path};
 
-                    InstallContext context = new InstallContext(null, commandLine);
+                    var context = new InstallContext(null, commandLine);
                     ti.Context = context;
 
-                    Hashtable savedState = new Hashtable();
+                    var savedState = new Hashtable();
 
                     ti.Install(savedState);
                 }
@@ -71,16 +72,18 @@ namespace Topshelf.Hosts
         }
         public void Unregister(string fullServiceName)
         {
-            if (IsInstalled(fullServiceName))
+            _log.DebugFormat("Attempting to uninstall {0}", fullServiceName);
+
+            if (WinServiceHelper.IsInstalled(fullServiceName))
             {
-                using (TransactedInstaller ti = new TransactedInstaller())
+                using (var ti = new TransactedInstaller())
                 {
                     ti.Installers.Add(this);
 
                     string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
                     string[] commandLine = {path};
 
-                    InstallContext context = new InstallContext(null, commandLine);
+                    var context = new InstallContext(null, commandLine);
                     ti.Context = context;
 
                     ti.Uninstall(null);
@@ -92,17 +95,6 @@ namespace Topshelf.Hosts
                 if (_log.IsInfoEnabled)
                     _log.Info("Service is not installed");
             }
-        }
-
-        public static bool IsInstalled(string fullServiceName)
-        {
-            foreach (ServiceController service in ServiceController.GetServices())
-            {
-                if (service.ServiceName == fullServiceName)
-                    return true;
-            }
-
-            return false;
         }
 
 

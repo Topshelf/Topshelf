@@ -26,22 +26,5 @@ namespace Topshelf.Configuration.Dsl
         public WinServiceSettings WinServiceSettings { get; set; }
         public Credentials Credentials { get; set; }
         public IServiceCoordinator Coordinator { get; set; }
-        public Type FormType { get; private set; }
-
-
-        public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
-        {
-            installer.ServiceName = WinServiceSettings.FullServiceName;
-            installer.Description = WinServiceSettings.Description;
-            installer.DisplayName = WinServiceSettings.FullDisplayName;
-            installer.ServicesDependedOn = WinServiceSettings.Dependencies.ToArray();
-            installer.StartType = ServiceStartMode.Automatic;
-        }
-        public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)
-        {
-            installer.Username = Credentials.Username;
-            installer.Password = Credentials.Password;
-            installer.Account = Credentials.AccountType;
-        }
     }
 }

@@ -14,7 +14,7 @@ namespace Topshelf.Specs.Configuration
 {
     using System.ServiceProcess;
     using NUnit.Framework;
-    using Topshelf.Configuration.Dsl;
+    using Topshelf.Configuration;
 
     [TestFixture]
     public class Credential_Specs

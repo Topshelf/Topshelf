@@ -22,6 +22,14 @@ namespace Topshelf.Commands.WinService.SubCommands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(InstallService));
+        string _fullServiceName;
+        IRunConfiguration _configuration;
+
+        public InstallService(string fullServiceName, IRunConfiguration runConfiguration)
+        {
+            _fullServiceName = fullServiceName;
+            _configuration = runConfiguration;
+        }
 
         #region Command Members
 
@@ -34,19 +42,16 @@ namespace Topshelf.Commands.WinService.SubCommands
         {
             _log.Info("Received service install notification");
 
-            var fullServiceName = ""; //configuration.WinServiceSettings.FullServiceName
-            if (HostServiceInstaller.IsInstalled(fullServiceName))
+            if (WinServiceHelper.IsInstalled(_fullServiceName))
             {
-                string message = string.Format("The {0} service has already been installed.", fullServiceName);
+                string message = string.Format("The {0} service has already been installed.", _fullServiceName);
                 _log.Error(message);
 
                 return;
             }
 
-            //TODO: FIX THIS SHIT
-            IRunConfiguration configuration = null;
-            new HostServiceInstaller(configuration)
-                .Register(configuration.WinServiceSettings.FullServiceName);
+            new HostServiceInstaller(_configuration)
+                .Register(_configuration.WinServiceSettings.FullServiceName);
         }
 
         #endregion

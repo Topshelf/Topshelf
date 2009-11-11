@@ -16,25 +16,26 @@ namespace Topshelf
     using System.Linq;
     using Commands;
     using Commands.CommandLine;
+    using Commands.WinService;
     using Configuration.Dsl;
     using log4net;
 
     public static class TopshelfDispatcher
     {
-        //convert actions to commands
-        static readonly List<Command> _commands = new List<Command>
-                                                  {
-                                                      new RunCommand(null) // how to get the service coordinator in here
-                                                  };
-
         static readonly ILog _log = LogManager.GetLogger(typeof(TopshelfDispatcher));
 
         public static void Dispatch(IRunConfiguration config, TopshelfArguments args)
         {
             //find the command by the args 'Command'
-            Command command = _commands.Where(x => x.Name == args.Command)
-                .DefaultIfEmpty(new RunCommand(config.Coordinator))
-                .Single();
+            var run = new RunCommand(config.Coordinator);
+            Command command = new List<Command>
+                              {
+                                  run,
+                                  new ServiceCommand(config.Coordinator)
+                              }
+                .Where(x => x.Name == args.Command)
+                .DefaultIfEmpty(run)
+                .SingleOrDefault();
 
             _log.DebugFormat("Running command: '{0}'", command.Name);
 

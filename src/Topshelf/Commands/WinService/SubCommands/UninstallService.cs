@@ -22,7 +22,7 @@ namespace Topshelf.Commands.WinService.SubCommands
             string fullServiceName = "";
             IRunConfiguration configuration = null;
 
-            if (!HostServiceInstaller.IsInstalled(fullServiceName))
+            if (!WinServiceHelper.IsInstalled(fullServiceName))
             {
                 string message = string.Format("The {0} service has not been installed.", fullServiceName);
                 _log.Error(message);

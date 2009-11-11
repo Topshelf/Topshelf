@@ -20,17 +20,25 @@ namespace Topshelf.Commands.WinService
     using Hosts;
     using log4net;
     using Magnum.CommandLineParser;
+    using Model;
+    using SubCommands;
 
-    public class RunCommand :
+    public class ServiceCommand :
         Command
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof(RunCommand));
+        static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCommand));
+        readonly IServiceCoordinator _coordinator = null;
+
+        public ServiceCommand(IServiceCoordinator coordinator)
+        {
+            this._coordinator = coordinator;
+        }
 
         #region Command Members
 
         public string Name
         {
-            get { return "run winservice"; }
+            get { return "service"; }
         }
 
         public void Execute(IEnumerable<ICommandLineElement> args)
@@ -38,6 +46,7 @@ namespace Topshelf.Commands.WinService
             var shouldInstall = args.Where(x => x is ITokenElement)
                 .Select(x => x as ITokenElement)
                 .Where(x => x.Token == "install");
+            Install("", args);
 
             var shouldUninstall = args.Where(x => x is ITokenElement)
                 .Select(x => x as ITokenElement)
@@ -49,11 +58,18 @@ namespace Topshelf.Commands.WinService
 
         #endregion
 
+        void Install(string fullServiceName, IEnumerable<ICommandLineElement> args)
+        {
+            IRunConfiguration config = null;
+            var i = new InstallService(fullServiceName, config);
+            i.Execute(args);
+        }
+
         void RunAsService(string fullServiceName)
         {
             _log.Info("Received service start notification");
 
-            if (!HostServiceInstaller.IsInstalled(fullServiceName))
+            if (!WinServiceHelper.IsInstalled(fullServiceName))
             {
                 string message = string.Format("The {0} service has not been installed yet. Please run {1} -install.",
                                                fullServiceName, Assembly.GetEntryAssembly().GetName());
@@ -61,8 +77,7 @@ namespace Topshelf.Commands.WinService
                 throw new ConfigurationException(message);
             }
 
-            IRunConfiguration configuration = null;
-            var inServiceHost = new ServiceHost(configuration.Coordinator);
+            var inServiceHost = new ServiceHost(_coordinator);
             inServiceHost.Run();
         }
     }

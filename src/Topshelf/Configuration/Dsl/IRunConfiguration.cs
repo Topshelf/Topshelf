@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,8 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-    using System;
-    using System.ServiceProcess;
     using Model;
 
     public interface IRunConfiguration
@@ -21,8 +19,5 @@ namespace Topshelf.Configuration.Dsl
         IServiceCoordinator Coordinator { get; }
         Credentials Credentials { get; }
         WinServiceSettings WinServiceSettings { get; }
-
-        void ConfigureServiceInstaller(ServiceInstaller installer);
-        void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer);
     }
 }
