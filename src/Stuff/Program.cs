@@ -20,6 +20,7 @@ namespace Stuff
     using Microsoft.Practices.ServiceLocation;
     using StructureMap;
     using Topshelf;
+    using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
 
     internal class Program
@@ -27,7 +28,7 @@ namespace Stuff
         static void Main(string[] args)
         {
             XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
-            IRunConfiguration cfg = RunnerConfigurator.New(x =>
+            RunConfiguration cfg = RunnerConfigurator.New(x =>
             {
                 x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 

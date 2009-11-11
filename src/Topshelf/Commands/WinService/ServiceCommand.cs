@@ -16,7 +16,7 @@ namespace Topshelf.Commands.WinService
     using System.Linq;
     using System.Reflection;
     using System.ServiceProcess;
-    using Configuration.Dsl;
+    using Configuration;
     using Exceptions;
     using log4net;
     using Magnum.CommandLineParser;
@@ -28,7 +28,7 @@ namespace Topshelf.Commands.WinService
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCommand));
         readonly IServiceCoordinator _coordinator = null;
-        readonly IRunConfiguration _config;
+        readonly RunConfiguration _config;
 
         public ServiceCommand(IServiceCoordinator coordinator)
         {
@@ -60,13 +60,13 @@ namespace Topshelf.Commands.WinService
 
         #endregion
 
-        static void Install(IEnumerable<ICommandLineElement> args, IRunConfiguration config)
+        static void Install(IEnumerable<ICommandLineElement> args, RunConfiguration config)
         {
             var i = new InstallService(config);
             i.Execute(args);
         }
 
-        static void Uninstall(IEnumerable<ICommandLineElement> args, IRunConfiguration config)
+        static void Uninstall(IEnumerable<ICommandLineElement> args, RunConfiguration config)
         {
             var i = new UninstallService(config);
             i.Execute(args);

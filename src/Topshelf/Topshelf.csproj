@@ -81,8 +81,7 @@
     <Compile Include="Model\IServiceControllerOf.cs" />
     <Compile Include="Model\IsolatedServiceController.cs" />
     <Compile Include="Model\FacadeToIsolatedServiceController.cs" />
-    <Compile Include="Configuration\Dsl\IRunConfiguration.cs" />
-    <Compile Include="Configuration\Dsl\RunConfiguration.cs" />
+    <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Model\IsolatedServiceControllerWrapper.cs" />
     <Compile Include="Model\ServiceControllerProxy.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />

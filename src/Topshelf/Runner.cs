@@ -13,7 +13,7 @@
 namespace Topshelf
 {
     using System;
-    using Configuration.Dsl;
+    using Configuration;
     using log4net;
 
     /// <summary>
@@ -36,7 +36,7 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Host(IRunConfiguration configuration, string args)
+        public static void Host(RunConfiguration configuration, string args)
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", args);

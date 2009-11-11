@@ -13,7 +13,7 @@
 namespace Topshelf.Commands.WinService.SubCommands
 {
     using System.Collections.Generic;
-    using Configuration.Dsl;
+    using Configuration;
     using log4net;
     using Magnum.CommandLineParser;
 
@@ -21,10 +21,10 @@ namespace Topshelf.Commands.WinService.SubCommands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(UninstallService));
-        readonly IRunConfiguration _configuration = null;
+        readonly RunConfiguration _configuration = null;
         readonly string _fullServiceName = "";
 
-        public UninstallService(IRunConfiguration configuration)
+        public UninstallService(RunConfiguration configuration)
         {
             _fullServiceName = configuration.WinServiceSettings.FullServiceName;
             _configuration = configuration;

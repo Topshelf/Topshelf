@@ -240,7 +240,7 @@ namespace Topshelf.Configuration.Dsl
             _disposed = true;
         }
 
-        IRunConfiguration Create()
+        RunConfiguration Create()
         {
             var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, _beforeStart, _afterStop);
             serviceCoordinator.RegisterServices(_serviceConfigurators);
@@ -263,7 +263,7 @@ namespace Topshelf.Configuration.Dsl
             Dispose(false);
         }
 
-        public static IRunConfiguration New(Action<IRunnerConfigurator> action)
+        public static RunConfiguration New(Action<IRunnerConfigurator> action)
         {
             using (var configurator = new RunnerConfigurator())
             {

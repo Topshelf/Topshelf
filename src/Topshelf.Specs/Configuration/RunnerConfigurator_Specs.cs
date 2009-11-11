@@ -18,6 +18,7 @@ namespace Topshelf.Specs.Configuration
     using NUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;
+    using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
 
     [TestFixture]
@@ -77,7 +78,7 @@ namespace Topshelf.Specs.Configuration
         public void A_pretend_void_main()
         {
             string[] args = new string[0];
-            IRunConfiguration cfg = RunnerConfigurator.New(x => { });
+            RunConfiguration cfg = RunnerConfigurator.New(x => { });
             //some thing parses the args
             //Dispatch(args, serviceCoordinator);
         }

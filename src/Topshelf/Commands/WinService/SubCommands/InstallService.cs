@@ -14,7 +14,6 @@ namespace Topshelf.Commands.WinService.SubCommands
 {
     using System.Collections.Generic;
     using Configuration;
-    using Configuration.Dsl;
     using log4net;
     using Magnum.CommandLineParser;
 
@@ -25,7 +24,7 @@ namespace Topshelf.Commands.WinService.SubCommands
         string _fullServiceName;
         WinServiceSettings _settings;
 
-        public InstallService( IRunConfiguration configuration)
+        public InstallService(RunConfiguration configuration)
         {
             _fullServiceName = configuration.WinServiceSettings.FullServiceName;
             _settings = configuration.WinServiceSettings;

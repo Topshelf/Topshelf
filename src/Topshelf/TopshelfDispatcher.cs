@@ -17,14 +17,14 @@ namespace Topshelf
     using Commands;
     using Commands.CommandLine;
     using Commands.WinService;
-    using Configuration.Dsl;
+    using Configuration;
     using log4net;
 
     public static class TopshelfDispatcher
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(TopshelfDispatcher));
 
-        public static void Dispatch(IRunConfiguration config, TopshelfArguments args)
+        public static void Dispatch(RunConfiguration config, TopshelfArguments args)
         {
             //find the command by the args 'Command'
             var run = new RunCommand(config.Coordinator);
