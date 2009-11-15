@@ -15,6 +15,7 @@ namespace Topshelf
     using System;
     using Configuration;
     using log4net;
+    using System.Linq;
 
     /// <summary>
     /// Entry point into the Host infrastructure
@@ -36,13 +37,14 @@ namespace Topshelf
         /// <summary>
         /// Go go gadget
         /// </summary>
-        public static void Host(RunConfiguration configuration, string args)
+        public static void Host(RunConfiguration configuration, string[] args)
         {
             _log.Info("Starting Host");
             _log.DebugFormat("Arguments: {0}", args);
 
             //make it so this can be passed in
-            var a = TopshelfArgumentParser.Parse(Environment.CommandLine);
+            var argv = args.Aggregate((l, r) => "{0} {1}".FormatWith(l, r));
+            var a = TopshelfArgumentParser.Parse(argv);
             TopshelfDispatcher.Dispatch(configuration, a);
         }
     }

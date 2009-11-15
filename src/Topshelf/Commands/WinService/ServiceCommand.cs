@@ -44,33 +44,32 @@ namespace Topshelf.Commands.WinService
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
-            var shouldInstall = args.Where(x => x is ITokenElement)
+            var subcommand = args.Take(1)
+                .Where(x => x is ITokenElement)
                 .Select(x => x as ITokenElement)
-                .Where(x => x.Token == "install");
-            Install(args, _config);
+                .Select(x => x.Token)
+                .DefaultIfEmpty("")
+                .First();
 
-            var shouldUninstall = args.Where(x => x is ITokenElement)
-                .Select(x => x as ITokenElement)
-                .Where(x => x.Token == "uninstall");
-            Uninstall(args, _config);
+            
+            var subcommands = new List<Command>
+                              {
+                                  new InstallService(_config),
+                                  new UninstallService(_config)
+                              };
 
-            //some kind of if?
-            RunAsService("full service name");
+            var oa = subcommands
+                .DefaultIfEmpty(this)
+                .Where(x => x.Name == subcommand)
+                .FirstOrDefault();
+
+            if (oa == this) RunAsService("full service name");
+            else oa.Execute(args.Skip(1));
         }
 
         #endregion
 
-        static void Install(IEnumerable<ICommandLineElement> args, RunConfiguration config)
-        {
-            var i = new InstallService(config);
-            i.Execute(args);
-        }
 
-        static void Uninstall(IEnumerable<ICommandLineElement> args, RunConfiguration config)
-        {
-            var i = new UninstallService(config);
-            i.Execute(args);
-        }
 
         void RunAsService(string fullServiceName)
         {
