@@ -21,13 +21,12 @@ namespace Topshelf.Commands.WinService.SubCommands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(UninstallService));
-        readonly RunConfiguration _configuration = null;
-        readonly string _fullServiceName = "";
+        private WinServiceSettings _settings;
 
-        public UninstallService(RunConfiguration configuration)
+
+        public UninstallService(WinServiceSettings settings)
         {
-            _fullServiceName = configuration.WinServiceSettings.FullServiceName;
-            _configuration = configuration;
+            _settings = settings;
         }
 
         #region Command Members
@@ -39,16 +38,16 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
-            if (!WinServiceHelper.IsInstalled(_fullServiceName))
+            if (!WinServiceHelper.IsInstalled(_settings.FullServiceName))
             {
-                string message = string.Format("The {0} service has not been installed.", _fullServiceName);
+                string message = string.Format("The {0} service has not been installed.", _settings.FullServiceName);
                 _log.Error(message);
 
                 return;
             }
 
             _log.Info("Received serice uninstall notification");
-            WinServiceHelper.Unregister(_fullServiceName, new HostServiceInstaller(_configuration.WinServiceSettings));
+            WinServiceHelper.Unregister(_settings.FullServiceName, new HostServiceInstaller(_settings));
         }
 
         #endregion

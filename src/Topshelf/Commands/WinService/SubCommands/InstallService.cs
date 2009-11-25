@@ -21,13 +21,12 @@ namespace Topshelf.Commands.WinService.SubCommands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(InstallService));
-        string _fullServiceName;
-        WinServiceSettings _settings;
 
-        public InstallService(RunConfiguration configuration)
+        readonly WinServiceSettings _settings;
+
+        public InstallService(WinServiceSettings settings)
         {
-            _fullServiceName = configuration.WinServiceSettings.FullServiceName;
-            _settings = configuration.WinServiceSettings;
+            _settings = settings;
         }
 
         #region Command Members
@@ -41,15 +40,15 @@ namespace Topshelf.Commands.WinService.SubCommands
         {
             _log.Info("Received service install notification");
 
-            if (WinServiceHelper.IsInstalled(_fullServiceName))
+            if (WinServiceHelper.IsInstalled(_settings.FullServiceName))
             {
-                string message = string.Format("The {0} service has already been installed.", _fullServiceName);
+                string message = string.Format("The {0} service has already been installed.", _settings.FullServiceName);
                 _log.Error(message);
 
                 return;
             }
 
-            WinServiceHelper.Register(_fullServiceName, new HostServiceInstaller(_settings));
+            WinServiceHelper.Register(_settings.FullServiceName, new HostServiceInstaller(_settings));
         }
 
         #endregion

@@ -15,7 +15,6 @@ namespace Topshelf.Commands.WinService
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.ServiceProcess;
     using Configuration;
     using Exceptions;
     using log4net;
@@ -27,12 +26,13 @@ namespace Topshelf.Commands.WinService
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCommand));
-        readonly IServiceCoordinator _coordinator = null;
-        readonly RunConfiguration _config;
+        readonly IServiceCoordinator _coordinator;
+        private readonly WinServiceSettings _settings;
 
-        public ServiceCommand(IServiceCoordinator coordinator)
+        public ServiceCommand(IServiceCoordinator coordinator, WinServiceSettings settings)
         {
-            this._coordinator = coordinator;
+            _coordinator = coordinator;
+            _settings = settings;
         }
 
         #region Command Members
@@ -46,7 +46,7 @@ namespace Topshelf.Commands.WinService
         {
             if(args.Count() == 0)
             {
-                RunAsService(_config.WinServiceSettings.FullServiceName);
+                RunAsService(_settings.FullServiceName);
                 return;
             }
 
@@ -60,8 +60,8 @@ namespace Topshelf.Commands.WinService
             
             var subcommands = new List<Command>
                               {
-                                  new InstallService(_config),
-                                  new UninstallService(_config)
+                                  new InstallService(_settings),
+                                  new UninstallService(_settings)
                               };
 
             var oa = subcommands

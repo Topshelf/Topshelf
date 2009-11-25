@@ -31,7 +31,7 @@ namespace Topshelf
             Command command = new List<Command>
                               {
                                   run,
-                                  new ServiceCommand(config.Coordinator)
+                                  new ServiceCommand(config.Coordinator, config.WinServiceSettings)
                               }
                 .Where(x => x.Name == args.Command)
                 .DefaultIfEmpty(run)
