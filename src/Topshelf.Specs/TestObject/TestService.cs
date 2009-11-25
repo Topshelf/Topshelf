@@ -1,4 +1,4 @@
-namespace Topshelf.Specs.Configuration
+namespace Topshelf.Specs.TestObject
 {
     using System;
 

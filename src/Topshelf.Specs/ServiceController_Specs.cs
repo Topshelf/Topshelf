@@ -12,11 +12,11 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using Configuration;
     using Microsoft.Practices.ServiceLocation;
     using Model;
     using NUnit.Framework;
     using Rhino.Mocks;
+    using TestObject;
     using Topshelf.Configuration.Dsl;
 
     [TestFixture]

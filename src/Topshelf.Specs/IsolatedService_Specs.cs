@@ -13,11 +13,11 @@
 namespace Topshelf.Specs
 {
     using System;
-    using Configuration;
     using Model;
     using NUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;
+    using TestObject;
     using Topshelf.Configuration.Dsl;
 
     [TestFixture]

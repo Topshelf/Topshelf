@@ -44,6 +44,12 @@ namespace Topshelf.Commands.WinService
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
+            if(args.Count() == 0)
+            {
+                RunAsService(_config.WinServiceSettings.FullServiceName);
+                return;
+            }
+
             var subcommand = args.Take(1)
                 .Where(x => x is ITokenElement)
                 .Select(x => x as ITokenElement)
@@ -59,12 +65,10 @@ namespace Topshelf.Commands.WinService
                               };
 
             var oa = subcommands
-                .DefaultIfEmpty(this)
                 .Where(x => x.Name == subcommand)
-                .FirstOrDefault();
+                .Single();
 
-            if (oa == this) RunAsService("full service name");
-            else oa.Execute(args.Skip(1));
+            oa.Execute(args.Skip(1));
         }
 
         #endregion
