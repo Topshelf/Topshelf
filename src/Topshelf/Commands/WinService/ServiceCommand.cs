@@ -51,9 +51,9 @@ namespace Topshelf.Commands.WinService
             }
 
             var subcommand = args.Take(1)
-                .Where(x => x is ITokenElement)
-                .Select(x => x as ITokenElement)
-                .Select(x => x.Token)
+                .Where(x => x is ISwitchElement)
+                .Select(x => x as ISwitchElement)
+                .Select(x => x.Key)
                 .DefaultIfEmpty("")
                 .First();
 
@@ -68,7 +68,7 @@ namespace Topshelf.Commands.WinService
                 .Where(x => x.Name == subcommand)
                 .Single();
 
-            oa.Execute(args.Skip(1));
+            oa.Execute(args.Skip(1).ToList());
         }
 
         #endregion

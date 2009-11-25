@@ -71,7 +71,10 @@ namespace Topshelf.Commands.WinService.SubCommands
                 {
                     ti.Installers.Add(installer);
 
-                    string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
+                    var assembly = Assembly.GetEntryAssembly();
+                    if(assembly == null) throw new Exception("Assembly.GetEntryAssembly() is null for some reason.");
+
+                    string path = string.Format("/assemblypath={0}", assembly.Location);
                     string[] commandLine = {path};
 
                     var context = new InstallContext(null, commandLine);

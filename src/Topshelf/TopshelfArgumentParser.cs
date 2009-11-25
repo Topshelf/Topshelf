@@ -27,7 +27,7 @@ namespace Topshelf
 
             args.Command = command;
             //leftovers
-            args.CommandArgs = commandLineElements.Skip(1);
+            args.CommandArgs = commandLineElements.Skip(1).ToList();
         }
 
         static IEnumerable<ICommandLineElement> P(string commandLine)
