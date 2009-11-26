@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System;
     using System.Collections.Generic;
     using System.Configuration;
     using System.ServiceProcess;
@@ -28,13 +27,11 @@ namespace Topshelf.Configuration
         }
 
         public ServiceStartMode StartMode { get; set; }
-        
-
         public string ServiceName { private get; set; }
         public string DisplayName { private get; set; }
         public string Description { get; set; }
         public string InstanceName { get; set; }
-        public string CommandLine { get; set; }
+        public Credentials Credentials { get; set; }
 
         public string FullServiceName
         {
@@ -69,6 +66,14 @@ namespace Topshelf.Configuration
 
                 settings.Dependencies.AddRange(ConfigurationManager.AppSettings["dependencies"].Split(','));
                 return settings;
+            }
+        }
+
+        public string ImagePath
+        {
+            get
+            {
+                return InstanceName == null ? " -service" : " -service -instance:{0}".FormatWith(InstanceName);
             }
         }
 

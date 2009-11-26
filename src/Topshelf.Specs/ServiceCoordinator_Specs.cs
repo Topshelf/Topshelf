@@ -14,11 +14,11 @@ namespace Topshelf.Specs
 {
     using System;
     using System.Collections.Generic;
-    using Configuration;
-    using Internal;
     using Microsoft.Practices.ServiceLocation;
+    using Model;
     using NUnit.Framework;
     using Rhino.Mocks;
+    using TestObject;
 
     [TestFixture]
     public class ServiceCoordinator_Specs

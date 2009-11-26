@@ -12,44 +12,11 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System;
-    using System.ServiceProcess;
-    using Internal;
-    using Internal.Actions;
+    using Model;
 
-    public class RunConfiguration :
-        IRunConfiguration
+    public class RunConfiguration
     {
-        public RunConfiguration()
-        {
-            DefaultAction = NamedAction.Console;
-        }
-
         public WinServiceSettings WinServiceSettings { get; set; }
-        public Credentials Credentials { get; set; }
         public IServiceCoordinator Coordinator { get; set; }
-        public Type FormType { get; private set; }
-        public NamedAction DefaultAction { get; private set; }
-
-        public void SetRunnerAction(NamedAction action, Type form)
-        {
-            DefaultAction = action;
-            FormType = form;
-        }
-
-        public virtual void ConfigureServiceInstaller(ServiceInstaller installer)
-        {
-            installer.ServiceName = WinServiceSettings.FullServiceName;
-            installer.Description = WinServiceSettings.Description;
-            installer.DisplayName = WinServiceSettings.FullDisplayName;
-            installer.ServicesDependedOn = WinServiceSettings.Dependencies.ToArray();
-            installer.StartType = ServiceStartMode.Automatic;
-        }
-        public virtual void ConfigureServiceProcessInstaller(ServiceProcessInstaller installer)
-        {
-            installer.Username = Credentials.Username;
-            installer.Password = Credentials.Password;
-            installer.Account = Credentials.AccountType;
-        }
     }
 }

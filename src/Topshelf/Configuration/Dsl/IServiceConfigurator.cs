@@ -10,26 +10,19 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Specs
+namespace Topshelf.Configuration.Dsl
 {
-    using NUnit.Framework;
+    using System;
+    using Microsoft.Practices.ServiceLocation;
 
-    [TestFixture]
-    public class ArgParsing_Specs
+    public interface IServiceConfigurator<TService> :
+        IDisposable
     {
-        string _args;
+        void WhenStarted(Action<TService> startAction);
+        void WhenStopped(Action<TService> stopAction);
+        void WhenPaused(Action<TService> pauseAction);
+        void WhenContinued(Action<TService> continueAction);
 
-        [SetUp]
-        public void Establish_Context()
-        {
-            _args = "service /instance:bob";
-        }
-
-        [Test]
-        public void InstanceName()
-        {
-            TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
-            a.Command.ShouldEqual("service");
-        }
+        void CreateServiceLocator(Func<IServiceLocator> createServiceLocator);
     }
 }

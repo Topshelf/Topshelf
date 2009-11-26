@@ -14,11 +14,13 @@ namespace Topshelf.Specs.Configuration
 {
     using System;
     using System.ServiceProcess;
-    using Internal;
+    using Model;
     using NUnit.Framework;
     using Microsoft.Practices.ServiceLocation;
     using Rhino.Mocks;
+    using TestObject;
     using Topshelf.Configuration;
+    using Topshelf.Configuration.Dsl;
 
     [TestFixture]
     public class RunnerConfigurator_Specs
@@ -77,7 +79,7 @@ namespace Topshelf.Specs.Configuration
         public void A_pretend_void_main()
         {
             string[] args = new string[0];
-            IRunConfiguration cfg = RunnerConfigurator.New(x => { });
+            RunConfiguration cfg = RunnerConfigurator.New(x => { });
             //some thing parses the args
             //Dispatch(args, serviceCoordinator);
         }
@@ -118,13 +120,13 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Credentials()
         {
-            _runConfiguration.Credentials.Username
+            _runConfiguration.WinServiceSettings.Credentials.Username
                 .ShouldEqual("dru");
 
-            _runConfiguration.Credentials.Password
+            _runConfiguration.WinServiceSettings.Credentials.Password
                 .ShouldEqual("pass");
 
-            _runConfiguration.Credentials.AccountType
+            _runConfiguration.WinServiceSettings.Credentials.AccountType
                 .ShouldEqual(ServiceAccount.User);
         }
 

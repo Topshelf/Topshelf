@@ -68,6 +68,7 @@
     <Compile Include="ServiceCoordinator_Specs.cs" />
     <Compile Include="ServiceController_Specs.cs" />
     <Compile Include="ServiceCoordinator_Singles_Specs.cs" />
+    <Compile Include="ServiceTests\Bob.cs" />
     <Compile Include="TestObject\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestObject\TestService2.cs" />

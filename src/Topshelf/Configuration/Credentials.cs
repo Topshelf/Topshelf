@@ -12,43 +12,43 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-	using System;
-	using System.Configuration;
-	using System.ServiceProcess;
+    using System;
+    using System.Configuration;
+    using System.ServiceProcess;
 
-	public class Credentials :
-		IEquatable<Credentials>
-	{
-		private readonly ServiceAccount _accountType;
-		private readonly string _password;
-		private readonly string _username;
+    public class Credentials :
+        IEquatable<Credentials>
+    {
+        private readonly ServiceAccount _accountType;
+        private readonly string _password;
+        private readonly string _username;
 
-		public Credentials(string username, string password, ServiceAccount accountType)
-		{
-			_username = username;
-			_accountType = accountType;
-			_password = password;
-		}
+        public Credentials(string username, string password, ServiceAccount accountType)
+        {
+            _username = username;
+            _accountType = accountType;
+            _password = password;
+        }
 
-		public static Credentials LocalSystem
-		{
-			get { return new Credentials("", "", ServiceAccount.LocalSystem); }
-		}
+        public static Credentials LocalSystem
+        {
+            get { return new Credentials("", "", ServiceAccount.LocalSystem); }
+        }
 
-		public static Credentials Interactive
-		{
-			get { return new Credentials(null, null, ServiceAccount.User); }
-		}
+        public static Credentials Interactive
+        {
+            get { return new Credentials(null, null, ServiceAccount.User); }
+        }
 
-		public static Credentials DotNetConfig
-		{
-			get
-			{
-				return new Credentials(ConfigurationManager.AppSettings["username"],
-					ConfigurationManager.AppSettings["password"],
-					ServiceAccount.User);
-			}
-		}
+        public static Credentials DotNetConfig
+        {
+            get
+            {
+                return new Credentials(ConfigurationManager.AppSettings["username"],
+                                       ConfigurationManager.AppSettings["password"],
+                                       ServiceAccount.User);
+            }
+        }
 
         public static Credentials Custom(string username, string password)
         {
@@ -62,46 +62,46 @@ namespace Topshelf.Configuration
 
 	    
         
-		public string Username
-		{
-			get { return _username; }
-		}
+        public string Username
+        {
+            get { return _username; }
+        }
 
-		public string Password
-		{
-			get { return _password; }
-		}
+        public string Password
+        {
+            get { return _password; }
+        }
 
-		public ServiceAccount AccountType
-		{
-			get { return _accountType; }
-		}
+        public ServiceAccount AccountType
+        {
+            get { return _accountType; }
+        }
 
-		public bool Equals(Credentials obj)
-		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			return Equals(obj._username, _username) && Equals(obj._password, _password) && Equals(obj._accountType, _accountType);
-		}
+        public bool Equals(Credentials obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return Equals(obj._username, _username) && Equals(obj._password, _password) && Equals(obj._accountType, _accountType);
+        }
 
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != typeof (Credentials)) return false;
-			return Equals((Credentials) obj);
-		}
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (Credentials)) return false;
+            return Equals((Credentials) obj);
+        }
 
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				int result = (_username != null ? _username.GetHashCode() : 0);
-				result = (result*397) ^ (_password != null ? _password.GetHashCode() : 0);
-				result = (result*397) ^ _accountType.GetHashCode();
-				return result;
-			}
-		}
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (_username != null ? _username.GetHashCode() : 0);
+                result = (result*397) ^ (_password != null ? _password.GetHashCode() : 0);
+                result = (result*397) ^ _accountType.GetHashCode();
+                return result;
+            }
+        }
 
 
 
@@ -112,5 +112,5 @@ namespace Topshelf.Configuration
             _commandLine = new Credentials(username, password, ServiceAccount.User);
         }
 
-	}
+    }
 }

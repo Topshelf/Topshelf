@@ -28,7 +28,8 @@ namespace Topshelf.Specs
             var type = typeof (Bill);
             Func<int> func = () => 3;
 
-            var bill = ad.CreateInstanceAndUnwrap<Bill>(func);
+            var bill = (Bill)ad.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new []{func}, null, null, null);
+
             bill.ShouldNotBeNull();
             bill.Yo.ShouldEqual(3);
             bill.AppDomainName.ShouldEqual("bob");

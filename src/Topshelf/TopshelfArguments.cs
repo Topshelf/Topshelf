@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,17 +12,29 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    using System;
-    using Model;
+    using System.Collections.Generic;
+    using Magnum.CommandLineParser;
 
-    public static class Extensions
+    public class TopshelfArguments
     {
+        // Actions
+        //   run as console
+        //   run as service
+        //     install
+        //     uninstall
+        //   plugin actions
+        //     run as winform
+        //     run as GTK#
+        // instance name
+        // services to start?
 
-        public static string FormatWith(this string format, params string[] args)
-        {
-            return string.Format(format, args);
-        }
 
+        // ts  -- runs as console
+        // ts service install
+        // ts service install /instance=bob
+        // ts service uninstall
 
+        public string Command { get; set; }
+        public IEnumerable<ICommandLineElement> CommandArgs { get; set; }
     }
 }

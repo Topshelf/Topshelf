@@ -10,26 +10,30 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Specs
+namespace Topshelf.Model
 {
-    using NUnit.Framework;
+    using System;
+    using System.Collections.Generic;
 
-    [TestFixture]
-    public class ArgParsing_Specs
+    public interface IServiceCoordinator :
+        IDisposable
     {
-        string _args;
+        void Start();
+        void Stop();
+        void Pause();
+        void Continue();
 
-        [SetUp]
-        public void Establish_Context()
-        {
-            _args = "service /instance:bob";
-        }
+        void StartService(string name);
+        void StopService(string name);
+        void PauseService(string name);
+        void ContinueService(string name);
 
-        [Test]
-        public void InstanceName()
-        {
-            TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
-            a.Command.ShouldEqual("service");
-        }
+        //void Install();
+        //void Uninstall();
+
+        event Action Stopped;
+        int HostedServiceCount { get; }
+        IServiceController GetService(string s);
+        IList<ServiceInformation> GetServiceInfo();
     }
 }
