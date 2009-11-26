@@ -13,9 +13,10 @@
 namespace Topshelf
 {
     using System;
+    using System.IO;
+    using System.Linq;
     using Configuration;
     using log4net;
-    using System.Linq;
 
     /// <summary>
     /// Entry point into the Host infrastructure
@@ -27,6 +28,7 @@ namespace Topshelf
         static Runner()
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
 
         static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -40,11 +42,11 @@ namespace Topshelf
         public static void Host(RunConfiguration configuration, string[] args)
         {
             _log.Info("Starting Host");
-            if(args.Length > 0)
+            if (args.Length > 0)
                 _log.DebugFormat("Arguments: {0}", args);
 
             //make it so this can be passed in
-            var argv = args.Aggregate("",(l, r) => "{0} {1}".FormatWith(l, r));
+            var argv = args.Aggregate("", (l, r) => "{0} {1}".FormatWith(l, r));
             var a = TopshelfArgumentParser.Parse(argv);
             TopshelfDispatcher.Dispatch(configuration, a);
         }
