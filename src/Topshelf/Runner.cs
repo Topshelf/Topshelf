@@ -40,10 +40,11 @@ namespace Topshelf
         public static void Host(RunConfiguration configuration, string[] args)
         {
             _log.Info("Starting Host");
-            _log.DebugFormat("Arguments: {0}", args);
+            if(args.Length > 0)
+                _log.DebugFormat("Arguments: {0}", args);
 
             //make it so this can be passed in
-            var argv = args.Aggregate((l, r) => "{0} {1}".FormatWith(l, r));
+            var argv = args.Aggregate("",(l, r) => "{0} {1}".FormatWith(l, r));
             var a = TopshelfArgumentParser.Parse(argv);
             TopshelfDispatcher.Dispatch(configuration, a);
         }
