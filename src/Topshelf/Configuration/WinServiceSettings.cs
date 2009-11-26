@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System;
     using System.Collections.Generic;
     using System.Configuration;
     using System.ServiceProcess;
@@ -28,8 +27,6 @@ namespace Topshelf.Configuration
         }
 
         public ServiceStartMode StartMode { get; set; }
-        
-
         public string ServiceName { private get; set; }
         public string DisplayName { private get; set; }
         public string Description { get; set; }

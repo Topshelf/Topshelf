@@ -29,7 +29,10 @@ namespace Topshelf
         // services to start?
 
 
-        // ts service /install /instance=bob
+        // ts  -- runs as console
+        // ts service install
+        // ts service install /instance=bob
+        // ts service uninstall
 
         public string Command { get; set; }
         public IEnumerable<ICommandLineElement> CommandArgs { get; set; }

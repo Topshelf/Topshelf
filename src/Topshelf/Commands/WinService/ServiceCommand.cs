@@ -57,7 +57,18 @@ namespace Topshelf.Commands.WinService
                 .DefaultIfEmpty("")
                 .First();
 
-            
+            //processing out the instance argument
+            var instance = args
+                .Where(x => x is IDefinitionElement)
+                .Select(x => x as IDefinitionElement)
+                .Where(x => x.Key == "instance")
+                .Select(x => x.Value)
+                .DefaultIfEmpty("")
+                .First();
+
+            //instance override
+            _settings.InstanceName = instance;
+
             var subcommands = new List<Command>
                               {
                                   new InstallService(_settings),
@@ -68,6 +79,7 @@ namespace Topshelf.Commands.WinService
                 .Where(x => x.Name == subcommand)
                 .Single();
 
+            //need to skip two now. ?
             oa.Execute(args.Skip(1).ToList());
         }
 
