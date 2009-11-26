@@ -33,11 +33,13 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         public string Name
         {
-            get { return "uninstall service"; }
+            get { return "uninstall"; }
         }
 
         public void Execute(IEnumerable<ICommandLineElement> args)
         {
+            _log.Info("Received service uninstall notification");
+
             if (!WinServiceHelper.IsInstalled(_settings.FullServiceName))
             {
                 string message = string.Format("The {0} service has not been installed.", _settings.FullServiceName);
@@ -46,8 +48,8 @@ namespace Topshelf.Commands.WinService.SubCommands
                 return;
             }
 
-            _log.Info("Received serice uninstall notification");
-            WinServiceHelper.Unregister(_settings.FullServiceName, new HostServiceInstaller(_settings));
+            var installer = new HostServiceInstaller(_settings);
+            WinServiceHelper.Unregister(_settings.FullServiceName, installer);
         }
 
         #endregion

@@ -29,9 +29,8 @@ namespace Topshelf.Commands.WinService.SubCommands
         {
             _settings = settings;
 
-            //Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
+            Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
         }
-
 
         /// <summary>
         /// For the .Net service install infrastructure

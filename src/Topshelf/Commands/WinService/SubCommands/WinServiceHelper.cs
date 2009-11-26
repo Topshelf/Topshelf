@@ -64,7 +64,7 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         public static void Register(string fullServiceName, HostServiceInstaller installer)
         {
-            _log.DebugFormat("Attempting to install {0}", fullServiceName);
+            _log.DebugFormat("Attempting to install '{0}'", fullServiceName);
             if (!IsInstalled(fullServiceName))
             {
                 using (var ti = new TransactedInstaller())
@@ -87,15 +87,13 @@ namespace Topshelf.Commands.WinService.SubCommands
             }
             else
             {
-                Console.WriteLine("Service is already installed");
-                if (_log.IsInfoEnabled)
                     _log.Info("Service is already installed");
             }
         }
 
         public static void Unregister(string fullServiceName, HostServiceInstaller installer)
         {
-            _log.DebugFormat("Attempting to uninstall {0}", fullServiceName);
+            _log.DebugFormat("Attempting to uninstall '{0}'", fullServiceName);
 
             if (IsInstalled(fullServiceName))
             {
@@ -103,8 +101,11 @@ namespace Topshelf.Commands.WinService.SubCommands
                 {
                     ti.Installers.Add(installer);
 
-                    string path = string.Format("/assemblypath={0}", Assembly.GetEntryAssembly().Location);
-                    string[] commandLine = {path};
+                    var assembly = Assembly.GetEntryAssembly();
+                    if (assembly == null) throw new Exception("Assembly.GetEntryAssembly() is null for some reason.");
+
+                    string path = string.Format("/assemblypath={0}", assembly.Location);
+                    string[] commandLine = { path };
 
                     var context = new InstallContext(null, commandLine);
                     ti.Context = context;
@@ -114,9 +115,7 @@ namespace Topshelf.Commands.WinService.SubCommands
             }
             else
             {
-                Console.WriteLine("Service is not installed");
-                if (_log.IsInfoEnabled)
-                    _log.Info("Service is not installed");
+                _log.Info("Service is not installed");
             }
         }
 

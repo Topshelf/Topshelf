@@ -48,7 +48,8 @@ namespace Topshelf.Commands.WinService.SubCommands
                 return;
             }
 
-            WinServiceHelper.Register(_settings.FullServiceName, new HostServiceInstaller(_settings));
+            var installer = new HostServiceInstaller(_settings);
+            WinServiceHelper.Register(_settings.FullServiceName, installer);
         }
 
         #endregion
