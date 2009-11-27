@@ -28,8 +28,6 @@ namespace Topshelf.Commands.WinService.SubCommands
         public HostServiceInstaller(WinServiceSettings settings)
         {
             _settings = settings;
-
-            Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
         }
 
         /// <summary>
