@@ -73,7 +73,7 @@ namespace Topshelf.Configuration
         {
             get
             {
-                return InstanceName == null ? " -service" : " -service -instance:{0}".FormatWith(InstanceName);
+                return InstanceName == null ? " service" : " service -instance:{0}".FormatWith(InstanceName);
             }
         }
 
