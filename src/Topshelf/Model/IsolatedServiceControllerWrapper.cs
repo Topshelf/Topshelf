@@ -13,7 +13,6 @@
 namespace Topshelf.Model
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
 
     public class IsolatedServiceControllerWrapper<TService> :
         IServiceControllerOf<object> where TService : class
@@ -41,11 +40,6 @@ namespace Topshelf.Model
         public ServiceState State
         {
             get { return _target.State; }
-        }
-
-        public IServiceLocator ServiceLocator
-        {
-            get { return _target.ServiceLocator; }
         }
 
         public void Start()
@@ -92,12 +86,17 @@ namespace Topshelf.Model
             set { _target.ContinueAction = service => value(service); }
         }
 
-        public Func<IServiceLocator> CreateServiceLocator
+        public Func<ServiceBuilder> BuildServiceAction
         {
-            get { return _target.CreateServiceLocator; }
-            set { _target.CreateServiceLocator = value; }
+            get { return () => _target.BuildService; }
+            set { _target.BuildService = value(); }
         }
 
+        public ServiceBuilder BuildService
+        {
+            get { return _target.BuildService; }
+            set { _target.BuildService = value; }
+        }
         #endregion
 
         public void ChangeName(string value)

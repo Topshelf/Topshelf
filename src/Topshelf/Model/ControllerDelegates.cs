@@ -22,7 +22,7 @@ namespace Topshelf.Model
         public Action<TService> StopAction { get; set; }
         public Action<TService> PauseAction { get; set; }
         public Action<TService> ContinueAction { get; set; }
-        public Func<IServiceLocator> CreateServiceLocator { get; set; }
+        public ServiceBuilder BuildAction { get; set; }
 
         public void StartActionObject(object obj)
         {
@@ -42,6 +42,11 @@ namespace Topshelf.Model
         public void ContinueActionObject(object obj)
         {
             ContinueAction((TService) obj);
+        }
+
+        public object BuildServiceObject(string name)
+        {
+            return BuildAction(name);
         }
     }
 }

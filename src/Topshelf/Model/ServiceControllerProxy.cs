@@ -13,7 +13,6 @@
 namespace Topshelf.Model
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
 
     public class ServiceControllerProxy :
         MarshalByRefObject,
@@ -51,10 +50,16 @@ namespace Topshelf.Model
             set { _target.ContinueAction = value; }
         }
 
-        public Func<IServiceLocator> CreateServiceLocator
+        public Func<ServiceBuilder> BuildServiceAction
         {
-            get { return _target.CreateServiceLocator; }
-            set { _target.CreateServiceLocator = value; }
+            get
+            {
+                return _target.BuildServiceAction;
+            }
+            set
+            {
+                _target.BuildServiceAction = value;
+            }
         }
 
         #region IServiceController Members
@@ -80,11 +85,6 @@ namespace Topshelf.Model
             get { return _target.State; }
         }
 
-        public IServiceLocator ServiceLocator
-        {
-            get { return _target.ServiceLocator; }
-        }
-
         public void Start()
         {
             _target.Start();
@@ -103,6 +103,11 @@ namespace Topshelf.Model
         public void Continue()
         {
             _target.Continue();
+        }
+
+        public ServiceBuilder BuildService
+        {
+            get { return _target.BuildService; }
         }
 
         #endregion

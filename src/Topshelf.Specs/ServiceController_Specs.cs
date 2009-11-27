@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using Microsoft.Practices.ServiceLocation;
     using Model;
     using NUnit.Framework;
     using Rhino.Mocks;
@@ -37,13 +36,7 @@ namespace Topshelf.Specs
             c.WhenStopped(s => s.Stop());
             c.WhenPaused(s => { _wasPaused = true; });
             c.WhenContinued(s => { _wasContinued = true; });
-            c.CreateServiceLocator(()=>
-            {
-                IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
-                ServiceLocator.SetLocatorProvider(() => sl);
-                sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(_srv);
-                return sl;
-            });
+            c.HowToBuildService((name)=> new TestService());
             _serviceController = c.Create();
             _serviceController.Start();
         }
@@ -118,13 +111,6 @@ namespace Topshelf.Specs
             var c = new ServiceConfigurator<TestService>("my_service");
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
-            c.CreateServiceLocator(()=>
-            {
-                TestService srv = new TestService();
-                var sl = MockRepository.GenerateStub<IServiceLocator>();
-                sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(srv);
-                return sl;
-            });
 
             var service = c.Create();
             service.Start();

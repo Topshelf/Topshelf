@@ -51,23 +51,24 @@ namespace Topshelf.Commands.WinService
             }
 
             var subcommand = args.Take(1)
-                .Where(x => x is ISwitchElement)
-                .Select(x => x as ISwitchElement)
-                .Select(x => x.Key)
+                .Where(x => x is IArgumentElement)
+                .Select(x => x as IArgumentElement)
+                .Select(x => x.Id)
                 .DefaultIfEmpty("")
                 .First();
 
+            _log.DebugFormat("Executing subcommand '{0}'", subcommand);
             //processing out the instance argument
-            var instance = args
-                .Where(x => x is IDefinitionElement)
-                .Select(x => x as IDefinitionElement)
-                .Where(x => x.Key == "instance")
-                .Select(x => x.Value)
-                .DefaultIfEmpty("")
-                .First();
+//            var instance = args
+//                .Where(x => x is IDefinitionElement)
+//                .Select(x => x as IDefinitionElement)
+//                .Where(x => x.Key == "instance")
+//                .Select(x => x.Value)
+//                .DefaultIfEmpty("")
+//                .First();
 
             //instance override
-            _settings.InstanceName = instance;
+            //_settings.InstanceName = instance;
 
             var subcommands = new List<Command>
                               {

@@ -32,11 +32,11 @@ namespace Topshelf.Configuration.Dsl
         {
             IServiceController serviceController = new FacadeToIsolatedServiceController<TService>
                                                    {
-                                                       CreateServiceLocator = _createServiceLocator,
                                                        StartAction = _startAction,
                                                        StopAction = _stopAction,
                                                        PauseAction = _pauseAction,
                                                        ContinueAction = _continueAction,
+                                                       BuildAction  = _buildAction,
                                                        Name = _name,
                                                        PathToConfigurationFile = _pathToConfigurationFile,
                                                        Args = _args,

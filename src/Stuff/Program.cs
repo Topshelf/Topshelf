@@ -13,12 +13,9 @@
 namespace Stuff
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Timers;
     using log4net.Config;
-    using Microsoft.Practices.ServiceLocation;
-    using StructureMap;
     using Topshelf;
     using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
@@ -34,32 +31,10 @@ namespace Stuff
 
                 x.ConfigureServiceInIsolation<TownCrier>("tc", s =>
                 {
-                    s.CreateServiceLocator(()=>
-                    {
-                        ObjectFactory.Initialize(i =>
-                        {
-                            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
-                        });
-
-                        return new StructureMapServiceLocator();
-                    });
+                    s.HowToBuildService(name=> new TownCrier());
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());
                 });
-//                x.ConfigureService<TownCrier>("tc", s =>
-//                {
-//                    s.CreateServiceLocator(() =>
-//                    {
-//                        ObjectFactory.Initialize(i =>
-//                        {
-//                            i.ForConcreteType<TownCrier>().Configure.WithName("tc");
-//                            i.ForConcreteType<ServiceConsole>(); //bah why do I have to register this?
-//                        });
-//                        return new StructureMapServiceLocator();
-//                    });
-//                    s.WhenStarted(tc => tc.Start());
-//                    s.WhenStopped(tc => tc.Stop());
-//                });
 
                 x.RunAsLocalSystem();
 
@@ -91,51 +66,5 @@ namespace Stuff
         {
             _timer.Stop();
         }
-    }
-
-    public class StructureMapServiceLocator :
-        IServiceLocator
-    {
-        #region IServiceLocator Members
-
-        public object GetService(Type serviceType)
-        {
-            return ObjectFactory.GetInstance(serviceType);
-        }
-
-        public object GetInstance(Type serviceType)
-        {
-            return ObjectFactory.GetInstance(serviceType);
-        }
-
-        public object GetInstance(Type serviceType, string key)
-        {
-            return ObjectFactory.GetNamedInstance(serviceType, key);
-        }
-
-        public IEnumerable<object> GetAllInstances(Type serviceType)
-        {
-            foreach (object instance in ObjectFactory.GetAllInstances(serviceType))
-            {
-                yield return instance;
-            }
-        }
-
-        public TService GetInstance<TService>()
-        {
-            return ObjectFactory.GetInstance<TService>();
-        }
-
-        public TService GetInstance<TService>(string key)
-        {
-            return ObjectFactory.GetNamedInstance<TService>(key);
-        }
-
-        public IEnumerable<TService> GetAllInstances<TService>()
-        {
-            return ObjectFactory.GetAllInstances<TService>();
-        }
-
-        #endregion
     }
 }

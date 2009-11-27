@@ -13,18 +13,24 @@
 namespace Topshelf.Configuration.Dsl
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
+    using Model;
 
     public class ServiceConfiguratorBase<TService> :
         IDisposable
     {
         protected Action<TService> _continueAction = NoOp;
-        protected Func<IServiceLocator> _createServiceLocator = () => new ActivatorServiceLocator();
+        
         bool _disposed;
         protected string _name = typeof (TService).Name;
         protected Action<TService> _pauseAction = NoOp;
         protected Action<TService> _startAction = NoOp;
         protected Action<TService> _stopAction = NoOp;
+
+        protected ServiceBuilder _buildAction = name =>
+        {
+            var asl = new ActivatorServiceLocator();
+            return asl.GetInstance<TService>(name);
+        };
 
         public ServiceConfiguratorBase(string name)
         {
@@ -61,9 +67,9 @@ namespace Topshelf.Configuration.Dsl
             _continueAction = continueAction;
         }
 
-        public void CreateServiceLocator(Func<IServiceLocator> createServiceLocator)
+        public void HowToBuildService(ServiceBuilder builder)
         {
-            _createServiceLocator = createServiceLocator;
+            _buildAction = builder;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -75,8 +81,7 @@ namespace Topshelf.Configuration.Dsl
             _stopAction = null;
             _pauseAction = null;
             _continueAction = null;
-
-            _createServiceLocator = null;
+            _buildAction = null;
 
             _disposed = true;
         }

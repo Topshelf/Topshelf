@@ -15,8 +15,6 @@ namespace Topshelf.Specs
     using System;
     using Model;
     using NUnit.Framework;
-    using Microsoft.Practices.ServiceLocation;
-    using Rhino.Mocks;
     using TestObject;
     using Topshelf.Configuration.Dsl;
 
@@ -37,12 +35,9 @@ namespace Topshelf.Specs
             c.WhenStopped(s => s.Stop());
             //c.WhenPaused(s => { _wasPaused = true; }); //need to change these
             //c.WhenContinued(s => { _wasContinued = true; }); //need to change these
-            c.CreateServiceLocator(()=>
+            c.HowToBuildService((name)=>
                                    {
-                                       TestService srv = new TestService();
-                                       var sl = MockRepository.GenerateStub<IServiceLocator>();
-                                       sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(srv);
-                                       return sl;
+                                       return new TestService();
                                    });
 
             _serviceController = c.Create();

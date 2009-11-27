@@ -13,7 +13,6 @@
 namespace Topshelf.Model
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
 
     public interface IServiceControllerOf<TService> : 
         IServiceController
@@ -23,6 +22,6 @@ namespace Topshelf.Model
         Action<TService> StopAction { get; set; }
         Action<TService> PauseAction { get; set; }
         Action<TService> ContinueAction { get; set; }
-        Func<IServiceLocator> CreateServiceLocator { get; set; }
+        Func<ServiceBuilder> BuildServiceAction { get; set; }
     }
 }
