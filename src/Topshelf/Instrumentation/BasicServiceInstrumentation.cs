@@ -13,7 +13,6 @@
 namespace Topshelf.Instrumentation
 {
     using System.Management.Instrumentation;
-    using Microsoft.Practices.ServiceLocation;
     using Model;
 
     [ManagementEntity(Singleton = true)]
@@ -32,10 +31,7 @@ namespace Topshelf.Instrumentation
             get
             {
                 var count = 0;
-                foreach(var x in ServiceLocator.Current.GetAllInstances<IServiceController>())
-                {
-                    count++;
-                }
+                
                 return count;
             }
         }

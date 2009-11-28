@@ -14,10 +14,8 @@ namespace Topshelf.Specs
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.Practices.ServiceLocation;
     using Model;
     using NUnit.Framework;
-    using Rhino.Mocks;
     using TestObject;
 
     [TestFixture]

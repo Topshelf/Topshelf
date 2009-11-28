@@ -15,12 +15,9 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using System.Collections.Generic;
     using Magnum.Reflection;
-    using Microsoft.Practices.ServiceLocation;
 
-    public class ActivatorServiceLocator :
-        IServiceLocator
+    public class ActivatorServiceLocator
     {
-        #region IServiceLocator Members
 
         public object GetService(Type serviceType)
         {
@@ -57,6 +54,5 @@ namespace Topshelf.Configuration.Dsl
             return new[] {ClassFactory.New<TService>()};
         }
 
-        #endregion
     }
 }

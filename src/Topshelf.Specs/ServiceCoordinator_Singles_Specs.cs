@@ -14,7 +14,6 @@ namespace Topshelf.Specs
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.Practices.ServiceLocation;
     using Model;
     using NUnit.Framework;
     using Rhino.Mocks;
@@ -30,11 +29,6 @@ namespace Topshelf.Specs
         {
             _service = new TestService();
             _service2 = new TestService2();
-            var sl = MockRepository.GenerateMock<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(() => sl);
-
-            sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
-            sl.Stub(x => x.GetInstance<TestService2>("test2")).Return(_service2).Repeat.Any();
 
             _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>

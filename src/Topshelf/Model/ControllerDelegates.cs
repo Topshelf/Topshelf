@@ -13,7 +13,6 @@
 namespace Topshelf.Model
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
 
     [Serializable]
     public class ControllerDelegates<TService> where TService : class
