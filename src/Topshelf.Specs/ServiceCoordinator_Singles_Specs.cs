@@ -42,8 +42,8 @@ namespace Topshelf.Specs
                                                            () =>
                                                            new ServiceController<TestService>
                                                            {
-                                                               CreateServiceLocator = () => sl,
                                                                Name = "test",
+                                                               BuildService = s=> _service,
                                                                StartAction = x => x.Start(),
                                                                StopAction = x => x.Stop(),
                                                                ContinueAction = x => x.Continue(),
@@ -52,8 +52,8 @@ namespace Topshelf.Specs
                                                            () =>
                                                            new ServiceController<TestService2>
                                                            {
-                                                               CreateServiceLocator = () => sl,
                                                                Name = "test2",
+                                                               BuildService = s=> _service2,
                                                                StartAction = x => x.Start(),
                                                                StopAction = x => x.Stop(),
                                                                ContinueAction = x => x.Continue(),

@@ -27,11 +27,11 @@ namespace Topshelf.Configuration.Dsl
         {
             IServiceController serviceController = new ServiceController<TService>
                                                    {
-                                                       CreateServiceLocator = _createServiceLocator,
                                                        StartAction = _startAction,
                                                        StopAction = _stopAction,
                                                        PauseAction = _pauseAction,
                                                        ContinueAction = _continueAction,
+                                                       BuildService = _buildAction,
                                                        Name = _name,
                                                    };
 

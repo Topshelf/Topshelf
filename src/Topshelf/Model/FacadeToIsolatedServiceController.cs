@@ -14,8 +14,8 @@ namespace Topshelf.Model
 {
     using System;
     using System.Diagnostics;
-    using Microsoft.Practices.ServiceLocation;
 
+    [Serializable]
     [DebuggerDisplay("Isolated Service({Name}) - {State}")]
     public class FacadeToIsolatedServiceController<TService> :
         IServiceController
@@ -51,9 +51,10 @@ namespace Topshelf.Model
 
             _remoteServiceController.StartAction = _delegates.StartActionObject;
             _remoteServiceController.StopAction = _delegates.StopActionObject;
-            _remoteServiceController.CreateServiceLocator = _delegates.CreateServiceLocator;
             _remoteServiceController.PauseAction = _delegates.PauseActionObject;
             _remoteServiceController.ContinueAction = _delegates.ContinueActionObject;
+            _remoteServiceController.BuildServiceAction = ()=>_delegates.BuildServiceObject;
+            
             _remoteServiceController.Name = Name;
 
             _remoteServiceController.Start();
@@ -65,7 +66,7 @@ namespace Topshelf.Model
         public Action<TService> StopAction { set { _delegates.StopAction = value; } }
         public Action<TService> PauseAction { set { _delegates.PauseAction = value; } }
         public Action<TService> ContinueAction { set { _delegates.ContinueAction = value; } }
-        public Func<IServiceLocator> CreateServiceLocator { set { _delegates.CreateServiceLocator = value; } }
+        public ServiceBuilder BuildAction { set { _delegates.BuildAction = value; } }
         public string Name { get; set; }
         public string PathToConfigurationFile { get; set; }
         public string[] Args { get; set; }
@@ -88,6 +89,14 @@ namespace Topshelf.Model
             _remoteServiceController.IfNotNull(x => x.Continue());
         }
 
+        public ServiceBuilder BuildService
+        {
+            get
+            {
+                return _remoteServiceController.IfNotNull<ServiceBuilder>(x => x.BuildService, s => new object());
+            }
+        }
+
         public void Dispose()
         {
             //do nothing?
@@ -102,11 +111,5 @@ namespace Topshelf.Model
         {
             get { return _remoteServiceController.IfNotNull(x => x.State, ServiceState.Stopped); }
         }
-
-        public IServiceLocator ServiceLocator
-        {
-            get { return _remoteServiceController.ServiceLocator; }
-        }
-
     }
 }

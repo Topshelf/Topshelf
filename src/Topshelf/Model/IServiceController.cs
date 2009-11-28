@@ -13,7 +13,6 @@
 namespace Topshelf.Model
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
 
     public interface IServiceController :
         IDisposable
@@ -21,7 +20,7 @@ namespace Topshelf.Model
         Type ServiceType { get; }
         string Name { get; set; }
         ServiceState State { get; }
-        IServiceLocator ServiceLocator { get; }
+        ServiceBuilder BuildService { get; }
         void Start();
         void Stop();
         void Pause();

@@ -14,7 +14,6 @@ namespace Topshelf.Model
 {
     using System;
     using System.Diagnostics;
-    using Microsoft.Practices.ServiceLocation;
 
     [DebuggerDisplay("Isolated Service({Name}) - {State}")]
     public class IsolatedServiceController<TService> :
@@ -34,11 +33,10 @@ namespace Topshelf.Model
             get { return _serviceController.ServiceType; }
         }
 
-        public IServiceLocator ServiceLocator
+        public ServiceBuilder BuildService
         {
-            get { return _serviceController.ServiceLocator; }
+            get { return _serviceController.BuildService; }
         }
-
 
         public string Name
         {
@@ -100,10 +98,10 @@ namespace Topshelf.Model
             set { _serviceController.ContinueAction = value; }
         }
 
-        public Func<IServiceLocator> CreateServiceLocator
+        public Func<ServiceBuilder> BuildServiceAction
         {
-            get { return _serviceController.CreateServiceLocator; }
-            set { _serviceController.CreateServiceLocator = value; }
+            get { return ()=>_serviceController.BuildService; }
+            set { _serviceController.BuildService = value(); }
         }
     }
 }

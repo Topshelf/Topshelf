@@ -31,19 +31,14 @@ namespace Topshelf.Specs
             _service = new TestService();
             _service2 = new TestService2();
 
-            var sl = MockRepository.GenerateMock<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(() => sl);
-
-            sl.Stub(x => x.GetInstance<TestService>("test")).Return(_service).Repeat.Any();
-            sl.Stub(x => x.GetInstance<TestService2>("test2")).Return(_service2).Repeat.Any();
 
             _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
                                                            () => new ServiceController<TestService>
                                                                  {
-                                                                     CreateServiceLocator = () => sl,
                                                                      Name = "test",
+                                                                     BuildService = s => _service,
                                                                      StartAction = x => x.Start(),
                                                                      StopAction = x => x.Stop(),
                                                                      ContinueAction = x => x.Continue(),
@@ -51,8 +46,8 @@ namespace Topshelf.Specs
                                                                  },
                                                            () => new ServiceController<TestService2>
                                                                  {
-                                                                     CreateServiceLocator = () => sl,
                                                                      Name = "test2",
+                                                                     BuildService = s => _service2,
                                                                      StartAction = x => x.Start(),
                                                                      StopAction = x => x.Stop(),
                                                                      ContinueAction = x => x.Continue(),

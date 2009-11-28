@@ -13,7 +13,7 @@
 namespace Topshelf.Configuration.Dsl
 {
     using System;
-    using Microsoft.Practices.ServiceLocation;
+    using Model;
 
     public interface IServiceConfigurator<TService> :
         IDisposable
@@ -23,6 +23,6 @@ namespace Topshelf.Configuration.Dsl
         void WhenPaused(Action<TService> pauseAction);
         void WhenContinued(Action<TService> continueAction);
 
-        void CreateServiceLocator(Func<IServiceLocator> createServiceLocator);
+        void HowToBuildService(ServiceBuilder serviceBuilder);
     }
 }

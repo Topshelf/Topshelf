@@ -16,8 +16,6 @@ namespace Topshelf.Specs.Configuration
     using System.ServiceProcess;
     using Model;
     using NUnit.Framework;
-    using Microsoft.Practices.ServiceLocation;
-    using Rhino.Mocks;
     using TestObject;
     using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
@@ -30,11 +28,8 @@ namespace Topshelf.Specs.Configuration
         [SetUp]
         public void EstablishContext()
         {
-            IServiceLocator sl = MockRepository.GenerateStub<IServiceLocator>();
             TestService s1 = new TestService();
             TestService s2 = new TestService();
-            sl.Stub(x => x.GetInstance<TestService>("my_service")).Return(s1);
-            sl.Stub(x => x.GetInstance<TestService>("my_service2")).Return(s2);
 
             _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
             {
@@ -48,7 +43,6 @@ namespace Topshelf.Specs.Configuration
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
-                    c.CreateServiceLocator(()=>sl);
                 });
 
                 //needs to moved to a custom area for testing
@@ -58,7 +52,7 @@ namespace Topshelf.Specs.Configuration
                 //                                                       c.WhenStopped(s => s.Stop());
                 //                                                       c.WhenPaused(s => { });
                 //                                                       c.WhenContinued(s => { });
-                //                                                       c.CreateServiceLocator(()=>sl);
+                //                                                       c.HowToBuildService(()=>sl);
                 //                                                   });
                 
 
