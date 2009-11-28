@@ -55,20 +55,21 @@ namespace Topshelf.Commands.WinService
                 .Select(x => x as IArgumentElement)
                 .Select(x => x.Id)
                 .DefaultIfEmpty("")
-                .First();
+                .FirstOrDefault();
 
-            _log.DebugFormat("Executing subcommand '{0}'", subcommand);
+            _log.DebugFormat("Subcommand: '{0}'", subcommand);
+
             //processing out the instance argument
-//            var instance = args
-//                .Where(x => x is IDefinitionElement)
-//                .Select(x => x as IDefinitionElement)
-//                .Where(x => x.Key == "instance")
-//                .Select(x => x.Value)
-//                .DefaultIfEmpty("")
-//                .First();
+            var instance = args
+                .Where(x => x is IDefinitionElement)
+                .Select(x => x as IDefinitionElement)
+                .Where(x => x.Key == "instance")
+                .Select(x => x.Value)
+                .DefaultIfEmpty(null)
+                .FirstOrDefault();
 
             //instance override
-            //_settings.InstanceName = instance;
+            _settings.InstanceName = instance;
 
             var subcommands = new List<Command>
                               {
