@@ -23,7 +23,7 @@ namespace Topshelf.Specs.ServiceTests
 
                 x.RunAsLocalSystem();
 
-                x.ConfigureServiceInIsolation<TestInstall>("ti", s =>
+                x.ConfigureServiceInIsolation<TestInstall>(s =>
                 {
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());

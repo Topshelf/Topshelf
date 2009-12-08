@@ -24,9 +24,6 @@ namespace Topshelf.Configuration.Dsl
         private string[] _args;
         private Func<AppDomainInitializer> _callback;
 
-        public IsolatedServiceConfigurator(string name) : base(name)
-        {
-        }
 
         public IServiceController Create()
         {

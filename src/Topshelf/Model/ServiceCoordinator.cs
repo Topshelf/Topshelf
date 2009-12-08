@@ -17,6 +17,7 @@ namespace Topshelf.Model
     using System.Diagnostics;
     using System.Linq;
     using log4net;
+    using Magnum.Collections;
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
     public class ServiceCoordinator :
@@ -26,7 +27,7 @@ namespace Topshelf.Model
         private readonly Action<IServiceCoordinator> _afterStop;
         private readonly Action<IServiceCoordinator> _beforeStart;
         private readonly Action<IServiceCoordinator> _beforeStartingServices;
-        private readonly Dictionary<string, IServiceController> _services = new Dictionary<string, IServiceController>();
+        private readonly IList<IServiceController> _services = new List<IServiceController>();
 
         public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices, Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
         {
@@ -48,7 +49,7 @@ namespace Topshelf.Model
             foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
             {
                 IServiceController serviceController = serviceConfigurator();
-                _services.Add(serviceController.Name, serviceController);
+                _services.Add(serviceController);
 
                 _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
                 serviceController.Start();
@@ -61,7 +62,7 @@ namespace Topshelf.Model
 
         public void Stop()
         {
-            foreach (var service in _services.Values.Reverse())
+            foreach (var service in _services.Reverse())
             {
                 try
                 {
@@ -82,7 +83,7 @@ namespace Topshelf.Model
 
         public void Pause()
         {
-            foreach (var service in _services.Values)
+            foreach (var service in _services)
             {
                 _log.InfoFormat("Pausing sub service '{0}'", service.Name);
                 service.Pause();
@@ -91,7 +92,7 @@ namespace Topshelf.Model
 
         public void Continue()
         {
-            foreach (var service in _services.Values)
+            foreach (var service in _services)
             {
                 _log.InfoFormat("Continuing sub service '{0}'", service.Name);
                 service.Continue();
@@ -103,7 +104,7 @@ namespace Topshelf.Model
             if (_services.Count == 0)
                 CreateServices();
 
-            _services[name].Start();
+            _services.Where(x => x.Name == name).First().Start();
         }
 
         public void StopService(string name)
@@ -111,7 +112,7 @@ namespace Topshelf.Model
             if (_services.Count == 0)
                 CreateServices();
 
-            _services[name].Stop();
+            _services.Where(x=>x.Name == name).First().Stop();
         }
 
         public void PauseService(string name)
@@ -119,7 +120,7 @@ namespace Topshelf.Model
             if (_services.Count == 0)
                 CreateServices();
 
-            _services[name].Pause();
+            _services.Where(x=>x.Name == name).First().Pause();
         }
 
         public void ContinueService(string name)
@@ -127,7 +128,7 @@ namespace Topshelf.Model
             if (_services.Count == 0)
                 CreateServices();
 
-            _services[name].Continue();
+            _services.Where(x=>x.Name == name).First().Continue();
         }
 
         public int HostedServiceCount
@@ -139,7 +140,7 @@ namespace Topshelf.Model
         {
             var result = new List<ServiceInformation>();
 
-            foreach (var value in _services.Values)
+            foreach (var value in _services)
             {
                 result.Add(new ServiceInformation
                            {
@@ -154,7 +155,7 @@ namespace Topshelf.Model
 
         public IServiceController GetService(string name)
         {
-            return _services[name];
+            return _services.Where(x=>x.Name == name).First();
         }
 
         public event Action Stopped;
@@ -175,7 +176,7 @@ namespace Topshelf.Model
             if (_disposed) return;
             if (disposing)
             {
-                foreach (var service in _services.Values)
+                foreach (var service in _services)
                 {
                     service.Dispose();
                 }
@@ -201,7 +202,7 @@ namespace Topshelf.Model
             foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
             {
                 IServiceController serviceController = serviceConfigurator();
-                _services.Add(serviceController.Name, serviceController);
+                _services.Add(serviceController);
             }
         }
 

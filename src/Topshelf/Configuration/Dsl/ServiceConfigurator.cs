@@ -19,10 +19,6 @@ namespace Topshelf.Configuration.Dsl
         IServiceConfigurator<TService>
         where TService : class
     {
-        public ServiceConfigurator(string name) : base(name)
-        {
-        }
-
         public IServiceController Create()
         {
             IServiceController serviceController = new ServiceController<TService>
@@ -37,5 +33,7 @@ namespace Topshelf.Configuration.Dsl
 
             return serviceController;
         }
+
+
     }
 }

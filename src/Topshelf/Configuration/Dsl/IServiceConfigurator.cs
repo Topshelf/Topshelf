@@ -18,6 +18,9 @@ namespace Topshelf.Configuration.Dsl
     public interface IServiceConfigurator<TService> :
         IDisposable
     {
+
+        void Named(string name);
+
         void WhenStarted(Action<TService> startAction);
         void WhenStopped(Action<TService> stopAction);
         void WhenPaused(Action<TService> pauseAction);

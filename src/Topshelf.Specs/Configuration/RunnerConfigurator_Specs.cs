@@ -37,16 +37,17 @@ namespace Topshelf.Specs.Configuration
                 x.SetServiceName("chris");
                 x.SetDescription("chris's pants");
 
-                x.ConfigureService<TestService>("my_service", c =>
+                x.ConfigureService<TestService>(c =>
                 {
                     c.WhenStarted(s => s.Start());
                     c.WhenStopped(s => s.Stop());
                     c.WhenPaused(s => { });
                     c.WhenContinued(s => { });
+                    c.Named("my_service");
                 });
 
                 //needs to moved to a custom area for testing
-                //x.ConfigureServiceInIsolation<TestService>("my_service2", c=>
+                //x.ConfigureServiceInIsolation<TestService>(c=>
                 //                                                   {
                 //                                                       c.WhenStarted(s => s.Start());
                 //                                                       c.WhenStopped(s => s.Stop());

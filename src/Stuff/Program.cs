@@ -29,8 +29,9 @@ namespace Stuff
             {
                 x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-                x.ConfigureServiceInIsolation<TownCrier>("tc", s =>
+                x.ConfigureServiceInIsolation<TownCrier>(s =>
                 {
+                    s.Named("tc");
                     s.HowToBuildService(name=> new TownCrier());
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());

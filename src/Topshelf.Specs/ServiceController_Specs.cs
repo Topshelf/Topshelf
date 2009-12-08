@@ -31,7 +31,7 @@ namespace Topshelf.Specs
         {
             _srv = new TestService();
 
-            ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>("my_service");
+            ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>();
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
             c.WhenPaused(s => { _wasPaused = true; });
@@ -106,7 +106,7 @@ namespace Topshelf.Specs
         [Test]
         public void Should_work()
         {
-            var c = new ServiceConfigurator<TestService>("my_service");
+            var c = new ServiceConfigurator<TestService>();
             c.WhenStarted(s => s.Start());
             c.WhenStopped(s => s.Stop());
 

@@ -32,9 +32,10 @@ namespace Topshelf.Configuration.Dsl
             return asl.GetInstance<TService>(name);
         };
 
-        public ServiceConfiguratorBase(string name)
+        public ServiceConfiguratorBase()
         {
-            _name = name;
+            
+            _name = "{0}:{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 
         #region IDisposable Members
@@ -46,6 +47,11 @@ namespace Topshelf.Configuration.Dsl
         }
 
         #endregion
+
+        public void Named(string name)
+        {
+            _name = name;
+        }
 
         public void WhenStarted(Action<TService> startAction)
         {
