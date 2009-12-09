@@ -14,7 +14,7 @@ namespace Topshelf.Model
 {
     public enum ServiceState
     {
-        //Initial
+        Initial,
         Stopped,
         Started,
         Paused

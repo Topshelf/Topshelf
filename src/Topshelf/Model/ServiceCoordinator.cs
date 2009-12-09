@@ -37,23 +37,43 @@ namespace Topshelf.Model
             _serviceConfigurators = new List<Func<IServiceController>>();
         }
 
-        public void Start()
+		public IList<IServiceController> Services
+		{
+			get
+			{
+				LoadNewServiceConfigurations();
+
+				return _services;
+			}
+		}
+
+    	private void LoadNewServiceConfigurations()
+    	{
+    		if (_serviceConfigurators.Any())
+    		{
+    			foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
+    			{
+    				IServiceController serviceController = serviceConfigurator();
+    				_services.Add(serviceController);
+    			}
+
+    			_serviceConfigurators.Clear();
+    		}
+    	}
+
+    	public void Start()
         {
             _log.Debug("Calling BeforeStartingServices");
             _beforeStartingServices(this);
             _log.Info("BeforeStart complete");
-
-
+            
             _log.Debug("Start is now starting any subordinate services");
 
-            foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
-            {
-                IServiceController serviceController = serviceConfigurator();
-                _services.Add(serviceController);
-
-                _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
-                serviceController.Start();
-            }
+        	foreach (var serviceController in Services)
+        	{
+				_log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
+				serviceController.Start();
+        	}
 
             _log.Debug("Calling BeforeStart");
             _beforeStart(this);
@@ -62,7 +82,7 @@ namespace Topshelf.Model
 
         public void Stop()
         {
-            foreach (var service in _services.Reverse())
+            foreach (var service in Services.Reverse())
             {
                 try
                 {
@@ -83,7 +103,7 @@ namespace Topshelf.Model
 
         public void Pause()
         {
-            foreach (var service in _services)
+            foreach (var service in Services)
             {
                 _log.InfoFormat("Pausing sub service '{0}'", service.Name);
                 service.Pause();
@@ -92,7 +112,7 @@ namespace Topshelf.Model
 
         public void Continue()
         {
-            foreach (var service in _services)
+            foreach (var service in Services)
             {
                 _log.InfoFormat("Continuing sub service '{0}'", service.Name);
                 service.Continue();
@@ -101,61 +121,61 @@ namespace Topshelf.Model
 
         public void StartService(string name)
         {
-            if (_services.Count == 0)
+            if (Services.Count == 0)
                 CreateServices();
 
-            _services.Where(x => x.Name == name).First().Start();
+            Services.Where(x => x.Name == name).First().Start();
         }
 
         public void StopService(string name)
         {
-            if (_services.Count == 0)
+            if (Services.Count == 0)
                 CreateServices();
 
-            _services.Where(x=>x.Name == name).First().Stop();
+            Services.Where(x=>x.Name == name).First().Stop();
         }
 
         public void PauseService(string name)
         {
-            if (_services.Count == 0)
+            if (Services.Count == 0)
                 CreateServices();
 
-            _services.Where(x=>x.Name == name).First().Pause();
+            Services.Where(x=>x.Name == name).First().Pause();
         }
 
         public void ContinueService(string name)
         {
-            if (_services.Count == 0)
+            if (Services.Count == 0)
                 CreateServices();
 
-            _services.Where(x=>x.Name == name).First().Continue();
+            Services.Where(x=>x.Name == name).First().Continue();
         }
 
         public int HostedServiceCount
         {
-            get { return _services.Count; }
+            get { return Services.Count; }
         }
 
-        public IList<ServiceInformation> GetServiceInfo()
+    	public IList<ServiceInformation> GetServiceInfo()
         {
             var result = new List<ServiceInformation>();
 
-            foreach (var value in _services)
+            foreach (var serviceController in Services)
             {
                 result.Add(new ServiceInformation
                            {
-                               Name = value.Name,
-                               State = value.State,
-                               Type = value.ServiceType.Name
+                               Name = serviceController.Name,
+                               State = serviceController.State,
+                               Type = serviceController.ServiceType.Name
                            });
             }
 
-            return result;
+			return result;
         }
 
         public IServiceController GetService(string name)
         {
-            return _services.Where(x=>x.Name == name).First();
+            return Services.Where(x=>x.Name == name).First();
         }
 
         public event Action Stopped;
@@ -176,11 +196,11 @@ namespace Topshelf.Model
             if (_disposed) return;
             if (disposing)
             {
-                foreach (var service in _services)
+                foreach (var service in Services)
                 {
                     service.Dispose();
                 }
-                _services.Clear();
+                Services.Clear();
             }
             _disposed = true;
         }
@@ -202,7 +222,7 @@ namespace Topshelf.Model
             foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
             {
                 IServiceController serviceController = serviceConfigurator();
-                _services.Add(serviceController);
+                Services.Add(serviceController);
             }
         }
 

@@ -10,9 +10,9 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+
 namespace Topshelf.Specs.Configuration
 {
-    using System;
     using System.ServiceProcess;
     using Model;
     using NUnit.Framework;
@@ -124,6 +124,45 @@ namespace Topshelf.Specs.Configuration
             _runConfiguration.WinServiceSettings.Credentials.AccountType
                 .ShouldEqual(ServiceAccount.User);
         }
+
+		[Test]
+		public void when_specified_service_names_are_used_in_the_service_configuration()
+		{
+			const string serviceName = "service name";
+
+			var runConfiguration = RunnerConfigurator.New(x =>
+			{
+				x.ConfigureService<TestService>(c => c.Named(serviceName));
+			});
+
+			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+
+			serviceInfo[0].Name.ShouldEqual(serviceName);
+		}
+
+		[Test]
+		public void when_not_specified_service_names_are_assigned()
+		{
+			var runConfiguration = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
+
+			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+
+			serviceInfo[0].Name.ShouldNotBeNull();
+		}
+
+    	[Test]
+    	public void when_not_specified_automatic_service_names_should_be_unique_for_services_of_the_same_type()
+     	{
+    		var runConfiguration = RunnerConfigurator.New(x =>
+    		{
+				x.ConfigureService<TestService>(c => { });
+    			x.ConfigureService<TestService>(c => { });
+    		});
+            
+    		var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+            
+			serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
+     	}
 
         [Test]
         public void Hosted_service_configuration()

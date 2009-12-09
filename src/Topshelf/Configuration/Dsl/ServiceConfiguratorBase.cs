@@ -21,7 +21,7 @@ namespace Topshelf.Configuration.Dsl
         protected Action<TService> _continueAction = NoOp;
         
         bool _disposed;
-        protected string _name = typeof (TService).Name;
+        protected string _name;
         protected Action<TService> _pauseAction = NoOp;
         protected Action<TService> _startAction = NoOp;
         protected Action<TService> _stopAction = NoOp;
@@ -34,7 +34,6 @@ namespace Topshelf.Configuration.Dsl
 
         public ServiceConfiguratorBase()
         {
-            
             _name = "{0}:{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 

@@ -27,6 +27,11 @@ namespace Topshelf.Specs
             Assert.AreEqual(expected, actual);
         }
 
+		public static void ShouldNotEqual<T>(this T actual, T expected)
+		{
+			Assert.AreNotEqual(expected, actual);
+		}
+
         public static void ShouldNotBeNull<T>(this T actual)
         {
             Assert.IsNotNull(actual);
