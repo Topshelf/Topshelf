@@ -21,38 +21,37 @@ namespace Topshelf.Configuration.Dsl
 
         public object GetService(Type serviceType)
         {
-            return ClassFactory.New(serviceType);
+			return FastActivator.Create(serviceType);
         }
 
         public object GetInstance(Type serviceType)
         {
-            return ClassFactory.New(serviceType);
+            return FastActivator.Create(serviceType);
         }
 
         public object GetInstance(Type serviceType, string key)
         {
-            return ClassFactory.New(serviceType);
+            return FastActivator.Create(serviceType);
         }
 
         public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            return new[] {ClassFactory.New(serviceType)};
+            return new[] {FastActivator.Create(serviceType)};
         }
 
         public TService GetInstance<TService>()
         {
-            return ClassFactory.New<TService>();
+            return FastActivator<TService>.Create();
         }
 
         public TService GetInstance<TService>(string key)
         {
-            return ClassFactory.New<TService>();
+			return FastActivator<TService>.Create();
         }
 
         public IEnumerable<TService> GetAllInstances<TService>()
         {
-            return new[] {ClassFactory.New<TService>()};
+			return new[] { FastActivator<TService>.Create() };
         }
-
     }
 }
