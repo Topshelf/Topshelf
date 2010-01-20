@@ -6,15 +6,19 @@
   <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
   <property name="file.current.no_extension" value="moma" />
   <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="path.to.toplevel" value="..\.." />
   <property name="folder.build_scripts" value="build" overwrite="false" />
   <property name="folder.build_scripts_custom" value="build.custom" overwrite="false" />
-  <property name="dirs.build_scripts_custom" value="${dirs.current}\..\..\${folder.build_scripts_custom}\analyzers" />
+  <property name="dirs.build_scripts_custom" value="${dirs.current}\${path.to.toplevel}\${folder.build_scripts_custom}\analyzers" />
   <property name="folder.code_build" value="build_output" overwrite="false" />
-  <property name="dirs.build" value="${dirs.current}\..\..\${folder.code_build}" />
+  <property name="dirs.build" value="${dirs.current}\${path.to.toplevel}\${folder.code_build}" />
+  <property name="folder.app.drop" value="${project.name}" overwrite="false" />
+  <property name="dirs.build.code" value="${dirs.build}\${folder.app.drop}" overwrite="false" />  
   <property name="folder.build_artifacts" value="build_artifacts" overwrite="false" />
   <property name="dirs.build_artifacts" value="${path::get-full-path(dirs.build)}\${folder.build_artifacts}" />
   <property name="project.name" value="__SOLUTION_NAME_WITHOUT_SLN_EXTENSION__" overwrite="false" />
-  <property name="dirs.lib" value="${dirs.current}\..\..\lib" overwrite="false" />
+  <property name="folder.references" value="lib" overwrite="false" />
+  <property name="dirs.lib" value="${dirs.current}\${path.to.toplevel}\${folder.references}" overwrite="false" />
   <property name="dirs.moma_results" value="${path::get-full-path(dirs.build_artifacts)}\monoMigrationAnalyzer" />
   <property name="app.moma" value="${path::get-full-path(dirs.lib)}\MoMA\MoMA.exe" overwrite="false" />
   <property name="file.moma_results" value="${project.name}.MoMAReport.html" />
@@ -54,22 +58,22 @@
           if="${file::exists(app.moma)}" />
   
   <target name="get_regular_dlls">
-    <echo message="Getting output dlls based on name in directory ${path::get-full-path(dirs.build)}." />
+    <echo message="Getting output dlls based on name in directory ${path::get-full-path(dirs.build.code)}." />
     <property name="dll.names" value="" />
     <foreach item="File" property="dll.filename">
       <in>
         <items>
-          <exclude name="${dirs.build}\NUnit*.dll" />
-          <exclude name="${dirs.build}\MbUnit*.dll" />
-          <exclude name="${dirs.build}\TestFu.dll" />
-          <exclude name="${dirs.build}\QuickGraph*.dll" />
-          <exclude name="${dirs.build}\Refly*.dll" />
-          <exclude name="${dirs.build}\Rhino.Mocks*.dll" />
-          <exclude name="${dirs.build}\*bdd*.dll" />
-          <exclude name="${dirs.build}\*Test*dll" />
-          <exclude name="${dirs.build}\*Spec*dll" />
-          <include name="${dirs.build}\*.dll" />
-          <include name="${dirs.build}\*.exe" />
+          <exclude name="${dirs.build.code}\NUnit*.dll" />
+          <exclude name="${dirs.build.code}\MbUnit*.dll" />
+          <exclude name="${dirs.build.code}\TestFu.dll" />
+          <exclude name="${dirs.build.code}\QuickGraph*.dll" />
+          <exclude name="${dirs.build.code}\Refly*.dll" />
+          <exclude name="${dirs.build.code}\Rhino.Mocks*.dll" />
+          <exclude name="${dirs.build.code}\*bdd*.dll" />
+          <exclude name="${dirs.build.code}\*Test*dll" />
+          <exclude name="${dirs.build.code}\*Spec*dll" />
+          <include name="${dirs.build.code}\*.dll" />
+          <include name="${dirs.build.code}\*.exe" />
         </items>
       </in>
       <do>
@@ -87,7 +91,7 @@
     <echo message="Attempting to run Mono Migration Analyzer. Creating file at ${file.moma_results} and logging at ${file.moma_log}." />
     
     <exec program="${app.moma}"
-          workingdir="${dirs.build}"
+          workingdir="${dirs.build.code}"
           >
       <arg line="${args.moma}" />
     </exec>
