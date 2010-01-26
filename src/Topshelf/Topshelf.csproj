@@ -70,7 +70,7 @@
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
-    <Compile Include="Exceptions\CouldntFindServiceException.cs" />
+    <Compile Include="Exceptions\CouldntBuildServiceException.cs" />
     <Compile Include="Model\Extensions.cs" />
     <Compile Include="Model\ServiceBuilder.cs" />
     <Compile Include="TopshelfDispatcher.cs" />

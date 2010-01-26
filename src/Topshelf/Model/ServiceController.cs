@@ -148,7 +148,7 @@ namespace Topshelf.Model
         {
             //TODO: do I need to pull it out by name?
             _instance = (TService)BuildService(Name);
-            if (_instance == null) throw new CouldntFindServiceException(Name, typeof(TService));
+            if (_instance == null) throw new CouldntBuildServiceException(Name, typeof(TService));
         }
     }
 }
