@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParsing_Specs.cs" />
-    <Compile Include="BasicContext.cs" />
     <Compile Include="IsolatedService_Specs.cs" />
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />
