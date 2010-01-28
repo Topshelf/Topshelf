@@ -79,15 +79,16 @@ namespace Topshelf.Specs
         }
 
         [Test]
-        [ExpectedException(typeof(AppDomainUnloadedException))]
         public void Should_stop()
         {
             _serviceController.Stop();
 
-            //this throws the exception
-            _serviceController.State
-                .ShouldEqual(ServiceState.Stopped);
-
+			Assert.Throws<AppDomainUnloadedException>(()=>
+				{
+					//this throws the exception
+					_serviceController.State
+						.ShouldEqual(ServiceState.Stopped);
+				});
         }
 
         [Test]
