@@ -27,7 +27,7 @@ namespace Topshelf.Configuration
         }
 
         public ServiceStartMode StartMode { get; set; }
-        public string ServiceName { private get; set; }
+        public string ServiceName {  get; set; }
         public string DisplayName { private get; set; }
         public string Description { get; set; }
         public string InstanceName { get; set; }
