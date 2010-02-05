@@ -31,13 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Magnum, Version=0.8.0.383, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Magnum, Version=0.8.180.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Magnum.dll</HintPath>
+      <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.4.6.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.5.2.9222, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\lib\NUnit\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks, Version=3.5.0.2, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParsing_Specs.cs" />
-    <Compile Include="BasicContext.cs" />
     <Compile Include="IsolatedService_Specs.cs" />
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />
