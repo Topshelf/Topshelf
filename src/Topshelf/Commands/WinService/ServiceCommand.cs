@@ -95,7 +95,7 @@ namespace Topshelf.Commands.WinService
 
             if (!WinServiceHelper.IsInstalled(fullServiceName))
             {
-                string message = string.Format("The {0} service has not been installed yet. Please run {1} -install.",
+                string message = string.Format("The {0} service has not been installed yet. Please run {1} service install.",
                                                fullServiceName, Assembly.GetEntryAssembly().GetName());
                 _log.Fatal(message);
                 throw new ConfigurationException(message);
