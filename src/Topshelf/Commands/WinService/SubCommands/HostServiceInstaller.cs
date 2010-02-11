@@ -65,5 +65,11 @@ namespace Topshelf.Commands.WinService.SubCommands
 
             if (_log.IsDebugEnabled) _log.Debug("Closing Registry");
         }
+
+        public override void Uninstall(IDictionary savedState)
+        {
+            Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
+            base.Uninstall(savedState);
+        }
     }
 }
