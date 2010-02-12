@@ -81,13 +81,17 @@ namespace Topshelf.Commands.WinService
                 .Where(x => x.Name == subcommand)
                 .Single();
 
+            if (oa == null)
+            {
+                RunAsService(_settings.FullServiceName);
+                return;
+            }
+
             //need to skip two now. ?
             oa.Execute(args.Skip(1).ToList());
         }
 
         #endregion
-
-
 
         void RunAsService(string fullServiceName)
         {
