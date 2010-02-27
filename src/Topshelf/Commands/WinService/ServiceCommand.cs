@@ -93,8 +93,6 @@ namespace Topshelf.Commands.WinService
 
         #endregion
 
-
-
         void RunAsService(string fullServiceName)
         {
             _log.Info("Received service start notification");
