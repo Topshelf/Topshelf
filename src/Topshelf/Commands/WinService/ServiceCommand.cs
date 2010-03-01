@@ -79,7 +79,13 @@ namespace Topshelf.Commands.WinService
 
             var oa = subcommands
                 .Where(x => x.Name == subcommand)
-                .Single();
+                .SingleOrDefault();
+
+            if (oa == null)
+            {
+                RunAsService(_settings.FullServiceName);
+                return;
+            }
 
             //need to skip two now. ?
             oa.Execute(args.Skip(1).ToList());
@@ -87,15 +93,13 @@ namespace Topshelf.Commands.WinService
 
         #endregion
 
-
-
         void RunAsService(string fullServiceName)
         {
             _log.Info("Received service start notification");
 
             if (!WinServiceHelper.IsInstalled(fullServiceName))
             {
-                string message = string.Format("The {0} service has not been installed yet. Please run {1} -install.",
+                string message = string.Format("The {0} service has not been installed yet. Please run {1} service install.",
                                                fullServiceName, Assembly.GetEntryAssembly().GetName());
                 _log.Fatal(message);
                 throw new ConfigurationException(message);

@@ -7,7 +7,7 @@ namespace Topshelf.Specs.ServiceTests
 
     [Category("Integration")]
     [Explicit] //don't just run these for shits and giggles yet
-        [TestFixture]
+    [TestFixture]
     public class Bob
     {
         RunConfiguration _configuration;
@@ -34,7 +34,7 @@ namespace Topshelf.Specs.ServiceTests
         [Test]
         public void Should_Install()
         {
-            var commandline = new []{"service","-install"};
+            var commandline = new[] { "service", "-install" };
             Runner.Host(_configuration, commandline);
 
             //assert the service installed
@@ -44,7 +44,7 @@ namespace Topshelf.Specs.ServiceTests
         public void Should_Uninstall()
         {
             var commandline = new[] { "service", "-uninstall" };
-            
+
         }
     }
 
@@ -55,7 +55,7 @@ namespace Topshelf.Specs.ServiceTests
         }
         public void Stop()
         {
-            
+
         }
     }
 }
