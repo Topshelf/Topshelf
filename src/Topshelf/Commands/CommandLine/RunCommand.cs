@@ -15,6 +15,7 @@ namespace Topshelf.Commands.CommandLine
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.ServiceProcess;
     using System.Threading;
     using log4net;
     using Magnum.CommandLineParser;
@@ -25,10 +26,12 @@ namespace Topshelf.Commands.CommandLine
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(RunCommand));
         readonly IServiceCoordinator _coordinator;
+        string _serviceName;
 
-        public RunCommand(IServiceCoordinator coordinator)
+        public RunCommand(IServiceCoordinator coordinator, string serviceName)
         {
             _coordinator = coordinator;
+            _serviceName = serviceName;
         }
 
         #region Command Members
@@ -43,7 +46,9 @@ namespace Topshelf.Commands.CommandLine
             //TODO: hijacked the host
             //TODO: feels hacky
             var servicesToStart = (IEnumerable<string>)new string[]{"ALL"};
-            
+
+            CheckToSeeIfWinServiceRunning();
+
             if(args != null) // this is start all
                 servicesToStart = args.Where(x => x is IDefinitionElement)
                     .Select(x => x as IDefinitionElement)
@@ -86,6 +91,14 @@ namespace Topshelf.Commands.CommandLine
             _log.InfoFormat("The service is running, press Control+C to exit.");
 
             WaitHandle.WaitAny(waitHandles); //will wait until a termination trigger occurs
+        }
+
+        void CheckToSeeIfWinServiceRunning()
+        {
+            if(ServiceController.GetServices().Where(s => s.ServiceName == _serviceName).Any())
+            {
+                _log.WarnFormat("There is an instance of this {0} running as a windows service", _serviceName);
+            }
         }
 
         #endregion

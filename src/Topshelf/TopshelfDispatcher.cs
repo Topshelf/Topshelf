@@ -27,7 +27,7 @@ namespace Topshelf
         public static void Dispatch(RunConfiguration config, TopshelfArguments args)
         {
             //find the command by the args 'Command'
-            var run = new RunCommand(config.Coordinator);
+            var run = new RunCommand(config.Coordinator, config.WinServiceSettings.ServiceName);
             Command command = new List<Command>
                               {
                                   run,
