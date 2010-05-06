@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="Topshelf">
+</Property><Property Name="Solution File" Value="C:\development\Topshelf\src\Topshelf.sln">
+</Property><Property Name="Date" Value="Saturday, April 24, 2010">
+</Property><Property Name="Time" Value="10:06 AM">
+</Property></Properties><Event ErrorLevel="0" Project="Topshelf" Source="Topshelf\Topshelf.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="Topshelf" Source="Topshelf\Topshelf.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="Topshelf.Specs" Source="Topshelf.Specs\Topshelf.Specs.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="Topshelf.Specs" Source="Topshelf.Specs\Topshelf.Specs.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="Stuff" Source="Stuff\Stuff.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="Stuff" Source="Stuff\Stuff.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="Topshelf.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="Topshelf.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="Stuff" Source="Stuff\Stuff.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="Topshelf" Source="Topshelf\Topshelf.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event><Event ErrorLevel="0" Project="Topshelf.Specs" Source="Topshelf.Specs\Topshelf.Specs.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>

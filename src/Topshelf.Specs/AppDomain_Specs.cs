@@ -12,8 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using System;
     using NUnit.Framework;
+    using Shelving;
 
     //a place to learn about app-domains
     [TestFixture]
@@ -22,43 +22,8 @@ namespace Topshelf.Specs
         [Test]
         public void NAME()
         {
-            var settings = AppDomain.CurrentDomain.SetupInformation;
-            settings.ShadowCopyFiles = "true";
-            var ad = AppDomain.CreateDomain("bob", null, settings);
-            var type = typeof (Bill);
-            Func<int> func = () => 3;
-
-            var bill = (Bill)ad.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new []{func}, null, null, null);
-
-            bill.ShouldNotBeNull();
-            bill.Yo.ShouldEqual(3);
-            bill.AppDomainName.ShouldEqual("bob");
-            //bill.ThreadInfo.ShouldEqual("STA"); //fails on the nunit runner which is MTA
-            Bill.Sup.ShouldEqual(2);
-            //AppDomain.CurrentDomain.FriendlyName.ShouldEqual("domain-nunit.addin.dll");
+            var sm = new ShelfMaker();
+            sm.MakeShelf("bob");
         }
     }
-
-    public class Bill : MarshalByRefObject {
-        public Bill(Func<int> i)
-        {
-            Yo = i();
-            Sup = i();
-        }
-        public static int Sup = 2;
-        public int Yo;
-        public string AppDomainName
-        {
-            get { return AppDomain.CurrentDomain.FriendlyName; }
-        }
-        public string ThreadInfo
-        {
-            get
-            {
-                var a = System.Threading.Thread.CurrentThread.GetApartmentState();
-                return a.ToString();
-            }
-        }
-    }
-
 }

@@ -1,11 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4D6049C9-10B8-45D6-8E60-3A6DDBFF4E08}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf", "Topshelf\Topshelf.csproj", "{1EEC6A0D-F213-4716-B5CC-33782BCE1908}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Specs", "Topshelf.Specs\Topshelf.Specs.csproj", "{574B7490-8F94-489F-90A9-C3CCD0D16AF0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{4D6049C9-10B8-45D6-8E60-3A6DDBFF4E08}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stuff", "Stuff\Stuff.csproj", "{831781DA-772B-49FD-8A92-D0452F9D87B9}"
 EndProject
