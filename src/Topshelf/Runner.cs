@@ -13,23 +13,27 @@
 namespace Topshelf
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using Configuration;
     using log4net;
-    using Model;
+    using Magnum.Pipeline;
+    using Messages;
 
     /// <summary>
     /// Entry point into the Host infrastructure
     /// </summary>
     public static class Runner
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof(Runner));
+        static readonly HostPipeline _pipe = new HostPipeline();
+        static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
+        static readonly ISubscriptionScope _scope;
 
         static Runner()
         {
+            _scope = _pipe.NewSubscribeScope();
+            _scope.Subscribe<ServiceMessage>(o => Console.WriteLine("LOG: {0}", o));
+
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
@@ -37,6 +41,7 @@ namespace Topshelf
         static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _log.Fatal("Host encountered an unhandled exception on the AppDomain", (Exception) e.ExceptionObject);
+            _pipe.Send(new ErrorMessage((Exception) e.ExceptionObject));
         }
 
         /// <summary>
@@ -48,182 +53,8 @@ namespace Topshelf
             if (args.Length > 0)
                 _log.DebugFormat("Arguments: {0}", args);
 
-            //make it so this can be passed in
-            var argv = args.Aggregate("", (l, r) => "{0} {1}".FormatWith(l, r));
-            var a = TopshelfArgumentParser.Parse(argv);
+            TopshelfArguments a = TopshelfArgumentParser.Parse(args);
             TopshelfDispatcher.Dispatch(configuration, a);
         }
-    }
-
-    internal class ServiceControllerFactory : IServiceControllerFactory
-    {
-        public IServiceController CreateController()
-        {
-            if (Process.GetCurrentProcess().GetParent().ProcessName == "services")
-                return new ScmServiceController();
-            return new AsynchronousServiceController();
-        }
-    }
-    public interface IServiceControllerFactory
-    {
-        IServiceController CreateController();
-    }
-
-    public class ScmServiceController :
-        IServiceController
-    {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Type ServiceType
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string Name
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public ServiceState State
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public ServiceBuilder BuildService
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public void Start()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Stop()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Pause()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Continue()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class AsynchronousServiceController :
-        IServiceController
-    {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Type ServiceType
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public string Name
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-
-        public ServiceState State
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public ServiceBuilder BuildService
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public void Start()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Stop()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Pause()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Continue()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public static class ProcessExtensions
-    {
-        public static Process GetParent(this Process child)
-        {
-            int parentPid = 0;
-
-            IntPtr hnd = Kernel32.CreateToolhelp32Snapshot(Kernel32.TH32CS_SNAPPROCESS, 0);
-
-            if (hnd == IntPtr.Zero)
-                return null;
-
-            Kernel32.PROCESSENTRY32 processInfo = new Kernel32.PROCESSENTRY32 { dwSize = (uint)Marshal.SizeOf(typeof(Kernel32.PROCESSENTRY32)) };
-
-            if (Kernel32.Process32First(hnd, ref processInfo) == false) return null;
-
-            do
-            {
-                if (child.Id == processInfo.th32ProcessID)
-                    parentPid = (int)processInfo.th32ParentProcessID;
-            }
-            while (parentPid == 0 && Kernel32.Process32Next(hnd, ref processInfo));
-
-            if (parentPid > 0)
-                return Process.GetProcessById(parentPid);
-            else
-                return null;
-        }
-    }
-
-    internal static class Kernel32
-    {
-        public static uint TH32CS_SNAPPROCESS = 2;
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct PROCESSENTRY32
-        {
-            public uint dwSize;
-            public uint cntUsage;
-            public uint th32ProcessID;
-            public IntPtr th32DefaultHeapID;
-            public uint th32ModuleID;
-            public uint cntThreads;
-            public uint th32ParentProcessID;
-            public int pcPriClassBase;
-            public uint dwFlags;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string szExeFile;
-        };
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr CreateToolhelp32Snapshot(uint dwFlags, uint th32ProcessID);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool Process32First(IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool Process32Next(IntPtr hSnapshot, ref PROCESSENTRY32 lppe);
     }
 }

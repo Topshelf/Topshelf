@@ -18,6 +18,11 @@ namespace Topshelf
 
     public static class TopshelfArgumentParser
     {
+        public static TopshelfArguments Parse(string[] args)
+        {
+            string argv = args.Aggregate("", (l, r) => "{0} {1}".FormatWith(l, r));
+            return Parse(argv);
+        }
         public static TopshelfArguments Parse(string commandLine)
         {
             var result = new TopshelfArguments();

@@ -6,6 +6,7 @@ using Magnum.Pipeline.Visitors;
 namespace Topshelf.Specs
 {
     using System.Collections.Generic;
+    using Messages;
     using Model;
 
     public class Pipeline_Play
@@ -29,30 +30,9 @@ namespace Topshelf.Specs
 
     }
 
-    public class ServiceMessage
-    {
-        public Guid ServiceId { get; set; }
-        public Guid ConversationId { get; set; }
-    }
-
-    //host commands
-    public class RunAsConsole {}
-    public class Install {} // instance name
-    public class Uninstall{} //instance name
-    public class RunAsService{} //instance name
 
 
-    //commands
-    public class StartService : ServiceMessage {}
-    public class StopService : ServiceMessage {}
-    public class ContinueService : ServiceMessage {}
-    public class PauseService : ServiceMessage {}
-    
-    //events
-    public class ServiceStarted : ServiceMessage {}
-    public class ServiceStopped : ServiceMessage {}
-    public class ServicePaused : ServiceMessage {}
-    public class ServiceContinued : ServiceMessage {}
+
 
     public class Coordinator
     {
