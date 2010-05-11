@@ -13,11 +13,11 @@
     {
         readonly ILog _log = LogManager.GetLogger(typeof (CommandLineHost));
         readonly IServiceCoordinator _coordinator;
-        readonly string _serviceName;
+        readonly ServiceName _serviceName;
 
-        public CommandLineHost(string serviceName, IServiceCoordinator coordinator)
+        public CommandLineHost(ServiceName name, IServiceCoordinator coordinator)
         {
-            _serviceName = serviceName;
+            _serviceName = name;
             _coordinator = coordinator;
         }
 
@@ -61,7 +61,7 @@
 
         void CheckToSeeIfWinServiceRunning()
         {
-            if (ServiceController.GetServices().Where(s => s.ServiceName == _serviceName).Any<ServiceController>())
+            if (ServiceController.GetServices().Where(s => s.ServiceName == _serviceName.FullServiceName).Any())
             {
                 _log.WarnFormat("There is an instance of this {0} running as a windows service", _serviceName);
             }

@@ -14,7 +14,6 @@ namespace Topshelf
 {
     using System;
     using System.IO;
-    using System.Linq;
     using Configuration;
     using log4net;
     using Magnum.Pipeline;
@@ -25,15 +24,11 @@ namespace Topshelf
     /// </summary>
     public static class Runner
     {
-        static readonly HostPipeline _pipe = new HostPipeline();
         static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
         static readonly ISubscriptionScope _scope;
 
         static Runner()
         {
-            _scope = _pipe.NewSubscribeScope();
-            _scope.Subscribe<ServiceMessage>(o => Console.WriteLine("LOG: {0}", o));
-
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
@@ -41,7 +36,6 @@ namespace Topshelf
         static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _log.Fatal("Host encountered an unhandled exception on the AppDomain", (Exception) e.ExceptionObject);
-            _pipe.Send(new ErrorMessage((Exception) e.ExceptionObject));
         }
 
         /// <summary>

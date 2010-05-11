@@ -22,14 +22,15 @@ namespace Topshelf.Specs
         [SetUp]
         public void Establish_Context()
         {
-            _args = "service /instance:bob";
+            _args = "/instance:bob";
         }
 
         [Test]
         public void InstanceName()
         {
             TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
-            a.Command.ShouldEqual("service");
+            a.Instance.ShouldEqual("bob");
+            a.Action.ShouldEqual(ServiceActions.Run);
         }
     }
 }

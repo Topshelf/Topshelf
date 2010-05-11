@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Magnum.CommandLineParser;
@@ -38,13 +39,11 @@ namespace Topshelf
                 .Take(1)
                 .Select(x => (IArgumentElement) x)
                 .Select(x => x.Id)
-                .DefaultIfEmpty("commandline")
+                .DefaultIfEmpty("run")
                 .SingleOrDefault();
 
 
-            args.Command = command;
-            //leftovers
-            args.CommandArgs = commandLineElements.Skip(1).ToList();
+            args.Action = command.ToEnum<ServiceActions>();
         }
 
         static IEnumerable<ICommandLineElement> P(string commandLine)

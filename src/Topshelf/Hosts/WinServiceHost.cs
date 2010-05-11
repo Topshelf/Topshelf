@@ -12,9 +12,9 @@
     {
         readonly ILog _log = LogManager.GetLogger(typeof (WinServiceHost));
         readonly IServiceCoordinator _coordinator;
-        readonly string _fullServiceName;
+        readonly ServiceName _fullServiceName;
 
-        public WinServiceHost(IServiceCoordinator coordinator, string fullServiceName)
+        public WinServiceHost(IServiceCoordinator coordinator, ServiceName fullServiceName)
         {
             _coordinator = coordinator;
             _fullServiceName = fullServiceName;
@@ -24,7 +24,7 @@
         {
             _log.Info("Received service start notification");
 
-            if (!WinServiceHelper.IsInstalled(_fullServiceName))
+            if (!WinServiceHelper.IsInstalled(_fullServiceName.FullServiceName))
             {
                 string message =
                     string.Format("The {0} service has not been installed yet. Please run {1} service install.",

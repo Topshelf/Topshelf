@@ -95,13 +95,13 @@
     <Compile Include="Hosts\CommandLineHost.cs" />
     <Compile Include="Hosts\Host.cs" />
     <Compile Include="Hosts\WinServiceHost.cs" />
-    <Compile Include="Hosts\IServiceControllerFactory.cs" />
+    <Compile Include="Hosts\HostFactory.cs" />
     <Compile Include="Kernel32.cs" />
     <Compile Include="Messages\ErrorMessage.cs" />
     <Compile Include="Model\ServiceBuilder.cs" />
     <Compile Include="ProcessExtensions.cs" />
-    <Compile Include="Hosts\ScmServiceController.cs" />
-    <Compile Include="Hosts\HostFactory.cs" />
+    <Compile Include="Hosts\AHostFactory.cs" />
+    <Compile Include="ServiceActions.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Shelving\Shelf.cs" />
     <Compile Include="Shelving\ShelfMaker.cs" />

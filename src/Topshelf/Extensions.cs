@@ -17,6 +17,10 @@ namespace Topshelf
 
     public static class Extensions
     {
+        public static E ToEnum<E>(this string label)
+        {
+            return (E) Enum.Parse(typeof (E), label, true);
+        }
 
         public static string FormatWith(this string format, params object[] args)
         {
