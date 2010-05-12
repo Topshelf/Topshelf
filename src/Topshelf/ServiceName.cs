@@ -10,10 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Commands.WinService.SubCommands
+namespace Topshelf
 {
     public class ServiceName
     {
+        private const string _instanceChar = "$";
         readonly string _instanceName;
         readonly string _name;
 
@@ -39,7 +40,7 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         public string FullName
         {
-            get { return "{0}@{1}".FormatWith(_name, _instanceName); }
+            get { return "{0}{1}{2}".FormatWith(_name,_instanceChar, _instanceName); }
         }
     }
 }

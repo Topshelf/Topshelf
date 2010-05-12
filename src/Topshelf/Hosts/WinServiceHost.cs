@@ -24,7 +24,7 @@
         {
             _log.Info("Received service start notification");
 
-            if (!WinServiceHelper.IsInstalled(_fullServiceName.FullServiceName))
+            if (!WinServiceHelper.IsInstalled(_fullServiceName.FullName))
             {
                 string message =
                     string.Format("The {0} service has not been installed yet. Please run {1} service install.",

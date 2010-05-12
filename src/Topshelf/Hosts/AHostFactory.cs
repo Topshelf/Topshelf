@@ -27,28 +27,4 @@ namespace Topshelf.Hosts
             return new CommandLineHost(name, _coordinator);
         }
     }
-
-    public class ServiceName
-    {
-        private const string _instanceChar = "$";
-        public string Name { get; private set; }
-        public string InstanceName { get; private set; }
-
-        public ServiceName(string name, string instanceName)
-        {
-            Name = name;
-            InstanceName = instanceName;
-        }
-
-        public string FullServiceName
-        {
-            get
-            {
-                return InstanceName == null
-                           ? Name : "{0}{1}{2}".FormatWith(Name, _instanceChar, InstanceName);
-            }
-        }
-    }
-
-
 }

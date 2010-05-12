@@ -23,10 +23,6 @@
 
         public void Host()
         {
-            //TODO: hijacked the host
-            //TODO: feels hacky
-            var servicesToStart = (IEnumerable<string>)new string[] { "ALL" };
-
             CheckToSeeIfWinServiceRunning();
 
             //not all
@@ -61,7 +57,7 @@
 
         void CheckToSeeIfWinServiceRunning()
         {
-            if (ServiceController.GetServices().Where(s => s.ServiceName == _serviceName.FullServiceName).Any())
+            if (ServiceController.GetServices().Where(s => s.ServiceName == _serviceName.FullName).Any())
             {
                 _log.WarnFormat("There is an instance of this {0} running as a windows service", _serviceName);
             }

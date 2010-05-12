@@ -79,13 +79,13 @@
       <Link>SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="Commands\Command.cs" />
-    <Compile Include="Commands\CommandLine\RunCommand.cs" />
-    <Compile Include="Commands\WinService\ServiceCommand.cs" />
-    <Compile Include="Commands\WinService\SubCommands\InstallService.cs" />
-    <Compile Include="Commands\WinService\SubCommands\ServiceName.cs" />
-    <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
+    <Compile Include="Commands\RunCommand.cs" />
+    <Compile Include="Commands\ServiceCommand.cs" />
+    <Compile Include="Commands\InstallService.cs" />
+    <Compile Include="ServiceName.cs" />
+    <Compile Include="Commands\UninstallService.cs" />
     <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
-    <Compile Include="Commands\WinService\SubCommands\WinServiceHelper.cs" />
+    <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
@@ -128,10 +128,10 @@
     <Compile Include="Model\ServiceState.cs" />
     <Compile Include="Configuration\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
-    <Compile Include="Commands\WinService\SubCommands\HostServiceInstaller.cs">
+    <Compile Include="WindowsServiceCode\HostServiceInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Commands\WinService\ServiceHost.cs">
+    <Compile Include="WindowsServiceCode\ServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Configuration\Dsl\KnownServiceNames.cs" />
