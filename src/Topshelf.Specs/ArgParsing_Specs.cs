@@ -22,7 +22,7 @@ namespace Topshelf.Specs
         [SetUp]
         public void Establish_Context()
         {
-            _args = "/instance:bob";
+            _args = "install /instance:bob";
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Topshelf.Specs
         {
             TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
             a.Instance.ShouldEqual("bob");
-            a.Action.ShouldEqual(ServiceActions.Run);
+            a.Action.ShouldEqual(ServiceActions.Install);
         }
     }
 }

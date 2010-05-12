@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -10,17 +10,16 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Commands.WinService.SubCommands
+namespace Topshelf.Commands
 {
-    using System.Collections.Generic;
     using Configuration;
     using log4net;
-    using Magnum.CommandLineParser;
+    using WinService.SubCommands;
 
     public class InstallService :
         Command
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof(InstallService));
+        static readonly ILog _log = LogManager.GetLogger(typeof (InstallService));
 
         readonly WinServiceSettings _settings;
 
@@ -31,25 +30,25 @@ namespace Topshelf.Commands.WinService.SubCommands
 
         #region Command Members
 
-        public string Name
+        public ServiceActions Name
         {
-            get { return "install"; }
+            get { return ServiceActions.Install; }
         }
 
-        public void Execute(IEnumerable<ICommandLineElement> args)
+        public void Execute()
         {
             _log.Info("Received service install notification");
 
-            if (WinServiceHelper.IsInstalled(_settings.FullServiceName))
+            if (WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
             {
-                string message = string.Format("The {0} service has already been installed.", _settings.FullServiceName);
+                string message = string.Format("The {0} service has already been installed.", _settings.ServiceName.FullName);
                 _log.Error(message);
 
                 return;
             }
 
             var installer = new HostServiceInstaller(_settings);
-            WinServiceHelper.Register(_settings.FullServiceName, installer);
+            WinServiceHelper.Register(_settings.ServiceName.FullName, installer);
         }
 
         #endregion

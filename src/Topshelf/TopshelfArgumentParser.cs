@@ -36,14 +36,21 @@ namespace Topshelf
         static void Set(TopshelfArguments args, IEnumerable<ICommandLineElement> commandLineElements)
         {
             var command = commandLineElements
-                .Take(1)
-                .Select(x => (IArgumentElement) x)
-                .Select(x => x.Id)
-                .DefaultIfEmpty("run")
+                .DefaultIfEmpty(new ArgumentElement("Run"))
+                .ToList()
+                .OfType<IArgumentElement>()
+                .Select(x=>x.Id)
                 .SingleOrDefault();
 
+            //TODO: Fix this
+            args.Action = (command ?? "Run").ToEnum<ServiceActions>();
 
-            args.Action = command.ToEnum<ServiceActions>();
+            args.Instance = commandLineElements
+                .OfType<IDefinitionElement>()
+                .Where(x => x.Key == "instance")
+                .Select(x => x.Value)
+                .DefaultIfEmpty("")
+                .Single();
         }
 
         static IEnumerable<ICommandLineElement> P(string commandLine)

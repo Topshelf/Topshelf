@@ -17,9 +17,7 @@ namespace Topshelf.Configuration
     using System.ServiceProcess;
 
     public class WinServiceSettings
-    {
-        private const string _instanceChar = "$";
-        
+    {   
         public WinServiceSettings()
         {
             StartMode = ServiceStartMode.Automatic;
@@ -27,27 +25,17 @@ namespace Topshelf.Configuration
         }
 
         public ServiceStartMode StartMode { get; set; }
-        public string ServiceName {  get; set; }
+        public ServiceName ServiceName {  get; set; }
         public string DisplayName { private get; set; }
         public string Description { get; set; }
-        public string InstanceName { get; set; }
         public Credentials Credentials { get; set; }
-
-        public string FullServiceName
-        {
-            get
-            {
-                return InstanceName == null
-                           ? ServiceName : "{0}{1}{2}".FormatWith(ServiceName, _instanceChar, InstanceName);
-            }
-        }
 
         public string FullDisplayName
         {
             get
             {
-                return InstanceName == null
-                           ? DisplayName : "{0} (Instance: {1})".FormatWith(DisplayName, InstanceName);
+                return ServiceName.InstanceName == null
+                           ? DisplayName : "{0} (Instance: {1})".FormatWith(DisplayName, ServiceName.InstanceName);
             }
         }
 
@@ -59,7 +47,7 @@ namespace Topshelf.Configuration
             {
                 var settings = new WinServiceSettings
                                {
-                                   ServiceName = ConfigurationManager.AppSettings["serviceName"],
+                                   ServiceName = new ServiceName(ConfigurationManager.AppSettings["serviceName"]),
                                    DisplayName = ConfigurationManager.AppSettings["displayName"],
                                    Description = ConfigurationManager.AppSettings["description"],
                                };
@@ -73,7 +61,7 @@ namespace Topshelf.Configuration
         {
             get
             {
-                return InstanceName == null ? " service" : " service -instance:{0}".FormatWith(InstanceName);
+                return ServiceName.InstanceName == null ? " " : " -instance:{0}".FormatWith(ServiceName.InstanceName);
             }
         }
 
@@ -81,7 +69,7 @@ namespace Topshelf.Configuration
         {
             var settings = new WinServiceSettings
                            {
-                               ServiceName = serviceName,
+                               ServiceName = new ServiceName(serviceName),
                                DisplayName = displayName,
                                Description = description,
                            };

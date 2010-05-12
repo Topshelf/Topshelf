@@ -39,7 +39,7 @@ namespace Topshelf.Commands.WinService.SubCommands
             Installers.AddRange(WinServiceHelper.BuildInstallers(_settings));
 
             if (_log.IsInfoEnabled)
-                _log.InfoFormat("Installing Service {0}", _settings.FullServiceName);
+                _log.InfoFormat("Installing Service {0}", _settings.ServiceName.FullName);
 
             base.Install(stateSaver);
 
@@ -48,7 +48,7 @@ namespace Topshelf.Commands.WinService.SubCommands
             using (RegistryKey system = Registry.LocalMachine.OpenSubKey("System"))
             using (RegistryKey currentControlSet = system.OpenSubKey("CurrentControlSet"))
             using (RegistryKey services = currentControlSet.OpenSubKey("Services"))
-            using (RegistryKey service = services.OpenSubKey(_settings.FullServiceName, true))
+            using (RegistryKey service = services.OpenSubKey(_settings.ServiceName.FullName, true))
             {
                 service.SetValue("Description", _settings.Description);
 

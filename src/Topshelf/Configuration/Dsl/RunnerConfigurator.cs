@@ -73,7 +73,7 @@ namespace Topshelf.Configuration.Dsl
         /// <param name="serviceName">The name of the service.</param>
         public void SetServiceName(string serviceName)
         {
-            _winServiceSettings.ServiceName = serviceName;
+            _winServiceSettings.ServiceName = new ServiceName(serviceName);
         }
 
         /// <summary>

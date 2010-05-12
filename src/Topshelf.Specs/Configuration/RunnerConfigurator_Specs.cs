@@ -98,7 +98,7 @@ namespace Topshelf.Specs.Configuration
             _runConfiguration.WinServiceSettings.FullDisplayName
                 .ShouldEqual("chris");
 
-            _runConfiguration.WinServiceSettings.FullServiceName
+            _runConfiguration.WinServiceSettings.ServiceName.FullName
                 .ShouldEqual("chris");
 
             _runConfiguration.WinServiceSettings.Description

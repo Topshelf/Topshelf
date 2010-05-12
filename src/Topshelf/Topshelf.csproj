@@ -80,7 +80,6 @@
     </Compile>
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\RunCommand.cs" />
-    <Compile Include="Commands\ServiceCommand.cs" />
     <Compile Include="Commands\InstallService.cs" />
     <Compile Include="ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
@@ -95,12 +94,10 @@
     <Compile Include="Hosts\CommandLineHost.cs" />
     <Compile Include="Hosts\Host.cs" />
     <Compile Include="Hosts\WinServiceHost.cs" />
-    <Compile Include="Hosts\HostFactory.cs" />
     <Compile Include="Kernel32.cs" />
     <Compile Include="Messages\ErrorMessage.cs" />
     <Compile Include="Model\ServiceBuilder.cs" />
     <Compile Include="ProcessExtensions.cs" />
-    <Compile Include="Hosts\AHostFactory.cs" />
     <Compile Include="ServiceActions.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Shelving\Shelf.cs" />

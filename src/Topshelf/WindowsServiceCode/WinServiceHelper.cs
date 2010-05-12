@@ -38,7 +38,7 @@ namespace Topshelf.Commands.WinService.SubCommands
         {
             var installer = new ServiceInstaller
                             {
-                                ServiceName = settings.FullServiceName,
+                                ServiceName = settings.ServiceName.FullName,
                                 Description = settings.Description,
                                 DisplayName = settings.FullDisplayName,
                                 ServicesDependedOn = settings.Dependencies.ToArray(),
