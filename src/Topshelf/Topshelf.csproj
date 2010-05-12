@@ -103,8 +103,6 @@
     <Compile Include="Shelving\ShelfMaker.cs" />
     <Compile Include="Shelving\WellknownAddresses.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
-    <Compile Include="Model\ControllerDelegates.cs" />
-    <Compile Include="Model\IServiceControllerOf.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />

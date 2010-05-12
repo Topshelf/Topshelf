@@ -13,11 +13,16 @@
 namespace Topshelf.Shelving
 {
     using System;
-    using System.IO;
     using System.Linq;
+    using Configuration.Dsl;
+    using Magnum.Channels;
+    using Model;
 
     public class Shelf
     {
+        IServiceController _controller;
+        Magnum.Channels.WcfUntypedChannel _hostChannel;
+
         public Shelf()
         {
             Initialize();
@@ -25,8 +30,23 @@ namespace Topshelf.Shelving
 
         public void Initialize()
         {
-            //how to bootstap? do I assume an interface?
-            File.WriteAllText(".\\bob.txt", WellknownAddresses.CurrentShelfAddress.ToString());
+            //fiber
+            //how do the addresses work
+            _hostChannel = new WcfUntypedChannel(null, WellknownAddresses.HostAddress, "host");
+
+            var t = FindBootstrapperImplementation();
+            var b = (Bootstrapper)Activator.CreateInstance(t);
+
+            //new up a service config
+            var cfg = new ServiceConfigurator<object>();
+            b.InitializeHostedService<object>()(cfg);
+            
+            //start up the service controller instance
+            _controller = cfg.Create();
+
+            //wire up all the subscriptions
+
+            //send message to host that I am ready
         }
 
         static Type FindBootstrapperImplementation()

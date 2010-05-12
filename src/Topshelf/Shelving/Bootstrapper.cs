@@ -12,10 +12,11 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
+    using System;
+    using Configuration.Dsl;
+
     public interface Bootstrapper
     {
-        //how to set up the required consumers?
-        //use the same DSL, so look for 'RunnerConfigurator'?
-        object InitializeHostedService();
+        Action<IServiceConfigurator<T>> InitializeHostedService<T>();
     }
 }
