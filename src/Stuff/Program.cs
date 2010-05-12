@@ -29,7 +29,7 @@ namespace Stuff
             {
                 x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-                x.ConfigureServiceInIsolation<TownCrier>(s =>
+                x.ConfigureService<TownCrier>(s =>
                 {
                     s.Named("tc");
                     s.HowToBuildService(name=> new TownCrier());

@@ -13,6 +13,7 @@
 namespace Topshelf.Commands
 {
     using System.Diagnostics;
+    using Configuration;
     using Hosts;
     using log4net;
     using Model;

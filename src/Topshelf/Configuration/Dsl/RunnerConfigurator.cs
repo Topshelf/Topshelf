@@ -154,22 +154,6 @@ namespace Topshelf.Configuration.Dsl
             });
         }
 
-        /// <summary>
-        /// Configures an isolated service using the specified configuration action or set of configuration actions.
-        /// </summary>
-        /// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
-        /// <param name="name">The name used to identify the service</param>
-        /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-        public void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action) where TService : class
-        {
-            var configurator = new IsolatedServiceConfigurator<TService>();
-            _serviceConfigurators.Add(() =>
-            {
-                action(configurator);
-                return configurator.Create();
-            });
-        }
-
         public void BeforeStartingServices(Action<IServiceCoordinator> action)
         {
             _beforeStartingServices = action;
@@ -214,16 +198,6 @@ namespace Topshelf.Configuration.Dsl
         public void ConfigureService<TService>() where TService : class
         {
             ConfigureService<TService>(x => { });
-        }
-
-        /// <summary>
-        /// Configures an isolated service using the default configuration.
-        /// </summary>
-        /// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
-        public void ConfigureServiceInIsolation<TService>()
-            where TService : MarshalByRefObject
-        {
-            ConfigureServiceInIsolation<TService>(x => { });
         }
 
         /// <summary>

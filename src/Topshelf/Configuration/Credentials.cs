@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-//  
+// Copyright 2007-2010 The Apache Software Foundation.
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -19,9 +19,9 @@ namespace Topshelf.Configuration
     public class Credentials :
         IEquatable<Credentials>
     {
-        private readonly ServiceAccount _accountType;
-        private readonly string _password;
-        private readonly string _username;
+        readonly ServiceAccount _accountType;
+        readonly string _password;
+        readonly string _username;
 
         public Credentials(string username, string password, ServiceAccount accountType)
         {
@@ -60,8 +60,7 @@ namespace Topshelf.Configuration
             return _commandLine;
         }
 
-	    
-        
+
         public string Username
         {
             get { return _username; }
@@ -81,7 +80,8 @@ namespace Topshelf.Configuration
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return Equals(obj._username, _username) && Equals(obj._password, _password) && Equals(obj._accountType, _accountType);
+            return Equals(obj._username, _username) && Equals(obj._password, _password) &&
+                   Equals(obj._accountType, _accountType);
         }
 
         public override bool Equals(object obj)
@@ -104,13 +104,12 @@ namespace Topshelf.Configuration
         }
 
 
-
         //command line
-        private static Credentials _commandLine;
+        static Credentials _commandLine;
+
         public static void SetCommandLine(string username, string password)
         {
             _commandLine = new Credentials(username, password, ServiceAccount.User);
         }
-
     }
 }

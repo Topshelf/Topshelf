@@ -16,7 +16,6 @@ namespace Topshelf
     using System.Linq;
     using Commands;
     using Configuration;
-    using Hosts;
     using log4net;
 
     public static class TopshelfDispatcher
@@ -28,11 +27,11 @@ namespace Topshelf
             //find the command by the args 'Command'
             var run = new RunCommand(config.Coordinator, config.WinServiceSettings.ServiceName);
             Command command = new List<Command>
-                              {
-                                  run,
-                                  new InstallService(config.WinServiceSettings),
-                                  new UninstallService(config.WinServiceSettings)
-                              }
+                                  {
+                                      run,
+                                      new InstallService(config.WinServiceSettings),
+                                      new UninstallService(config.WinServiceSettings)
+                                  }
                 .Where(x => x.Name == args.Action)
                 .DefaultIfEmpty(run)
                 .SingleOrDefault();
