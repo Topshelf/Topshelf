@@ -21,7 +21,7 @@ namespace Topshelf.Shelving
     public class Shelf
     {
         IServiceController _controller;
-        Magnum.Channels.WcfUntypedChannel _hostChannel;
+        WcfUntypedChannel _hostChannel;
 
         public Shelf()
         {
@@ -30,15 +30,17 @@ namespace Topshelf.Shelving
 
         public void Initialize()
         {
-            //fiber
-            //how do the addresses work
-            _hostChannel = new WcfUntypedChannel(null, WellknownAddresses.HostAddress, "host");
+            //how do the addresses work (its a light wrapper over wcf)
+            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
 
             var t = FindBootstrapperImplementation();
             var b = (Bootstrapper)Activator.CreateInstance(t);
 
-            //new up a service config
             var cfg = new ServiceConfigurator<object>();
+			
+			//let the bootstrapper configure the service
+			//have to do some type coearcion here
+			//wonder if co/contra will help here?
             b.InitializeHostedService<object>()(cfg);
             
             //start up the service controller instance
