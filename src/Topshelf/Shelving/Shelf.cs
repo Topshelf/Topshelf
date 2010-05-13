@@ -24,7 +24,7 @@ namespace Topshelf.Shelving
     {
         IServiceController _controller;
         WcfUntypedChannel _hostChannel;
-        WcfUntypedChannel _myChannel;
+        WcfUntypedChannelAdapter _myChannel;
         ChannelSubscription _subscription;
 
         public Shelf()
@@ -36,17 +36,16 @@ namespace Topshelf.Shelving
         {
             //how do the addresses work (its a light wrapper over wcf)
             _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
-            _myChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
+            _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
 
             var t = FindBootstrapperImplementation();
             var b = (Bootstrapper)Activator.CreateInstance(t);
 
             var cfg = new ServiceConfigurator<object>();
 			
-			//let the bootstrapper configure the service
 			//have to do some type coearcion here
 			//wonder if co/contra will help here?
-            b.InitializeHostedService(cfg);
+            b.InitializeHostedService<object>(cfg);
             
             //start up the service controller instance
             _controller = cfg.Create();
@@ -75,6 +74,11 @@ namespace Topshelf.Shelving
             if (type == null)
                 throw new InvalidOperationException("The bootstrapper was not found.");
             return type;
+        }
+
+        public void Dispose()
+        {
+            _subscription.Dispose();
         }
     }
 }
