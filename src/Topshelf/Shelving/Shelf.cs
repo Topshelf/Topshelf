@@ -16,12 +16,16 @@ namespace Topshelf.Shelving
     using System.Linq;
     using Configuration.Dsl;
     using Magnum.Channels;
+    using Magnum.Fibers;
+    using Messages;
     using Model;
 
     public class Shelf
     {
         IServiceController _controller;
         WcfUntypedChannel _hostChannel;
+        WcfUntypedChannel _myChannel;
+        ChannelSubscription _subscription;
 
         public Shelf()
         {
@@ -32,6 +36,7 @@ namespace Topshelf.Shelving
         {
             //how do the addresses work (its a light wrapper over wcf)
             _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+            _myChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
 
             var t = FindBootstrapperImplementation();
             var b = (Bootstrapper)Activator.CreateInstance(t);
@@ -41,14 +46,22 @@ namespace Topshelf.Shelving
 			//let the bootstrapper configure the service
 			//have to do some type coearcion here
 			//wonder if co/contra will help here?
-            b.InitializeHostedService<object>()(cfg);
+            b.InitializeHostedService(cfg);
             
             //start up the service controller instance
             _controller = cfg.Create();
 
             //wire up all the subscriptions
+            _subscription = _myChannel.Subscribe(s =>
+                                     {
+                                         s.Consume<StopService>().Using(m => _controller.Stop());
+                                         s.Consume<StartService>().Using(m => _controller.Start());
+                                         s.Consume<PauseService>().Using(m => _controller.Pause());
+                                         s.Consume<ContinueService>().Using(m => _controller.Continue());
+                                     });
 
             //send message to host that I am ready
+            _hostChannel.Send(new ShelfReady());
         }
 
         static Type FindBootstrapperImplementation()
