@@ -34,7 +34,7 @@ namespace Topshelf.Configuration
         {
             get
             {
-                return ServiceName.InstanceName == null
+                return string.IsNullOrEmpty(ServiceName.InstanceName)
                            ? DisplayName : "{0} (Instance: {1})".FormatWith(DisplayName, ServiceName.InstanceName);
             }
         }
