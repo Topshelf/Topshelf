@@ -12,10 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using System;
-    using System.Configuration;
-    using System.Net;
-    using System.Reflection;
     using System.Threading;
     using Magnum.Extensions;
     using NUnit.Framework;
@@ -33,7 +29,8 @@ namespace Topshelf.Specs
             {
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                Thread.Sleep(5.Seconds());
+                // this takes too long currently... can we do better?
+                Thread.Sleep(20.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Ready);
 
@@ -58,34 +55,6 @@ namespace Topshelf.Specs
                 sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
             }
         }
-
-        [Test]
-        /*
-         * Edge case: what if there's an exception in the construction of the Shelf object after an adapter is connected to the pipe?
-         * It won't be released in Dispose because the object was never created, should we make it a two parter? 
-         *   Activtor.CreateInstance(Shelf)
-         *   Shelf.Init()
-         * To avoid anything like that happening? A lot of the work that can fail in the constructor doesn't make me feel good
-         */
-        public void Incorrect_bootstrapper_type_fails_MakeShelf()
-        {
-            using (var sm = new ShelfMaker())
-            {
-                // anything that fails during the Activator.CreateInstance will be a TargetInvocationException; gotta check the child instance
-                // should we unwrap that in the ShelfMaker?
-                Assert.That(() => sm.MakeShelf("doh", typeof(string)), Throws.InstanceOf<TargetInvocationException>().And.Property("InnerException").InstanceOf<InvalidOperationException>());
-            }
-        }
-
-        [Test]
-        public void Access_to_app_config_is_provided_to_host()
-        {
-            using (var sm = new ShelfMaker())
-            {
-                // we are looking for an unlikely exception to be thrown to ensure that execution reached the end of InitializeHostedService
-                Assert.That(() => sm.MakeShelf("appChecker", typeof(AppDomain_Specs_Bootstrapper_reads_app_config_and_fails)), Throws.InstanceOf<TargetInvocationException>().And.Property("InnerException").InstanceOf<CookieException>());
-            }
-        }
     }
 
     public class AppDomain_Specs_Bootstrapper :
@@ -97,17 +66,6 @@ namespace Topshelf.Specs
 
             cfg.WhenStarted(a => { });
             cfg.WhenStopped(a => { });
-        }
-    }
-
-    public class AppDomain_Specs_Bootstrapper_reads_app_config_and_fails :
-        Bootstrapper
-    {
-        public void InitializeHostedService<T>(IServiceConfigurator<T> cfg)
-        {
-            ConfigurationManager.AppSettings["test"].ShouldEqual("test");
-
-            throw new CookieException();
         }
     }
 }

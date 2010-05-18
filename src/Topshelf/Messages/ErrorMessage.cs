@@ -16,17 +16,12 @@ namespace Topshelf.Messages
 
     public class ErrorMessage
     {
-        readonly Exception _ex;
-
         public ErrorMessage(Exception ex)
         {
-            _ex = ex;
+            Ex = ex;
         }
 
-        public Exception Ex
-        {
-            get { return _ex; }
-        }
+        public Exception Ex { get; private set; }
     }
 
     public class ServiceMessage
@@ -58,36 +53,49 @@ namespace Topshelf.Messages
 
 
     //commands
-    public class StartService : ServiceMessage
+    public class StartService :
+        ServiceMessage
     {
     }
 
-    public class StopService : ServiceMessage
+    public class StopService :
+        ServiceMessage
     {
     }
 
-    public class ContinueService : ServiceMessage
+    public class ContinueService :
+        ServiceMessage
     {
     }
 
-    public class PauseService : ServiceMessage
+    public class PauseService :
+        ServiceMessage
     {
     }
 
     //events
-    public class ServiceStarted : ServiceMessage
+    public class ServiceStarted :
+        ServiceMessage
     {
     }
 
-    public class ServiceStopped : ServiceMessage
+    public class ServiceStopped :
+        ServiceMessage
     {
     }
 
-    public class ServicePaused : ServiceMessage
+    public class ServicePaused :
+        ServiceMessage
     {
     }
 
-    public class ServiceContinued : ServiceMessage
+    public class ServiceContinued :
+        ServiceMessage
+    {
+    }
+
+    public class ReadyService :
+        ServiceMessage
     {
     }
 }

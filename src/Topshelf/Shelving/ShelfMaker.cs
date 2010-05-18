@@ -18,9 +18,7 @@ namespace Topshelf.Shelving
     using System.Linq;
     using System.Reflection;
     using System.Runtime.Remoting;
-    using System.Threading;
     using Magnum.Channels;
-    using Magnum.Extensions;
     using Magnum.Fibers;
     using Messages;
 
@@ -38,7 +36,8 @@ namespace Topshelf.Shelving
 
             _myChannel.Subscribe(s =>
             {
-                s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndStart(m));
+                s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndInitService(m));
+                s.Consume<ServiceReady>().Using(m => MarkServiceReadyAndStart(m));
                 s.Consume<ShelfStopped>().Using(m => MarkShelfStopped(m));
             });
         }
@@ -105,7 +104,7 @@ namespace Topshelf.Shelving
             _shelves[shelfName].ShelfChannel.Send(new StopService());
         }
 
-        private void MarkShelfReadyAndStart(ShelfReady message)
+        private void MarkServiceReadyAndStart(ServiceReady message)
         {
             if (!_shelves.ContainsKey(message.ShelfName))
                 throw new Exception("Shelf does not exist");
@@ -114,7 +113,20 @@ namespace Topshelf.Shelving
 
             shelfStatus.CurrentState = ShelfState.Ready;
 
+            // if auto start is setup, send start
             shelfStatus.ShelfChannel.Send(new StartService());
+        }
+
+        private void MarkShelfReadyAndInitService(ShelfReady message)
+        {
+            if (!_shelves.ContainsKey(message.ShelfName))
+                throw new Exception("Shelf does not exist");
+
+            var shelfStatus = _shelves[message.ShelfName];
+
+            shelfStatus.CurrentState = ShelfState.Readying;
+
+            shelfStatus.ShelfChannel.Send(new ReadyService());
         }
 
         public void Dispose()

@@ -23,19 +23,35 @@ namespace Topshelf.Shelving
     public class Shelf :
         IDisposable
     {
-        IServiceController _controller;
-        WcfUntypedChannel _hostChannel;
-        WcfUntypedChannelAdapter _myChannel;
-        ChannelSubscription _subscription;
+        private IServiceController _controller;
+        private readonly WcfUntypedChannel _hostChannel;
+        private readonly WcfUntypedChannelAdapter _myChannel;
+        private readonly ChannelSubscription _subscription;
+        private readonly Type _bootstrapperType;
 
         public Shelf(Type bootstraper)
         {
-            Initialize(bootstraper);
+            _bootstrapperType = bootstraper;
+            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+            _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
+            
+            //wire up all the subscriptions
+            _subscription = _myChannel.Subscribe(s =>
+                                     {
+                                         s.Consume<ReadyService>().Using(m => Initialize());
+                                         s.Consume<StopService>().Using(m => HandleStop(m));
+                                         s.Consume<StartService>().Using(m => HandleStart(m));
+                                         s.Consume<PauseService>().Using(m => _controller.Pause());
+                                         s.Consume<ContinueService>().Using(m => _controller.Continue());
+                                     });
+
+            //send message to host that I am ready
+            _hostChannel.Send(new ShelfReady());
         }
 
-        public void Initialize(Type bootstraper)
+        public void Initialize()
         {
-            var t = FindBootstrapperImplementation(bootstraper);
+            var t = FindBootstrapperImplementation(_bootstrapperType);
             var b = (Bootstrapper)Activator.CreateInstance(t);
 
             var cfg = new ServiceConfigurator<object>();
@@ -47,21 +63,7 @@ namespace Topshelf.Shelving
             //start up the service controller instance
             _controller = cfg.Create();
 
-            //how do the addresses work (its a light wrapper over wcf)
-            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
-            _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
-
-            //wire up all the subscriptions
-            _subscription = _myChannel.Subscribe(s =>
-                                     {
-                                         s.Consume<StopService>().Using(m => HandleStop(m));
-                                         s.Consume<StartService>().Using(m => HandleStart(m));
-                                         s.Consume<PauseService>().Using(m => _controller.Pause());
-                                         s.Consume<ContinueService>().Using(m => _controller.Continue());
-                                     });
-
-            //send message to host that I am ready
-            _hostChannel.Send(new ShelfReady());
+            _hostChannel.Send(new ServiceReady());
         }
 
         static Type FindBootstrapperImplementation(Type bootstrapper)
@@ -70,7 +72,7 @@ namespace Topshelf.Shelving
             {
                 if (bootstrapper.GetInterfaces().Where(x => x == typeof(Bootstrapper)).Count() > 0)
                     return bootstrapper;
-                
+
                 throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
                                                     + ", is not a subclass of Bootstrapper.");
             }
@@ -83,7 +85,7 @@ namespace Topshelf.Shelving
             if (possibleTypes.Count() > 1)
                 throw new InvalidOperationException("Unable to identify the bootstrapper, more than one found.");
 
-            if (possibleTypes.Count()  == 0)
+            if (possibleTypes.Count() == 0)
                 throw new InvalidOperationException("The bootstrapper was not found.");
 
             return possibleTypes.Single();
@@ -92,7 +94,6 @@ namespace Topshelf.Shelving
         private void HandleStart(StartService message)
         {
             _hostChannel.Send(new ShelfStarting());
-
             _controller.Start();
             _hostChannel.Send(new ShelfStarted());
         }

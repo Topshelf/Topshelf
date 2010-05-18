@@ -23,4 +23,10 @@ namespace Topshelf.Messages
 
         public string ShelfName { get; set; }
     }
+
+    public class ServiceReady :
+        ShelfMessageBase
+    {
+        
+    }
 }
