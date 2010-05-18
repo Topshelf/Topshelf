@@ -20,25 +20,22 @@ namespace Topshelf.Shelving
     using Messages;
     using Model;
 
-    public class Shelf
+    public class Shelf :
+        IDisposable
     {
         IServiceController _controller;
         WcfUntypedChannel _hostChannel;
         WcfUntypedChannelAdapter _myChannel;
         ChannelSubscription _subscription;
 
-        public Shelf()
+        public Shelf(Type bootstraper)
         {
-            Initialize();
+            Initialize(bootstraper);
         }
 
-        public void Initialize()
+        public void Initialize(Type bootstraper)
         {
-            //how do the addresses work (its a light wrapper over wcf)
-            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
-            _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
-
-            var t = FindBootstrapperImplementation();
+            var t = FindBootstrapperImplementation(bootstraper);
             var b = (Bootstrapper)Activator.CreateInstance(t);
 
             var cfg = new ServiceConfigurator<object>();
@@ -49,6 +46,10 @@ namespace Topshelf.Shelving
 
             //start up the service controller instance
             _controller = cfg.Create();
+
+            //how do the addresses work (its a light wrapper over wcf)
+            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+            _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
 
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
@@ -63,22 +64,38 @@ namespace Topshelf.Shelving
             _hostChannel.Send(new ShelfReady { ShelfName = AppDomain.CurrentDomain.FriendlyName });
         }
 
-        static Type FindBootstrapperImplementation()
+        static Type FindBootstrapperImplementation(Type bootstrapper)
         {
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
+            if (bootstrapper != null)
+            {
+                if (bootstrapper.GetInterfaces().Where(x => x == typeof(Bootstrapper)).Count() > 0)
+                    return bootstrapper;
+                
+                throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
+                                                    + ", is not a subclass of Bootstrapper.");
+            }
+
+            var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => x.IsInterface == false)
-                .Where(x => typeof(Bootstrapper).IsAssignableFrom(x))
-                .FirstOrDefault();
+                .Where(x => typeof(Bootstrapper).IsAssignableFrom(x));
 
-            if (type == null)
+            if (possibleTypes.Count() > 1)
+                throw new InvalidOperationException("Unable to identify the bootstrapper, more than one found.");
+
+            if (possibleTypes.Count()  == 0)
                 throw new InvalidOperationException("The bootstrapper was not found.");
-            return type;
+
+            return possibleTypes.Single();
         }
 
         public void Dispose()
         {
-            _subscription.Dispose();
+            if (_subscription != null)
+                _subscription.Dispose();
+
+            if (_myChannel != null)
+                _myChannel.Dispose();
         }
     }
 }

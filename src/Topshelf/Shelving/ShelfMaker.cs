@@ -18,11 +18,14 @@ namespace Topshelf.Shelving
     using System.Linq;
     using System.Reflection;
     using System.Runtime.Remoting;
+    using System.Threading;
     using Magnum.Channels;
+    using Magnum.Extensions;
     using Magnum.Fibers;
     using Messages;
 
-    public class ShelfMaker
+    public class ShelfMaker :
+        IDisposable
     {
         private readonly WcfUntypedChannelAdapter _myChannel;
         private readonly Dictionary<string, ShelfStatus> _shelves;
@@ -38,6 +41,11 @@ namespace Topshelf.Shelving
 
         public void MakeShelf(string name, params AssemblyName[] assemblies)
         {
+            MakeShelf(name, null, assemblies);
+        }
+
+        public void MakeShelf(string name, Type bootstrapper, params AssemblyName[] assemblies)
+        {
             if (_shelves.ContainsKey(name))
                 throw new ArgumentException("Shelf already exists, cannot create a new one named: " + name);
 
@@ -50,7 +58,7 @@ namespace Topshelf.Shelving
             // or anything else before we start the system?
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
             Type type = typeof(Shelf);
-            ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, null,
+            ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[] { bootstrapper }, 
                                                null, null);
 
             _shelves.Add(name, new ShelfStatus
@@ -77,6 +85,15 @@ namespace Topshelf.Shelving
             shelfStatus.CurrentState = ShelfState.Ready;
 
             shelfStatus.ShelfChannel.Send(new StartService());
+        }
+
+        public void Dispose()
+        {
+            if (_myChannel != null)
+            {
+                _myChannel.Dispose();
+                Thread.Sleep(5.Seconds());
+            }
         }
     }
 }

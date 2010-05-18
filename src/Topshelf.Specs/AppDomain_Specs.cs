@@ -12,7 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using System.Configuration;
+    using System;
+    using System.Reflection;
     using System.Threading;
     using NUnit.Framework;
     using Shelving;
@@ -25,16 +26,36 @@ namespace Topshelf.Specs
         [Test]
         public void Start_and_ready_service_in_seperate_app_domain()
         {
-            var sm = new ShelfMaker();
-            sm.MakeShelf("bob", GetType().Assembly.GetName());
+            using (var sm = new ShelfMaker())
+            {
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-            Thread.Sleep(5000);
+                Thread.Sleep(5000);
 
-            sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+            }
+        }
+
+        [Test]
+        /*
+         * Edge case: what if there's an exception in the construction of the Shelf object after an adapter is connected to the pipe?
+         * It won't be released in Dispose because the object was never created, should we make it a two parter? 
+         *   Activtor.CreateInstance(Shelf)
+         *   Shelf.Init()
+         * To avoid anything like that happening? A lot of the work that can fail in the constructor doesn't make me feel good
+         */
+        public void Incorrect_bootstrapper_type_fails_MakeShelf()
+        {
+            using (var sm = new ShelfMaker())
+            {
+                // anything that fails during the Activator.CreateInstance will be a TargetInvocationException; gotta check the child instance
+                // should we unwrap that in the ShelfMaker?
+                Assert.That(() => sm.MakeShelf("doh", typeof(string)), Throws.InstanceOf<TargetInvocationException>().And.Property("InnerException").InstanceOf<InvalidOperationException>());
+            }
         }
     }
 
-    public class AppDomain_Specs_Bootstrapper : 
+    public class AppDomain_Specs_Bootstrapper :
         Bootstrapper
     {
         public void InitializeHostedService<T>(IServiceConfigurator<T> cfg)
