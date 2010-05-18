@@ -13,8 +13,11 @@
 namespace Topshelf.Specs
 {
     using System;
+    using System.Configuration;
+    using System.Net;
     using System.Reflection;
     using System.Threading;
+    using Magnum.Extensions;
     using NUnit.Framework;
     using Shelving;
     using Topshelf.Configuration.Dsl;
@@ -24,15 +27,35 @@ namespace Topshelf.Specs
     public class AppDomain_Specs
     {
         [Test]
-        public void Start_and_ready_service_in_seperate_app_domain()
+        public void Init_and_ready_service_in_seperate_app_domain()
         {
             using (var sm = new ShelfMaker())
             {
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                Thread.Sleep(5000);
+                Thread.Sleep(5.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+
+                Thread.Sleep(1.Seconds());
+            }
+        }
+
+        [Test]
+        public void Stop_a_shelf()
+        {
+            using (var sm = new ShelfMaker())
+            {
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+
+                Thread.Sleep(5.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                sm.StopShelf("bob");
+
+                Thread.Sleep(3.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
             }
         }
 
@@ -53,6 +76,16 @@ namespace Topshelf.Specs
                 Assert.That(() => sm.MakeShelf("doh", typeof(string)), Throws.InstanceOf<TargetInvocationException>().And.Property("InnerException").InstanceOf<InvalidOperationException>());
             }
         }
+
+        [Test]
+        public void Access_to_app_config_is_provided_to_host()
+        {
+            using (var sm = new ShelfMaker())
+            {
+                // we are looking for an unlikely exception to be thrown to ensure that execution reached the end of InitializeHostedService
+                Assert.That(() => sm.MakeShelf("appChecker", typeof(AppDomain_Specs_Bootstrapper_reads_app_config_and_fails)), Throws.InstanceOf<TargetInvocationException>().And.Property("InnerException").InstanceOf<CookieException>());
+            }
+        }
     }
 
     public class AppDomain_Specs_Bootstrapper :
@@ -64,6 +97,17 @@ namespace Topshelf.Specs
 
             cfg.WhenStarted(a => { });
             cfg.WhenStopped(a => { });
+        }
+    }
+
+    public class AppDomain_Specs_Bootstrapper_reads_app_config_and_fails :
+        Bootstrapper
+    {
+        public void InitializeHostedService<T>(IServiceConfigurator<T> cfg)
+        {
+            ConfigurationManager.AppSettings["test"].ShouldEqual("test");
+
+            throw new CookieException();
         }
     }
 }

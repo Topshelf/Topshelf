@@ -12,8 +12,15 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    public class ShelfReady :
-        ShelfMessageBase
+    using System;
+
+    public class ShelfMessageBase
     {
+        public ShelfMessageBase()
+        {
+            ShelfName = AppDomain.CurrentDomain.FriendlyName;
+        }
+
+        public string ShelfName { get; set; }
     }
 }

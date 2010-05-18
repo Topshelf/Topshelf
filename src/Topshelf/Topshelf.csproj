@@ -84,7 +84,15 @@
     <Compile Include="Configuration\ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
     <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
+    <Compile Include="Messages\ShelfContinued.cs" />
+    <Compile Include="Messages\ShelfFault.cs" />
+    <Compile Include="Messages\ShelfMessageBase.cs" />
+    <Compile Include="Messages\ShelfPaused.cs" />
     <Compile Include="Messages\ShelfReady.cs" />
+    <Compile Include="Messages\ShelfStarted.cs" />
+    <Compile Include="Messages\ShelfStarting.cs" />
+    <Compile Include="Messages\ShelfStopped.cs" />
+    <Compile Include="Messages\ShelfStopping.cs" />
     <Compile Include="Shelving\ShelfState.cs" />
     <Compile Include="Shelving\ShelfStatus.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />

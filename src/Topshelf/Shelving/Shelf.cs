@@ -54,14 +54,14 @@ namespace Topshelf.Shelving
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
                                      {
-                                         s.Consume<StopService>().Using(m => _controller.Stop());
-                                         s.Consume<StartService>().Using(m => _controller.Start());
+                                         s.Consume<StopService>().Using(m => HandleStop(m));
+                                         s.Consume<StartService>().Using(m => HandleStart(m));
                                          s.Consume<PauseService>().Using(m => _controller.Pause());
                                          s.Consume<ContinueService>().Using(m => _controller.Continue());
                                      });
 
             //send message to host that I am ready
-            _hostChannel.Send(new ShelfReady { ShelfName = AppDomain.CurrentDomain.FriendlyName });
+            _hostChannel.Send(new ShelfReady());
         }
 
         static Type FindBootstrapperImplementation(Type bootstrapper)
@@ -87,6 +87,21 @@ namespace Topshelf.Shelving
                 throw new InvalidOperationException("The bootstrapper was not found.");
 
             return possibleTypes.Single();
+        }
+
+        private void HandleStart(StartService message)
+        {
+            _hostChannel.Send(new ShelfStarting());
+
+            _controller.Start();
+            _hostChannel.Send(new ShelfStarted());
+        }
+
+        private void HandleStop(StopService message)
+        {
+            _hostChannel.Send(new ShelfStopping());
+            _controller.Stop();
+            _hostChannel.Send(new ShelfStopped());
         }
 
         public void Dispose()

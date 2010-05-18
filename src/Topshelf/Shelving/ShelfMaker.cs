@@ -36,7 +36,21 @@ namespace Topshelf.Shelving
 
             _myChannel = new WcfUntypedChannelAdapter(new SynchronousFiber(), WellknownAddresses.HostAddress, "topshelf.host");
 
-            _myChannel.Subscribe(s => s.Consume<ShelfReady>().Using((Consumer<ShelfReady>)MarkShelfReadyAndStart));
+            _myChannel.Subscribe(s =>
+            {
+                s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndStart(m));
+                s.Consume<ShelfStopped>().Using(m => MarkShelfStopped(m));
+            });
+        }
+
+        private void MarkShelfStopped(ShelfStopped message)
+        {
+            if (!_shelves.ContainsKey(message.ShelfName))
+                throw new Exception("Shelf does not exist");
+
+            var shelfStatus = _shelves[message.ShelfName];
+
+            shelfStatus.CurrentState = ShelfState.Stopped;
         }
 
         public void MakeShelf(string name, params AssemblyName[] assemblies)
@@ -58,7 +72,7 @@ namespace Topshelf.Shelving
             // or anything else before we start the system?
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
             Type type = typeof(Shelf);
-            ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[] { bootstrapper }, 
+            ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[] { bootstrapper },
                                                null, null);
 
             _shelves.Add(name, new ShelfStatus
@@ -73,6 +87,22 @@ namespace Topshelf.Shelving
         public ShelfState GetState(string shelfName)
         {
             return _shelves[shelfName].CurrentState;
+        }
+
+        public void StartShelf(string shelfName)
+        {
+            if (!_shelves.ContainsKey(shelfName))
+                throw new Exception("Shelf does not exist");
+
+            _shelves[shelfName].ShelfChannel.Send(new StartService());
+        }
+
+        public void StopShelf(string shelfName)
+        {
+            if (!_shelves.ContainsKey(shelfName))
+                throw new Exception("Shelf does not exist");
+
+            _shelves[shelfName].ShelfChannel.Send(new StopService());
         }
 
         private void MarkShelfReadyAndStart(ShelfReady message)
@@ -92,8 +122,9 @@ namespace Topshelf.Shelving
             if (_myChannel != null)
             {
                 _myChannel.Dispose();
-                Thread.Sleep(5.Seconds());
             }
+
+            _shelves.Values.ToList().ForEach(x => AppDomain.Unload(x.AppDomain));
         }
     }
 }
