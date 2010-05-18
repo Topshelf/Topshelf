@@ -12,6 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
+    using System.Configuration;
+    using System.Threading;
     using NUnit.Framework;
     using Shelving;
     using Topshelf.Configuration.Dsl;
@@ -21,10 +23,14 @@ namespace Topshelf.Specs
     public class AppDomain_Specs
     {
         [Test]
-        public void NAME()
+        public void Start_and_ready_service_in_seperate_app_domain()
         {
             var sm = new ShelfMaker();
             sm.MakeShelf("bob", GetType().Assembly.GetName());
+
+            Thread.Sleep(5000);
+
+            sm.GetState("bob").ShouldEqual(ShelfState.Ready);
         }
     }
 
@@ -33,7 +39,10 @@ namespace Topshelf.Specs
     {
         public void InitializeHostedService<T>(IServiceConfigurator<T> cfg)
         {
-            
+            cfg.HowToBuildService(serviceBuilder => new object());
+
+            cfg.WhenStarted(a => { });
+            cfg.WhenStopped(a => { });
         }
     }
 }

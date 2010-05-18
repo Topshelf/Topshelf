@@ -19,7 +19,7 @@ namespace Topshelf.Specs
     {
         public static void ShouldContain<T>(this IEnumerable<T> list, T value)
         {
-                Assert.Contains(value, new List<T>(list));
+            Assert.Contains(value, new List<T>(list));
         }
 
         public static void ShouldEqual<T>(this T actual, T expected)
@@ -27,14 +27,19 @@ namespace Topshelf.Specs
             Assert.AreEqual(expected, actual);
         }
 
-		public static void ShouldNotEqual<T>(this T actual, T expected)
-		{
-			Assert.AreNotEqual(expected, actual);
-		}
+        public static void ShouldNotEqual<T>(this T actual, T expected)
+        {
+            Assert.AreNotEqual(expected, actual);
+        }
 
         public static void ShouldNotBeNull<T>(this T actual)
         {
             Assert.IsNotNull(actual);
+        }
+
+        public static void ShouldBeNull<T>(this T actual)
+        {
+            Assert.IsNull(actual);
         }
 
         public static void ShouldBeTrue(this bool actual)

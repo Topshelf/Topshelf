@@ -85,6 +85,8 @@
     <Compile Include="Commands\UninstallService.cs" />
     <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
     <Compile Include="Messages\ShelfReady.cs" />
+    <Compile Include="Shelving\ShelfState.cs" />
+    <Compile Include="Shelving\ShelfStatus.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />

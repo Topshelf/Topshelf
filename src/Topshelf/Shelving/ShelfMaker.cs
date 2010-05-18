@@ -13,22 +13,70 @@
 namespace Topshelf.Shelving
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.Remoting;
+    using Magnum.Channels;
+    using Magnum.Fibers;
+    using Messages;
 
     public class ShelfMaker
     {
-        public void MakeShelf(string name, params AssemblyName [] assemblies)
+        private readonly WcfUntypedChannelAdapter _myChannel;
+        private readonly Dictionary<string, ShelfStatus> _shelves;
+
+        public ShelfMaker()
         {
+            _shelves = new Dictionary<string, ShelfStatus>();
+
+            _myChannel = new WcfUntypedChannelAdapter(new SynchronousFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+
+            _myChannel.Subscribe(s => s.Consume<ShelfReady>().Using((Consumer<ShelfReady>)MarkShelfReadyAndStart));
+        }
+
+        public void MakeShelf(string name, params AssemblyName[] assemblies)
+        {
+            if (_shelves.ContainsKey(name))
+                throw new ArgumentException("Shelf already exists, cannot create a new one named: " + name);
+
             AppDomainSetup settings = AppDomain.CurrentDomain.SetupInformation;
             settings.ShadowCopyFiles = "true";
             settings.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
+            settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service.config");
             AppDomain ad = AppDomain.CreateDomain(name, null, settings);
-            assemblies.ToList().ForEach(x => ad.Load(x));
-            Type type = typeof (Shelf);
+            // should we query the service.config to look for any additional assemblies 
+            // or anything else before we start the system?
+            assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
+            Type type = typeof(Shelf);
             ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, null,
                                                null, null);
+
+            _shelves.Add(name, new ShelfStatus
+                {
+                    AppDomain = ad,
+                    ObjectHandle = s,
+                    ShelfChannelBuilder = () => new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me"),
+                    ShelfName = name
+                });
+        }
+
+        public ShelfState GetState(string shelfName)
+        {
+            return _shelves[shelfName].CurrentState;
+        }
+
+        private void MarkShelfReadyAndStart(ShelfReady message)
+        {
+            if (!_shelves.ContainsKey(message.ShelfName))
+                throw new Exception("Shelf does not exist");
+
+            var shelfStatus = _shelves[message.ShelfName];
+
+            shelfStatus.CurrentState = ShelfState.Ready;
+
+            shelfStatus.ShelfChannel.Send(new StartService());
         }
     }
 }

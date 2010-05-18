@@ -42,11 +42,11 @@ namespace Topshelf.Shelving
             var b = (Bootstrapper)Activator.CreateInstance(t);
 
             var cfg = new ServiceConfigurator<object>();
-			
-			//have to do some type coearcion here
-			//wonder if co/contra will help here?
-            b.InitializeHostedService<object>(cfg);
-            
+
+            //have to do some type coearcion here
+            //wonder if co/contra will help here?
+            b.InitializeHostedService(cfg);
+
             //start up the service controller instance
             _controller = cfg.Create();
 
@@ -60,7 +60,7 @@ namespace Topshelf.Shelving
                                      });
 
             //send message to host that I am ready
-            _hostChannel.Send(new ShelfReady());
+            _hostChannel.Send(new ShelfReady { ShelfName = AppDomain.CurrentDomain.FriendlyName });
         }
 
         static Type FindBootstrapperImplementation()
@@ -68,7 +68,7 @@ namespace Topshelf.Shelving
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => x.IsInterface == false)
-                .Where(x => typeof (Bootstrapper).IsAssignableFrom(x))
+                .Where(x => typeof(Bootstrapper).IsAssignableFrom(x))
                 .FirstOrDefault();
 
             if (type == null)
