@@ -13,15 +13,19 @@
 namespace Topshelf.Shelving
 {
     using System;
+    using System.Linq;
+    using System.Reflection;
     using System.Runtime.Remoting;
 
     public class ShelfMaker
     {
-        public void MakeShelf(string name)
+        public void MakeShelf(string name, params AssemblyName [] assemblies)
         {
             AppDomainSetup settings = AppDomain.CurrentDomain.SetupInformation;
             settings.ShadowCopyFiles = "true";
+            settings.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
             AppDomain ad = AppDomain.CreateDomain(name, null, settings);
+            assemblies.ToList().ForEach(x => ad.Load(x));
             Type type = typeof (Shelf);
             ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, null,
                                                null, null);

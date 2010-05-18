@@ -14,6 +14,7 @@ namespace Topshelf.Specs
 {
     using NUnit.Framework;
     using Shelving;
+    using Topshelf.Configuration.Dsl;
 
     //a place to learn about app-domains
     [TestFixture]
@@ -23,7 +24,16 @@ namespace Topshelf.Specs
         public void NAME()
         {
             var sm = new ShelfMaker();
-            sm.MakeShelf("bob");
+            sm.MakeShelf("bob", GetType().Assembly.GetName());
+        }
+    }
+
+    public class AppDomain_Specs_Bootstrapper : 
+        Bootstrapper
+    {
+        public void InitializeHostedService<T>(IServiceConfigurator<T> cfg)
+        {
+            
         }
     }
 }
