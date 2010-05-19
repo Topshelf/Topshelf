@@ -15,8 +15,8 @@ namespace Topshelf.Shelving
     using System;
     using Configuration.Dsl;
 
-    public interface Bootstrapper
+    public interface Bootstrapper<T>
     {
-        void InitializeHostedService<T>(IServiceConfigurator<T> cfg);
+        void InitializeHostedService(IServiceConfigurator<T> cfg);
     }
 }

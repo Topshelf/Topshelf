@@ -17,6 +17,7 @@ namespace Topshelf.Shelving
     using Configuration.Dsl;
     using Magnum.Channels;
     using Magnum.Fibers;
+    using Magnum.Reflection;
     using Messages;
     using Model;
 
@@ -39,16 +40,7 @@ namespace Topshelf.Shelving
             _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
 
             var t = FindBootstrapperImplementation();
-            var b = (Bootstrapper)Activator.CreateInstance(t);
-
-            var cfg = new ServiceConfigurator<object>();
-			
-			//have to do some type coearcion here
-			//wonder if co/contra will help here?
-            b.InitializeHostedService<object>(cfg);
-            
-            //start up the service controller instance
-            _controller = cfg.Create();
+            _controller = CreateController(t);
 
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
@@ -63,12 +55,22 @@ namespace Topshelf.Shelving
             _hostChannel.Send(new ShelfReady());
         }
 
-        static Type FindBootstrapperImplementation()
+        public static IServiceController CreateController(Type bootstrapperType)
+        {
+            var bs = Activator.CreateInstance(bootstrapperType);
+            //TODO: issue is here
+            var st = bs.GetType().GetInterfaces()[0].GetGenericArguments()[0];
+            var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(st));
+            bs.FastInvoke("InitializeHostedService", cfg);
+
+            return cfg.FastInvoke<object, IServiceController>("Create");
+        }
+        public static Type FindBootstrapperImplementation()
         {
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => x.IsInterface == false)
-                .Where(x => typeof (Bootstrapper).IsAssignableFrom(x))
+                .Where(t => t.GetInterfaces().Any(i => i.Name.StartsWith("Bootstrapper")))
                 .FirstOrDefault();
 
             if (type == null)
