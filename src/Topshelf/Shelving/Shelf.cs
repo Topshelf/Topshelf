@@ -70,7 +70,7 @@ namespace Topshelf.Shelving
         {
             if (bootstrapper != null)
             {
-                if (bootstrapper.GetInterfaces().Where(x =>x.GetGenericTypeDefinition() == typeof(Bootstrapper<>)).Count() > 0)
+                if (bootstrapper.GetInterfaces().Where(IsBootstrapperType).Count() > 0)
                     return bootstrapper;
 
                 throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
@@ -80,7 +80,7 @@ namespace Topshelf.Shelving
             var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => x.IsInterface == false)
-                .Where(t => t.GetInterfaces().Any(i => i.GetGenericTypeDefinition() == typeof(Bootstrapper<>)));
+                .Where(t => t.GetInterfaces().Any(IsBootstrapperType));
 
             if (possibleTypes.Count() > 1)
                 throw new InvalidOperationException("Unable to identify the bootstrapper, more than one found.");
@@ -89,6 +89,15 @@ namespace Topshelf.Shelving
                 throw new InvalidOperationException("The bootstrapper was not found.");
 
             return possibleTypes.Single();
+        }
+
+        private static bool IsBootstrapperType(Type t)
+        {
+            if(t.IsGenericType)
+            {
+                return t.GetGenericTypeDefinition() == typeof (Bootstrapper<>);
+            }
+            return false;
         }
 
         private void HandleStart(StartService message)
