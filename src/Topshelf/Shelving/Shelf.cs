@@ -70,7 +70,7 @@ namespace Topshelf.Shelving
         {
             if (bootstrapper != null)
             {
-                if (bootstrapper.GetInterfaces().Where(x => x == typeof(Bootstrapper<>)).Count() > 0)
+                if (bootstrapper.GetInterfaces().Where(x => x.Name == typeof(Bootstrapper<>).Name && x.Namespace == typeof(Bootstrapper<>).Namespace).Count() > 0)
                     return bootstrapper;
 
                 throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
