@@ -21,32 +21,27 @@ namespace Topshelf.Shelving
     using Messages;
     using Model;
 
-    public class Shelf
+    public class Shelf :
+        IDisposable
     {
-        IServiceController _controller;
-        WcfUntypedChannel _hostChannel;
-        WcfUntypedChannelAdapter _myChannel;
-        ChannelSubscription _subscription;
+        private IServiceController _controller;
+        private readonly WcfUntypedChannel _hostChannel;
+        private readonly WcfUntypedChannelAdapter _myChannel;
+        private readonly ChannelSubscription _subscription;
+        private readonly Type _bootstrapperType;
 
-        public Shelf()
+        public Shelf(Type bootstraper)
         {
-            Initialize();
-        }
-
-        public void Initialize()
-        {
-            //how do the addresses work (its a light wrapper over wcf)
+            _bootstrapperType = bootstraper;
             _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
             _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
-
-            var t = FindBootstrapperImplementation();
-            _controller = CreateController(t);
 
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
                                      {
-                                         s.Consume<StopService>().Using(m => _controller.Stop());
-                                         s.Consume<StartService>().Using(m => _controller.Start());
+                                         s.Consume<ReadyService>().Using(m => Initialize());
+                                         s.Consume<StopService>().Using(m => HandleStop(m));
+                                         s.Consume<StartService>().Using(m => HandleStart(m));
                                          s.Consume<PauseService>().Using(m => _controller.Pause());
                                          s.Consume<ContinueService>().Using(m => _controller.Continue());
                                      });
@@ -55,32 +50,68 @@ namespace Topshelf.Shelving
             _hostChannel.Send(new ShelfReady());
         }
 
-        public static IServiceController CreateController(Type bootstrapperType)
+        public void Initialize()
         {
-            var bs = Activator.CreateInstance(bootstrapperType);
+            var t = FindBootstrapperImplementation(_bootstrapperType);
+            var bs = Activator.CreateInstance(t);
+
             //TODO: issue is here
             var st = bs.GetType().GetInterfaces()[0].GetGenericArguments()[0];
             var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(st));
             bs.FastInvoke("InitializeHostedService", cfg);
 
-            return cfg.FastInvoke<object, IServiceController>("Create");
+            //start up the service controller instance
+            _controller = cfg.FastInvoke<object, IServiceController>("Create");
+
+            _hostChannel.Send(new ServiceReady());
         }
-        public static Type FindBootstrapperImplementation()
+
+        public static Type FindBootstrapperImplementation(Type bootstrapper)
         {
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
+            if (bootstrapper != null)
+            {
+                if (bootstrapper.GetInterfaces().Where(x => x == typeof(Bootstrapper<>)).Count() > 0)
+                    return bootstrapper;
+
+                throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
+                                                    + ", is not a subclass of Bootstrapper.");
+            }
+
+            var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(x => x.IsInterface == false)
-                .Where(t => t.GetInterfaces().Any(i => i.Name.StartsWith("Bootstrapper")))
-                .FirstOrDefault();
+                .Where(t => t.GetInterfaces().Any(i => i.Name.StartsWith("Bootstrapper")));
 
-            if (type == null)
+            if (possibleTypes.Count() > 1)
+                throw new InvalidOperationException("Unable to identify the bootstrapper, more than one found.");
+
+            if (possibleTypes.Count() == 0)
                 throw new InvalidOperationException("The bootstrapper was not found.");
-            return type;
+
+            return possibleTypes.Single();
+        }
+
+        private void HandleStart(StartService message)
+        {
+            _hostChannel.Send(new ShelfStarting());
+            _controller.Start();
+            _hostChannel.Send(new ShelfStarted());
+        }
+
+        private void HandleStop(StopService message)
+        {
+            _hostChannel.Send(new ShelfStopping());
+            _controller.Stop();
+            _hostChannel.Send(new ShelfStopped());
         }
 
         public void Dispose()
         {
-            _subscription.Dispose();
+            if (_subscription != null)
+                _subscription.Dispose();
+
+            if (_myChannel != null)
+                _myChannel.Dispose();
         }
     }
 }

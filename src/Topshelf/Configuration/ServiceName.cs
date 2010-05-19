@@ -18,7 +18,7 @@ namespace Topshelf.Configuration
         readonly string _instanceName;
         readonly string _name;
 
-        public ServiceName(string name) : this(name, "")
+        public ServiceName(string name) : this(name, null)
         {
         }
 
@@ -40,7 +40,8 @@ namespace Topshelf.Configuration
 
         public string FullName
         {
-            get { return "{0}{1}{2}".FormatWith(_name, _instanceChar, _instanceName); }
+            get { return string.IsNullOrEmpty(_instanceName) 
+                ? _name : "{0}{1}{2}".FormatWith(_name, _instanceChar, _instanceName); }
         }
     }
 }

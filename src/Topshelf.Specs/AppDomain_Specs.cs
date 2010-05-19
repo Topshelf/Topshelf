@@ -12,18 +12,60 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
+    using System.Threading;
+    using Magnum.Extensions;
     using NUnit.Framework;
     using Shelving;
+    using Topshelf.Configuration.Dsl;
 
     //a place to learn about app-domains
     [TestFixture]
     public class AppDomain_Specs
     {
         [Test]
-        public void NAME()
+        public void Init_and_ready_service_in_seperate_app_domain()
         {
-            var sm = new ShelfMaker();
-            sm.MakeShelf("bob");
+            using (var sm = new ShelfMaker())
+            {
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper<object>), GetType().Assembly.GetName());
+
+                // this takes too long currently... can we do better?
+                Thread.Sleep(20.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+
+                Thread.Sleep(1.Seconds());
+            }
+        }
+
+        [Test]
+        public void Stop_a_shelf()
+        {
+            using (var sm = new ShelfMaker())
+            {
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper<object>), GetType().Assembly.GetName());
+
+                Thread.Sleep(5.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                sm.StopShelf("bob");
+
+                Thread.Sleep(3.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
+            }
+        }
+    }
+
+    public class AppDomain_Specs_Bootstrapper<T> :
+        Bootstrapper<T>
+    {
+        public void InitializeHostedService(IServiceConfigurator<T> cfg)
+        {
+            cfg.HowToBuildService(serviceBuilder => new object());
+
+            cfg.WhenStarted(a => { });
+            cfg.WhenStopped(a => { });
         }
     }
 }

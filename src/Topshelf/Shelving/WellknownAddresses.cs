@@ -20,12 +20,12 @@ namespace Topshelf.Shelving
     {
         public static Uri CurrentShelfAddress
         {
-            get { return new Uri("pipes://localhost/topshelf-{0}-{1}".FormatWith(GetFolder(), GetPid())); }
+            get { return new Uri("net.pipe://localhost/topshelf-{0}-{1}".FormatWith(GetFolder(), GetPid())); }
         }
 
         public static Uri HostAddress
         {
-            get { return new Uri("pipes://localhost/topshelf-host-{0}".FormatWith(GetPid())); }
+            get { return new Uri("net.pipe://localhost/topshelf-host-{0}".FormatWith(GetPid())); }
         }
 
         public static int GetPid()

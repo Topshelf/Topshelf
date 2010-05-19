@@ -10,10 +10,8 @@ namespace Topshelf.Specs
     {
         public void TestIt()
         {
-            var t = Shelf.FindBootstrapperImplementation();
+            var t = Shelf.FindBootstrapperImplementation(null);
             Console.WriteLine(t);
-            var o = Shelf.CreateController(t);
-            Console.WriteLine(o);
         }
 
     }
