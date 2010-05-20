@@ -14,7 +14,6 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Diagnostics;
-    using System.IO;
 
     public static class WellknownAddresses
     {
@@ -28,6 +27,11 @@ namespace Topshelf.Shelving
             get { return new Uri("net.pipe://localhost/topshelf-host-{0}".FormatWith(GetPid())); }
         }
 
+        public static Uri GetShelfAddress(AppDomain appDomain)
+        {
+            return new Uri("net.pipe://localhost/topshelf-{0}-{1}".FormatWith(appDomain.FriendlyName, GetPid()));
+        }
+
         public static int GetPid()
         {
             return Process.GetCurrentProcess().Id;
@@ -35,7 +39,7 @@ namespace Topshelf.Shelving
 
         public static string GetFolder()
         {
-            return new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Name;
+            return AppDomain.CurrentDomain.FriendlyName;
         }
     }
 }

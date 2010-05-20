@@ -97,6 +97,7 @@
     <Compile Include="Commands\UninstallService.cs" />
     <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
+    <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
     <Compile Include="Messages\ShelfContinued.cs" />
     <Compile Include="Messages\ShelfFault.cs" />
     <Compile Include="Messages\ShelfMessageBase.cs" />

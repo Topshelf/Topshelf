@@ -64,8 +64,12 @@ namespace Topshelf.Shelving
 
             AppDomainSetup settings = AppDomain.CurrentDomain.SetupInformation;
             settings.ShadowCopyFiles = "true";
-            settings.ApplicationBase = AppDomain.CurrentDomain.BaseDirectory;
-            settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service.config");
+            if (name != "TopShelf.DirectoryWatcher")
+            {
+                // uggh, shouldn't have to do this... revisit to fixy
+                settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
+                settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "service.config");
+            }
             AppDomain ad = AppDomain.CreateDomain(name, null, settings);
             // should we query the service.config to look for any additional assemblies 
             // or anything else before we start the system?
@@ -78,7 +82,7 @@ namespace Topshelf.Shelving
                 {
                     AppDomain = ad,
                     ObjectHandle = s,
-                    ShelfChannelBuilder = () => new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me"),
+                    ShelfChannelBuilder = appDomain => new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
                     ShelfName = name
                 });
         }

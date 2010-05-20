@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
+    using System.IO;
     using System.Threading;
     using Magnum.Extensions;
     using NUnit.Framework;
@@ -22,12 +23,31 @@ namespace Topshelf.Specs
     [TestFixture]
     public class AppDomain_Specs
     {
+        [SetUp]
+        public void Setup()
+        {
+            Directory.CreateDirectory("Services");
+            Directory.CreateDirectory(Path.Combine("Services", "bob"));
+
+            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", Path.Combine("Services", "bob"));
+            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", Path.Combine("Services", "bob"));
+            DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", Path.Combine("Services", "bob"));
+            DirectoryMonitor_Specs.CopyFileToDir("System.CoreEx.dll", Path.Combine("Services", "bob"));
+            DirectoryMonitor_Specs.CopyFileToDir("System.Reactive.dll", Path.Combine("Services", "bob"));
+        }
+
+        [TearDown]
+        public void CleanUp()
+        {
+            Directory.Delete("Services", true);
+        }
+
         [Test]
         public void Init_and_ready_service_in_seperate_app_domain()
         {
             using (var sm = new ShelfMaker())
             {
-                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper<object>), GetType().Assembly.GetName());
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
                 // this takes too long currently... can we do better?
                 Thread.Sleep(20.Seconds());
@@ -43,7 +63,7 @@ namespace Topshelf.Specs
         {
             using (var sm = new ShelfMaker())
             {
-                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper<object>), GetType().Assembly.GetName());
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
                 Thread.Sleep(5.Seconds());
 
@@ -57,10 +77,10 @@ namespace Topshelf.Specs
         }
     }
 
-    public class AppDomain_Specs_Bootstrapper<T> :
-        Bootstrapper<T>
+    public class AppDomain_Specs_Bootstrapper :
+        Bootstrapper<object>
     {
-        public void InitializeHostedService(IServiceConfigurator<T> cfg)
+        public void InitializeHostedService(IServiceConfigurator<object> cfg)
         {
             cfg.HowToBuildService(serviceBuilder => new object());
 

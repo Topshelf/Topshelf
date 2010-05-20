@@ -26,7 +26,7 @@ namespace Topshelf.Messages
 
     public class ServiceMessage
     {
-        public Guid ServiceId { get; set; }
+        public string ServiceId { get; set; }
         public Guid ConversationId { get; set; }
     }
 
@@ -95,6 +95,11 @@ namespace Topshelf.Messages
     }
 
     public class ReadyService :
+        ServiceMessage
+    {
+    }
+
+    public class FileSystemChange :
         ServiceMessage
     {
     }

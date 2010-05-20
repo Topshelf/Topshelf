@@ -16,44 +16,65 @@ namespace Topshelf.FileSystem
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Magnum.Channels;
+    using Magnum.Fibers;
+    using Messages;
+    using Shelving;
 
     public class DirectoryMonitor :
         IDisposable
     {
-        private readonly FileSystemWatcher _fileSystemWatcher;
+        private FileSystemWatcher _fileSystemWatcher;
+        private readonly string _baseDir;
+        private readonly WcfUntypedChannel _hostChannel;
 
         public DirectoryMonitor(string directory)
         {
-            _fileSystemWatcher = new FileSystemWatcher(directory)
+            _baseDir = directory;
+            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+        }
+
+        public void Start()
+        {
+            _fileSystemWatcher = new FileSystemWatcher(_baseDir)
                 {
                     IncludeSubdirectories = true,
                     EnableRaisingEvents = true, 
-                    NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.Size | NotifyFilters.LastWrite
                 };
 
             _fileSystemWatcher
                 .GetEvents()
                 .Select(e => GetChangedDirectory(e.EventArgs.FullPath))
                 .BufferWithTime(TimeSpan.FromSeconds(3))
-                //.Where(e => e.Count() > 0)
-                //.Select(e => e.Distinct())
+                .Where(e => e.Count() > 0)
+                .Select(e => e.Distinct())
                 .Subscribe(e =>
                     {
-                        e.ToList().ForEach(Console.WriteLine);
+                        e.ToList().ForEach(str => _hostChannel.Send(new FileSystemChange { ServiceId = str }));
                     });
+        }
+
+        public void Stop()
+        {
+            if (_fileSystemWatcher != null)
+            {
+                _fileSystemWatcher.Dispose();
+                _fileSystemWatcher = null;
+            }
         }
 
         /// <summary>
         /// Normalize the source of the event; we only care about the directory in question
         /// </summary>
-        private static string GetChangedDirectory(string eventItem)
+        private string GetChangedDirectory(string eventItem)
         {
-            return eventItem;
+            return eventItem.Substring(_baseDir.Length).Split(Path.DirectorySeparatorChar).Where(x => x.Length > 0).FirstOrDefault();
         }
 
         public void Dispose()
         {
-            _fileSystemWatcher.Dispose();
+            if (_fileSystemWatcher != null)
+                _fileSystemWatcher.Dispose();
         }
     }
 
