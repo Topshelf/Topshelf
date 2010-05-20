@@ -78,6 +78,7 @@
     <Compile Include="Configuration\RunnerConfigurator_Specs.cs">
     </Compile>
     <Compile Include="Configuration\Credential_Specs.cs" />
+    <Compile Include="DirectoryMonitor_Specs.cs" />
     <Compile Include="Pipeline_Play.cs" />
     <Compile Include="Scenarios\Scenario.cs" />
     <Compile Include="Scenarios\ScenarioContext.cs" />
