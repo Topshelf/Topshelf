@@ -68,7 +68,7 @@ namespace Topshelf.Shelving
             {
                 // uggh, shouldn't have to do this... revisit to fixy
                 settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
-                settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, "service.config");
+                settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
             }
             AppDomain ad = AppDomain.CreateDomain(name, null, settings);
             // should we query the service.config to look for any additional assemblies 
