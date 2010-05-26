@@ -115,10 +115,14 @@ namespace Topshelf.Shelving
 
             var shelfStatus = _shelves[message.ShelfName];
 
+            var oldState = shelfStatus.CurrentState;
+
             shelfStatus.CurrentState = ShelfState.Ready;
 
             // if auto start is setup, send start
             shelfStatus.ShelfChannel.Send(new StartService());
+
+            StateChanged(oldState, ShelfState.Ready, message.ShelfName);
         }
 
         private void MarkShelfReadyAndInitService(ShelfReady message)
@@ -128,9 +132,26 @@ namespace Topshelf.Shelving
 
             var shelfStatus = _shelves[message.ShelfName];
 
+            var oldState = shelfStatus.CurrentState;
+
             shelfStatus.CurrentState = ShelfState.Readying;
 
             shelfStatus.ShelfChannel.Send(new ReadyService());
+
+            StateChanged(oldState, ShelfState.Readying, message.ShelfName);
+        }
+
+        public delegate void ShelfStateChangedHandler(object sender, ShelfStateChangedEventArgs args);
+
+        public event ShelfStateChangedHandler OnShelfStateChanged;
+
+        private void StateChanged(ShelfState oldSate, ShelfState newState, string shelfName)
+        {
+            var handler = OnShelfStateChanged;
+            if (handler != null)
+            {
+                handler(this, new ShelfStateChangedEventArgs { PreviousShelfState = oldSate, CurrentShelfState = newState, ShelfName = shelfName });
+            }
         }
 
         public void Dispose()

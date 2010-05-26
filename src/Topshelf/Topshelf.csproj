@@ -108,6 +108,7 @@
     <Compile Include="Messages\ShelfStopped.cs" />
     <Compile Include="Messages\ShelfStopping.cs" />
     <Compile Include="Shelving\ShelfState.cs" />
+    <Compile Include="Shelving\ShelfStateChangedEventArgs.cs" />
     <Compile Include="Shelving\ShelfStatus.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />

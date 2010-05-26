@@ -47,14 +47,19 @@ namespace Topshelf.Specs
         {
             using (var sm = new ShelfMaker())
             {
+                var manualResetEvent = new ManualResetEvent(false);
+
+                sm.OnShelfStateChanged += (sender, args) =>
+                {
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
+                        manualResetEvent.Set();
+                };
+
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                // this takes too long currently... can we do better?
-                Thread.Sleep(20.Seconds());
-
+                manualResetEvent.WaitOne(20.Seconds());
+                
                 sm.GetState("bob").ShouldEqual(ShelfState.Ready);
-
-                Thread.Sleep(1.Seconds());
             }
         }
 
