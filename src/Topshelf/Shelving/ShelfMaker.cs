@@ -28,14 +28,17 @@ namespace Topshelf.Shelving
     public class ShelfMaker :
         IDisposable
     {
-        private readonly WcfUntypedChannelAdapter _myChannel;
+        private readonly WcfUntypedChannelHost _myChannelHost;
+		private readonly UntypedChannelAdapter _myChannel;
         private readonly Dictionary<string, ShelfStatus> _shelves;
 
         public ShelfMaker()
         {
             _shelves = new Dictionary<string, ShelfStatus>();
 
-            _myChannel = new WcfUntypedChannelAdapter(new SynchronousFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+
+			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+			_myChannelHost = new WcfUntypedChannelHost(new SynchronousFiber(), _myChannel, WellknownAddresses.HostAddress, "topshelf.host");
 
             _myChannel.Subscribe(s =>
             {
@@ -117,7 +120,7 @@ namespace Topshelf.Shelving
                 {
                     AppDomain = ad,
                     ObjectHandle = s,
-                    ShelfChannelBuilder = appDomain => new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
+                    ShelfChannelBuilder = appDomain => new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
                     ShelfName = name
                 });
         }
@@ -205,9 +208,9 @@ namespace Topshelf.Shelving
 
         public void Dispose()
         {
-            if (_myChannel != null)
+            if (_myChannelHost != null)
             {
-                _myChannel.Dispose();
+                _myChannelHost.Dispose();
             }
 
             _shelves.Values.ToList().ForEach(x => AppDomain.Unload(x.AppDomain));

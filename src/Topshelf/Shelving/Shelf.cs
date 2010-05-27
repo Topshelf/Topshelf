@@ -25,16 +25,18 @@ namespace Topshelf.Shelving
         IDisposable
     {
         private IServiceController _controller;
-        private readonly WcfUntypedChannel _hostChannel;
-        private readonly WcfUntypedChannelAdapter _myChannel;
+		private readonly WcfUntypedChannelProxy _hostChannel;
+		private readonly WcfUntypedChannelHost _myChannelHost;
+		private readonly UntypedChannelAdapter _myChannel;
         private readonly ChannelSubscription _subscription;
         private readonly Type _bootstrapperType;
 
         public Shelf(Type bootstraper)
         {
             _bootstrapperType = bootstraper;
-            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
-            _myChannel = new WcfUntypedChannelAdapter(new ThreadPoolFiber(), WellknownAddresses.CurrentShelfAddress, "topshelf.me");
+			_hostChannel = new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+			_myChannelHost = new WcfUntypedChannelHost(new ThreadPoolFiber(), _myChannel, WellknownAddresses.CurrentShelfAddress, "topshelf.me");
 
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
@@ -126,8 +128,8 @@ namespace Topshelf.Shelving
             if (_subscription != null)
                 _subscription.Dispose();
 
-            if (_myChannel != null)
-                _myChannel.Dispose();
+            if (_myChannelHost != null)
+                _myChannelHost.Dispose();
         }
     }
 }

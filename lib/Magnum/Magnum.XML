@@ -28,6 +28,91 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:Magnum.Actors.ActorRegistry">
+            <summary>
+            An actor registry provide running storage for actors that are active in the system
+            </summary>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Register``1(``0)">
+            <summary>
+            Adds an actor to the registry
+            </summary>
+            <typeparam name="T">The type of the actor</typeparam>
+            <param name="actor">The actor to add</param>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Unregister``1(``0)">
+            <summary>
+            Removes an actor from the registry
+            </summary>
+            <typeparam name="T">The type of the actor</typeparam>
+            <param name="actor">The actor to remove</param>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Unregister(System.Guid)">
+            <summary>
+            Removes an actor from the registry
+            </summary>
+            <param name="id">The id of the actor to remove</param>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Shutdown">
+            <summary>
+            Stops all actors and removes them from the registry
+            </summary>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Get(System.Guid)">
+            <summary>
+            Gets an actor from the registry
+            </summary>
+            <param name="id">The id of the actor</param>
+            <returns>The actor with the specified id</returns>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.GetAll">
+            <summary>
+            Gets all actors from the registry
+            </summary>
+            <returns>All actors in the registry</returns>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.GetAll``1">
+            <summary>
+            Get all actors from the registry that are the specified type
+            </summary>
+            <typeparam name="T">The type of actor to retrieve</typeparam>
+            <returns>A list of actors matching the specified type</returns>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.GetAll(System.Type)">
+            <summary>
+            Get all actors from the registry that are the specified type
+            </summary>
+            <param name="actorType">The type of actor to retrieve</param>
+            <returns>A list of actors matching the specified type</returns>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Each(System.Action{Magnum.Actors.Actor})">
+            <summary>
+            Calls the callback for each actor in the registry
+            </summary>
+            <param name="callback">A method to call with each actor</param>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Each``1(System.Action{``0})">
+            <summary>
+            Calls the callback for each actor in the registry of the specified type
+            </summary>
+            <typeparam name="T">The type of actor to select</typeparam>
+            <param name="callback">The method to call with each actor</param>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Each(System.Type,System.Action{Magnum.Actors.Actor})">
+            <summary>
+            Calls the callback for each actor in the registry of the specified type
+            </summary>
+            <param name="actorType">The type of actor to select</param>
+            <param name="callback">The method to call with each actor</param>
+        </member>
+        <member name="M:Magnum.Actors.ActorRegistry.Subscribe(System.Action{Magnum.Channels.Configuration.SubscriptionConfigurator})">
+            <summary>
+            Allow subscription to events that are produced by the actor registry as actors
+            are registered and unregistered.
+            </summary>
+            <param name="subscriberActions">The subscription actions</param>
+            <returns>A channel subscription</returns>
+        </member>
         <member name="T:Magnum.Actors.Internal.ActorChannelProvider`2">
             <summary>
               Provides a channel from an actor, based on the property information which is used
@@ -127,6 +212,14 @@
             Context for binding to a model
             </summary>
         </member>
+        <member name="T:Magnum.Channels.WcfChannelHost`1">
+            <summary>
+            Receives messages from a named pipe via WCF and forwards it to the output
+            channel. Message serialization is handled entirely by WCF and therefore
+            requires that classes are appropriately decorated.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
         <member name="T:Magnum.Channels.Channel`1">
             <summary>
             A one-way communication containing messages of the specified type
@@ -198,17 +291,39 @@
             <typeparam name="TChannel">The channel type</typeparam>
             <returns>A chainable method to configure additional options</returns>
         </member>
-        <member name="T:Magnum.Channels.WcfChannel`1">
+        <member name="T:Magnum.Channels.DeserializeMessageEnvelopeChannel`1">
+            <summary>
+            Accepts a MessageEnvelope as input and deserializes the message body on the supplied fiber,
+            after which the message object is sent to the untyped output channel.
+            </summary>
+            <typeparam name="T">The input message type, which must implement MessageEnvelope</typeparam>
+        </member>
+        <member name="M:Magnum.Channels.DeserializeMessageEnvelopeChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Serialization.Serializer,Magnum.Channels.UntypedChannel)">
+            <summary>
+            Constructs an instance
+            </summary>
+            <param name="fiber">The fiber used to perform message deserialization</param>
+            <param name="serializer">The serializer to use on the message body</param>
+            <param name="output">The output channel for the deserialized message</param>
+        </member>
+        <member name="T:Magnum.Channels.Internal.WcfChannel`1">
             <summary>
               A single generic channel type used for local channels via WCF/named pipes
             </summary>
             <typeparam name = "T"></typeparam>
         </member>
-        <member name="T:Magnum.Channels.WcfChannelService`1">
+        <member name="T:Magnum.Channels.Internal.WcfChannelService`1">
             <summary>
               Handles the server end of a WCF channel connection
             </summary>
             <typeparam name = "T">The channel type</typeparam>
+        </member>
+        <member name="T:Magnum.Channels.WcfUntypedChannelHost">
+            <summary>
+            Receives messages from a named pipe via WCF and forwards them to the specific channel. Messages
+            are first serialized to a wire type that is already WCF compliant, making it unnecessary to decorate
+            your message objects with WCF data contract serializer attributes.
+            </summary>
         </member>
         <member name="T:Magnum.Channels.SelectiveConsumer`1">
             <summary>

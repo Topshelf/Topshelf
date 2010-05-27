@@ -26,12 +26,12 @@ namespace Topshelf.FileSystem
     {
         private FileSystemWatcher _fileSystemWatcher;
         private readonly string _baseDir;
-        private readonly WcfUntypedChannel _hostChannel;
+        private readonly WcfUntypedChannelProxy _hostChannel;
 
         public DirectoryMonitor(string directory)
         {
             _baseDir = directory;
-            _hostChannel = new WcfUntypedChannel(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+			_hostChannel = new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
         }
 
         public void Start()

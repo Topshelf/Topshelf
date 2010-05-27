@@ -20,13 +20,13 @@ namespace Topshelf.Shelving
     public class ShelfStatus :
         IDisposable
     {
-        private WcfUntypedChannel _shelfChannel = null;
+        private WcfUntypedChannelProxy _shelfChannel = null;
 
-        public Func<AppDomain, WcfUntypedChannel> ShelfChannelBuilder { private get; set; }
+		public Func<AppDomain, WcfUntypedChannelProxy> ShelfChannelBuilder { private get; set; }
         public string ShelfName { get; set; }
         public ObjectHandle ObjectHandle { get; set; }
         public Shelf RemoteShelf { get; set; }
-        public WcfUntypedChannel ShelfChannel
+		public WcfUntypedChannelProxy ShelfChannel
         {
             get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
         }
