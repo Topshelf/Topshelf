@@ -29,33 +29,48 @@ namespace Topshelf.Specs
         [Test]
         public void Identifies_changed_services_to_pipeline()
         {
-            var count = 0;
+            long count = 0;
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            using (var dm = new DirectoryMonitor("."))
+            using (var manualResetEvent = new ManualResetEvent(false))
             {
-                using (var myChannel = new WcfUntypedChannelAdapter(new SynchronousFiber(), WellknownAddresses.HostAddress, "topshelf.host"))
+                using (var dm = new DirectoryMonitor("."))
                 {
-                    dm.Start();
+                    using (var myChannel = new WcfUntypedChannelAdapter(new SynchronousFiber(), WellknownAddresses.HostAddress, "topshelf.host"))
+                    {
+                        dm.Start();
 
-                    myChannel.Subscribe(sc => sc.Consume<FileSystemChange>()
-                                                  .Using(fsc =>
-                                                      {
-                                                          Interlocked.Increment(ref count);
-                                                          Console.WriteLine(fsc.ServiceId);
-                                                      }));
+                        myChannel.Subscribe(sc => sc.Consume<FileSystemChange>()
+                                                      .Using(fsc =>
+                                                          {
+                                                              var localCount = Interlocked.Increment(ref count);
+                                                              Console.WriteLine(fsc.ServiceId);
+                                                              if (localCount % 2 == 0)
+                                                                manualResetEvent.Set();
+                                                          }));
 
-                    Console.WriteLine(baseDir);
-                    Thread.Sleep(1.Seconds());
-                    Console.WriteLine("-- Directories");
-                    Directory.CreateDirectory(Path.Combine(baseDir, "Service1"));
-                    Directory.CreateDirectory(Path.Combine(baseDir, "Service2"));
-                    Thread.Sleep(8.Seconds());
-                    Console.WriteLine("-- Files");
-                    File.AppendAllText(Path.Combine(baseDir, "Service1", "test.out"), "Testing stuff");
-                    File.AppendAllText(Path.Combine(baseDir, "Service2", "test.out"), "Testing stuff");
-                    File.AppendAllText(Path.Combine(baseDir, "Service1", "test2.out"), "Testing stuff");
-                    Thread.Sleep(8.Seconds());
-                    Console.WriteLine("-- Done");
+                        Console.WriteLine(baseDir);
+                        //Thread.Sleep(1.Seconds());
+                        Console.WriteLine("-- Directories");
+                        
+                        Directory.CreateDirectory(Path.Combine(baseDir, "Service1"));
+                        Directory.CreateDirectory(Path.Combine(baseDir, "Service2"));
+                        
+                        manualResetEvent.WaitOne(15.Seconds());
+                        count.ShouldEqual(2);
+                        manualResetEvent.Reset();
+                        
+                        Console.WriteLine("-- Files");
+                        
+                        File.AppendAllText(Path.Combine(baseDir, "Service1", "test.out"), "Testing stuff");
+                        File.AppendAllText(Path.Combine(baseDir, "Service2", "test.out"), "Testing stuff");
+                        File.AppendAllText(Path.Combine(baseDir, "Service1", "test2.out"), "Testing stuff");
+                        
+                        manualResetEvent.WaitOne(10.Seconds());
+                        
+                        Console.WriteLine("-- Done");
+                        
+                        count.ShouldEqual(4);
+                    }
                 }
             }
         }
@@ -65,10 +80,22 @@ namespace Topshelf.Specs
         {
             using (var sm = new ShelfMaker())
             {
+                var dwStarted = new ManualResetEvent(false);
+                var bobStarted = new ManualResetEvent(false);
+
+                sm.OnShelfStateChanged += (sender, args) =>
+                {
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Started)
+                        bobStarted.Set();
+
+                    if (args.ShelfName == "TopShelf.DirectoryWatcher" && args.CurrentShelfState == ShelfState.Started)
+                        dwStarted.Set();
+                };
                 sm.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
 
                 string bobDir = Path.Combine(".", "Services", "bob");
-                Thread.Sleep(5.Seconds());
+
+                dwStarted.WaitOne(20.Seconds());
 
                 Directory.CreateDirectory(Path.Combine(".", "Services"));
                 Directory.CreateDirectory(bobDir);
@@ -81,13 +108,13 @@ namespace Topshelf.Specs
 
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                Thread.Sleep(30.Seconds());
+                bobStarted.WaitOne(30.Seconds());
 
-                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                sm.GetState("bob").ShouldEqual(ShelfState.Started);
             }
         }
 
-        [TearDown]
+        [TearDown, SetUp]
         public void CleanUp()
         {
             if (Directory.Exists("Service1"))

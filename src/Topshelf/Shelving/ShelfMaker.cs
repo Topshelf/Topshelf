@@ -39,6 +39,7 @@ namespace Topshelf.Shelving
                 s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndInitService(m));
                 s.Consume<ServiceReady>().Using(m => MarkServiceReadyAndStart(m));
                 s.Consume<ShelfStopped>().Using(m => MarkShelfStopped(m));
+                s.Consume<ShelfStarted>().Using(m => MarkServiceStarted(m));
             });
         }
 
@@ -139,6 +140,20 @@ namespace Topshelf.Shelving
             shelfStatus.ShelfChannel.Send(new ReadyService());
 
             StateChanged(oldState, ShelfState.Readying, message.ShelfName);
+        }
+
+        private void MarkServiceStarted(ShelfStarted message)
+        {
+            if (!_shelves.ContainsKey(message.ShelfName))
+                throw new Exception("Shelf does not exist");
+
+            var shelfStatus = _shelves[message.ShelfName];
+
+            var oldState = shelfStatus.CurrentState;
+
+            shelfStatus.CurrentState = ShelfState.Started;
+
+            StateChanged(oldState, ShelfState.Started, message.ShelfName);
         }
 
         public delegate void ShelfStateChangedHandler(object sender, ShelfStateChangedEventArgs args);

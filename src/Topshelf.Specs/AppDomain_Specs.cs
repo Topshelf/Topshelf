@@ -75,14 +75,26 @@ namespace Topshelf.Specs
         {
             using (var sm = new ShelfMaker())
             {
+                var readyEvent = new ManualResetEvent(false);
+                var stopEvent = new ManualResetEvent(false);
+
+                sm.OnShelfStateChanged += (sender, args) =>
+                {
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
+                        readyEvent.Set();
+
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Stopped)
+                        stopEvent.Set();
+                };
+
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                Thread.Sleep(5.Seconds());
+                readyEvent.WaitOne(20.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Ready);
                 sm.StopShelf("bob");
 
-                Thread.Sleep(3.Seconds());
+                stopEvent.WaitOne(20.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
             }
