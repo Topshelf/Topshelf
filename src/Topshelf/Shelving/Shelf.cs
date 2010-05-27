@@ -58,13 +58,20 @@ namespace Topshelf.Shelving
             //TODO: issue is here
             var st = bs.GetType().GetInterfaces()[0].GetGenericArguments()[0];
             var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(st));
-            bs.FastInvoke("InitializeHostedService", cfg);
 
-            //start up the service controller instance
-            _controller = cfg.FastInvoke<object, IServiceController>("Create");
+            this.FastInvoke(new[] { st }, "InitializeAndCreateHostedService", bs, cfg);
 
             _hostChannel.Send(new ServiceReady());
         }
+
+        private void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
+            where T : class
+        {
+            bootstrapper.FastInvoke("InitializeHostedService", cfg);
+            //start up the service controller instance
+            _controller = cfg.FastInvoke<ServiceConfigurator<T>, IServiceController>("Create");
+        }
+
 
         public static Type FindBootstrapperImplementation(Type bootstrapper)
         {
@@ -93,9 +100,9 @@ namespace Topshelf.Shelving
 
         private static bool IsBootstrapperType(Type t)
         {
-            if(t.IsGenericType)
+            if (t.IsGenericType)
             {
-                return t.GetGenericTypeDefinition() == typeof (Bootstrapper<>);
+                return t.GetGenericTypeDefinition() == typeof(Bootstrapper<>);
             }
             return false;
         }

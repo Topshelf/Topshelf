@@ -36,6 +36,13 @@ namespace Topshelf.Specs
             DirectoryMonitor_Specs.CopyFileToDir("System.Reactive.dll", Path.Combine("Services", "bob"));
         }
 
+        [SetUp]
+        public void EnsureClean()
+        {
+            if (Directory.Exists("Services"))
+                Directory.Delete("Services", true);
+        }
+
         [TearDown]
         public void CleanUp()
         {
@@ -58,7 +65,7 @@ namespace Topshelf.Specs
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
                 manualResetEvent.WaitOne(20.Seconds());
-                
+
                 sm.GetState("bob").ShouldEqual(ShelfState.Ready);
             }
         }
