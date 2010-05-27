@@ -14,11 +14,14 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.Remoting;
+    using System.Threading;
     using Magnum.Channels;
+    using Magnum.Extensions;
     using Magnum.Fibers;
     using Messages;
 
@@ -40,7 +43,26 @@ namespace Topshelf.Shelving
                 s.Consume<ServiceReady>().Using(m => MarkServiceReadyAndStart(m));
                 s.Consume<ShelfStopped>().Using(m => MarkShelfStopped(m));
                 s.Consume<ShelfStarted>().Using(m => MarkServiceStarted(m));
+                s.Consume<FileSystemChange>().Using(m => ReloadShelf(m));
             });
+        }
+
+        private void ReloadShelf(FileSystemChange message)
+        {
+            if (_shelves.ContainsKey(message.ServiceId))
+            {
+                var shelf = _shelves[message.ServiceId];
+                var resetEvent = shelf.StopHandle = shelf.StopHandle ?? new ManualResetEvent(false);
+
+                StopShelf(message.ServiceId);
+
+                resetEvent.WaitOne(30.Seconds());
+                
+                AppDomain.Unload(shelf.AppDomain);
+                _shelves.Remove(message.ServiceId);
+            }
+
+            MakeShelf(message.ServiceId);
         }
 
         private void MarkShelfStopped(ShelfStopped message)
@@ -49,6 +71,9 @@ namespace Topshelf.Shelving
                 throw new Exception("Shelf does not exist");
 
             var shelfStatus = _shelves[message.ShelfName];
+
+            if (shelfStatus.StopHandle != null)
+                shelfStatus.StopHandle.Set();
 
             shelfStatus.CurrentState = ShelfState.Stopped;
         }
@@ -72,8 +97,17 @@ namespace Topshelf.Shelving
                 settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
             }
             AppDomain ad = AppDomain.CreateDomain(name, null, settings);
-            // should we query the service.config to look for any additional assemblies 
-            // or anything else before we start the system?
+            
+            // check the config for a bootstrapper if one isn't defined
+            if (bootstrapper == null && File.Exists(settings.ConfigurationFile))
+            {
+                var config = ShelfConfiguration.GetConfig(settings.ConfigurationFile);
+                if (config != null)
+                {
+                    bootstrapper = config.BootstrapperType;
+                }
+            }
+
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
             Type type = typeof(Shelf);
             ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[] { bootstrapper },
@@ -90,7 +124,7 @@ namespace Topshelf.Shelving
 
         public ShelfState GetState(string shelfName)
         {
-            return _shelves[shelfName].CurrentState;
+            return !_shelves.ContainsKey(shelfName) ? ShelfState.Unknown : _shelves[shelfName].CurrentState;
         }
 
         public void StartShelf(string shelfName)

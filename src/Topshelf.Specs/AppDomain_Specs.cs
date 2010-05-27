@@ -80,7 +80,7 @@ namespace Topshelf.Specs
 
                 sm.OnShelfStateChanged += (sender, args) =>
                 {
-                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Started)
                         readyEvent.Set();
 
                     if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Stopped)
@@ -89,12 +89,13 @@ namespace Topshelf.Specs
 
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                readyEvent.WaitOne(20.Seconds());
+                readyEvent.WaitOne(30.Seconds());
 
-                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                sm.GetState("bob").ShouldEqual(ShelfState.Started);
+
                 sm.StopShelf("bob");
 
-                stopEvent.WaitOne(20.Seconds());
+                stopEvent.WaitOne(30.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
             }

@@ -95,7 +95,9 @@ namespace Topshelf.Specs
 
                 string bobDir = Path.Combine(".", "Services", "bob");
 
-                dwStarted.WaitOne(20.Seconds());
+                dwStarted.WaitOne(30.Seconds());
+
+                sm.GetState("TopShelf.DirectoryWatcher").ShouldEqual(ShelfState.Started);
 
                 Directory.CreateDirectory(Path.Combine(".", "Services"));
                 Directory.CreateDirectory(bobDir);
@@ -105,8 +107,9 @@ namespace Topshelf.Specs
                 CopyFileToDir("Magnum.dll", bobDir);
                 CopyFileToDir("System.CoreEx.dll", bobDir);
                 CopyFileToDir("System.Reactive.dll", bobDir);
-
-                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+                File.Copy("service.config", Path.Combine(bobDir, "bob.config"));
+                
+                //sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
                 bobStarted.WaitOne(30.Seconds());
 

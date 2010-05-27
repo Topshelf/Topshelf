@@ -36,6 +36,10 @@ namespace Topshelf.FileSystem
 
         public void Start()
         {
+            // file system watcher will fail if directory isn't there, ensure it is
+            if (!Directory.Exists(_baseDir))
+                Directory.CreateDirectory(_baseDir);
+
             _fileSystemWatcher = new FileSystemWatcher(_baseDir)
                 {
                     IncludeSubdirectories = true,

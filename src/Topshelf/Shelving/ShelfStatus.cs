@@ -14,9 +14,11 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Runtime.Remoting;
+    using System.Threading;
     using Magnum.Channels;
 
-    public class ShelfStatus
+    public class ShelfStatus :
+        IDisposable
     {
         private WcfUntypedChannel _shelfChannel = null;
 
@@ -30,5 +32,12 @@ namespace Topshelf.Shelving
         }
         public AppDomain AppDomain { get; set; }
         public ShelfState CurrentState { get; set; }
+        public ManualResetEvent StopHandle { get; set; }
+        
+        public void Dispose()
+        {
+            if (StopHandle != null)
+                StopHandle.Dispose();
+        }
     }
 }
