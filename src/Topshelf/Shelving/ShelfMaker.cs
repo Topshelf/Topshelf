@@ -14,7 +14,6 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -23,6 +22,7 @@ namespace Topshelf.Shelving
     using Magnum.Channels;
     using Magnum.Extensions;
     using Magnum.Fibers;
+    using Magnum.Threading;
     using Messages;
 
     public class ShelfMaker :
@@ -30,12 +30,11 @@ namespace Topshelf.Shelving
     {
         private readonly WcfUntypedChannelHost _myChannelHost;
 		private readonly UntypedChannelAdapter _myChannel;
-        private readonly Dictionary<string, ShelfStatus> _shelves;
+        private readonly ReaderWriterLockedObject<Dictionary<string, ShelfHandle>> _shelves;
 
         public ShelfMaker()
         {
-            _shelves = new Dictionary<string, ShelfStatus>();
-
+            _shelves = new ReaderWriterLockedObject<Dictionary<string, ShelfHandle>>(new Dictionary<string, ShelfHandle>());
 
 			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
 			_myChannelHost = new WcfUntypedChannelHost(new SynchronousFiber(), _myChannel, WellknownAddresses.HostAddress, "topshelf.host");
@@ -50,19 +49,27 @@ namespace Topshelf.Shelving
             });
         }
 
+        private static ShelfHandle GetShelfStatus(Dictionary<string, ShelfHandle> dictionary, string key)
+        {
+            return dictionary.ContainsKey(key) ? dictionary[key] : null;
+        }
+
         private void ReloadShelf(FileSystemChange message)
         {
-            if (_shelves.ContainsKey(message.ServiceId))
+            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ServiceId));
+            if (shelf != null)
             {
-                var shelf = _shelves[message.ServiceId];
-                var resetEvent = shelf.StopHandle = shelf.StopHandle ?? new ManualResetEvent(false);
+                if (shelf.CurrentState == ShelfState.Started)
+                {
+                    var resetEvent = shelf.StopHandle = shelf.StopHandle ?? new ManualResetEvent(false);
 
-                StopShelf(message.ServiceId);
+                    StopShelf(message.ServiceId);
 
-                resetEvent.WaitOne(30.Seconds());
-                
+                    resetEvent.WaitOne(30.Seconds());
+                }
+
                 AppDomain.Unload(shelf.AppDomain);
-                _shelves.Remove(message.ServiceId);
+                _shelves.WriteLock(dict => dict.Remove(message.ServiceId));
             }
 
             MakeShelf(message.ServiceId);
@@ -70,15 +77,14 @@ namespace Topshelf.Shelving
 
         private void MarkShelfStopped(ShelfStopped message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            var shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            if (shelf == null)
                 throw new Exception("Shelf does not exist");
 
-            var shelfStatus = _shelves[message.ShelfName];
+            if (shelf.StopHandle != null)
+                shelf.StopHandle.Set();
 
-            if (shelfStatus.StopHandle != null)
-                shelfStatus.StopHandle.Set();
-
-            shelfStatus.CurrentState = ShelfState.Stopped;
+            shelf.CurrentState = ShelfState.Stopped;
         }
 
         public void MakeShelf(string name, params AssemblyName[] assemblies)
@@ -88,14 +94,15 @@ namespace Topshelf.Shelving
 
         public void MakeShelf(string name, Type bootstrapper, params AssemblyName[] assemblies)
         {
-            if (_shelves.ContainsKey(name))
+            var shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, name));
+            if (shelf != null)
                 throw new ArgumentException("Shelf already exists, cannot create a new one named: " + name);
 
             AppDomainSetup settings = AppDomain.CurrentDomain.SetupInformation;
             settings.ShadowCopyFiles = "true";
             if (name != "TopShelf.DirectoryWatcher")
             {
-                // uggh, shouldn't have to do this... revisit to fixy
+                // uggh, don't like a specific exemption but I don't have a good solution to do otherwise yet
                 settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
                 settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
             }
@@ -116,59 +123,60 @@ namespace Topshelf.Shelving
             ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[] { bootstrapper },
                                                null, null);
 
-            _shelves.Add(name, new ShelfStatus
+            _shelves.WriteLock(dict => dict.Add(name, new ShelfHandle
                 {
                     AppDomain = ad,
                     ObjectHandle = s,
                     ShelfChannelBuilder = appDomain => new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
                     ShelfName = name
-                });
+                }));
         }
 
         public ShelfState GetState(string shelfName)
         {
-            return !_shelves.ContainsKey(shelfName) ? ShelfState.Unknown : _shelves[shelfName].CurrentState;
+            var shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
+            return shelf == null ? ShelfState.Unknown : shelf.CurrentState;
         }
 
         public void StartShelf(string shelfName)
         {
-            if (!_shelves.ContainsKey(shelfName))
+            var shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
+            if (shelf == null)
                 throw new Exception("Shelf does not exist");
 
-            _shelves[shelfName].ShelfChannel.Send(new StartService());
+            shelf.ShelfChannel.Send(new StartService());
         }
 
         public void StopShelf(string shelfName)
         {
-            if (!_shelves.ContainsKey(shelfName))
+            var shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
+            if (shelf == null)
                 throw new Exception("Shelf does not exist");
 
-            _shelves[shelfName].ShelfChannel.Send(new StopService());
+            shelf.ShelfChannel.Send(new StopService());
         }
 
         private void MarkServiceReadyAndStart(ServiceReady message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            var shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            if (shelf == null)
                 throw new Exception("Shelf does not exist");
 
-            var shelfStatus = _shelves[message.ShelfName];
+            var oldState = shelf.CurrentState;
 
-            var oldState = shelfStatus.CurrentState;
-
-            shelfStatus.CurrentState = ShelfState.Ready;
+            shelf.CurrentState = ShelfState.Ready;
 
             // if auto start is setup, send start
-            shelfStatus.ShelfChannel.Send(new StartService());
+            shelf.ShelfChannel.Send(new StartService());
 
             StateChanged(oldState, ShelfState.Ready, message.ShelfName);
         }
 
         private void MarkShelfReadyAndInitService(ShelfReady message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            var shelfStatus = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            if (shelfStatus == null)
                 throw new Exception("Shelf does not exist");
-
-            var shelfStatus = _shelves[message.ShelfName];
 
             var oldState = shelfStatus.CurrentState;
 
@@ -181,10 +189,9 @@ namespace Topshelf.Shelving
 
         private void MarkServiceStarted(ShelfStarted message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            var shelfStatus = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            if (shelfStatus == null)
                 throw new Exception("Shelf does not exist");
-
-            var shelfStatus = _shelves[message.ShelfName];
 
             var oldState = shelfStatus.CurrentState;
 
@@ -213,7 +220,7 @@ namespace Topshelf.Shelving
                 _myChannelHost.Dispose();
             }
 
-            _shelves.Values.ToList().ForEach(x => AppDomain.Unload(x.AppDomain));
+            _shelves.WriteLock(dict => dict.Values.ToList().ForEach(x => AppDomain.Unload(x.AppDomain)));
         }
     }
 }

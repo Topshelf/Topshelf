@@ -27,13 +27,14 @@ namespace Topshelf.Specs
         public void Setup()
         {
             Directory.CreateDirectory("Services");
-            Directory.CreateDirectory(Path.Combine("Services", "bob"));
+            var bobPath = Path.Combine("Services", "bob");
+            Directory.CreateDirectory(bobPath);
 
-            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", Path.Combine("Services", "bob"));
-            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", Path.Combine("Services", "bob"));
-            DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", Path.Combine("Services", "bob"));
-            DirectoryMonitor_Specs.CopyFileToDir("System.CoreEx.dll", Path.Combine("Services", "bob"));
-            DirectoryMonitor_Specs.CopyFileToDir("System.Reactive.dll", Path.Combine("Services", "bob"));
+            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("System.CoreEx.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("System.Reactive.dll", bobPath);
         }
 
         [SetUp]

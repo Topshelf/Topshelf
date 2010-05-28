@@ -13,25 +13,33 @@
 namespace Topshelf.Shelving
 {
     using System;
+    using System.Diagnostics;
     using System.Runtime.Remoting;
     using System.Threading;
     using Magnum.Channels;
 
-    public class ShelfStatus :
+    [DebuggerDisplay("{ShelfName}: {CurrentState}")]
+    public class ShelfHandle :
         IDisposable
     {
         private WcfUntypedChannelProxy _shelfChannel = null;
-
-		public Func<AppDomain, WcfUntypedChannelProxy> ShelfChannelBuilder { private get; set; }
-        public string ShelfName { get; set; }
-        public ObjectHandle ObjectHandle { get; set; }
-        public Shelf RemoteShelf { get; set; }
-		public WcfUntypedChannelProxy ShelfChannel
+        public WcfUntypedChannelProxy ShelfChannel
         {
             get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
         }
-        public AppDomain AppDomain { get; set; }
+		public Func<AppDomain, WcfUntypedChannelProxy> ShelfChannelBuilder { private get; set; }
+
+        // Do we need to hold onto this handle at all?
+        internal ObjectHandle ObjectHandle { get; set; }
+        
+        public string ShelfName { get; set; }
+		public AppDomain AppDomain { get; set; }
         public ShelfState CurrentState { get; set; }
+
+        /// <summary>
+        /// Used for shutting down
+        /// </summary>
+        // Is there a better place to keep this? Something inside the ShelfMaker?
         public ManualResetEvent StopHandle { get; set; }
         
         public void Dispose()
