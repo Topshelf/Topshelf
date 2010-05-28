@@ -54,19 +54,20 @@ namespace Topshelf.Specs
         {
             using (var sm = new ShelfMaker())
             {
-                var manualResetEvent = new ManualResetEvent(false);
-
-                sm.OnShelfStateChanged += (sender, args) =>
+                using (var manualResetEvent = new ManualResetEvent(false))
                 {
-                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
-                        manualResetEvent.Set();
-                };
+                    sm.OnShelfStateChanged += (sender, args) =>
+                        {
+                            if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
+                                manualResetEvent.Set();
+                        };
 
-                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+                    sm.MakeShelf("bob", typeof (AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                manualResetEvent.WaitOne(20.Seconds());
+                    manualResetEvent.WaitOne(20.Seconds());
 
-                sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                    sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                }
             }
         }
 
@@ -98,6 +99,9 @@ namespace Topshelf.Specs
                 stopEvent.WaitOne(30.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
+
+                readyEvent.Dispose();
+                stopEvent.Dispose();
             }
         }
     }
