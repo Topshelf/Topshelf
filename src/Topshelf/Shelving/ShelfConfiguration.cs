@@ -25,7 +25,9 @@ namespace Topshelf.Shelving
 
         public static ShelfConfiguration GetConfig(string fileName)
         {
-            return ConfigurationManager.OpenExeConfiguration(fileName).GetSection("ShelfConfiguration") as ShelfConfiguration;
+            var exeConfig = ConfigurationManager.OpenExeConfiguration(fileName);
+            var section = exeConfig.GetSection("ShelfConfiguration");
+            return section as ShelfConfiguration;
         }
 
         [ConfigurationProperty("Bootstrapper", IsRequired = true)]

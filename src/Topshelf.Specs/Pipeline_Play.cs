@@ -17,12 +17,12 @@ namespace Topshelf.Specs
             var ss = pipe.NewSubscriptionScope();
 
             ss.Subscribe<ServiceMessage>(o => Console.WriteLine("LOG: {0}", o));
-            ss.Subscribe<StartService>(s => Console.WriteLine(s.ServiceId));
-            ss.Subscribe<StopService>(s => Console.WriteLine(s.ServiceId));
-            ss.Subscribe<PauseService>(s => Console.WriteLine(s.ServiceId));
-            ss.Subscribe<ContinueService>(s => Console.WriteLine(s.ServiceId));
+            ss.Subscribe<StartService>(s => Console.WriteLine(s.ShelfName));
+            ss.Subscribe<StopService>(s => Console.WriteLine(s.ShelfName));
+            ss.Subscribe<PauseService>(s => Console.WriteLine(s.ShelfName));
+            ss.Subscribe<ContinueService>(s => Console.WriteLine(s.ShelfName));
 
-            pipe.Send(new StartService { ServiceId = "Service1" });
+            pipe.Send(new StartService { ShelfName = "Service1" });
 
             new TracePipeVisitor().Trace(pipe);
         }
@@ -35,7 +35,7 @@ namespace Topshelf.Specs
 
         public void StartService(StartService cmd)
         {
-            _controllers[cmd.ServiceId].Start();
+            _controllers[cmd.ShelfName].Start();
         }
     }
 

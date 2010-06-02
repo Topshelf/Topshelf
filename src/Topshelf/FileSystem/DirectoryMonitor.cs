@@ -54,7 +54,7 @@ namespace Topshelf.FileSystem
                 .Select(e => e.Distinct())
                 .Subscribe(e =>
                 {
-                    e.ToList().ForEach(str => _hostChannel.Send(new FileSystemChange {ServiceId = str}));
+                    e.ToList().ForEach(str => _hostChannel.Send(new FileSystemChange {ShelfName = str}));
                 });
         }
 
