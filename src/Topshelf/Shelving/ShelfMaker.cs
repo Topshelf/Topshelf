@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2008 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -14,7 +14,6 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -28,17 +27,18 @@ namespace Topshelf.Shelving
     public class ShelfMaker :
         IDisposable
     {
-        private readonly WcfUntypedChannelHost _myChannelHost;
-		private readonly UntypedChannelAdapter _myChannel;
-        private readonly Dictionary<string, ShelfStatus> _shelves;
+        readonly WcfUntypedChannelHost _myChannelHost;
+        readonly UntypedChannelAdapter _myChannel;
+        readonly Dictionary<string, ShelfInformation> _shelves;
 
         public ShelfMaker()
         {
-            _shelves = new Dictionary<string, ShelfStatus>();
+            _shelves = new Dictionary<string, ShelfInformation>();
 
 
-			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
-			_myChannelHost = new WcfUntypedChannelHost(new SynchronousFiber(), _myChannel, WellknownAddresses.HostAddress, "topshelf.host");
+            _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+            _myChannelHost = new WcfUntypedChannelHost(new SynchronousFiber(), _myChannel, WellknownAddresses.HostAddress, "topshelf.host");
+
 
             _myChannel.Subscribe(s =>
             {
@@ -50,17 +50,17 @@ namespace Topshelf.Shelving
             });
         }
 
-        private void ReloadShelf(FileSystemChange message)
+        void ReloadShelf(FileSystemChange message)
         {
             if (_shelves.ContainsKey(message.ServiceId))
             {
-                var shelf = _shelves[message.ServiceId];
-                var resetEvent = shelf.StopHandle = shelf.StopHandle ?? new ManualResetEvent(false);
+                ShelfInformation shelf = _shelves[message.ServiceId];
+                ManualResetEvent resetEvent = shelf.StopHandle = shelf.StopHandle ?? new ManualResetEvent(false);
 
                 StopShelf(message.ServiceId);
 
                 resetEvent.WaitOne(30.Seconds());
-                
+
                 AppDomain.Unload(shelf.AppDomain);
                 _shelves.Remove(message.ServiceId);
             }
@@ -68,12 +68,12 @@ namespace Topshelf.Shelving
             MakeShelf(message.ServiceId);
         }
 
-        private void MarkShelfStopped(ShelfStopped message)
+        void MarkShelfStopped(ShelfStopped message)
         {
             if (!_shelves.ContainsKey(message.ShelfName))
                 throw new Exception("Shelf does not exist");
 
-            var shelfStatus = _shelves[message.ShelfName];
+            ShelfInformation shelfStatus = _shelves[message.ShelfName];
 
             if (shelfStatus.StopHandle != null)
                 shelfStatus.StopHandle.Set();
@@ -89,40 +89,53 @@ namespace Topshelf.Shelving
         public void MakeShelf(string name, Type bootstrapper, params AssemblyName[] assemblies)
         {
             if (_shelves.ContainsKey(name))
-                throw new ArgumentException("Shelf already exists, cannot create a new one named: " + name);
+                throw new ArgumentException("Shelf already exists, cannot create a new one named: '{0}'".FormatWith(name));
+            //TODO: Is this an exception? or should we just exit and log it?
 
-            AppDomainSetup settings = AppDomain.CurrentDomain.SetupInformation;
-            settings.ShadowCopyFiles = "true";
-            if (name != "TopShelf.DirectoryWatcher")
-            {
-                // uggh, shouldn't have to do this... revisit to fixy
-                settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
-                settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
-            }
-            AppDomain ad = AppDomain.CreateDomain(name, null, settings);
-            
+            var settings = GetAppDomainSettings(name);
+            var ad = AppDomain.CreateDomain(name, null, settings);
+
             // check the config for a bootstrapper if one isn't defined
+            
             if (bootstrapper == null && File.Exists(settings.ConfigurationFile))
             {
-                var config = ShelfConfiguration.GetConfig(settings.ConfigurationFile);
+                ShelfConfiguration config = ShelfConfiguration.GetConfig(settings.ConfigurationFile);
                 if (config != null)
                 {
                     bootstrapper = config.BootstrapperType;
                 }
+                else
+                {
+                    throw new Exception("Couldn't find a bootstrapper");
+                }
             }
 
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
-            Type type = typeof(Shelf);
-            ObjectHandle s = ad.CreateInstance(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[] { bootstrapper },
-                                               null, null);
+            Type shelfType = typeof (Shelf);
+            ObjectHandle shelfHandle = ad.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null, new object[] {bootstrapper},
+                                                         null, null);
 
-            _shelves.Add(name, new ShelfStatus
-                {
-                    AppDomain = ad,
-                    ObjectHandle = s,
-                    ShelfChannelBuilder = appDomain => new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
-                    ShelfName = name
-                });
+            _shelves.Add(name, new ShelfInformation
+                                   {
+                                       AppDomain = ad,
+                                       ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
+                                       ShelfChannelBuilder = appDomain => new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
+                                       ShelfName = name
+                                   });
+        }
+
+        static AppDomainSetup GetAppDomainSettings(string name)
+        {
+            var settings = AppDomain.CurrentDomain.SetupInformation;
+            settings.ShadowCopyFiles = "true";
+
+            //TODO: Is this better?
+            if (name == "TopShelf.DirectoryWatcher") return settings;
+
+            
+            settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
+            settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
+            return settings;
         }
 
         public ShelfState GetState(string shelfName)
@@ -133,27 +146,27 @@ namespace Topshelf.Shelving
         public void StartShelf(string shelfName)
         {
             if (!_shelves.ContainsKey(shelfName))
-                throw new Exception("Shelf does not exist");
+                throw new Exception("Shelf does not exist"); //TODO: Is this really an exception?
 
             _shelves[shelfName].ShelfChannel.Send(new StartService());
         }
 
         public void StopShelf(string shelfName)
         {
-            if (!_shelves.ContainsKey(shelfName))
+            if (!_shelves.ContainsKey(shelfName)) //TODO: Is this really an exception?
                 throw new Exception("Shelf does not exist");
 
             _shelves[shelfName].ShelfChannel.Send(new StopService());
         }
 
-        private void MarkServiceReadyAndStart(ServiceReady message)
+        void MarkServiceReadyAndStart(ServiceReady message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            if (!_shelves.ContainsKey(message.ShelfName)) //TODO: Is this really an exception?
                 throw new Exception("Shelf does not exist");
 
-            var shelfStatus = _shelves[message.ShelfName];
+            ShelfInformation shelfStatus = _shelves[message.ShelfName];
 
-            var oldState = shelfStatus.CurrentState;
+            ShelfState oldState = shelfStatus.CurrentState;
 
             shelfStatus.CurrentState = ShelfState.Ready;
 
@@ -163,14 +176,14 @@ namespace Topshelf.Shelving
             StateChanged(oldState, ShelfState.Ready, message.ShelfName);
         }
 
-        private void MarkShelfReadyAndInitService(ShelfReady message)
+        void MarkShelfReadyAndInitService(ShelfReady message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            if (!_shelves.ContainsKey(message.ShelfName)) //TODO: Is this really an exception?
                 throw new Exception("Shelf does not exist");
 
-            var shelfStatus = _shelves[message.ShelfName];
+            ShelfInformation shelfStatus = _shelves[message.ShelfName];
 
-            var oldState = shelfStatus.CurrentState;
+            ShelfState oldState = shelfStatus.CurrentState;
 
             shelfStatus.CurrentState = ShelfState.Readying;
 
@@ -179,14 +192,14 @@ namespace Topshelf.Shelving
             StateChanged(oldState, ShelfState.Readying, message.ShelfName);
         }
 
-        private void MarkServiceStarted(ShelfStarted message)
+        void MarkServiceStarted(ShelfStarted message)
         {
-            if (!_shelves.ContainsKey(message.ShelfName))
+            if (!_shelves.ContainsKey(message.ShelfName)) //TODO: Is this really an exception?
                 throw new Exception("Shelf does not exist");
 
-            var shelfStatus = _shelves[message.ShelfName];
+            ShelfInformation shelfStatus = _shelves[message.ShelfName];
 
-            var oldState = shelfStatus.CurrentState;
+            ShelfState oldState = shelfStatus.CurrentState;
 
             shelfStatus.CurrentState = ShelfState.Started;
 
@@ -197,12 +210,12 @@ namespace Topshelf.Shelving
 
         public event ShelfStateChangedHandler OnShelfStateChanged;
 
-        private void StateChanged(ShelfState oldSate, ShelfState newState, string shelfName)
+        void StateChanged(ShelfState oldSate, ShelfState newState, string shelfName)
         {
-            var handler = OnShelfStateChanged;
+            ShelfStateChangedHandler handler = OnShelfStateChanged;
             if (handler != null)
             {
-                handler(this, new ShelfStateChangedEventArgs { PreviousShelfState = oldSate, CurrentShelfState = newState, ShelfName = shelfName });
+                handler(this, new ShelfStateChangedEventArgs {PreviousShelfState = oldSate, CurrentShelfState = newState, ShelfName = shelfName});
             }
         }
 

@@ -17,7 +17,7 @@ namespace Topshelf.Shelving
     using System.Threading;
     using Magnum.Channels;
 
-    public class ShelfStatus :
+    public class ShelfInformation :
         IDisposable
     {
         private WcfUntypedChannelProxy _shelfChannel = null;
