@@ -13,6 +13,7 @@
 namespace Topshelf.Specs
 {
     using NUnit.Framework;
+    using Topshelf.Configuration;
 
     [TestFixture]
     public class ArgParsing_Specs
@@ -30,7 +31,7 @@ namespace Topshelf.Specs
         {
             TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
             a.Instance.ShouldEqual("bob");
-            a.Action.ShouldEqual(ServiceActions.Install);
+            a.ActionName.ShouldEqual(ServiceActionNames.Install);
         }
     }
 }

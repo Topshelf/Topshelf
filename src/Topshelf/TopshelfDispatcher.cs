@@ -26,13 +26,13 @@ namespace Topshelf
         {
             //find the command by the args 'Command'
             var run = new RunCommand(config.Coordinator, config.WinServiceSettings.ServiceName);
-            Command command = new List<Command>
+            var command = new List<Command>
                                   {
                                       run,
                                       new InstallService(config.WinServiceSettings),
                                       new UninstallService(config.WinServiceSettings)
                                   }
-                .Where(x => x.Name == args.Action)
+                .Where(x => x.Name == args.ActionName)
                 .DefaultIfEmpty(run)
                 .SingleOrDefault();
 

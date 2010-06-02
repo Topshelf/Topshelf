@@ -17,7 +17,6 @@ namespace Topshelf
     using Configuration;
     using log4net;
     using Magnum.Pipeline;
-    using Messages;
 
     /// <summary>
     /// Entry point into the Host infrastructure
@@ -47,7 +46,7 @@ namespace Topshelf
             if (args.Length > 0)
                 _log.DebugFormat("Arguments: {0}", args);
 
-            TopshelfArguments a = TopshelfArgumentParser.Parse(args);
+            var a = TopshelfArgumentParser.Parse(args);
             TopshelfDispatcher.Dispatch(configuration, a);
         }
     }
