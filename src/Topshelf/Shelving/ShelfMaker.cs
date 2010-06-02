@@ -19,6 +19,7 @@ namespace Topshelf.Shelving
     using System.Reflection;
     using System.Runtime.Remoting;
     using System.Threading;
+    using log4net;
     using Magnum.Channels;
     using Magnum.Extensions;
     using Magnum.Fibers;
@@ -31,6 +32,7 @@ namespace Topshelf.Shelving
         readonly WcfUntypedChannelHost _myChannelHost;
         readonly UntypedChannelAdapter _myChannel;
         readonly ReaderWriterLockedObject<Dictionary<string, ShelfHandle>> _shelves;
+        static readonly ILog _log = LogManager.GetLogger(typeof (ShelfMaker));
 
         public ShelfMaker()
         {
@@ -96,7 +98,11 @@ namespace Topshelf.Shelving
         {
             ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, name));
             if (shelf != null)
-                throw new ArgumentException("Shelf already exists, cannot create a new one named: " + name);
+            {
+                _log.WarnFormat("Shelf '{0}' aleady exists. Cannot create.", name);
+                throw new ArgumentException("Shelf already exists, cannot create a new one named: '{0}'".FormatWith(name));
+            }
+                
 
             AppDomainSetup settings = GetAppDomainSettings(name);
             
@@ -112,7 +118,8 @@ namespace Topshelf.Shelving
                 }
                 else
                 {
-                    throw new Exception("Couldn't find a bootstrapper");
+                    _log.ErrorFormat("Couldn't find a bootstrapper for shelf '{0}'", name);
+                    throw new Exception("Couldn't find a bootstrapper for shelf '{0}'".FormatWith(name));
                 }
             }
 

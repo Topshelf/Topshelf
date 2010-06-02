@@ -81,8 +81,7 @@ namespace Topshelf.Shelving
                 if (bootstrapper.GetInterfaces().Where(IsBootstrapperType).Count() > 0)
                     return bootstrapper;
 
-                throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
-                                                    + ", is not a subclass of Bootstrapper.");
+                throw new InvalidOperationException("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
             }
 
             var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
