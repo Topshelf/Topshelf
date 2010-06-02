@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
-    using System;
     using Configuration.Dsl;
 
     public interface Bootstrapper<T>

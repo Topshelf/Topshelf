@@ -92,15 +92,15 @@ namespace Topshelf.Specs
                     if (args.ShelfName == "TopShelf.DirectoryWatcher" && args.CurrentShelfState == ShelfState.Started)
                         dwStarted.Set();
                 };
+
                 sm.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
-
-                string bobDir = Path.Combine(".", "Services", "bob");
-
                 dwStarted.WaitOne(30.Seconds());
-
                 sm.GetState("TopShelf.DirectoryWatcher").ShouldEqual(ShelfState.Started);
 
-                Directory.CreateDirectory(Path.Combine(".", "Services"));
+                //TODO: should this be in setup?
+                var srvDir = Path.Combine(".", "Services");
+                Directory.CreateDirectory(srvDir);
+                string bobDir = Path.Combine(srvDir, "bob");
                 Directory.CreateDirectory(bobDir);
 
                 CopyFileToDir("TopShelf.dll", bobDir);
@@ -109,8 +109,9 @@ namespace Topshelf.Specs
                 CopyFileToDir("System.CoreEx.dll", bobDir);
                 CopyFileToDir("System.Reactive.dll", bobDir);
                 File.Copy("service.config", Path.Combine(bobDir, "bob.config"));
-                
-                //sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+                //TODO: end 'setup'
+
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
                 bobStarted.WaitOne(30.Seconds());
 

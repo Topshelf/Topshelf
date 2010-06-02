@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-//  
+// Copyright 2007-2010 The Apache Software Foundation.
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -20,20 +20,21 @@ namespace Topshelf.Shelving
     public class ShelfInformation :
         IDisposable
     {
-        private WcfUntypedChannelProxy _shelfChannel = null;
+        WcfUntypedChannelProxy _shelfChannel;
 
-		public Func<AppDomain, WcfUntypedChannelProxy> ShelfChannelBuilder { private get; set; }
-        public string ShelfName { get; set; }
-        public ObjectHandle ObjectHandle { get; set; }
-        public Shelf RemoteShelf { get; set; }
-		public WcfUntypedChannelProxy ShelfChannel
+        public WcfUntypedChannelProxy ShelfChannel
         {
             get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
         }
+
+        public Func<AppDomain, WcfUntypedChannelProxy> ShelfChannelBuilder { private get; set; }
+        public string ShelfName { get; set; }
+        public ObjectHandle ObjectHandle { get; set; }
+        public Shelf RemoteShelf { get; set; }
         public AppDomain AppDomain { get; set; }
         public ShelfState CurrentState { get; set; }
         public ManualResetEvent StopHandle { get; set; }
-        
+
         public void Dispose()
         {
             if (StopHandle != null)
