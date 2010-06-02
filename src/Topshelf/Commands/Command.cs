@@ -12,9 +12,11 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Commands
 {
+    using Configuration;
+
     public interface Command
     {
-        ServiceActions Name { get; }
+        ServiceActionNames Name { get; }
         void Execute();
     }
 }

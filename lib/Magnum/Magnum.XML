@@ -212,13 +212,19 @@
             Context for binding to a model
             </summary>
         </member>
-        <member name="T:Magnum.Channels.WcfChannelHost`1">
+        <member name="T:Magnum.Channels.InstanceChannelProvider`2">
             <summary>
-            Receives messages from a named pipe via WCF and forwards it to the output
-            channel. Message serialization is handled entirely by WCF and therefore
-            requires that classes are appropriately decorated.
+            Creates an instance of a class and returns the channel from the class
             </summary>
-            <typeparam name="T"></typeparam>
+            <typeparam name="TConsumer">The consumer type</typeparam>
+            <typeparam name="TChannel">The channel type</typeparam>
+        </member>
+        <member name="T:Magnum.Channels.SelectiveConsumerChannel`1">
+            <summary>
+            A channel that accepts a message and enqueues the consumer method via the
+            specified Fiber
+            </summary>
+            <typeparam name="T">The type of message delivered on the channel</typeparam>
         </member>
         <member name="T:Magnum.Channels.Channel`1">
             <summary>
@@ -231,6 +237,26 @@
             Send a message to the channel
             </summary>
             <param name="message">The message to send</param>
+        </member>
+        <member name="M:Magnum.Channels.SelectiveConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.SelectiveConsumer{`0})">
+            <summary>
+            Constructs a channel
+            </summary>
+            <param name="fiber">The queue where consumer actions should be enqueued</param>
+            <param name="selectiveConsumer">The method to call when a message is sent to the channel</param>
+        </member>
+        <member name="T:Magnum.Graphing.GraphProvider">
+            <summary>
+            A provider of graph data can return vertices and edges
+            </summary>
+        </member>
+        <member name="T:Magnum.Channels.WcfChannelHost`1">
+            <summary>
+            Receives messages from a named pipe via WCF and forwards it to the output
+            channel. Message serialization is handled entirely by WCF and therefore
+            requires that classes are appropriately decorated.
+            </summary>
+            <typeparam name="T"></typeparam>
         </member>
         <member name="T:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1">
             <summary>
@@ -403,32 +429,28 @@
             <param name = "path"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.Enqueue(System.Action)">
+        <member name="M:Magnum.Fibers.Fiber.Add(System.Action)">
             <summary>
             Enqueue a single action to the queue
             </summary>
             <param name="action"></param>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.EnqueueMany(System.Action[])">
+        <member name="M:Magnum.Fibers.Fiber.AddMany(System.Action[])">
             <summary>
             Enqueue a series of actions to the queue
             </summary>
             <param name="actions"></param>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.ExecuteAll(System.TimeSpan)">
+        <member name="M:Magnum.Fibers.Fiber.Shutdown(System.TimeSpan)">
             <summary>
-            Run all remaining actions and return when complete (or when the timeout expires)
+            Runs all remaining actions, waiting until all actions have been executed or until the
+            timeout expires. If the timeout expires, an exception is thrown.
             </summary>
             <param name="timeout">The time to wait for all pending actions to be executed before throwing an exception</param>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.StopAcceptingActions">
+        <member name="M:Magnum.Fibers.Fiber.Stop">
             <summary>
-            Disable the action queue, discarding any remaining items
-            </summary>
-        </member>
-        <member name="M:Magnum.Fibers.Fiber.DiscardAllActions">
-            <summary>
-            Discard any pending actions from the queue
+            Stops the fiber, discards any remaining actions, and prevents new actions from being added
             </summary>
         </member>
         <member name="T:Magnum.Fibers.SynchronousFiber">
@@ -486,20 +508,6 @@
             </summary>
             <param name="fiber">The queue where consumer actions should be enqueued</param>
             <param name="consumer">The method to call when a message is sent to the channel</param>
-        </member>
-        <member name="T:Magnum.Channels.SelectiveConsumerChannel`1">
-            <summary>
-            A channel that accepts a message and enqueues the consumer method via the
-            specified Fiber
-            </summary>
-            <typeparam name="T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.SelectiveConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.SelectiveConsumer{`0})">
-            <summary>
-            Constructs a channel
-            </summary>
-            <param name="fiber">The queue where consumer actions should be enqueued</param>
-            <param name="selectiveConsumer">The method to call when a message is sent to the channel</param>
         </member>
         <member name="T:Magnum.Channels.Consumer`1">
             <summary>
@@ -660,7 +668,7 @@
             <param name = "output">The method to call when a message is sent to the channel</param>
             <param name = "filter">The filter to determine if the message can be consumed</param>
         </member>
-        <member name="T:Magnum.Channels.PublishSubscribeChannel`1">
+        <member name="T:Magnum.Channels.ChannelRouter`1">
             <summary>
               Publishes a messages to multiple channels
             </summary>
@@ -12190,6 +12198,19 @@
             </summary>
             <param name="data">The byte array</param>
             <returns>The UTF-8 string</returns>
+        </member>
+        <member name="T:Magnum.FileSystem.FileSystemEventProducer">
+            <summary>
+            Wraps a FileSystemWatcher as an event producer that sends file system events to the
+            specified channel
+            </summary>
+        </member>
+        <member name="M:Magnum.FileSystem.FileSystemEventProducer.#ctor(System.String,Magnum.Channels.UntypedChannel)">
+            <summary>
+            Creates a FileSystemEventProducer
+            </summary>
+            <param name="directory">The directory to watch</param>
+            <param name="channel">The channel where events should be sent</param>
         </member>
         <member name="T:Magnum.Logging.LoggerFacade">
             <summary>

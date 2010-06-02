@@ -23,7 +23,7 @@ namespace Topshelf.FileSystem
     {
         public void InitializeHostedService(IServiceConfigurator<DirectoryMonitor> cfg)
         {
-            var baseDir = ConfigurationManager.AppSettings["MonitorDirectory"] ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
+            string baseDir = ConfigurationManager.AppSettings["MonitorDirectory"] ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
             cfg.HowToBuildService(serviceBuilder => new DirectoryMonitor(baseDir));
 
             cfg.WhenStarted(dm => dm.Start());

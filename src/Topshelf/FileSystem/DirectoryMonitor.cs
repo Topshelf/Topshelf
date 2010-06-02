@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-//  
+// Copyright 2007-2010 The Apache Software Foundation.
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -24,14 +24,14 @@ namespace Topshelf.FileSystem
     public class DirectoryMonitor :
         IDisposable
     {
-        private FileSystemWatcher _fileSystemWatcher;
-        private readonly string _baseDir;
-        private readonly WcfUntypedChannelProxy _hostChannel;
+        FileSystemWatcher _fileSystemWatcher;
+        readonly string _baseDir;
+        readonly WcfUntypedChannelProxy _hostChannel;
 
         public DirectoryMonitor(string directory)
         {
             _baseDir = directory;
-			_hostChannel = new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+            _hostChannel = new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
         }
 
         public void Start()
@@ -41,10 +41,10 @@ namespace Topshelf.FileSystem
                 Directory.CreateDirectory(_baseDir);
 
             _fileSystemWatcher = new FileSystemWatcher(_baseDir)
-                {
-                    IncludeSubdirectories = true,
-                    EnableRaisingEvents = true, 
-                };
+                                     {
+                                         IncludeSubdirectories = true,
+                                         EnableRaisingEvents = true,
+                                     };
 
             _fileSystemWatcher
                 .GetEvents()
@@ -53,9 +53,9 @@ namespace Topshelf.FileSystem
                 .Where(e => e.Count() > 0)
                 .Select(e => e.Distinct())
                 .Subscribe(e =>
-                    {
-                        e.ToList().ForEach(str => _hostChannel.Send(new FileSystemChange { ServiceId = str }));
-                    });
+                {
+                    e.ToList().ForEach(str => _hostChannel.Send(new FileSystemChange {ServiceId = str}));
+                });
         }
 
         public void Stop()
@@ -68,9 +68,9 @@ namespace Topshelf.FileSystem
         }
 
         /// <summary>
-        /// Normalize the source of the event; we only care about the directory in question
+        ///   Normalize the source of the event; we only care about the directory in question
         /// </summary>
-        private string GetChangedDirectory(string eventItem)
+        string GetChangedDirectory(string eventItem)
         {
             return eventItem.Substring(_baseDir.Length).Split(Path.DirectorySeparatorChar).Where(x => x.Length > 0).FirstOrDefault();
         }
@@ -86,10 +86,10 @@ namespace Topshelf.FileSystem
     {
         public static IObservable<IEvent<FileSystemEventArgs>> GetEvents(this FileSystemWatcher fileSystemWatcher)
         {
-            var changed = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Changed");
-            var created = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Created");
-            var deleted = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Deleted");
-            var renamed = Observable.FromEvent<RenamedEventArgs>(fileSystemWatcher, "Renamed").Cast<IEvent<FileSystemEventArgs>>();
+            IObservable<IEvent<FileSystemEventArgs>> changed = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Changed");
+            IObservable<IEvent<FileSystemEventArgs>> created = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Created");
+            IObservable<IEvent<FileSystemEventArgs>> deleted = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Deleted");
+            IObservable<IEvent<FileSystemEventArgs>> renamed = Observable.FromEvent<RenamedEventArgs>(fileSystemWatcher, "Renamed").Cast<IEvent<FileSystemEventArgs>>();
 
             return Observable.Merge(changed, created, deleted, renamed);
         }
