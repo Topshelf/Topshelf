@@ -4,699 +4,106 @@
         <name>Magnum</name>
     </assembly>
     <members>
-        <member name="T:Magnum.Channels.Channel">
+        <member name="M:Magnum.Actors.Channels.Channel.UnsubscribeAll">
             <summary>
-            A channel represents a one-way communication, well, channel
+            Remove all subscriptions to the channel
             </summary>
         </member>
-        <member name="M:Magnum.Channels.UntypedChannel.Send``1(``0)">
+        <member name="M:Magnum.Actors.Channels.Channel`1.Publish(`0)">
             <summary>
-              Send a message to an untyped channel
+            Publish a message to the channel
             </summary>
-            <typeparam name = "T">The message type</typeparam>
-            <param name = "message">The message</param>
+            <param name="message"></param>
+            <returns>True if there was a consumer for the message, otherwise false</returns>
         </member>
-        <member name="T:Magnum.Actors.ActorFactory`1">
+        <member name="M:Magnum.Actors.Channels.Channel`1.Subscribe(System.Action{`0})">
             <summary>
-            A builder abstraction for creating actor instances when needed
-            </summary>
-            <typeparam name="TActor">The actor type</typeparam>
-        </member>
-        <member name="M:Magnum.Actors.ActorFactory`1.GetActor">
-            <summary>
-            Returns an instance of an actor
+            Subscribes a consumer to the channel that will be called for every message that gets published
             </summary>
             <returns></returns>
         </member>
-        <member name="T:Magnum.Actors.ActorRegistry">
+        <member name="T:Magnum.Actors.CommandQueue">
             <summary>
-            An actor registry provide running storage for actors that are active in the system
+            A queue-backed execution context to ensure all operations are done on the actors thread
             </summary>
         </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Register``1(``0)">
+        <member name="M:Magnum.Actors.CommandQueue.Enqueue(System.Action)">
             <summary>
-            Adds an actor to the registry
-            </summary>
-            <typeparam name="T">The type of the actor</typeparam>
-            <param name="actor">The actor to add</param>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Unregister``1(``0)">
-            <summary>
-            Removes an actor from the registry
-            </summary>
-            <typeparam name="T">The type of the actor</typeparam>
-            <param name="actor">The actor to remove</param>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Unregister(System.Guid)">
-            <summary>
-            Removes an actor from the registry
-            </summary>
-            <param name="id">The id of the actor to remove</param>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Shutdown">
-            <summary>
-            Stops all actors and removes them from the registry
-            </summary>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Get(System.Guid)">
-            <summary>
-            Gets an actor from the registry
-            </summary>
-            <param name="id">The id of the actor</param>
-            <returns>The actor with the specified id</returns>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.GetAll">
-            <summary>
-            Gets all actors from the registry
-            </summary>
-            <returns>All actors in the registry</returns>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.GetAll``1">
-            <summary>
-            Get all actors from the registry that are the specified type
-            </summary>
-            <typeparam name="T">The type of actor to retrieve</typeparam>
-            <returns>A list of actors matching the specified type</returns>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.GetAll(System.Type)">
-            <summary>
-            Get all actors from the registry that are the specified type
-            </summary>
-            <param name="actorType">The type of actor to retrieve</param>
-            <returns>A list of actors matching the specified type</returns>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Each(System.Action{Magnum.Actors.Actor})">
-            <summary>
-            Calls the callback for each actor in the registry
-            </summary>
-            <param name="callback">A method to call with each actor</param>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Each``1(System.Action{``0})">
-            <summary>
-            Calls the callback for each actor in the registry of the specified type
-            </summary>
-            <typeparam name="T">The type of actor to select</typeparam>
-            <param name="callback">The method to call with each actor</param>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Each(System.Type,System.Action{Magnum.Actors.Actor})">
-            <summary>
-            Calls the callback for each actor in the registry of the specified type
-            </summary>
-            <param name="actorType">The type of actor to select</param>
-            <param name="callback">The method to call with each actor</param>
-        </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Subscribe(System.Action{Magnum.Channels.Configuration.SubscriptionConfigurator})">
-            <summary>
-            Allow subscription to events that are produced by the actor registry as actors
-            are registered and unregistered.
-            </summary>
-            <param name="subscriberActions">The subscription actions</param>
-            <returns>A channel subscription</returns>
-        </member>
-        <member name="T:Magnum.Actors.Internal.ActorChannelProvider`2">
-            <summary>
-              Provides a channel from an actor, based on the property information which is used
-              to create a dynamic method that returns the actual channel
-            </summary>
-            <typeparam name = "TActor">The actor type</typeparam>
-            <typeparam name = "TChannel">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.ChannelProvider`1">
-            <summary>
-            Used by dispatching channels to retrieve the appropriate channel for
-            a message.
-            </summary>
-            <typeparam name="T">The channel type</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.ChannelProvider`1.GetChannel(`0)">
-            <summary>
-            Get a channel for the message
-            </summary>
-            <param name="message">The message to use to select the channel</param>
-            <returns>The channel that should process the message, or null</returns>
-        </member>
-        <member name="T:Magnum.Actors.Internal.ThreadStaticActorFactory`1">
-            <summary>
-              Maintains only one instance of an actor per thread
-            </summary>
-            <typeparam name = "TActor">The actor type</typeparam>
-        </member>
-        <member name="T:Magnum.Actors.Internal.TransientActorFactory`1">
-            <summary>
-              Creates a new instance of an actor for each call
-            </summary>
-            <typeparam name = "TActor"></typeparam>
-        </member>
-        <member name="T:Magnum.Binding.BinderContext">
-            <summary>
-            Used by the type binders to obtain information
-            </summary>
-        </member>
-        <member name="M:Magnum.Binding.BinderContext.Bind(Magnum.Binding.ObjectPropertyBinder)">
-            <summary>
-            Binds a property of an object, pushing the property context on the stack
-            </summary>
-            <param name="property"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Binding.BinderContext.GetChannel``1">
-            <summary>
-            Returns a channel for the specified message type
-            </summary>
-            <typeparam name="T">The channel message type</typeparam>
-            <returns>A channel </returns>
-        </member>
-        <member name="P:Magnum.Binding.BinderContext.Property">
-            <summary>
-            The current property being bound
-            </summary>
-        </member>
-        <member name="P:Magnum.Binding.BinderContext.PropertyValue">
-            <summary>
-            Resolves the value of the property based on the naming convention.
-            This can be an expensive call, so it should only be called once and
-            the return value should be cached to avoid performance concerns
-            </summary>
-        </member>
-        <member name="T:Magnum.Binding.FastModelBinder">
-            <summary>
-            A fast model binder for quickly applying values to properties
-            </summary>
-        </member>
-        <member name="T:Magnum.Binding.ModelBinder">
-            <summary>
-            A model binder is used to map an unstructured data source to an object
-            using a series of conventions and value providers
-            </summary>
-        </member>
-        <member name="M:Magnum.Binding.ModelBinder.Bind(System.Type,Magnum.Binding.ModelBinderContext)">
-            <summary>
-            Create an object of the requested type, initializing the properties
-            of that object to the value retrieved from the context
-            </summary>
-            <param name="type">The type of object to create</param>
-            <param name="context">The context to use while binding the object</param>
-            <returns>Returns an instance of the object, or an exception if the binding was unsuccessful</returns>
-        </member>
-        <member name="M:Magnum.Binding.ModelBinder.Bind``1(Magnum.Binding.ModelBinderContext)">
-            <summary>
-            Create an object of the requested type, initializing the properties
-            of that object to the value retrieved from the context
-            </summary>
-            <typeparam name="T">The type of object to create</typeparam>
-            <param name="context">The context to use while binding the object</param>
-            <returns>Returns an instance of the object, or an exception if the binding was unsuccessful</returns>
-        </member>
-        <member name="T:Magnum.Binding.ModelBinderContext">
-            <summary>
-            Context for binding to a model
-            </summary>
-        </member>
-        <member name="T:Magnum.Channels.WcfChannelHost`1">
-            <summary>
-            Receives messages from a named pipe via WCF and forwards it to the output
-            channel. Message serialization is handled entirely by WCF and therefore
-            requires that classes are appropriately decorated.
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Channel`1">
-            <summary>
-            A one-way communication containing messages of the specified type
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="M:Magnum.Channels.Channel`1.Send(`0)">
-            <summary>
-            Send a message to the channel
-            </summary>
-            <param name="message">The message to send</param>
-        </member>
-        <member name="T:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1">
-            <summary>
-            A fluent syntax for configuration the options of a channel subscription
-            </summary>
-            <typeparam name="TChannel">The channel type</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1.Using``1(Magnum.Channels.ChannelAccessor{``0,`0})">
-            <summary>
-            Defines a consumer that is to consume the specified message type
-            </summary>
-            <typeparam name="TConsumer"></typeparam>
-            <param name="channelAccessor"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1.Every(System.TimeSpan)">
-            <summary>
-            Specifies an interval at which the consumer should be called with a collection
-            of messages received during that period.
-            </summary>
-            <param name="interval">The time period of each interval</param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1.Every``1(System.TimeSpan,Magnum.Channels.KeyAccessor{`0,``0})">
-            <summary>
-            Specifies an interval at which the consumer should be called with a dictionary
-            of messages received during that period. Only the most recent message for each
-            key is included in the dictionary.
-            </summary>
-            <typeparam name="TKey">The key type</typeparam>
-            <param name="interval">The time period of each interval</param>
-            <param name="keyAccessor">The key accessor</param>
-            <returns></returns>
-        </member>
-        <member name="T:Magnum.Channels.Configuration.ConsumerConfigurator`2">
-            <summary>
-            A fluent syntax for configuration options of a channel consumer
-            </summary>
-            <typeparam name="TConsumer">The consumer type</typeparam>
-            <typeparam name="TChannel">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Configuration.SubscriptionConfigurator">
-            <summary>
-            A fluent syntax for defining subscriptions against a channel network
-            </summary>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.SubscriptionConfigurator.Add``1(Magnum.Channels.Channel{``0})">
-            <summary>
-            Adds a channel directly without any modification
-            </summary>
-            <typeparam name="TChannel">The channel type</typeparam>
-            <param name="channel">The channel instance</param>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.SubscriptionConfigurator.Consume``1">
-            <summary>
-            Configures a new consumer
-            </summary>
-            <typeparam name="TChannel">The channel type</typeparam>
-            <returns>A chainable method to configure additional options</returns>
-        </member>
-        <member name="T:Magnum.Channels.DeserializeMessageEnvelopeChannel`1">
-            <summary>
-            Accepts a MessageEnvelope as input and deserializes the message body on the supplied fiber,
-            after which the message object is sent to the untyped output channel.
-            </summary>
-            <typeparam name="T">The input message type, which must implement MessageEnvelope</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.DeserializeMessageEnvelopeChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Serialization.Serializer,Magnum.Channels.UntypedChannel)">
-            <summary>
-            Constructs an instance
-            </summary>
-            <param name="fiber">The fiber used to perform message deserialization</param>
-            <param name="serializer">The serializer to use on the message body</param>
-            <param name="output">The output channel for the deserialized message</param>
-        </member>
-        <member name="T:Magnum.Channels.Internal.WcfChannel`1">
-            <summary>
-              A single generic channel type used for local channels via WCF/named pipes
-            </summary>
-            <typeparam name = "T"></typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Internal.WcfChannelService`1">
-            <summary>
-              Handles the server end of a WCF channel connection
-            </summary>
-            <typeparam name = "T">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.WcfUntypedChannelHost">
-            <summary>
-            Receives messages from a named pipe via WCF and forwards them to the specific channel. Messages
-            are first serialized to a wire type that is already WCF compliant, making it unnecessary to decorate
-            your message objects with WCF data contract serializer attributes.
-            </summary>
-        </member>
-        <member name="T:Magnum.Channels.SelectiveConsumer`1">
-            <summary>
-              A conditional consumer is given a message to evaluate, after which it
-              can determine if it is interested in the message and return an action
-              to process the message or null
-            </summary>
-            <typeparam name = "T">The message type</typeparam>
-            <param name = "message">The message</param>
-            <returns>An action to consume the message, or null</returns>
-        </member>
-        <member name="T:Magnum.Channels.Mailbox`1">
-            <summary>
-              Mailbox is a higher level construct than a channel, providing channel aggregation,
-              directed receives, and dispatching to channels within a context, such as an actor
-            </summary>
-        </member>
-        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.SelectiveConsumer{`0})">
-            <summary>
-              Calls the specified method when a message of the requested type is received. The
-              consumer is asked if the message should be parsed, and returns a non-null action
-              if the message should be passed to the consumer. At that point, the message is removed
-              from the mailbox and delivered to the consumer
-            </summary>
-            <typeparam name = "T">The requested message type</typeparam>
-            <param name = "consumer">The consumer</param>
-        </member>
-        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.SelectiveConsumer{`0},System.TimeSpan,System.Action)">
-            <summary>
-              Specifies a method to call when a message is recieved. If a message is not received within
-              the specified timeout, a timeout callback is called instead and the receiver is removed from 
-              the waiting list of receivers.
-            </summary>
-            <param name = "consumer">The consumer to call with the message</param>
-            <param name = "timeout">The time period to wait for a message</param>
-            <param name = "timeoutCallback">The method to call if a message is not received within the timeout period</param>
-        </member>
-        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.SelectiveConsumer{`0},System.Int32,System.Action)">
-            <summary>
-              Specifies a method to call when a message is recieved. If a message is not received within
-              the specified timeout, a timeout callback is called instead and the receiver is removed from 
-              the waiting list of receivers.
-            </summary>
-            <param name = "consumer">The consumer to call with the message</param>
-            <param name = "timeout">The time period to wait for a message</param>
-            <param name = "timeoutCallback">The method to call if a message is not received within the timeout period</param>
-        </member>
-        <member name="T:Magnum.Channels.ShuntChannel">
-            <summary>
-            Implements a channel shunt, discarding any message that is send without action
-            </summary>
-        </member>
-        <member name="T:Magnum.Channels.ShuntChannel`1">
-            <summary>
-            Implements a channel shunt, discarding any message that is send without action
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:Magnum.Channels.TypedChannelAdapter`1">
-            <summary>
-            Converts an untyped channel to a typed channel, passing only messages
-            which can be assigned to the channel type and discarding all others
-            </summary>
-            <typeparam name="TOutput">The output channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.LocalWcfChannelProxy`1">
-            <summary>
-              A local net.pipe channel proxy
-            </summary>
-            <typeparam name = "T">The channel type</typeparam>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToUri.AppendPath(System.Uri,System.String)">
-            <summary>
-              Appends a path to an existing Uri
-            </summary>
-            <param name = "uri"></param>
-            <param name = "path"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Fibers.Fiber.Enqueue(System.Action)">
-            <summary>
-            Enqueue a single action to the queue
+            Adds an action to the end of the command queue
             </summary>
             <param name="action"></param>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.EnqueueMany(System.Action[])">
+        <member name="M:Magnum.Actors.CommandQueue.EnqueueAll(System.Action[])">
             <summary>
-            Enqueue a series of actions to the queue
+            Adds a range of actions to the end of the command queue
             </summary>
             <param name="actions"></param>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.ExecuteAll(System.TimeSpan)">
+        <member name="M:Magnum.Actors.CommandQueue.Disable">
             <summary>
-            Run all remaining actions and return when complete (or when the timeout expires)
-            </summary>
-            <param name="timeout">The time to wait for all pending actions to be executed before throwing an exception</param>
-        </member>
-        <member name="M:Magnum.Fibers.Fiber.StopAcceptingActions">
-            <summary>
-            Disable the action queue, discarding any remaining items
+            Disables the command queue, losing all commands that are present in the queue
             </summary>
         </member>
-        <member name="M:Magnum.Fibers.Fiber.DiscardAllActions">
+        <member name="M:Magnum.Actors.CommandQueue.Run">
             <summary>
-            Discard any pending actions from the queue
+            Runs the command queue on the callers thread. Does not return until the queue is
+            disabled.
             </summary>
         </member>
-        <member name="T:Magnum.Fibers.SynchronousFiber">
+        <member name="T:Magnum.Actors.CommandQueues.SynchronousCommandQueue">
             <summary>
-            A synchronous fiber will execute an action immediately on the calling thread
-            without any protection from an exception
+            Implements a command queues that calls actions immediately on the callers thread
+            as they are queued. This should only be used for testing and not in production.
             </summary>
         </member>
-        <member name="T:Magnum.Fibers.ThreadPoolFiber">
+        <member name="M:Magnum.Actors.Schedulers.ThreadPoolScheduler.GetNextScheduledTime(System.Int64@,System.Int64)">
             <summary>
-            An Fiber that uses the .NET ThreadPool and QueueUserWorkItem to execute
-            actions.
-            </summary>
-        </member>
-        <member name="M:Magnum.Fibers.ThreadPoolFiber.#ctor">
-            <summary>
-            Constructs a new ThreadPoolFiber using the default queue settings
-            of unlimited actions with an infinite timeout to add new actions
-            </summary>
-        </member>
-        <member name="M:Magnum.Fibers.ThreadPoolFiber.#ctor(System.Int32,System.Int32)">
-            <summary>
-            Constructs a new ThreadPoolFiber using the specified settings for the
-            queue
-            </summary>
-            <param name="queueLimit">The maximum number of actions that can be waiting in the queue</param>
-            <param name="queueTimeout">The timeout to wait when adding actions when the queue if full before throwing an exception</param>
-        </member>
-        <member name="T:Magnum.Channels.AsyncResultChannel`1">
-            <summary>
-            Wraps a channel in an IAsyncResult compatible wrapper to support asynchronous usage with
-            frameworks that support asynchronous callbacks
-            </summary>
-            <typeparam name="T">The channel type supported</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.ChannelAccessor`2">
-            <summary>
-            Provides a channel from an instance
-            </summary>
-            <typeparam name="T">The type of instance being accessed</typeparam>
-            <typeparam name="TChannel">The type of channel to return</typeparam>
-            <param name="source">The instance to retrieve the channel from</param>
-            <returns>The channel of the requested type from the instance</returns>
-        </member>
-        <member name="T:Magnum.Channels.ConsumerChannel`1">
-            <summary>
-            A channel that accepts a message and enqueues the consumer method via the
-            specified Fiber
-            </summary>
-            <typeparam name="T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.ConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.Consumer{`0})">
-            <summary>
-            Constructs a channel
-            </summary>
-            <param name="fiber">The queue where consumer actions should be enqueued</param>
-            <param name="consumer">The method to call when a message is sent to the channel</param>
-        </member>
-        <member name="T:Magnum.Channels.SelectiveConsumerChannel`1">
-            <summary>
-            A channel that accepts a message and enqueues the consumer method via the
-            specified Fiber
-            </summary>
-            <typeparam name="T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.SelectiveConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.SelectiveConsumer{`0})">
-            <summary>
-            Constructs a channel
-            </summary>
-            <param name="fiber">The queue where consumer actions should be enqueued</param>
-            <param name="selectiveConsumer">The method to call when a message is sent to the channel</param>
-        </member>
-        <member name="T:Magnum.Channels.Consumer`1">
-            <summary>
-            A consumer delegate, which can be assigned to any method that takes a message as an argument,
-            including Actions, void methods, etc.
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="message"></param>
-        </member>
-        <member name="T:Magnum.Channels.DelegateChannelProvider`1">
-            <summary>
-            Wraps an anonymous method in a ChannelProvider
-            </summary>
-            <typeparam name="T">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Future`1">
-            <summary>
-            A future object that supports asynchronous waits and channel sends, in addition to a regular complete method
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="M:Magnum.Channels.Interceptor`1.OnSend(`0)">
-            <summary>
-            Called before a message is delivered to the output channel
-            </summary>
-            <param name="message">The message being delivered</param>
-            <returns>The message passed, a modified message, or null to discard the message</returns>
-        </member>
-        <member name="M:Magnum.Channels.Interceptor`1.OnException(System.Exception)">
-            <summary>
-            Called when an exception is returned during delivery to the output channel
-            </summary>
-            <param name="exception">The exception that occurred</param>
-        </member>
-        <member name="M:Magnum.Channels.Interceptor`1.OnComplete">
-            <summary>
-            Called when a message has been successfully delivered to the output channel
-            </summary>
-        </member>
-        <member name="T:Magnum.Channels.InterceptorChannel`1">
-            <summary>
-            An interceptor channel can be placed in front of any other channel and provides
-            the ability to intercept sends to the wrapper channel and modify the message that
-            is sent. An additional method is also called once the message has been processed by
-            the wrapped channel
-            </summary>
-            <typeparam name="T">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.InterceptorFactory`1">
-            <summary>
-            Provides an instance of an interceptor for an InterceptorChannel to
-            handle the interception of messages on channels
-            </summary>
-            <typeparam name="T">The message type</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.InterceptorFactory`1.GetInterceptor(`0)">
-            <summary>
-            Returns an instance of an interceptor
-            </summary>
-            <param name="message">The message being delivered</param>
-            <returns>An interceptor</returns>
-        </member>
-        <member name="T:Magnum.Channels.DistinctIntervalChannel`2">
-            <summary>
-            A channel that accepts distinct messages and sends them to the channel at regular intervals
-            </summary>
-            <typeparam name="T">The type of message delivered on the channel</typeparam>
-            <typeparam name="TKey">The type of the key for the message</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.DistinctIntervalChannel`2.#ctor(Magnum.Fibers.Fiber,Magnum.Fibers.Scheduler,System.TimeSpan,Magnum.Channels.KeyAccessor{`0,`1},Magnum.Channels.Channel{System.Collections.Generic.IDictionary{`1,`0}})">
-            <summary>
-            Constructs a channel
-            </summary>
-            <param name="fiber">The queue where consumer actions should be enqueued</param>
-            <param name="scheduler">The scheduler to use for scheduling calls to the consumer</param>
-            <param name="interval">The interval between calls to the consumer</param>
-            <param name="keyAccessor">Returns the key for the message</param>
-            <param name="output">The method to call when a message is sent to the channel</param>
-        </member>
-        <member name="T:Magnum.Channels.InstanceChannel`1">
-            <summary>
-            An instance channel requests an instance of a channel which can be created/loaded
-            based on the information in the message being sent on the channel
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Internal.MessageList`1">
-            <summary>
-            Encapsulates a collection of messages
-            </summary>
-            <typeparam name="T">The message type</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.Internal.MessageList`1.Add(`0)">
-            <summary>
-            Adds a message to the list
-            </summary>
-            <param name="message"></param>
-        </member>
-        <member name="M:Magnum.Channels.Internal.MessageList`1.RemoveAll">
-            <summary>
-            Removes all messages from the list
-            </summary>
-            <returns>A list of messages that were removed from the list</returns>
-        </member>
-        <member name="T:Magnum.Channels.IntervalChannel`1">
-            <summary>
-            A channel that accepts messages and sends them to the channel at regular intervals
-            </summary>
-            <typeparam name="T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.IntervalChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Fibers.Scheduler,System.TimeSpan,Magnum.Channels.Channel{System.Collections.Generic.ICollection{`0}})">
-            <summary>
-            Constructs a channel
-            </summary>
-            <param name="fiber">The queue where consumer actions should be enqueued</param>
-            <param name="scheduler">The scheduler to use for scheduling calls to the consumer</param>
-            <param name="interval">The interval between calls to the consumer</param>
-            <param name="output">The method to call when a message is sent to the channel</param>
-        </member>
-        <member name="T:Magnum.Channels.KeyAccessor`2">
-            <summary>
-            Returns the key for the given source
-            </summary>
-            <typeparam name="T">The type of the source from which the key is to be retrieved</typeparam>
-            <typeparam name="TKey">The type of the key to return</typeparam>
-            <param name="source">The source from which to retrieve the key</param>
-            <returns>The value of the key for the source</returns>
-        </member>
-        <member name="T:Magnum.Channels.LastIntervalChannel`1">
-            <summary>
-            A channel that sends the most recent message to the consumer every interval
-            </summary>
-            <typeparam name="T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.LastIntervalChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Fibers.Scheduler,System.TimeSpan,Magnum.Channels.Channel{`0})">
-            <summary>
-            Constructs a channel
-            </summary>
-            <param name="fiber">The queue where consumer actions should be enqueued</param>
-            <param name="scheduler">The scheduler to use for scheduling calls to the consumer</param>
-            <param name="interval">The interval between calls to the consumer</param>
-            <param name="output">The method to call when a message is sent to the channel</param>
-        </member>
-        <member name="T:Magnum.Channels.FilterChannel`1">
-            <summary>
-              A channel that selectively accepts a message and enqueues the consumer method via the
-              specified Fiber.
-              Note that the filter function is called as part of the queued action, so threading
-              is not an issue.
-            </summary>
-            <typeparam name = "T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.FilterChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.Channel{`0},Magnum.Channels.Filter{`0})">
-            <summary>
-              Constructs a channel
-            </summary>
-            <param name = "fiber">The queue where consumer actions should be enqueued</param>
-            <param name = "output">The method to call when a message is sent to the channel</param>
-            <param name = "filter">The filter to determine if the message can be consumed</param>
-        </member>
-        <member name="T:Magnum.Channels.PublishSubscribeChannel`1">
-            <summary>
-              Publishes a messages to multiple channels
-            </summary>
-            <typeparam name = "T">Channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.SynchronizedChannel`1">
-            <summary>
-            Using the specified SynchronizationContext, messages sent through this channel
-            will be delivered on the specified user interface thread, to avoid issues when
-            writing to the UI
-            </summary>
-            <typeparam name="T">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.ThreadPoolChannel`1">
-            <summary>
-            Keeps a fixed number of channels available, which presumably are doing some form of synchronous processing
-            of messages, to avoid too many consumers running at the same time
-            </summary>
-            <typeparam name="T">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.ThreadStaticChannelProvider`1">
-            <summary>
-            Provides an instance of a channel per thread for situations where the
-            processing of a channel should be done per-thread to avoid bottlenecks
             
-            This should not be used in cases where the channel maintains state
-            between calls since threads may change and ordering cannot be guaranteed
             </summary>
-            <typeparam name="T">The message type of the channel</typeparam>
+            <param name="nextScheduledTime"></param>
+            <param name="now"></param>
+            <returns>True if there is a future time to schedule, 
+            otherwise false if nothing is available or execution is immediately required</returns>
         </member>
-        <member name="T:Magnum.Channels.ConvertChannel`2">
+        <member name="T:Magnum.Check">
             <summary>
-              Tranforms a message from one type to another
+            Check class for verifying the condition of items included in interface contracts
             </summary>
-            <typeparam name = "TInput">Input message type</typeparam>
-            <typeparam name = "TOutput">Output message type</typeparam>
+        </member>
+        <member name="M:Magnum.PreconditionException.#ctor">
+            <summary>
+            Precondition Exception.
+            </summary>
+        </member>
+        <member name="M:Magnum.PreconditionException.#ctor(System.String)">
+            <summary>
+            Precondition Exception.
+            </summary>
+        </member>
+        <member name="M:Magnum.PreconditionException.#ctor(System.String,System.Exception)">
+            <summary>
+            Precondition Exception.
+            </summary>
+        </member>
+        <member name="T:Magnum.PostconditionException">
+            <summary>
+            Exception raised when a postcondition fails.
+            </summary>
+        </member>
+        <member name="M:Magnum.PostconditionException.#ctor">
+            <summary>
+            Postcondition Exception.
+            </summary>
+        </member>
+        <member name="M:Magnum.PostconditionException.#ctor(System.String)">
+            <summary>
+            Postcondition Exception.
+            </summary>
+        </member>
+        <member name="M:Magnum.PostconditionException.#ctor(System.String,System.Exception)">
+            <summary>
+            Postcondition Exception.
+            </summary>
         </member>
         <member name="T:Magnum.Collections.BinaryPredicate`1">
             <summary>
@@ -7215,11 +6622,6 @@
             <param name="x">KeyAndValues to copy.</param>
             <returns>A copied version.</returns>
         </member>
-        <member name="T:Magnum.Collections.ObjectToDictionaryConverter">
-            <summary>
-            Converts an object of an anonymous type to a dictionary
-            </summary>
-        </member>
         <member name="T:Magnum.Collections.OrderedBag`1">
              <summary>
              OrderedBag&lt;T&gt; is a collection that contains items of type T. 
@@ -11914,6 +11316,12 @@
             </summary>
             <param name="parser">The pattern to match and return the resulting object</param>
         </member>
+        <member name="T:Magnum.Concurrency.SingleLinkNode`1">
+            <summary>
+            Used by the concurrent collections for interlocked operations
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
         <member name="T:Magnum.Data.IUnitOfWork">
             <summary>
             An interface to resolve from the container to encapsulate a unit of work
@@ -11958,45 +11366,7 @@
             This is really just a facade around the <see cref="T:Magnum.LocalContext"/> storage
             </summary>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToAttributes.GetAttribute``1(System.Reflection.ICustomAttributeProvider)">
-            <summary>
-            Returns the first attribute of the specified type for the object specified
-            </summary>
-            <typeparam name="T">The type of attribute</typeparam>
-            <param name="provider">An attribute provider, which can be a MethodInfo, PropertyInfo, Type, etc.</param>
-            <returns>The attribute instance if found, or null</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToAttributes.HasAttribute``1(System.Reflection.ICustomAttributeProvider)">
-            <summary>
-            Determines if the target has the specified attribute
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="provider"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToAttributes.ForAttributesOf``1(System.Reflection.ICustomAttributeProvider,System.Action{``0})">
-            <summary>
-            Calls the provided action for each instance of the specified attribute type for the object specified
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="provider"></param>
-            <param name="action"></param>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDateTime.FromNow(System.TimeSpan)">
-            <summary>
-            Gets the current DateTime and adjusts it by the specified TimeSpan
-            </summary>
-            <param name="span"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDateTime.ToUnixTimestamp(System.DateTime)">
-            <summary>
-            Gets a Unix Timestamp from a DateTime, converting local time to UTC if necessary.
-            </summary>
-            <param name="date">The date to convert</param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDictionary.Retrieve``2(System.Collections.Generic.IDictionary{``0,``1},``0)">
+        <member name="M:Magnum.CollectionExtensions.DictionaryExt.Retrieve``2(System.Collections.Generic.IDictionary{``0,``1},``0)">
             <summary>
             Gets the value for the specified key or adds a new value to the dictionary
             </summary>
@@ -12006,7 +11376,7 @@
             <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDictionary.Retrieve``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)">
+        <member name="M:Magnum.CollectionExtensions.DictionaryExt.Retrieve``2(System.Collections.Generic.IDictionary{``0,``1},``0,``1)">
             <summary>
             Gets the value for the specified key or adds a new value to the dictionary
             </summary>
@@ -12017,7 +11387,7 @@
             <param name="missingValue">The value to add if the key is not found</param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDictionary.Retrieve``2(System.Collections.Generic.IDictionary{``0,``1},``0,System.Func{``1})">
+        <member name="M:Magnum.CollectionExtensions.DictionaryExt.Retrieve``2(System.Collections.Generic.IDictionary{``0,``1},``0,System.Func{``1})">
             <summary>
             Gets the value for the specified key or adds a new value to the dictionary
             </summary>
@@ -12027,169 +11397,6 @@
             <param name="key"></param>
             <param name="valueProvider">The function to return the value to add if the key is not found</param>
             <returns></returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDictionary.StrongGet``1(System.Collections.Generic.IDictionary{System.String,System.Object},System.String)">
-            <summary>
-            Converts an object to the strongly typed version of a dictionary
-            </summary>
-            <typeparam name="TResult"></typeparam>
-            <param name="dictionary"></param>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToDisposable.AutoDispose``1(``0)">
-            <summary>
-            Wraps an object that implements IDisposable in an enumeration to make it safe for use in LINQ expressions
-            </summary>
-            <typeparam name="T">The type of the object, which must implement IDisposable</typeparam>
-            <param name="target">The target to wrap</param>
-            <returns>An enumeration with a single entry equal to the target</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToEnumerable.Each``1(System.Collections.Generic.IEnumerable{``0},System.Action{``0})">
-            <summary>
-            Enumerates a collection, calling the specified action for each entry in the collection
-            </summary>
-            <typeparam name="T">The type of the enumeration</typeparam>
-            <param name="collection">The collection to enumerate</param>
-            <param name="callback">The action to call for each entry in the collection</param>
-            <returns>The collection that was enumerated</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToEnumerable.WhileTrue``1(System.Collections.IEnumerable,System.Func{``0,System.Boolean})">
-            <summary>
-            Enumerates a collection, calling the callback until false is returned
-            </summary>
-            <typeparam name="T">The type of item being enumerated</typeparam>
-            <param name="collection">The collection to enumerate</param>
-            <param name="callback">The callback to call for each element</param>
-            <returns>True if all of the elements were enumerated, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToEventHandler.Raise``1(System.EventHandler{``0},System.Object,``0)">
-            <summary>
-            thanks, http://kohari.org/2009/02/07/eventhandler-extension-method/
-            </summary>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToExpression.MemberName``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
-            <summary>
-            Gets the name of the member specified
-            </summary>
-            <typeparam name="T">The type referenced</typeparam>
-            <typeparam name="TMember">The type of the member referenced</typeparam>
-            <param name="expression">The expression referencing the member</param>
-            <returns>The name of the member referenced by the expression</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToExpression.MemberName``1(System.Linq.Expressions.Expression{System.Action{``0}})">
-            <summary>
-            Gets the name of the member specified
-            </summary>
-            <typeparam name="T">The type referenced</typeparam>
-            <param name="expression">The expression referencing the member</param>
-            <returns>The name of the member referenced by the expression</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToExpression.MemberName``2(System.Linq.Expressions.Expression{System.Action{``0,``1}})">
-            <summary>
-            Gets the name of the member specified
-            </summary>
-            <typeparam name="T1">The type referenced</typeparam>
-            <typeparam name="T2">The type of the member referenced</typeparam>
-            <param name="expression">The expression referencing the member</param>
-            <returns>The name of the member referenced by the expression</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToExpression.WrapActionWithArgument``1(System.Linq.Expressions.Expression{System.Action})">
-            <summary>
-            Wraps an action expression with no arguments inside an expression that takes an 
-            argument of the specified type (the argument is ignored, but the original expression is
-            invoked)
-            </summary>
-            <typeparam name="TArgument">The type of argument to accept in the wrapping expression</typeparam>
-            <param name="expression">The expression to wrap</param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToInterfaces.Implements``1(System.Object)">
-            <summary>
-              Checks if an object implements the specified interface
-            </summary>
-            <typeparam name = "T">The interface type</typeparam>
-            <param name = "obj">The object to check</param>
-            <returns>True if the interface is implemented by the object, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToInterfaces.Implements(System.Object,System.Type)">
-            <summary>
-              Checks if an object implements the specified interface
-            </summary>
-            <param name = "obj">The object to check</param>
-            <param name = "interfaceType">The interface type (can be generic, either specific or open)</param>
-            <returns>True if the interface is implemented by the object, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToInterfaces.Implements``1(System.Type)">
-            <summary>
-              Checks if a type implements the specified interface
-            </summary>
-            <typeparam name = "T">The interface type (can be generic, either specific or open)</typeparam>
-            <param name = "objectType">The type to check</param>
-            <returns>True if the interface is implemented by the type, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToInterfaces.Implements(System.Type,System.Type)">
-            <summary>
-              Checks if a type implements the specified interface
-            </summary>
-            <param name = "objectType">The type to check</param>
-            <param name = "interfaceType">The interface type (can be generic, either specific or open)</param>
-            <returns>True if the interface is implemented by the type, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToInterfaces.ImplementsGeneric(System.Type,System.Type)">
-            <summary>
-              Checks if a type implements an open generic at any level of the inheritance chain, including all
-              base classes
-            </summary>
-            <param name = "objectType">The type to check</param>
-            <param name = "interfaceType">The interface type (must be a generic type definition)</param>
-            <returns>True if the interface is implemented by the type, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToInterfaces.ImplementsGeneric(System.Type,System.Type,System.Type@)">
-            <summary>
-              Checks if a type implements an open generic at any level of the inheritance chain, including all
-              base classes
-            </summary>
-            <param name = "objectType">The type to check</param>
-            <param name = "interfaceType">The interface type (must be a generic type definition)</param>
-            <param name = "matchedType">The matching type that was found for the interface type</param>
-            <returns>True if the interface is implemented by the type, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToString.IsNotEmpty(System.String)">
-            <summary>
-            Checks if a string is not null or empty
-            </summary>
-            <param name="value">A string instance</param>
-            <returns>True if the string has a value</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToString.IsEmpty(System.String)">
-            <summary>
-            Check if a string is null or empty
-            </summary>
-            <param name="value">A string instance</param>
-            <returns>True if the string is null or empty, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToString.IsNull(System.String)">
-            <summary>
-            Returns true if a string is null (the string can, however, be empty)
-            </summary>
-            <param name="value">A string value</param>
-            <returns>True if the string value is null, otherwise false</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToString.FormatWith(System.String,System.Object[])">
-            <summary>
-            Uses the string as a template and applies the specified arguments
-            </summary>
-            <param name="format">The format string</param>
-            <param name="args">The arguments to pass to the format provider</param>
-            <returns>The formatted string</returns>
-        </member>
-        <member name="M:Magnum.Extensions.ExtensionsToString.ToUtf8String(System.Byte[])">
-            <summary>
-            Returns the UTF-8 encoded string from the specified byte array
-            </summary>
-            <param name="data">The byte array</param>
-            <returns>The UTF-8 string</returns>
         </member>
         <member name="T:Magnum.Logging.LoggerFacade">
             <summary>
@@ -12261,6 +11468,11 @@
         <member name="P:Magnum.Metrics.IMonitor.Name">
             <summary>
             The name of the monitor
+            </summary>
+        </member>
+        <member name="M:Magnum.ObjectExtensions.EventHandlerExtensions.Raise``1(System.EventHandler{``0},System.Object,``0)">
+            <summary>
+            thanks, http://kohari.org/2009/02/07/eventhandler-extension-method/
             </summary>
         </member>
         <member name="T:Magnum.Pipeline.InterceptionBinder">
@@ -12349,6 +11561,51 @@
             The type accepted by this segment
             </summary>
         </member>
+        <member name="M:Magnum.ExtensionMethods.Each``1(System.Collections.Generic.IEnumerable{``0},System.Action{``0})">
+            <summary>
+            Enumerates a collection, calling the specified action for each entry in the collection
+            </summary>
+            <typeparam name="T">The type of the enumeration</typeparam>
+            <param name="collection">The collection to enumerate</param>
+            <param name="callback">The action to call for each entry in the collection</param>
+            <returns>The collection that was enumerated</returns>
+        </member>
+        <member name="M:Magnum.ExtensionMethods.AutoDispose``1(``0)">
+            <summary>
+            Wraps an object that implements IDisposable in an enumeration to make it safe for use in LINQ expressions
+            </summary>
+            <typeparam name="T">The type of the object, which must implement IDisposable</typeparam>
+            <param name="target">The target to wrap</param>
+            <returns>An enumeration with a single entry equal to the target</returns>
+        </member>
+        <member name="M:Magnum.ExtensionMethods.MemberName``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+            Gets the name of the member specified
+            </summary>
+            <typeparam name="T">The type referenced</typeparam>
+            <typeparam name="V">The type of the member referenced</typeparam>
+            <param name="expression">The expression referencing the member</param>
+            <returns>The name of the member referenced by the expression</returns>
+        </member>
+        <member name="M:Magnum.ExtensionMethods.MemberName``1(System.Linq.Expressions.Expression{System.Action{``0}})">
+            <summary>
+            Gets the name of the member specified
+            </summary>
+            <typeparam name="T">The type referenced</typeparam>
+            <typeparam name="V">The type of the member referenced</typeparam>
+            <param name="expression">The expression referencing the member</param>
+            <returns>The name of the member referenced by the expression</returns>
+        </member>
+        <member name="M:Magnum.ExtensionMethods.WrapActionWithArgument``1(System.Linq.Expressions.Expression{System.Action})">
+            <summary>
+            Wraps an action expression with no arguments inside an expression that takes an 
+            argument of the specified type (the argument is ignored, but the original expression is
+            invoked)
+            </summary>
+            <typeparam name="TArgument">The type of argument to accept in the wrapping expression</typeparam>
+            <param name="expression">The expression to wrap</param>
+            <returns></returns>
+        </member>
         <member name="T:Magnum.Collections.Empty`1">
             <summary>
             Used to provide empty collections for generic types
@@ -12373,54 +11630,6 @@
         <member name="T:Magnum.Reflection.FastCollectionProperty`3">
             <summary>
             Represents a property that has a collection type that needs to be manipulated
-            </summary>
-        </member>
-        <member name="T:Magnum.Serialization.TypeSerializerCacheImpl">
-            <summary>
-              Wraps the cache for TypeSerializer implementations
-            </summary>
-        </member>
-        <member name="T:Magnum.Serialization.Serializer">
-            <summary>
-            Serializers convert objects to some type of string output
-            </summary>
-        </member>
-        <member name="M:Magnum.Serialization.Serializer.Serialize``1(``0,System.IO.TextWriter)">
-            <summary>
-            Serialize an object to the specified TextWriter
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="obj"></param>
-            <param name="writer"></param>
-        </member>
-        <member name="M:Magnum.Serialization.Serializer.Serialize``1(``0)">
-            <summary>
-            Serialize an object and return the string representing the object data
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="obj"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Serialization.Serializer.Deserialize``1(System.String)">
-            <summary>
-            Deserialize an object from a string
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="text"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Serialization.Serializer.Deserialize``1(System.IO.TextReader)">
-            <summary>
-            Deserialize an object from a TextReader
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="reader"></param>
-            <returns></returns>
-        </member>
-        <member name="T:Magnum.Serialization.TypeSerializerLoader">
-            <summary>
-              Scans the assembly for implementations of the TypeSerializer interface for 
-              the built-in types
             </summary>
         </member>
         <member name="T:Magnum.StateMachine.BasicEvent`1">
@@ -12569,6 +11778,14 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
+        <member name="M:Magnum.ObjectExtensions.ObjectExt.GetAttribute``1(System.Reflection.ICustomAttributeProvider)">
+            <summary>
+            props to Jeremy Miller for these two nice helpers
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="provider"></param>
+            <returns></returns>
+        </member>
         <member name="T:Magnum.Range`1">
             <summary>
             Represents a range of enumerable items
@@ -12713,49 +11930,49 @@
             <typeparam name="T"></typeparam>
             <param name="item"></param>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Weeks(System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Weeks(System.Int32)">
             <summary>
             Creates a TimeSpan for the specified number of weeks
             </summary>
             <param name="value">The number of weeks</param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Days(System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Days(System.Int32)">
             <summary>
             Creates a TimeSpan for the specified number of days
             </summary>
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Hours(System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Hours(System.Int32)">
             <summary>
             Creates a TimeSpan for the specified number of hours
             </summary>
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Minutes(System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Minutes(System.Int32)">
             <summary>
             Creates a TimeSpan for the specified number of minutes
             </summary>
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Seconds(System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Seconds(System.Int32)">
             <summary>
             Creates a TimeSpan for the specified number of seconds
             </summary>
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Milliseconds(System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Milliseconds(System.Int32)">
             <summary>
             Creates a TimeSpan for the specified number of milliseconds
             </summary>
             <param name="value"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Extensions.ExtensionsToTimeSpan.Repeat(System.TimeSpan,System.Int32)">
+        <member name="M:Magnum.DateTimeExtensions.TimeSpanExt.Repeat(System.TimeSpan,System.Int32)">
             <summary>
             Returns an enumeration of the specified TimeSpan with the specified number of elements
             </summary>
@@ -12854,11 +12071,6 @@
             Contains an object within a ReaderWriterLockContext
             </summary>
             <typeparam name="T"></typeparam>
-        </member>
-        <member name="T:Magnum.ValueProviders.MultipleValueProvider">
-            <summary>
-              Requests a value from an ordered list of value providers
-            </summary>
         </member>
     </members>
 </doc>
