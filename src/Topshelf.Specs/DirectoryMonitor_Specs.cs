@@ -115,6 +115,9 @@ namespace Topshelf.Specs
                 bobStarted.WaitOne(30.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Started);
+
+                dwStarted.Dispose();
+                bobStarted.Dispose();
             }
         }
 
