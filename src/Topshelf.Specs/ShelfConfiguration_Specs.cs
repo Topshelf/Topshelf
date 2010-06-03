@@ -21,7 +21,7 @@ namespace Topshelf.Specs
         [Test]
         public void Load_configuration_from_file()
         {
-            var config = ShelfConfiguration.GetConfig("service.config");
+            var config = ShelfConfiguration.GetConfig();
 
             Assert.That(config, Is.Not.Null);
             config.BootstrapperType.ShouldEqual(typeof(AppDomain_Specs_Bootstrapper));

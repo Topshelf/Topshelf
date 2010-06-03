@@ -148,21 +148,6 @@ namespace Topshelf.Shelving
 
             AppDomain ad = AppDomain.CreateDomain(name, null, settings);
 
-            // check the config for a bootstrapper if one isn't defined
-            if (bootstrapper == null && File.Exists(settings.ConfigurationFile))
-            {
-                ShelfConfiguration config = ShelfConfiguration.GetConfig(settings.ConfigurationFile);
-                if (config != null)
-                {
-                    bootstrapper = config.BootstrapperType;
-                }
-                else
-                {
-                    _log.ErrorFormat("Couldn't find a bootstrapper for shelf '{0}'", name);
-                    throw new Exception("Couldn't find a bootstrapper for shelf '{0}'".FormatWith(name));
-                }
-            }
-
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
             Type shelfType = typeof(Shelf);
             ObjectHandle shelfHandle = ad.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null, new object[] { bootstrapper },

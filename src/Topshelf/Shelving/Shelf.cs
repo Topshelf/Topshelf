@@ -72,8 +72,7 @@ namespace Topshelf.Shelving
             }
 
         }
-
-
+        
         private void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
             where T : class
         {
@@ -81,8 +80,7 @@ namespace Topshelf.Shelving
             //start up the service controller instance
             _controller = cfg.FastInvoke<ServiceConfigurator<T>, IServiceController>("Create");
         }
-
-
+        
         public static Type FindBootstrapperImplementation(Type bootstrapper)
         {
             if (bootstrapper != null)
@@ -91,6 +89,13 @@ namespace Topshelf.Shelving
                     return bootstrapper;
 
                 throw new InvalidOperationException("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
+            }
+            
+            // check configuration first
+            ShelfConfiguration config = ShelfConfiguration.GetConfig();
+            if (config != null)
+            {
+                return config.BootstrapperType;
             }
 
             var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()

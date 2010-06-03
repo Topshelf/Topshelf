@@ -14,7 +14,6 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Configuration;
-    using System.IO;
 
     public class ShelfConfiguration :
         ConfigurationSection
@@ -22,25 +21,6 @@ namespace Topshelf.Shelving
         public static ShelfConfiguration GetConfig()
         {
             return ConfigurationManager.GetSection("ShelfConfiguration") as ShelfConfiguration;
-        }
-
-        public static ShelfConfiguration GetConfig(string fileName)
-        {
-            // TODO: Do I really have to do this? Make a file exist so the .config will really load?
-            // This likely needs to be reconsidered - is there another way to load the config file for the app domain?
-            // Can I pull it directly from the AppDomain, DomainManager, or something else? 
-            
-            // chop off the .config
-            if (fileName.EndsWith(".config"))
-                fileName = fileName.Substring(0, fileName.Length - ".config".Length);
-
-            // if the filename doesn't exist, it won't load
-            if (!File.Exists(fileName))
-                File.WriteAllText(fileName, string.Empty);
-
-            var exeConfig = ConfigurationManager.OpenExeConfiguration(fileName);
-            var section = exeConfig.GetSection("ShelfConfiguration");
-            return section as ShelfConfiguration;
         }
 
         [ConfigurationProperty("Bootstrapper", IsRequired = true)]
