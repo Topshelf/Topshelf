@@ -56,6 +56,8 @@ namespace Topshelf.Shelving
                 s.Consume<ServicePausing>().Using(m => HandleShelfStateChange(m, ShelfState.Pausing));
                 s.Consume<ServiceContinuing>().Using(m => HandleShelfStateChange(m, ShelfState.Continuing));
             });
+
+            _log.Debug("ShelfMaker started.");
         }
 
         static ShelfHandle GetShelfStatus(IDictionary<string, ShelfHandle> dictionary, string key)
@@ -67,6 +69,7 @@ namespace Topshelf.Shelving
         {
             try
             {
+                _log.DebugFormat("Reloading shelf {0}", message.ShelfName);
                 ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
                 if (shelf != null)
                 {
@@ -137,6 +140,7 @@ namespace Topshelf.Shelving
 
         public void MakeShelf(string name, Type bootstrapper, params AssemblyName[] assemblies)
         {
+            _log.DebugFormat("Making shelf {0}", name);
             ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, name));
             if (shelf != null)
             {
@@ -150,6 +154,8 @@ namespace Topshelf.Shelving
 
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
             Type shelfType = typeof(Shelf);
+
+            _log.DebugFormat("Building shelf {0} with bootstrapper {1}", name, bootstrapper);
             ObjectHandle shelfHandle = ad.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null, new object[] { bootstrapper },
                                                          null, null);
 
@@ -171,7 +177,9 @@ namespace Topshelf.Shelving
             if (name == "TopShelf.DirectoryWatcher") return settings;
 
             settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
+            _log.DebugFormat("Shelf[{0}].ApplicationBase = {1}", name, settings.ApplicationBase);
             settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
+            _log.DebugFormat("Shelf[{0}].ConfigurationFile = {1}", name, settings.ConfigurationFile);
             return settings;
         }
 
@@ -234,12 +242,13 @@ namespace Topshelf.Shelving
 
         public event ShelfStateChangedHandler OnShelfStateChanged;
 
-        void StateChanged(ShelfState oldSate, ShelfState newState, string shelfName)
+        void StateChanged(ShelfState oldState, ShelfState newState, string shelfName)
         {
+            _log.DebugFormat("Shelf State Change {0} from {1} to {2}", shelfName, oldState, newState);
             ShelfStateChangedHandler handler = OnShelfStateChanged;
             if (handler != null)
             {
-                handler(this, new ShelfStateChangedEventArgs { PreviousShelfState = oldSate, CurrentShelfState = newState, ShelfName = shelfName });
+                handler(this, new ShelfStateChangedEventArgs { PreviousShelfState = oldState, CurrentShelfState = newState, ShelfName = shelfName });
             }
         }
 
