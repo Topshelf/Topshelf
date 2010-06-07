@@ -53,11 +53,11 @@
     <property name="dirs.build_scripts_custom" value="${dirs.build_scripts_custom}${path.to.custom_file}" />
     <echo message="Found ${customize.step.name} in '${dirs.current}\${path.to.custom_file}'. This means the custom path is going to be ${dirs.build_scripts_custom}." />
   </target>
-  
+
   <target name="create_file_if_not_already_existing">
     <copy file="customizers\${file.customize.template}" tofile="${dirs.build_scripts_custom}\${file.customized}" if="${not file::exists(dirs.build_scripts_custom + '\' + file.customized)}" />
   </target>
-  
+
   <target name="replace_template_values">
     <xmlpoke
       file="${dirs.build_scripts_custom}\${file.customized}"
@@ -68,7 +68,7 @@
       xpath="/project/property[@name = 'path.to.toplevel']/@value"
       value="..\.." if="${path.to.custom_file !=''}" />
   </target>
-  
+
   <target name="report_finish_time">
     <echo message="Customize finished at ${datetime::now()}. Please make any customizations you need to now to ${dirs.build_scripts_custom}\${file.customized} and don't forget to add it to source control." />
   </target>
