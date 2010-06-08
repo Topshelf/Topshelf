@@ -18,6 +18,7 @@ namespace Topshelf.Shelving
     using System.Linq;
     using System.Reflection;
     using System.Runtime.Remoting;
+    using System.Text;
     using System.Threading;
     using log4net;
     using Magnum.Channels;
@@ -155,7 +156,16 @@ namespace Topshelf.Shelving
             assemblies.ToList().ForEach(x => ad.Load(x)); // add any missing assemblies
             Type shelfType = typeof(Shelf);
 
-            _log.DebugFormat("Building shelf {0} with bootstrapper {1}", name, bootstrapper);
+            if(_log.IsDebugEnabled)
+            {
+                var message = new StringBuilder();
+                message.AppendFormat("Building shelf '{0}' ", name);
+                //message.AppendFormat("with bootstrapper '{0}' ", bootstrapper.Name);
+                //message.AppendFormat("in assembly '{0}'", bootstrapper.Assembly.GetName().Name);
+                //message.AppendFormat(" - version: {0}", bootstrapper.Assembly.GetName().Version);
+                _log.Debug(message);
+            }
+
             ObjectHandle shelfHandle = ad.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null, new object[] { bootstrapper },
                                                          null, null);
 
