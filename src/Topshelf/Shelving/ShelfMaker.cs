@@ -264,6 +264,11 @@ namespace Topshelf.Shelving
 
         public void Dispose()
         {
+            //NEW STUFF
+            _shelves.WriteLock(dict => dict.Values.ToList().ForEach(shelf => shelf.ShelfChannel.Send(new StopService())));
+
+            //how to wait for everything to have changed to stop + a timeout
+
             if (_myChannelHost != null)
             {
                 _myChannelHost.Dispose();
