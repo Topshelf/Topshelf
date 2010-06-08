@@ -37,7 +37,6 @@
 
         public void Start()
         {
-            File.WriteAllText(@"C:\development\Topshelf\src\logs\clock\test.txt", ConfigurationManager.AppSettings["name"]);
             _timer.Start();
         }
         public void Stop()

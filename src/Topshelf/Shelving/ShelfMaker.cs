@@ -94,7 +94,7 @@ namespace Topshelf.Shelving
                 // trash the partially formed shelf
                 // another file system event might kick it up again
                 _shelves.WriteLock(dict => { if (dict.ContainsKey(message.ShelfName)) dict.Remove(message.ShelfName); });
-                _log.ErrorFormat("Error reloading shelf {0}: {1}", message.ShelfName, ex);
+                _log.Error("Error reloading shelf '{0}'".FormatWith( message.ShelfName), ex);
             }
 
         }
@@ -118,7 +118,7 @@ namespace Topshelf.Shelving
 
         void HandleShelfFault(ShelfFault message)
         {
-            _log.Error("Error in shelf {0}: {1}".FormatWith(message.ShelfName, message.Exception));
+            _log.Error("Error in shelf '{0}' -> '{1}'".FormatWith(message.ShelfName, message.Exception.Message), message.Exception);
             ShelfHandle shelfStatus = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
             if (shelfStatus == null)
                 return;

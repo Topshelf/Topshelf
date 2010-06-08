@@ -94,7 +94,7 @@ namespace Topshelf.Model
                     _log.Error("Exception stopping sub service " + service.Name, ex);
                 }
             }
-
+            //TODO: Need to wait for shut down
             _log.Debug("pre after stop");
             _afterStop(this);
             _log.Info("AfterStop complete");
