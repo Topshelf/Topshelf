@@ -1,7 +1,6 @@
 ﻿namespace StuffOnAShelf
 {
     using System;
-    using System.Configuration;
     using System.IO;
     using System.Timers;
     using log4net;
