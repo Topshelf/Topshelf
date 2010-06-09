@@ -72,7 +72,8 @@ namespace Topshelf.Model
         #endregion
 
         #region Messaging Start
-//        readonly UntypedChannelAdapter _myChannel;
+        //readonly UntypedChannelAdapter _myChannel;
+        //readonly WcfUntypedChannelProxy _hostChannel;
         //subscribe
         //bind the messages to the appropriate action.
         #endregion
@@ -88,6 +89,9 @@ namespace Topshelf.Model
 //                s.Consume<PauseService>().Using(m => Pause());
 //                s.Consume<ContinueService>().Using(m => Continue());
 //            });
+
+            //TODO: need an alternative name? botttle? 
+            //_hostChannel.Send(new BottleReady());
         }
 
         TService _instance;
