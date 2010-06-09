@@ -25,7 +25,7 @@ namespace Topshelf.Shelving
         IDisposable
     {
         IServiceController _controller;
-		readonly WcfUntypedChannelProxy _hostChannel;
+		readonly UntypedChannel _hostChannel;
 		readonly WcfUntypedChannelHost _myChannelHost;
 		readonly UntypedChannelAdapter _myChannel;
         readonly ChannelSubscription _subscription;
