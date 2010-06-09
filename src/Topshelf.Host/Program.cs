@@ -27,10 +27,10 @@ namespace Topshelf.Host
             {
                 x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-                x.ConfigureService<ShelfMakerService>(s =>
+                x.ConfigureService<TopshelfHostService>(s =>
                 {
                     s.Named("Topshelf.Host");
-                    s.HowToBuildService(name => new ShelfMakerService());
+                    s.HowToBuildService(name => new TopshelfHostService());
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());
                 });

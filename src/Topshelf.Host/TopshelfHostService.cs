@@ -15,7 +15,7 @@ namespace Topshelf.Host
     using FileSystem;
     using Shelving;
 
-    public class ShelfMakerService
+    public class TopshelfHostService
     {
         private ShelfMaker _shelfMaker;
 
