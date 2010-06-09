@@ -23,7 +23,6 @@ namespace Topshelf.Shelving
         Paused,
         Stopping,
         Stopped,
-        Continuing,
-        Continued
+        Continuing
     }
 }

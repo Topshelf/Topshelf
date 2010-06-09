@@ -49,7 +49,7 @@ namespace Topshelf.Shelving
                 s.Consume<ServiceStopped>().Using(m => MarkShelvedServiceStopped(m));
                 s.Consume<ServiceStarted>().Using(m => HandleShelfStateChange(m, ShelfState.Started));
                 s.Consume<FileSystemChange>().Using(m => ReloadShelf(m));
-                s.Consume<ServiceContinued>().Using(m => HandleShelfStateChange(m, ShelfState.Continued));
+                s.Consume<ServiceContinued>().Using(m => HandleShelfStateChange(m, ShelfState.Started));
                 s.Consume<ServicePaused>().Using(m => HandleShelfStateChange(m, ShelfState.Paused));
                 s.Consume<ServiceStarting>().Using(m => HandleShelfStateChange(m, ShelfState.Starting));
                 s.Consume<ServiceStopping>().Using(m => HandleShelfStateChange(m, ShelfState.Stopping));
