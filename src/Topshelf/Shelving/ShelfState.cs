@@ -14,7 +14,7 @@ namespace Topshelf.Shelving
 {
     public enum ShelfState
     {
-        Unknown,
+        Unavailable,
         Readying,
         Ready,
         Starting,
