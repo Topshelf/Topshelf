@@ -28,7 +28,7 @@ namespace StuffOnAShelf
             cfg.HowToBuildService(n => new TheClock());
             cfg.WhenStarted(s =>
             {
-                XmlConfigurator.Configure(new FileInfo(".\\clock.log4net.config"));
+                XmlConfigurator.Configure(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clock.log4net.config")));
                 s.Start();
             });
             cfg.WhenStopped(s => s.Stop());
@@ -38,11 +38,11 @@ namespace StuffOnAShelf
     public class TheClock
     {
         readonly Timer _timer;
-        readonly ILog _log = LogManager.GetLogger(typeof (TheClock));
+        readonly ILog _log = LogManager.GetLogger(typeof(TheClock));
 
         public TheClock()
         {
-            _timer = new Timer(1000) {AutoReset = true};
+            _timer = new Timer(1000) { AutoReset = true };
             _timer.Elapsed += (sender, eventArgs) => _log.Info(DateTime.Now);
         }
 
