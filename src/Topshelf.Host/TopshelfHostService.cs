@@ -12,6 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Host
 {
+    using System;
+    using System.IO;
+    using System.Linq;
     using FileSystem;
     using Shelving;
 
@@ -23,6 +26,13 @@ namespace Topshelf.Host
         {
             _shelfMaker = new ShelfMaker();
             _shelfMaker.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
+
+            var serviceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
+
+            Directory.GetDirectories(serviceDir)
+                .ToList()
+                .ConvertAll(Path.GetFileName)
+                .ForEach(dir => _shelfMaker.MakeShelf(dir));
         }
 
         public void Stop()
