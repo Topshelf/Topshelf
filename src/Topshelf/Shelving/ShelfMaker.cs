@@ -160,9 +160,16 @@ namespace Topshelf.Shelving
             {
                 var message = new StringBuilder();
                 message.AppendFormat("Building shelf '{0}' ", name);
-                //message.AppendFormat("with bootstrapper '{0}' ", bootstrapper.Name);
-                //message.AppendFormat("in assembly '{0}'", bootstrapper.Assembly.GetName().Name);
-                //message.AppendFormat(" - version: {0}", bootstrapper.Assembly.GetName().Version);
+                if (bootstrapper != null)
+                {
+                    message.AppendFormat("with bootstrapper '{0}' ", bootstrapper.Name);
+                    message.AppendFormat("in assembly '{0}'", bootstrapper.Assembly.GetName().Name);
+                    message.AppendFormat(" - version: {0}", bootstrapper.Assembly.GetName().Version);
+                }
+                else
+                {
+                    message.AppendFormat(" bootstrapper unknown - delegating to Shelf");
+                }
                 _log.Debug(message);
             }
 

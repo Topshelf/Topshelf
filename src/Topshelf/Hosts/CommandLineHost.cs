@@ -37,16 +37,11 @@ namespace Topshelf.Hosts
         {
             CheckToSeeIfWinServiceRunning();
 
-            //not all
-
             _log.Debug("Starting up as a console application");
 
-            var internalallyTriggeredTermination = new ManualResetEvent(false);
             var externalTriggeredTerminatation = new ManualResetEvent(false);
 
-            var waitHandles = new WaitHandle[] {internalallyTriggeredTermination, externalTriggeredTerminatation};
-
-            _coordinator.Stopped += (() => internalallyTriggeredTermination.Set());
+            var waitHandles = new WaitHandle[] { externalTriggeredTerminatation};
 
             Console.CancelKeyPress += delegate
                                           {
