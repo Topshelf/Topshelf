@@ -28,10 +28,8 @@ namespace Topshelf.Model
         void PauseService(string name);
         void ContinueService(string name);
 
-        //void Install();
-        //void Uninstall();
 
-        event Action Stopped;
+        //TODO: Do these functions belong on the Host?
         int HostedServiceCount { get; }
         IServiceController GetService(string s);
         IList<ServiceInformation> GetServiceInfo();

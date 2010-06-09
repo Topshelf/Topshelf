@@ -44,8 +44,8 @@ namespace Topshelf.Shelving
                                          s.Consume<ReadyService>().Using(m => Initialize());
                                          s.Consume<StopService>().Using(m => HandleStop(m));
                                          s.Consume<StartService>().Using(m => HandleStart(m));
-                                         s.Consume<PauseService>().Using(m => _controller.Pause());
-                                         s.Consume<ContinueService>().Using(m => _controller.Continue());
+                                         s.Consume<PauseService>().Using(m => HandlePause(m));
+                                         s.Consume<ContinueService>().Using(m => HandleContinue(m));
                                      });
 
             //send message to host that I am ready

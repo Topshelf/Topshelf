@@ -160,9 +160,16 @@ namespace Topshelf.Shelving
             {
                 var message = new StringBuilder();
                 message.AppendFormat("Building shelf '{0}' ", name);
-                //message.AppendFormat("with bootstrapper '{0}' ", bootstrapper.Name);
-                //message.AppendFormat("in assembly '{0}'", bootstrapper.Assembly.GetName().Name);
-                //message.AppendFormat(" - version: {0}", bootstrapper.Assembly.GetName().Version);
+                if (bootstrapper != null)
+                {
+                    message.AppendFormat("with bootstrapper '{0}' ", bootstrapper.Name);
+                    message.AppendFormat("in assembly '{0}'", bootstrapper.Assembly.GetName().Name);
+                    message.AppendFormat(" - version: {0}", bootstrapper.Assembly.GetName().Version);
+                }
+                else
+                {
+                    message.AppendFormat(" bootstrapper unknown - delegating to Shelf");
+                }
                 _log.Debug(message);
             }
 
@@ -254,7 +261,7 @@ namespace Topshelf.Shelving
 
         void StateChanged(ShelfState oldState, ShelfState newState, string shelfName)
         {
-            _log.DebugFormat("Shelf State Change {0} from {1} to {2}", shelfName, oldState, newState);
+            _log.DebugFormat("Shelf State Change '{0}' from '{1}' to '{2}'", shelfName, oldState, newState);
             ShelfStateChangedHandler handler = OnShelfStateChanged;
             if (handler != null)
             {

@@ -17,7 +17,6 @@ namespace Topshelf.Model
     using System.Diagnostics;
     using System.Linq;
     using log4net;
-    using Magnum.Collections;
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
     public class ServiceCoordinator :
@@ -61,8 +60,15 @@ namespace Topshelf.Model
     		}
     	}
 
+        public void AddNewService(IServiceController controller)
+        {
+            _services.Add(controller);
+            //TODO: How to best call start here?
+        }
+
     	public void Start()
         {
+            //TODO: With Shelving this feels like it needs to become before 'host' start
             _log.Debug("Calling BeforeStartingServices");
             _beforeStartingServices(this);
             _log.Info("BeforeStart complete");
@@ -75,6 +81,7 @@ namespace Topshelf.Model
 				serviceController.Start();
         	}
 
+            //TODO: This feels like it should be after 'host' stop
             _log.Debug("Calling BeforeStart");
             _beforeStart(this);
             _log.Info("BeforeStart complete");
@@ -82,6 +89,8 @@ namespace Topshelf.Model
 
         public void Stop()
         {
+            //TODO: PRE STOP
+
             foreach (var service in Services.Reverse())
             {
                 try
@@ -98,7 +107,6 @@ namespace Topshelf.Model
             _log.Debug("pre after stop");
             _afterStop(this);
             _log.Info("AfterStop complete");
-            OnStopped();
         }
 
         public void Pause()
@@ -178,8 +186,6 @@ namespace Topshelf.Model
             return Services.Where(x=>x.Name == name).First();
         }
 
-        public event Action Stopped;
-
         #region Dispose Crap
 
         private readonly List<Func<IServiceController>> _serviceConfigurators;
@@ -223,15 +229,6 @@ namespace Topshelf.Model
             {
                 IServiceController serviceController = serviceConfigurator();
                 Services.Add(serviceController);
-            }
-        }
-
-        private void OnStopped()
-        {
-            Action handler = Stopped;
-            if (handler != null)
-            {
-                handler();
             }
         }
     }
