@@ -49,7 +49,7 @@ namespace Topshelf.Shelving
                 s.Consume<ServiceStopped>().Using(m => MarkShelvedServiceStopped(m));
                 s.Consume<ServiceStarted>().Using(m => HandleShelfStateChange(m, ShelfState.Started));
                 s.Consume<FileSystemChange>().Using(m => ReloadShelf(m));
-                s.Consume<ServiceContinued>().Using(m => HandleShelfStateChange(m, ShelfState.Continued));
+                s.Consume<ServiceContinued>().Using(m => HandleShelfStateChange(m, ShelfState.Started));
                 s.Consume<ServicePaused>().Using(m => HandleShelfStateChange(m, ShelfState.Paused));
                 s.Consume<ServiceStarting>().Using(m => HandleShelfStateChange(m, ShelfState.Starting));
                 s.Consume<ServiceStopping>().Using(m => HandleShelfStateChange(m, ShelfState.Stopping));
@@ -96,7 +96,6 @@ namespace Topshelf.Shelving
                 _shelves.WriteLock(dict => { if (dict.ContainsKey(message.ShelfName)) dict.Remove(message.ShelfName); });
                 _log.Error("Error reloading shelf '{0}'".FormatWith( message.ShelfName), ex);
             }
-
         }
 
         public void MakeShelf(string name, params AssemblyName[] assemblies)
@@ -113,7 +112,10 @@ namespace Topshelf.Shelving
             if (shelf.StopHandle != null)
                 shelf.StopHandle.Set();
 
+            ShelfState oldState = shelf.CurrentState;
             shelf.CurrentState = ShelfState.Stopped;
+
+            StateChanged(oldState, shelf.CurrentState, message.ShelfName);
         }
 
         void HandleShelfFault(ShelfFault message)
@@ -168,7 +170,7 @@ namespace Topshelf.Shelving
                 }
                 else
                 {
-                    message.AppendFormat(" bootstrapper unknown - delegating to Shelf");
+                    message.AppendFormat("bootstrapper unknown - delegating to Shelf");
                 }
                 _log.Debug(message);
             }
@@ -203,7 +205,7 @@ namespace Topshelf.Shelving
         public ShelfState GetState(string shelfName)
         {
             ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
-            return shelf == null ? ShelfState.Unknown : shelf.CurrentState;
+            return shelf == null ? ShelfState.Unavailable : shelf.CurrentState;
         }
 
         public void StartShelf(string shelfName)
