@@ -40,7 +40,7 @@ namespace Topshelf.Shelving
             _shelves = new ReaderWriterLockedObject<Dictionary<string, ShelfHandle>>(new Dictionary<string, ShelfHandle>());
 
             _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
-            _myChannelHost = new WcfUntypedChannelHost(new SynchronousFiber(), _myChannel, WellknownAddresses.HostAddress, "topshelf.host");
+            _myChannelHost = WellknownAddresses.GetHostHost(_myChannel);
 
             _myChannel.Subscribe(s =>
             {
@@ -182,7 +182,7 @@ namespace Topshelf.Shelving
                                    {
                                        AppDomain = ad,
                                        ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
-                                       ShelfChannelBuilder = appDomain => new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.GetShelfAddress(appDomain), "topshelf.me"),
+                                       ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
                                        ShelfName = name
                                    }));
         }

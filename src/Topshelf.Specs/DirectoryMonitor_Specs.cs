@@ -36,7 +36,7 @@ namespace Topshelf.Specs
                 using (var dm = new DirectoryMonitor("."))
                 {
 					var myChannel = new UntypedChannelAdapter(new SynchronousFiber());
-                    using (new WcfUntypedChannelHost(new SynchronousFiber(), myChannel, WellknownAddresses.HostAddress, "topshelf.host"))
+                    using (WellknownAddresses.GetHostHost(myChannel))
                     {
                         dm.Start();
 
