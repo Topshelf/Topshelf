@@ -34,9 +34,9 @@ namespace Topshelf.Shelving
         public Shelf(Type bootstraper)
         {
             _bootstrapperType = bootstraper;
-			_hostChannel = new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+            _hostChannel = WellknownAddresses.GetHostChannelProxy();
 			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
-			_myChannelHost = new WcfUntypedChannelHost(new ThreadPoolFiber(), _myChannel, WellknownAddresses.CurrentShelfAddress, "topshelf.me");
+            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel);
 
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
