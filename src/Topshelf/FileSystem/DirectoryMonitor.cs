@@ -21,6 +21,33 @@ namespace Topshelf.FileSystem
     using Messages;
     using Shelving;
 
+
+	public class FileSystemEventPublisher
+	{
+		private readonly string _path;
+
+		public FileSystemEventPublisher(string path)
+		{
+			_path = path;
+		}
+
+		public void Start()
+		{
+			if(!Directory.Exists(_path))
+				Directory.CreateDirectory(_path);
+
+			_fileSystemWatcher = new FileSystemWatcher(_path)
+			{
+				IncludeSubdirectories = true,
+				EnableRaisingEvents = true,
+			};
+
+			_fileSystemWatcher.Changed += 
+
+		}
+	}
+
+
     public class DirectoryMonitor :
         IDisposable
     {
