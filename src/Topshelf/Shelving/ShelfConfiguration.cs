@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -23,19 +23,20 @@ namespace Topshelf.Shelving
             return ConfigurationManager.GetSection("ShelfConfiguration") as ShelfConfiguration;
         }
 
-        public static ShelfConfiguration GetConfig(string fileName)
+        [ConfigurationProperty("Bootstrapper", IsRequired = true)]
+        public string Bootstrapper
         {
-            return ConfigurationManager.OpenExeConfiguration(fileName).GetSection("ShelfConfiguration") as ShelfConfiguration;
+            get { return (string) this["Bootstrapper"]; }
         }
 
-        [ConfigurationProperty("Bootstrapper", IsRequired = true)]
-        [SubclassTypeValidator(typeof(Bootstrapper<>))]
         public Type BootstrapperType
         {
             get
             {
-                return Type.GetType((string)this["Bootstrapper"]);
+                var value = Bootstrapper;
+                return Type.GetType(value);
             }
         }
+
     }
 }

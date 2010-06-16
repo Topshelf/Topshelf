@@ -12,6 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    using Configuration;
+
     public class TopshelfArguments
     {
         // ts  -- runs as console | service (auto detected)
@@ -21,6 +23,6 @@ namespace Topshelf
         // ts uninstall /instance=bob
 
         public string Instance { get; set; }
-        public ServiceActions Action { get; set; }
+        public ServiceActionNames ActionName { get; set; }
     }
 }

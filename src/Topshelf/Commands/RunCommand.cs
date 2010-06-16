@@ -31,11 +31,10 @@ namespace Topshelf.Commands
             _serviceName = serviceName;
         }
 
-        #region Command Members
 
-        public ServiceActions Name
+        public ServiceActionNames Name
         {
-            get { return ServiceActions.Run; }
+            get { return ServiceActionNames.Run; }
         }
 
         public void Execute()
@@ -43,6 +42,8 @@ namespace Topshelf.Commands
             Host host;
             if (Process.GetCurrentProcess().GetParent().ProcessName == "services")
             {
+                _log.Debug("Detected that I am running in the windows services");
+                _log.Debug("Starting up as a win service application");
                 host = new WinServiceHost(_coordinator, _serviceName);
             }
             else
@@ -54,7 +55,5 @@ namespace Topshelf.Commands
 
             host.Host();
         }
-
-        #endregion
     }
 }

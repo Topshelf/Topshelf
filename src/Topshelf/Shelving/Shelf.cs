@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2008 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -24,19 +24,19 @@ namespace Topshelf.Shelving
     public class Shelf :
         IDisposable
     {
-        private IServiceController _controller;
-		private readonly WcfUntypedChannelProxy _hostChannel;
-		private readonly WcfUntypedChannelHost _myChannelHost;
-		private readonly UntypedChannelAdapter _myChannel;
-        private readonly ChannelSubscription _subscription;
-        private readonly Type _bootstrapperType;
+        IServiceController _controller;
+		readonly UntypedChannel _hostChannel;
+		readonly WcfUntypedChannelHost _myChannelHost;
+		readonly UntypedChannelAdapter _myChannel;
+        readonly ChannelSubscription _subscription;
+        readonly Type _bootstrapperType;
 
         public Shelf(Type bootstraper)
         {
             _bootstrapperType = bootstraper;
-			_hostChannel = new WcfUntypedChannelProxy(new ThreadPoolFiber(), WellknownAddresses.HostAddress, "topshelf.host");
+            _hostChannel = WellknownAddresses.GetHostChannelProxy();
 			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
-			_myChannelHost = new WcfUntypedChannelHost(new ThreadPoolFiber(), _myChannel, WellknownAddresses.CurrentShelfAddress, "topshelf.me");
+            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel);
 
             //wire up all the subscriptions
             _subscription = _myChannel.Subscribe(s =>
@@ -44,8 +44,8 @@ namespace Topshelf.Shelving
                                          s.Consume<ReadyService>().Using(m => Initialize());
                                          s.Consume<StopService>().Using(m => HandleStop(m));
                                          s.Consume<StartService>().Using(m => HandleStart(m));
-                                         s.Consume<PauseService>().Using(m => _controller.Pause());
-                                         s.Consume<ContinueService>().Using(m => _controller.Continue());
+                                         s.Consume<PauseService>().Using(m => HandlePause(m));
+                                         s.Consume<ContinueService>().Using(m => HandleContinue(m));
                                      });
 
             //send message to host that I am ready
@@ -54,18 +54,25 @@ namespace Topshelf.Shelving
 
         public void Initialize()
         {
-            var t = FindBootstrapperImplementation(_bootstrapperType);
-            var bs = Activator.CreateInstance(t);
+            try
+            {
+                Type t = FindBootstrapperImplementation(_bootstrapperType);
+                object bs = Activator.CreateInstance(t);
 
-            //TODO: issue is here
-            var st = bs.GetType().GetInterfaces()[0].GetGenericArguments()[0];
-            var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(st));
+                Type st = bs.GetType().GetInterfaces()[0].GetGenericArguments()[0];
+                object cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(st));
 
-            this.FastInvoke(new[] { st }, "InitializeAndCreateHostedService", bs, cfg);
+                this.FastInvoke(new[] { st }, "InitializeAndCreateHostedService", bs, cfg);
 
-            _hostChannel.Send(new ServiceReady());
+                _hostChannel.Send(new ServiceReady());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+
         }
-
+        
         private void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
             where T : class
         {
@@ -73,8 +80,7 @@ namespace Topshelf.Shelving
             //start up the service controller instance
             _controller = cfg.FastInvoke<ServiceConfigurator<T>, IServiceController>("Create");
         }
-
-
+        
         public static Type FindBootstrapperImplementation(Type bootstrapper)
         {
             if (bootstrapper != null)
@@ -82,8 +88,14 @@ namespace Topshelf.Shelving
                 if (bootstrapper.GetInterfaces().Where(IsBootstrapperType).Count() > 0)
                     return bootstrapper;
 
-                throw new InvalidOperationException("Bootstrapper type, " + bootstrapper.GetType().Name
-                                                    + ", is not a subclass of Bootstrapper.");
+                throw new InvalidOperationException("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
+            }
+            
+            // check configuration first
+            ShelfConfiguration config = ShelfConfiguration.GetConfig();
+            if (config != null)
+            {
+                return config.BootstrapperType;
             }
 
             var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -111,16 +123,71 @@ namespace Topshelf.Shelving
 
         private void HandleStart(StartService message)
         {
-            _hostChannel.Send(new ShelfStarting());
-            _controller.Start();
-            _hostChannel.Send(new ShelfStarted());
+            try
+            {
+                _hostChannel.Send(new ServiceStarting());
+                _controller.Start();
+                _hostChannel.Send(new ServiceStarted());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
         }
 
         private void HandleStop(StopService message)
         {
-            _hostChannel.Send(new ShelfStopping());
-            _controller.Stop();
-            _hostChannel.Send(new ShelfStopped());
+            try
+            {
+                _hostChannel.Send(new ServiceStopping());
+                _controller.Stop();
+                _hostChannel.Send(new ServiceStopped());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+        }
+
+        private void HandlePause(PauseService messsage)
+        {
+            try
+            {
+                _hostChannel.Send(new ServicePausing());
+                _controller.Pause();
+                _hostChannel.Send(new ServicePaused());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+        }
+
+        private void HandleContinue(ContinueService message)
+        {
+            try
+            {
+                _hostChannel.Send(new ServiceContinuing());
+                _controller.Continue();
+                _hostChannel.Send(new ServiceContinued());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+        }
+
+
+        private void SendFault(Exception exception)
+        {
+            try
+            {
+                _hostChannel.Send(new ShelfFault(exception));
+            }
+            catch (Exception)
+            {
+                // eat the exception for now
+            }
         }
 
         public void Dispose()

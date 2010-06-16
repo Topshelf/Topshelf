@@ -36,7 +36,7 @@ namespace Topshelf.Specs
                 using (var dm = new DirectoryMonitor("."))
                 {
 					var myChannel = new UntypedChannelAdapter(new SynchronousFiber());
-                    using (new WcfUntypedChannelHost(new SynchronousFiber(), myChannel, WellknownAddresses.HostAddress, "topshelf.host"))
+                    using (WellknownAddresses.GetHostHost(myChannel))
                     {
                         dm.Start();
 
@@ -44,7 +44,7 @@ namespace Topshelf.Specs
                                                       .Using(fsc =>
                                                           {
                                                               var localCount = Interlocked.Increment(ref count);
-                                                              Console.WriteLine(fsc.ServiceId);
+                                                              Console.WriteLine(fsc.ShelfName);
                                                               if (localCount % 2 == 0)
                                                                 manualResetEvent.Set();
                                                           }));
@@ -92,15 +92,20 @@ namespace Topshelf.Specs
                     if (args.ShelfName == "TopShelf.DirectoryWatcher" && args.CurrentShelfState == ShelfState.Started)
                         dwStarted.Set();
                 };
+
+                // this needs to happen before we attach the file watcher
+                string srvDir = Path.Combine(".", "Services");
+                Directory.CreateDirectory(srvDir);
+
+                Console.WriteLine("Starting TopShelf.DirectoryWatcher");
                 sm.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
-
-                string bobDir = Path.Combine(".", "Services", "bob");
-
                 dwStarted.WaitOne(30.Seconds());
-
                 sm.GetState("TopShelf.DirectoryWatcher").ShouldEqual(ShelfState.Started);
+                Console.WriteLine("TopShelf.DirectoryWatcher started");
 
-                Directory.CreateDirectory(Path.Combine(".", "Services"));
+                // This isn't in setup, because we want the events to fire off to generate the shelf
+                Console.WriteLine("Copying files...");
+                string bobDir = Path.Combine(srvDir, "bob");
                 Directory.CreateDirectory(bobDir);
 
                 CopyFileToDir("TopShelf.dll", bobDir);
@@ -109,12 +114,15 @@ namespace Topshelf.Specs
                 CopyFileToDir("System.CoreEx.dll", bobDir);
                 CopyFileToDir("System.Reactive.dll", bobDir);
                 File.Copy("service.config", Path.Combine(bobDir, "bob.config"));
-                
-                //sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+                Console.WriteLine("Files copied, waiting for bob to start.");
 
+                // let the service automagically start
                 bobStarted.WaitOne(30.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Started);
+
+                dwStarted.Dispose();
+                bobStarted.Dispose();
             }
         }
 

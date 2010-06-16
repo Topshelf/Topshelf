@@ -30,9 +30,9 @@ namespace Topshelf.Commands
 
         #region Command Members
 
-        public ServiceActions Name
+        public ServiceActionNames Name
         {
-            get { return ServiceActions.Uninstall; }
+            get { return ServiceActionNames.Uninstall; }
         }
 
         public void Execute()

@@ -21,6 +21,8 @@ namespace Topshelf.Model
         string Name { get; set; }
         ServiceState State { get; }
         ServiceBuilder BuildService { get; }
+
+        //initialize? - this would just build the service
         void Start();
         void Stop();
         void Pause();

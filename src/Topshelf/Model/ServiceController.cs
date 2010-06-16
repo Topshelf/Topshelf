@@ -15,7 +15,10 @@ namespace Topshelf.Model
     using System;
     using System.Diagnostics;
     using Exceptions;
+    using Magnum.Channels;
+    using Magnum.Fibers;
     using Magnum.StateMachine;
+    using Messages;
 
     [DebuggerDisplay("Service({Name}) is {State}")]
     public class ServiceController<TService> :
@@ -31,7 +34,7 @@ namespace Topshelf.Model
             {
                 Initially(
                     When(OnStart)
-                        .Then(sc => sc.BuildInstance())
+                        .Then(sc => sc.Initialize())
                         .Then(sc => sc.StartAction(sc._instance))
                         .TransitionTo(Started)
                     );
@@ -67,6 +70,29 @@ namespace Topshelf.Model
         public static State Completed { get; set; }
 
         #endregion
+
+        #region Messaging Start
+        //readonly UntypedChannelAdapter _myChannel;
+        //readonly WcfUntypedChannelProxy _hostChannel;
+        //subscribe
+        //bind the messages to the appropriate action.
+        #endregion
+
+        public ServiceController()
+        {
+//            _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+//            _myChannel.Subscribe(s =>
+//            {
+//                s.Consume<ReadyService>().Using(m => Initialize());
+//                s.Consume<StopService>().Using(m => Stop());
+//                s.Consume<StartService>().Using(m => Start());
+//                s.Consume<PauseService>().Using(m => Pause());
+//                s.Consume<ContinueService>().Using(m => Continue());
+//            });
+
+            //TODO: need an alternative name? botttle? 
+            //_hostChannel.Send(new BottleReady());
+        }
 
         TService _instance;
         public Action<TService> StartAction { get; set; }
@@ -144,7 +170,7 @@ namespace Topshelf.Model
 
         #endregion
 
-        void BuildInstance()
+        void Initialize()
         {
             //TODO: do I need to pull it out by name?
             _instance = (TService)BuildService(Name);

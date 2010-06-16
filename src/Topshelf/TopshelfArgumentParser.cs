@@ -15,6 +15,7 @@ namespace Topshelf
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Configuration;
     using Magnum.CommandLineParser;
 
     public static class TopshelfArgumentParser
@@ -42,8 +43,7 @@ namespace Topshelf
                 .Select(x=>x.Id)
                 .SingleOrDefault();
 
-            //TODO: Fix this
-            args.Action = (command ?? "Run").ToEnum<ServiceActions>();
+            args.ActionName = (command ?? "Run").ToEnum<ServiceActionNames>();
 
             args.Instance = commandLineElements
                 .OfType<IDefinitionElement>()

@@ -30,9 +30,9 @@ namespace Topshelf.Commands
 
         #region Command Members
 
-        public ServiceActions Name
+        public ServiceActionNames Name
         {
-            get { return ServiceActions.Install; }
+            get { return ServiceActionNames.Install; }
         }
 
         public void Execute()

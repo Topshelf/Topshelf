@@ -14,30 +14,56 @@ namespace Topshelf.Shelving
 {
     using System;
     using System.Diagnostics;
+    using Magnum.Channels;
+    using Magnum.Fibers;
 
     public static class WellknownAddresses
     {
-        public static Uri CurrentShelfAddress
+        public static WcfUntypedChannelHost GetHostHost(UntypedChannel hostProxy)
         {
-            get { return new Uri("net.pipe://localhost/topshelf-{0}-{1}".FormatWith(GetFolder(), GetPid())); }
+            return new WcfUntypedChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress( GetHostPipeName()),"host");
+        }
+        public static WcfUntypedChannelHost GetCurrentShelfHost(UntypedChannelAdapter myChannel)
+        {
+            return new WcfUntypedChannelHost(new ThreadPoolFiber(), myChannel, GetBaseAddress(GetThisShelfPipeName()), "shelf");
         }
 
-        public static Uri HostAddress
+        public static UntypedChannel GetCurrentChannelProxy()
         {
-            get { return new Uri("net.pipe://localhost/topshelf-host-{0}".FormatWith(GetPid())); }
+            return new WcfUntypedChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetThisShelfPipeName()), "shelf"); 
+        }
+        public static WcfUntypedChannelProxy GetShelfChannelProxy(AppDomain appDomain)
+        {
+            return new WcfUntypedChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(appDomain.FriendlyName)), "shelf");
+        }
+        public static UntypedChannel GetHostChannelProxy()
+        {
+            return new WcfUntypedChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetHostPipeName()), "host");
         }
 
-        public static Uri GetShelfAddress(AppDomain appDomain)
+        private static string GetShelfPipeName(string name)
         {
-            return new Uri("net.pipe://localhost/topshelf-{0}-{1}".FormatWith(appDomain.FriendlyName, GetPid()));
+            return "{0}/{1}".FormatWith(GetPid(),name);
+        }
+        private static string GetThisShelfPipeName()
+        {
+            return "{0}/{1}".FormatWith(GetPid(), GetFolder());
+        }
+        private static string GetHostPipeName()
+        {
+            return "{0}/host".FormatWith(GetPid());
         }
 
-        public static int GetPid()
+        private static Uri GetBaseAddress(string name)
+        {
+            return new Uri("net.pipe://localhost/topshelf/{0}".FormatWith(name));
+        }
+
+        private static int GetPid()
         {
             return Process.GetCurrentProcess().Id;
         }
-
-        public static string GetFolder()
+        private static string GetFolder()
         {
             return AppDomain.CurrentDomain.FriendlyName;
         }
