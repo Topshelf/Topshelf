@@ -35,12 +35,12 @@ namespace Topshelf.Specs
             {
                 using (var dm = new DirectoryMonitor("."))
                 {
-					var myChannel = new UntypedChannelAdapter(new SynchronousFiber());
+					var myChannel = new ChannelAdapter();
                     using (WellknownAddresses.GetHostHost(myChannel))
                     {
                         dm.Start();
 
-                        myChannel.Subscribe(sc => sc.Consume<FileSystemChange>()
+                        myChannel.Connect(sc => sc.Consume<FileSystemChange>()
                                                       .Using(fsc =>
                                                           {
                                                               var localCount = Interlocked.Increment(ref count);

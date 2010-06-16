@@ -4,6 +4,11 @@
         <name>Magnum</name>
     </assembly>
     <members>
+        <member name="T:Magnum.Channels.UntypedChannel">
+            <summary>
+            A channel to which any message type can be sent
+            </summary>
+        </member>
         <member name="T:Magnum.Channels.Channel">
             <summary>
             A channel represents a one-way communication, well, channel
@@ -105,7 +110,7 @@
             <param name="actorType">The type of actor to select</param>
             <param name="callback">The method to call with each actor</param>
         </member>
-        <member name="M:Magnum.Actors.ActorRegistry.Subscribe(System.Action{Magnum.Channels.Configuration.SubscriptionConfigurator})">
+        <member name="M:Magnum.Actors.ActorRegistry.Subscribe(System.Action{Magnum.Channels.Configuration.ConnectionConfigurator})">
             <summary>
             Allow subscription to events that are produced by the actor registry as actors
             are registered and unregistered.
@@ -212,6 +217,39 @@
             Context for binding to a model
             </summary>
         </member>
+        <member name="T:Magnum.Channels.Configuration.ChannelConnectionConfigurator`1">
+            <summary>
+            A fluent syntax for configuration the options of a channel subscription
+            </summary>
+            <typeparam name="TChannel">The channel type</typeparam>
+        </member>
+        <member name="M:Magnum.Channels.Configuration.ChannelConnectionConfigurator`1.Using``1(Magnum.Channels.ChannelAccessor{``0,`0})">
+            <summary>
+            Defines a consumer that is to consume the specified message type
+            </summary>
+            <typeparam name="TConsumer"></typeparam>
+            <param name="channelAccessor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnum.Channels.Configuration.ChannelConnectionConfigurator`1.Every(System.TimeSpan)">
+            <summary>
+            Specifies an interval at which the consumer should be called with a collection
+            of messages received during that period.
+            </summary>
+            <param name="interval">The time period of each interval</param>
+            <returns></returns>
+        </member>
+        <member name="M:Magnum.Channels.Configuration.ChannelConnectionConfigurator`1.Every``1(System.TimeSpan,Magnum.Channels.KeyAccessor{`0,``0})">
+            <summary>
+            Specifies an interval at which the consumer should be called with a dictionary
+            of messages received during that period. Only the most recent message for each
+            key is included in the dictionary.
+            </summary>
+            <typeparam name="TKey">The key type</typeparam>
+            <param name="interval">The time period of each interval</param>
+            <param name="keyAccessor">The key accessor</param>
+            <returns></returns>
+        </member>
         <member name="T:Magnum.Channels.InstanceChannelProvider`2">
             <summary>
             Creates an instance of a class and returns the channel from the class
@@ -238,7 +276,7 @@
             </summary>
             <param name="message">The message to send</param>
         </member>
-        <member name="M:Magnum.Channels.SelectiveConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.SelectiveConsumer{`0})">
+        <member name="M:Magnum.Channels.SelectiveConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.ConsumerFactory{`0})">
             <summary>
             Constructs a channel
             </summary>
@@ -250,6 +288,13 @@
             A provider of graph data can return vertices and edges
             </summary>
         </member>
+        <member name="T:Magnum.Channels.WcfChannelHost">
+            <summary>
+            Receives messages from a named pipe via WCF and forwards them to the specific channel. Messages
+            are first serialized to a wire type that is already WCF compliant, making it unnecessary to decorate
+            your message objects with WCF data contract serializer attributes.
+            </summary>
+        </member>
         <member name="T:Magnum.Channels.WcfChannelHost`1">
             <summary>
             Receives messages from a named pipe via WCF and forwards it to the output
@@ -258,39 +303,6 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="T:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1">
-            <summary>
-            A fluent syntax for configuration the options of a channel subscription
-            </summary>
-            <typeparam name="TChannel">The channel type</typeparam>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1.Using``1(Magnum.Channels.ChannelAccessor{``0,`0})">
-            <summary>
-            Defines a consumer that is to consume the specified message type
-            </summary>
-            <typeparam name="TConsumer"></typeparam>
-            <param name="channelAccessor"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1.Every(System.TimeSpan)">
-            <summary>
-            Specifies an interval at which the consumer should be called with a collection
-            of messages received during that period.
-            </summary>
-            <param name="interval">The time period of each interval</param>
-            <returns></returns>
-        </member>
-        <member name="M:Magnum.Channels.Configuration.ChannelSubscriptionConfigurator`1.Every``1(System.TimeSpan,Magnum.Channels.KeyAccessor{`0,``0})">
-            <summary>
-            Specifies an interval at which the consumer should be called with a dictionary
-            of messages received during that period. Only the most recent message for each
-            key is included in the dictionary.
-            </summary>
-            <typeparam name="TKey">The key type</typeparam>
-            <param name="interval">The time period of each interval</param>
-            <param name="keyAccessor">The key accessor</param>
-            <returns></returns>
-        </member>
         <member name="T:Magnum.Channels.Configuration.ConsumerConfigurator`2">
             <summary>
             A fluent syntax for configuration options of a channel consumer
@@ -298,24 +310,48 @@
             <typeparam name="TConsumer">The consumer type</typeparam>
             <typeparam name="TChannel">The channel type</typeparam>
         </member>
-        <member name="T:Magnum.Channels.Configuration.SubscriptionConfigurator">
+        <member name="T:Magnum.Channels.Configuration.ConnectionConfigurator">
             <summary>
             A fluent syntax for defining subscriptions against a channel network
             </summary>
         </member>
-        <member name="M:Magnum.Channels.Configuration.SubscriptionConfigurator.Add``1(Magnum.Channels.Channel{``0})">
+        <member name="M:Magnum.Channels.Configuration.ConnectionConfigurator.Add``1(Magnum.Channels.Channel{``0})">
             <summary>
             Adds a channel directly without any modification
             </summary>
             <typeparam name="TChannel">The channel type</typeparam>
             <param name="channel">The channel instance</param>
         </member>
-        <member name="M:Magnum.Channels.Configuration.SubscriptionConfigurator.Consume``1">
+        <member name="M:Magnum.Channels.Configuration.ConnectionConfigurator.Add(Magnum.Channels.UntypedChannel)">
+            <summary>
+            Adds a channel directly without any modification
+            </summary>
+            <param name="channel">The channel instance</param>
+        </member>
+        <member name="M:Magnum.Channels.Configuration.ConnectionConfigurator.Consume``1">
             <summary>
             Configures a new consumer
             </summary>
             <typeparam name="TChannel">The channel type</typeparam>
             <returns>A chainable method to configure additional options</returns>
+        </member>
+        <member name="T:Magnum.Channels.ChannelAdapter">
+            <summary>
+            A channel adapter is a mutable segment in a channel network. The output channel can
+            be replaced, allowing a new channel network (built via a ChannelVisitor) to be installed
+            in response to changes (attachments, detachments, etc.) to the network.
+            
+            This particular version handles untyped channels
+            </summary>
+        </member>
+        <member name="T:Magnum.Channels.ChannelAdapter`1">
+            <summary>
+            A channel adapter is a mutable segment in a channel network. The output channel can
+            be replaced, allowing a new channel network (built via a ChannelVisitor) to be installed
+            in response to changes (attachments, detachments, etc.) to the network.
+            
+            This particular version handles typed channels
+            </summary>
         </member>
         <member name="T:Magnum.Channels.DeserializeMessageEnvelopeChannel`1">
             <summary>
@@ -344,14 +380,7 @@
             </summary>
             <typeparam name = "T">The channel type</typeparam>
         </member>
-        <member name="T:Magnum.Channels.WcfUntypedChannelHost">
-            <summary>
-            Receives messages from a named pipe via WCF and forwards them to the specific channel. Messages
-            are first serialized to a wire type that is already WCF compliant, making it unnecessary to decorate
-            your message objects with WCF data contract serializer attributes.
-            </summary>
-        </member>
-        <member name="T:Magnum.Channels.SelectiveConsumer`1">
+        <member name="T:Magnum.Channels.ConsumerFactory`1">
             <summary>
               A conditional consumer is given a message to evaluate, after which it
               can determine if it is interested in the message and return an action
@@ -367,7 +396,7 @@
               directed receives, and dispatching to channels within a context, such as an actor
             </summary>
         </member>
-        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.SelectiveConsumer{`0})">
+        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.ConsumerFactory{`0})">
             <summary>
               Calls the specified method when a message of the requested type is received. The
               consumer is asked if the message should be parsed, and returns a non-null action
@@ -377,7 +406,7 @@
             <typeparam name = "T">The requested message type</typeparam>
             <param name = "consumer">The consumer</param>
         </member>
-        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.SelectiveConsumer{`0},System.TimeSpan,System.Action)">
+        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.ConsumerFactory{`0},System.TimeSpan,System.Action)">
             <summary>
               Specifies a method to call when a message is recieved. If a message is not received within
               the specified timeout, a timeout callback is called instead and the receiver is removed from 
@@ -387,7 +416,7 @@
             <param name = "timeout">The time period to wait for a message</param>
             <param name = "timeoutCallback">The method to call if a message is not received within the timeout period</param>
         </member>
-        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.SelectiveConsumer{`0},System.Int32,System.Action)">
+        <member name="M:Magnum.Channels.Mailbox`1.Receive(Magnum.Channels.ConsumerFactory{`0},System.Int32,System.Action)">
             <summary>
               Specifies a method to call when a message is recieved. If a message is not received within
               the specified timeout, a timeout callback is called instead and the receiver is removed from 
@@ -414,12 +443,6 @@
             which can be assigned to the channel type and discarding all others
             </summary>
             <typeparam name="TOutput">The output channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.LocalWcfChannelProxy`1">
-            <summary>
-              A local net.pipe channel proxy
-            </summary>
-            <typeparam name = "T">The channel type</typeparam>
         </member>
         <member name="M:Magnum.Extensions.ExtensionsToUri.AppendPath(System.Uri,System.String)">
             <summary>
@@ -479,6 +502,13 @@
             <param name="queueLimit">The maximum number of actions that can be waiting in the queue</param>
             <param name="queueTimeout">The timeout to wait when adding actions when the queue if full before throwing an exception</param>
         </member>
+        <member name="T:Magnum.Channels.AsyncResultChannel">
+            <summary>
+            Wraps a channel in an IAsyncResult compatible wrapper to support asynchronous usage with
+            frameworks that support asynchronous callbacks
+            </summary>
+            <typeparam name="T">The channel type supported</typeparam>
+        </member>
         <member name="T:Magnum.Channels.AsyncResultChannel`1">
             <summary>
             Wraps a channel in an IAsyncResult compatible wrapper to support asynchronous usage with
@@ -490,9 +520,9 @@
             <summary>
             Provides a channel from an instance
             </summary>
-            <typeparam name="T">The type of instance being accessed</typeparam>
-            <typeparam name="TChannel">The type of channel to return</typeparam>
-            <param name="source">The instance to retrieve the channel from</param>
+            <typeparam name="TInstance">The type of instance being accessed</typeparam>
+            <typeparam name="T">The type of channel to return</typeparam>
+            <param name="instance">The instance to retrieve the channel from</param>
             <returns>The channel of the requested type from the instance</returns>
         </member>
         <member name="T:Magnum.Channels.ConsumerChannel`1">
@@ -516,6 +546,12 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="message"></param>
+        </member>
+        <member name="T:Magnum.Channels.ChannelProvider">
+            <summary>
+            Used by an untyped channel dispatcher to get a channel where a message
+            can be sent
+            </summary>
         </member>
         <member name="T:Magnum.Channels.DelegateChannelProvider`1">
             <summary>
@@ -668,9 +704,14 @@
             <param name = "output">The method to call when a message is sent to the channel</param>
             <param name = "filter">The filter to determine if the message can be consumed</param>
         </member>
-        <member name="T:Magnum.Channels.ChannelRouter`1">
+        <member name="T:Magnum.Channels.BroadcastChannel">
             <summary>
-              Publishes a messages to multiple channels
+            A BroadcastChannel sends a message to zero or more listeners
+            </summary>
+        </member>
+        <member name="T:Magnum.Channels.BroadcastChannel`1">
+            <summary>
+            A BroadcastChannel sends a message to zero or more listeners
             </summary>
             <typeparam name = "T">Channel type</typeparam>
         </member>
@@ -12243,6 +12284,13 @@
         <member name="P:Magnum.Logging.ILogSource.Level">
             <summary>
             The level of the message
+            </summary>
+        </member>
+        <member name="T:Magnum.Reflection.SafeProperty">
+            <summary>
+            Use to safely set a property on an object, including the expansion of any lists as necessary
+            and creation of reference properties. May not be suitable to all situations, but works great
+            for deserializing data into an empty object graph.
             </summary>
         </member>
         <member name="M:Magnum.ILocalContext.Store``1(``0)">
