@@ -16,13 +16,17 @@ namespace Topshelf.Host
     using System.IO;
     using Configuration;
     using Configuration.Dsl;
-    using log4net.Config;
+	using log4net;
+	using log4net.Config;
 
     public class Program
     {
+		private static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+
         static void Main(string[] args)
         {
-            XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
+			BootstrapLogger();
+
             RunConfiguration cfg = RunnerConfigurator.New(x =>
             {
                 x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
@@ -44,5 +48,16 @@ namespace Topshelf.Host
 
             Runner.Host(cfg, args);
         }
+
+		private static void BootstrapLogger()
+		{
+			var configurationFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
+			
+			var configurationFile = new FileInfo(configurationFilePath);
+
+			XmlConfigurator.ConfigureAndWatch(configurationFile);
+
+			_log.DebugFormat("Logging configuration loaded: {0}", configurationFilePath);
+		}
     }
 }
