@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2008 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,52 +12,53 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Host
 {
-    using System;
-    using System.IO;
-    using Configuration;
-    using Configuration.Dsl;
+	using System;
+	using System.IO;
+	using Configuration;
+	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
 
-    public class Program
-    {
-		private static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
 
-        static void Main(string[] args)
-        {
+	public class Program
+	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+
+		static void Main(string[] args)
+		{
 			BootstrapLogger();
 
-            RunConfiguration cfg = RunnerConfigurator.New(x =>
-            {
-                x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
+			RunConfiguration cfg = RunnerConfigurator.New(x =>
+				{
+					x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
-                x.ConfigureService<TopshelfHostService>(s =>
-                {
-                    s.Named("Topshelf.Host");
-                    s.HowToBuildService(name => new TopshelfHostService());
-                    s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop());
-                });
+					x.ConfigureService<TopshelfHostService>(s =>
+						{
+							s.Named("Topshelf.Host");
+							s.HowToBuildService(name => new TopshelfHostService());
+							s.WhenStarted(tc => tc.Start());
+							s.WhenStopped(tc => tc.Stop());
+						});
 
-                x.RunAsLocalSystem();
+					x.RunAsLocalSystem();
 
-                x.SetDescription("Topshelf Hosting Service");
-                x.SetDisplayName("Topshelf.Host");
-                x.SetServiceName("Topshelf.Host");
-            });
+					x.SetDescription("Topshelf Hosting Service");
+					x.SetDisplayName("Topshelf.Host");
+					x.SetServiceName("Topshelf.Host");
+				});
 
-            Runner.Host(cfg, args);
-        }
+			Runner.Host(cfg, args);
+		}
 
-		private static void BootstrapLogger()
+		static void BootstrapLogger()
 		{
-			var configurationFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
-			
+			string configurationFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.config");
+
 			var configurationFile = new FileInfo(configurationFilePath);
 
 			XmlConfigurator.ConfigureAndWatch(configurationFile);
 
 			_log.DebugFormat("Logging configuration loaded: {0}", configurationFilePath);
 		}
-    }
+	}
 }

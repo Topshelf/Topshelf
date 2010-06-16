@@ -12,69 +12,69 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.ServiceProcess;
+	using System.Collections.Generic;
+	using System.Configuration;
+	using System.ServiceProcess;
 
-    public class WinServiceSettings
-    {   
-        public WinServiceSettings()
-        {
-            StartMode = ServiceStartMode.Automatic;
-            Dependencies = new List<string>();
-        }
 
-        public ServiceStartMode StartMode { get; set; }
-        public ServiceName ServiceName {  get; set; }
-        public string DisplayName { private get; set; }
-        public string Description { get; set; }
-        public Credentials Credentials { get; set; }
+	public class WinServiceSettings
+	{
+		public WinServiceSettings()
+		{
+			StartMode = ServiceStartMode.Automatic;
+			Dependencies = new List<string>();
+		}
 
-        public string FullDisplayName
-        {
-            get
-            {
-                return string.IsNullOrEmpty(ServiceName.InstanceName)
-                           ? DisplayName : "{0} (Instance: {1})".FormatWith(DisplayName, ServiceName.InstanceName);
-            }
-        }
+		public ServiceStartMode StartMode { get; set; }
+		public ServiceName ServiceName { get; set; }
+		public string DisplayName { private get; set; }
+		public string Description { get; set; }
+		public Credentials Credentials { get; set; }
 
-        public List<string> Dependencies { get; set; }
+		public string FullDisplayName
+		{
+			get
+			{
+				return string.IsNullOrEmpty(ServiceName.InstanceName)
+				       	? DisplayName
+				       	: "{0} (Instance: {1})".FormatWith(DisplayName, ServiceName.InstanceName);
+			}
+		}
 
-        public static WinServiceSettings DotNetConfig
-        {
-            get
-            {
-                var settings = new WinServiceSettings
-                               {
-                                   ServiceName = new ServiceName(ConfigurationManager.AppSettings["serviceName"]),
-                                   DisplayName = ConfigurationManager.AppSettings["displayName"],
-                                   Description = ConfigurationManager.AppSettings["description"],
-                               };
+		public List<string> Dependencies { get; set; }
 
-                settings.Dependencies.AddRange(ConfigurationManager.AppSettings["dependencies"].Split(','));
-                return settings;
-            }
-        }
+		public static WinServiceSettings DotNetConfig
+		{
+			get
+			{
+				var settings = new WinServiceSettings
+					{
+						ServiceName = new ServiceName(ConfigurationManager.AppSettings["serviceName"]),
+						DisplayName = ConfigurationManager.AppSettings["displayName"],
+						Description = ConfigurationManager.AppSettings["description"],
+					};
 
-        public string ImagePath
-        {
-            get
-            {
-                return ServiceName.InstanceName == null ? " " : " -instance:{0}".FormatWith(ServiceName.InstanceName);
-            }
-        }
+				settings.Dependencies.AddRange(ConfigurationManager.AppSettings["dependencies"].Split(','));
+				return settings;
+			}
+		}
 
-        public static WinServiceSettings Custom(string serviceName, string displayName, string description, params string[] dependencies)
-        {
-            var settings = new WinServiceSettings
-                           {
-                               ServiceName = new ServiceName(serviceName),
-                               DisplayName = displayName,
-                               Description = description,
-                           };
-            settings.Dependencies.AddRange(dependencies);
-            return settings;
-        }
-    }
+		public string ImagePath
+		{
+			get { return ServiceName.InstanceName == null ? " " : " -instance:{0}".FormatWith(ServiceName.InstanceName); }
+		}
+
+		public static WinServiceSettings Custom(string serviceName, string displayName, string description,
+		                                        params string[] dependencies)
+		{
+			var settings = new WinServiceSettings
+				{
+					ServiceName = new ServiceName(serviceName),
+					DisplayName = displayName,
+					Description = description,
+				};
+			settings.Dependencies.AddRange(dependencies);
+			return settings;
+		}
+	}
 }

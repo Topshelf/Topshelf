@@ -1,5 +1,5 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
-// 
+﻿// Copyright 2007-2008 The Apache Software Foundation.
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,15 +12,16 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    using System;
+	using System;
 
-    public class ServiceMessage
-    {
-        public string ShelfName { get; set; }
 
-        public ServiceMessage()
-        {
-            ShelfName = AppDomain.CurrentDomain.FriendlyName;
-        }
-    }
+	public class ServiceMessage
+	{
+		protected ServiceMessage()
+		{
+			ShelfName = AppDomain.CurrentDomain.FriendlyName;
+		}
+
+		public string ShelfName { get; set; }
+	}
 }
