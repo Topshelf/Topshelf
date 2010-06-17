@@ -19,26 +19,26 @@ namespace Topshelf.Shelving
 
     public static class WellknownAddresses
     {
-        public static WcfUntypedChannelHost GetHostHost(UntypedChannel hostProxy)
+        public static WcfChannelHost GetHostHost(UntypedChannel hostProxy)
         {
-            return new WcfUntypedChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress( GetHostPipeName()),"host");
+            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress( GetHostPipeName()),"host");
         }
-        public static WcfUntypedChannelHost GetCurrentShelfHost(UntypedChannelAdapter myChannel)
+        public static WcfChannelHost GetCurrentShelfHost(ChannelAdapter myChannel)
         {
-            return new WcfUntypedChannelHost(new ThreadPoolFiber(), myChannel, GetBaseAddress(GetThisShelfPipeName()), "shelf");
+            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, GetBaseAddress(GetThisShelfPipeName()), "shelf");
         }
 
         public static UntypedChannel GetCurrentChannelProxy()
         {
-            return new WcfUntypedChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetThisShelfPipeName()), "shelf"); 
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetThisShelfPipeName()), "shelf"); 
         }
-        public static WcfUntypedChannelProxy GetShelfChannelProxy(AppDomain appDomain)
+        public static WcfChannelProxy GetShelfChannelProxy(AppDomain appDomain)
         {
-            return new WcfUntypedChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(appDomain.FriendlyName)), "shelf");
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(appDomain.FriendlyName)), "shelf");
         }
         public static UntypedChannel GetHostChannelProxy()
         {
-            return new WcfUntypedChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetHostPipeName()), "host");
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetHostPipeName()), "host");
         }
 
         private static string GetShelfPipeName(string name)

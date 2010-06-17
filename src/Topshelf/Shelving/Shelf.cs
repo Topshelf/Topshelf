@@ -28,20 +28,20 @@ namespace Topshelf.Shelving
         static ILog _log = LogManager.GetLogger(typeof (Shelf));
         IServiceController _controller;
 		readonly UntypedChannel _hostChannel;
-		readonly WcfUntypedChannelHost _myChannelHost;
-		readonly UntypedChannelAdapter _myChannel;
-        readonly ChannelSubscription _subscription;
+		readonly WcfChannelHost _myChannelHost;
+		readonly ChannelAdapter _myChannel;
+        readonly ChannelConnection _connection;
         readonly Type _bootstrapperType;
 
         public Shelf(Type bootstraper)
         {
             _bootstrapperType = bootstraper;
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
-			_myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+			_myChannel = new ChannelAdapter();
             _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel);
 
             //wire up all the subscriptions
-            _subscription = _myChannel.Subscribe(s =>
+            _connection = _myChannel.Connect(s =>
                                      {
                                          s.Consume<ReadyService>().Using(m => Initialize());
                                          s.Consume<StopService>().Using(m => HandleStop(m));
@@ -195,8 +195,8 @@ namespace Topshelf.Shelving
 
         public void Dispose()
         {
-            if (_subscription != null)
-                _subscription.Dispose();
+            if (_connection != null)
+                _connection.Dispose();
 
             if (_myChannelHost != null)
                 _myChannelHost.Dispose();
