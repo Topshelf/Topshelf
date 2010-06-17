@@ -17,6 +17,7 @@ namespace Topshelf.Model
     using System.Diagnostics;
     using System.Linq;
     using log4net;
+    using Messages;
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
     public class ServiceCoordinator :
@@ -78,7 +79,7 @@ namespace Topshelf.Model
         	foreach (var serviceController in Services)
         	{
 				_log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
-				serviceController.Start();
+				serviceController.ControllerChannel.Send(new StartService());
         	}
 
             //TODO: This feels like it should be after 'host' stop
@@ -132,7 +133,8 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Start();
+            Services.Where(x => x.Name == name).First().ControllerChannel.Send(new StartService());
+            //need a way to pause here
         }
 
         public void StopService(string name)

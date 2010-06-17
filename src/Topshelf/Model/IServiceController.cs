@@ -13,6 +13,7 @@
 namespace Topshelf.Model
 {
     using System;
+    using Magnum.Channels;
 
     public interface IServiceController :
         IDisposable
@@ -21,6 +22,8 @@ namespace Topshelf.Model
         string Name { get; set; }
         ServiceState State { get; }
         ServiceBuilder BuildService { get; }
+
+        UntypedChannel ControllerChannel { get; }
 
         //initialize? - this would just build the service
         void Start();

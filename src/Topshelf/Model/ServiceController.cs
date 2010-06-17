@@ -19,6 +19,7 @@ namespace Topshelf.Model
     using Magnum.Fibers;
     using Magnum.StateMachine;
     using Messages;
+    using Shelving;
 
     [DebuggerDisplay("Service({Name}) is {State}")]
     public class ServiceController<TService> :
@@ -72,25 +73,38 @@ namespace Topshelf.Model
         #endregion
 
         #region Messaging Start
-        //readonly UntypedChannelAdapter _myChannel;
-        //readonly WcfUntypedChannelProxy _hostChannel;
-        //subscribe
-        //bind the messages to the appropriate action.
+
+        readonly UntypedChannel _hostChannel;
+        readonly WcfUntypedChannelHost _myChannelHost;
+        readonly UntypedChannelAdapter _myChannel;
+        readonly ChannelSubscription _subscription;
+
+        public UntypedChannel ControllerChannel
+        {
+            get
+            {
+                return _myChannel;
+            }
+        }
         #endregion
 
         public ServiceController()
         {
-//            _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
-//            _myChannel.Subscribe(s =>
-//            {
-//                s.Consume<ReadyService>().Using(m => Initialize());
-//                s.Consume<StopService>().Using(m => Stop());
-//                s.Consume<StartService>().Using(m => Start());
-//                s.Consume<PauseService>().Using(m => Pause());
-//                s.Consume<ContinueService>().Using(m => Continue());
-//            });
+            _hostChannel = WellknownAddresses.GetHostChannelProxy();
+            _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel);
 
-            //TODO: need an alternative name? botttle? 
+            //build subscriptions
+           _subscription = _myChannel.Subscribe(s =>
+            {
+                s.Consume<ReadyService>().Using(m => Initialize());
+                s.Consume<StopService>().Using(m => Stop());
+                s.Consume<StartService>().Using(m => Start());
+                s.Consume<PauseService>().Using(m => Pause());
+                s.Consume<ContinueService>().Using(m => Continue());
+            });
+
+            //TODO: need an alternative name? botttle? shelf?
             //_hostChannel.Send(new BottleReady());
         }
 
@@ -116,7 +130,10 @@ namespace Topshelf.Model
             if (!disposing) return;
             if (!_disposed) return;
 
-
+            //TODO: Is this correct
+            _subscription.Dispose();
+            _myChannelHost.Dispose();
+            
             _instance = default(TService);
             StartAction = null;
             StopAction = null;

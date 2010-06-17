@@ -15,6 +15,7 @@ namespace Topshelf.Shelving
     using System;
     using System.Linq;
     using Configuration.Dsl;
+    using log4net;
     using Magnum.Channels;
     using Magnum.Fibers;
     using Magnum.Reflection;
@@ -24,6 +25,7 @@ namespace Topshelf.Shelving
     public class Shelf :
         IDisposable
     {
+        static ILog _log = LogManager.GetLogger(typeof (Shelf));
         IServiceController _controller;
 		readonly UntypedChannel _hostChannel;
 		readonly WcfUntypedChannelHost _myChannelHost;
@@ -126,7 +128,7 @@ namespace Topshelf.Shelving
             try
             {
                 _hostChannel.Send(new ServiceStarting());
-                _controller.Start();
+                _controller.ControllerChannel.Send(message);
                 _hostChannel.Send(new ServiceStarted());
             }
             catch (Exception ex)
@@ -186,6 +188,7 @@ namespace Topshelf.Shelving
             }
             catch (Exception)
             {
+                _log.Error("Shelf '{0}' is having a bad day.", exception);
                 // eat the exception for now
             }
         }
