@@ -22,12 +22,12 @@ namespace Topshelf.Shelving
     public class ShelfHandle :
         IDisposable
     {
-        private WcfUntypedChannelProxy _shelfChannel = null;
-        public WcfUntypedChannelProxy ShelfChannel
+        private WcfChannelProxy _shelfChannel = null;
+		public WcfChannelProxy ShelfChannel
         {
             get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
         }
-		public Func<AppDomain, WcfUntypedChannelProxy> ShelfChannelBuilder { private get; set; }
+		public Func<AppDomain, WcfChannelProxy> ShelfChannelBuilder { private get; set; }
 
         // Do we need to hold onto this handle at all?
         internal ObjectHandle ObjectHandle { get; set; }
