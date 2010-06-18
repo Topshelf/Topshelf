@@ -30,8 +30,8 @@ namespace Topshelf.Shelving
     public class ShelfMaker :
         IDisposable
     {
-        readonly WcfUntypedChannelHost _myChannelHost;
-        readonly UntypedChannelAdapter _myChannel;
+        readonly WcfChannelHost _myChannelHost;
+        readonly ChannelAdapter _myChannel;
         readonly ReaderWriterLockedObject<Dictionary<string, ShelfHandle>> _shelves;
         static readonly ILog _log = LogManager.GetLogger(typeof(ShelfMaker));
 
@@ -39,10 +39,10 @@ namespace Topshelf.Shelving
         {
             _shelves = new ReaderWriterLockedObject<Dictionary<string, ShelfHandle>>(new Dictionary<string, ShelfHandle>());
 
-            _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
+            _myChannel = new ChannelAdapter();
             _myChannelHost = WellknownAddresses.GetHostHost(_myChannel);
 
-            _myChannel.Subscribe(s =>
+            _myChannel.Connect(s =>
             {
                 s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndInitService(m));
                 s.Consume<ServiceReady>().Using(m => MarkServiceReadyAndStart(m));
