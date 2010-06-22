@@ -185,6 +185,7 @@ namespace Topshelf.Shelving
                                        ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
                                        ShelfName = name
                                    }));
+
         }
 
         static AppDomainSetup GetAppDomainSettings(string name)

@@ -25,7 +25,7 @@ namespace Topshelf.Model
 
         UntypedChannel ControllerChannel { get; }
 
-        //initialize? - this would just build the service
+        void Initialize();
         void Start();
         void Stop();
         void Pause();
