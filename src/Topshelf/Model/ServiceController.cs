@@ -159,10 +159,11 @@ namespace Topshelf.Model
 
         public void Initialize()
         {
-            //TODO: do I need to pull it out by name?
             _instance = (TService)BuildService(Name);
+            
             //TODO: send fault
-            if (_instance == null) throw new CouldntBuildServiceException(Name, typeof(TService));
+            if (_instance == null) 
+                throw new CouldntBuildServiceException(Name, typeof(TService));
 
 
             _hostChannel.Send(new ServiceReady());
@@ -173,10 +174,9 @@ namespace Topshelf.Model
         {
             try
             {
-            _hostChannel.Send(new ServiceStarting());
-            RaiseEvent(OnStart);
-            _hostChannel.Send(new ServiceStarted());
-
+                _hostChannel.Send(new ServiceStarting());
+                RaiseEvent(OnStart);
+                _hostChannel.Send(new ServiceStarted());
             }
             catch (Exception ex)
             {
@@ -256,7 +256,5 @@ namespace Topshelf.Model
         }
 
         #endregion
-
-
     }
 }
