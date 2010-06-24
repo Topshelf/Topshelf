@@ -18,23 +18,30 @@ namespace Topshelf.Configuration.Dsl
     public class ServiceConfiguratorBase<TService> :
         IDisposable
     {
-        protected Action<TService> _continueAction = NoOp;
-        
         bool _disposed;
-        protected string _name;
-        protected Action<TService> _pauseAction = NoOp;
-        protected Action<TService> _startAction = NoOp;
-        protected Action<TService> _stopAction = NoOp;
+       
+        public string Name { get; private set; }
+        public Action<TService> ContinueAction { get; private set;}
+        public Action<TService> PauseAction { get; private set;}
+        public Action<TService> StartAction { get; private set; }
+        public Action<TService> StopAction { get; private set; }
 
-        protected ServiceBuilder _buildAction = name =>
-        {
-            var asl = new ActivatorServiceLocator();
-            return asl.GetInstance<TService>(name);
-        };
+        public ServiceBuilder BuildAction { get; private set; }
 
         public ServiceConfiguratorBase()
         {
-            _name = "{0}:{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
+             PauseAction = NoOp;
+             StartAction = NoOp;
+             StopAction = NoOp;
+             ContinueAction = NoOp;
+
+             BuildAction = name =>
+             {
+                 var asl = new ActivatorServiceLocator();
+                 return asl.GetInstance<TService>(name);
+             };
+
+            Name = "{0}:{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 
         #region IDisposable Members
@@ -49,32 +56,32 @@ namespace Topshelf.Configuration.Dsl
 
         public void Named(string name)
         {
-            _name = name;
+            Name = name;
         }
 
         public void WhenStarted(Action<TService> startAction)
         {
-            _startAction = startAction;
+            StartAction = startAction;
         }
 
         public void WhenStopped(Action<TService> stopAction)
         {
-            _stopAction = stopAction;
+            StopAction = stopAction;
         }
 
         public void WhenPaused(Action<TService> pauseAction)
         {
-            _pauseAction = pauseAction;
+            PauseAction = pauseAction;
         }
 
         public void WhenContinued(Action<TService> continueAction)
         {
-            _continueAction = continueAction;
+            ContinueAction = continueAction;
         }
 
         public void HowToBuildService(ServiceBuilder builder)
         {
-            _buildAction = builder;
+            BuildAction = builder;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -82,11 +89,11 @@ namespace Topshelf.Configuration.Dsl
             if (!disposing) return;
             if (_disposed) return;
 
-            _startAction = null;
-            _stopAction = null;
-            _pauseAction = null;
-            _continueAction = null;
-            _buildAction = null;
+            StartAction = null;
+            StopAction = null;
+            PauseAction = null;
+            ContinueAction = null;
+            BuildAction = null;
 
             _disposed = true;
         }

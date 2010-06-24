@@ -17,7 +17,6 @@ namespace Topshelf.Shelving
     using Configuration.Dsl;
     using log4net;
     using Magnum.Channels;
-    using Magnum.Fibers;
     using Magnum.Reflection;
     using Messages;
     using Model;
@@ -25,48 +24,33 @@ namespace Topshelf.Shelving
     public class Shelf :
         IDisposable
     {
-        static ILog _log = LogManager.GetLogger(typeof (Shelf));
+        static ILog _log = LogManager.GetLogger(typeof(Shelf));
         IServiceController _controller;
-		readonly UntypedChannel _hostChannel;
-		readonly WcfChannelHost _myChannelHost;
-		readonly ChannelAdapter _myChannel;
-        readonly ChannelConnection _connection;
         readonly Type _bootstrapperType;
+        readonly UntypedChannel _hostChannel;
 
         public Shelf(Type bootstraper)
         {
-            _bootstrapperType = bootstraper;
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
-			_myChannel = new ChannelAdapter();
-            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel);
+            _bootstrapperType = bootstraper;
 
-            //wire up all the subscriptions
-            _connection = _myChannel.Connect(s =>
-                                     {
-                                         s.Consume<ReadyService>().Using(m => Initialize());
-                                         s.Consume<StopService>().Using(m => HandleStop(m));
-                                         s.Consume<StartService>().Using(m => HandleStart(m));
-                                         s.Consume<PauseService>().Using(m => HandlePause(m));
-                                         s.Consume<ContinueService>().Using(m => HandleContinue(m));
-                                     });
-
-            //send message to host that I am ready
-            _hostChannel.Send(new ShelfReady());
+            Initialize();
         }
 
-        public void Initialize()
+        void Initialize()
         {
             try
             {
-                Type t = FindBootstrapperImplementation(_bootstrapperType);
-                object bs = Activator.CreateInstance(t);
+                var t = FindBootstrapperImplementationType(_bootstrapperType);
+                var bootstrapper = Activator.CreateInstance(t);
 
-                Type st = bs.GetType().GetInterfaces()[0].GetGenericArguments()[0];
-                object cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(st));
+                var serviceType = bootstrapper.GetType().GetInterfaces()[0].GetGenericArguments()[0];
+                var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(serviceType));
 
-                this.FastInvoke(new[] { st }, "InitializeAndCreateHostedService", bs, cfg);
 
-                _hostChannel.Send(new ServiceReady());
+                this.FastInvoke(new[] { serviceType }, "InitializeAndCreateHostedService", bootstrapper, cfg);
+
+                _controller.Initialize();
             }
             catch (Exception ex)
             {
@@ -75,15 +59,16 @@ namespace Topshelf.Shelving
 
         }
         
+        //Converts the cfg to the closed type from the object type
         private void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
             where T : class
         {
             bootstrapper.FastInvoke("InitializeHostedService", cfg);
-            //start up the service controller instance
-            _controller = cfg.FastInvoke<ServiceConfigurator<T>, IServiceController>("Create");
+           
+            _controller = cfg.Create();
         }
-        
-        public static Type FindBootstrapperImplementation(Type bootstrapper)
+
+        public static Type FindBootstrapperImplementationType(Type bootstrapper)
         {
             if (bootstrapper != null)
             {
@@ -92,7 +77,7 @@ namespace Topshelf.Shelving
 
                 throw new InvalidOperationException("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
             }
-            
+
             // check configuration first
             ShelfConfiguration config = ShelfConfiguration.GetConfig();
             if (config != null)
@@ -123,62 +108,14 @@ namespace Topshelf.Shelving
             return false;
         }
 
-        private void HandleStart(StartService message)
+
+        public string Name
         {
-            try
+            get
             {
-                _hostChannel.Send(new ServiceStarting());
-                _controller.ControllerChannel.Send(message);
-                _hostChannel.Send(new ServiceStarted());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
+                return AppDomain.CurrentDomain.FriendlyName;
             }
         }
-
-        private void HandleStop(StopService message)
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceStopping());
-                _controller.Stop();
-                _hostChannel.Send(new ServiceStopped());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
-
-        private void HandlePause(PauseService messsage)
-        {
-            try
-            {
-                _hostChannel.Send(new ServicePausing());
-                _controller.Pause();
-                _hostChannel.Send(new ServicePaused());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
-
-        private void HandleContinue(ContinueService message)
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceContinuing());
-                _controller.Continue();
-                _hostChannel.Send(new ServiceContinued());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
-
 
         private void SendFault(Exception exception)
         {
@@ -195,11 +132,7 @@ namespace Topshelf.Shelving
 
         public void Dispose()
         {
-            if (_connection != null)
-                _connection.Dispose();
-
-            if (_myChannelHost != null)
-                _myChannelHost.Dispose();
+            //TODO: what 
         }
     }
 }
