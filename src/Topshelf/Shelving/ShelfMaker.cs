@@ -23,7 +23,6 @@ namespace Topshelf.Shelving
     using log4net;
     using Magnum.Channels;
     using Magnum.Extensions;
-    using Magnum.Fibers;
     using Magnum.Threading;
     using Messages;
 
@@ -42,6 +41,7 @@ namespace Topshelf.Shelving
             _myChannel = new ChannelAdapter();
             _myChannelHost = WellknownAddresses.GetHostHost(_myChannel);
 
+            //TODO:this should move to the service coordinator
             _myChannel.Connect(s =>
             {
                 s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndInitService(m));
@@ -185,6 +185,7 @@ namespace Topshelf.Shelving
                                        ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
                                        ShelfName = name
                                    }));
+
         }
 
         static AppDomainSetup GetAppDomainSettings(string name)

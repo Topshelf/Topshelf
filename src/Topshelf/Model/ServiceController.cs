@@ -15,8 +15,8 @@ namespace Topshelf.Model
     using System;
     using System.Diagnostics;
     using Exceptions;
+    using log4net;
     using Magnum.Channels;
-    using Magnum.Fibers;
     using Magnum.StateMachine;
     using Messages;
     using Shelving;
@@ -27,6 +27,8 @@ namespace Topshelf.Model
         IServiceController
         where TService : class
     {
+        ILog _log = LogManager.GetLogger(typeof(ServiceController<TService>));
+
         #region StateMachine
 
         static ServiceController()
@@ -75,9 +77,9 @@ namespace Topshelf.Model
         #region Messaging Start
 
         readonly UntypedChannel _hostChannel;
-        readonly WcfUntypedChannelHost _myChannelHost;
-        readonly UntypedChannelAdapter _myChannel;
-        readonly ChannelSubscription _subscription;
+        readonly WcfChannelHost _myChannelHost;
+        readonly ChannelAdapter _myChannel;
+        readonly ChannelConnection _connection;
 
         public UntypedChannel ControllerChannel
         {
@@ -86,16 +88,19 @@ namespace Topshelf.Model
                 return _myChannel;
             }
         }
+
         #endregion
 
         public ServiceController()
         {
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
-            _myChannel = new UntypedChannelAdapter(new ThreadPoolFiber());
-            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel);
+            _myChannel = new ChannelAdapter();
+
+            //TODO: this will error in multiple hosted services - stuff style
+            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel); //service name?
 
             //build subscriptions
-           _subscription = _myChannel.Subscribe(s =>
+            _connection = _myChannel.Connect(s =>
             {
                 s.Consume<ReadyService>().Using(m => Initialize());
                 s.Consume<StopService>().Using(m => Stop());
@@ -104,8 +109,6 @@ namespace Topshelf.Model
                 s.Consume<ContinueService>().Using(m => Continue());
             });
 
-            //TODO: need an alternative name? botttle? shelf?
-            //_hostChannel.Send(new BottleReady());
         }
 
         TService _instance;
@@ -115,7 +118,7 @@ namespace Topshelf.Model
         public Action<TService> ContinueAction { get; set; }
         public ServiceBuilder BuildService { get; set; }
 
-        #region Dispose Shit
+        #region Dispose Stuff
 
         bool _disposed;
 
@@ -130,9 +133,11 @@ namespace Topshelf.Model
             if (!disposing) return;
             if (!_disposed) return;
 
-            //TODO: Is this correct
-            _subscription.Dispose();
-            _myChannelHost.Dispose();
+            if(_connection != null)
+                _connection.Dispose();
+            
+            if(_myChannelHost != null)
+                _myChannelHost.Dispose();
             
             _instance = default(TService);
             StartAction = null;
@@ -152,26 +157,91 @@ namespace Topshelf.Model
 
         #region IServiceController Members
 
+        public void Initialize()
+        {
+            _instance = (TService)BuildService(Name);
+            
+            //TODO: send fault
+            if (_instance == null) 
+                throw new CouldntBuildServiceException(Name, typeof(TService));
+
+
+            _hostChannel.Send(new ServiceReady());
+
+        }
+
         public void Start()
         {
-            RaiseEvent(OnStart);
+            try
+            {
+                _hostChannel.Send(new ServiceStarting());
+                RaiseEvent(OnStart);
+                _hostChannel.Send(new ServiceStarted());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
         }
 
         public void Stop()
         {
-            RaiseEvent(OnStop);
+            try
+            {
+                _hostChannel.Send(new ServiceStopping());
+                RaiseEvent(OnStop);
+                _hostChannel.Send(new ServiceStopped());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+            
         }
 
         public void Pause()
         {
-            RaiseEvent(OnPause);
+            try
+            {
+                _hostChannel.Send(new ServicePausing());
+                RaiseEvent(OnPause);
+                _hostChannel.Send(new ServicePaused());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+
         }
 
         public void Continue()
         {
-            RaiseEvent(OnContinue);
+            try
+            {
+                _hostChannel.Send(new ServiceContinuing());
+                RaiseEvent(OnContinue);
+                _hostChannel.Send(new ServiceContinued());
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
         }
 
+        //dispose 
+
+        private void SendFault(Exception exception)
+        {
+            try
+            {
+                _hostChannel.Send(new ShelfFault(exception));
+            }
+            catch (Exception)
+            {
+                _log.Error("Shelf '{0}' is having a bad day.", exception);
+                // eat the exception for now
+            }
+        }
 
         public string Name { get; set; }
 
@@ -186,12 +256,5 @@ namespace Topshelf.Model
         }
 
         #endregion
-
-        void Initialize()
-        {
-            //TODO: do I need to pull it out by name?
-            _instance = (TService)BuildService(Name);
-            if (_instance == null) throw new CouldntBuildServiceException(Name, typeof(TService));
-        }
     }
 }

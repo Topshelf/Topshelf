@@ -23,12 +23,12 @@ namespace Topshelf.Configuration.Dsl
         {
             IServiceController serviceController = new ServiceController<TService>
                                                    {
-                                                       StartAction = _startAction,
-                                                       StopAction = _stopAction,
-                                                       PauseAction = _pauseAction,
-                                                       ContinueAction = _continueAction,
-                                                       BuildService = _buildAction,
-                                                       Name = _name,
+                                                       StartAction = StartAction,
+                                                       StopAction = StopAction,
+                                                       PauseAction = PauseAction,
+                                                       ContinueAction = ContinueAction,
+                                                       BuildService = BuildAction,
+                                                       Name = Name,
                                                    };
 
             return serviceController;

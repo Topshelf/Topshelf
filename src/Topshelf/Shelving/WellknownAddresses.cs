@@ -13,7 +13,9 @@
 namespace Topshelf.Shelving
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using Exceptions;
     using Magnum.Channels;
     using Magnum.Fibers;
 
@@ -23,9 +25,24 @@ namespace Topshelf.Shelving
         {
             return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress( GetHostPipeName()),"host");
         }
+
         public static WcfChannelHost GetCurrentShelfHost(ChannelAdapter myChannel)
         {
-            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, GetBaseAddress(GetThisShelfPipeName()), "shelf");
+            var pipeName = GetThisShelfPipeName();
+
+            EnsureNoDuplicatePipes(pipeName);
+
+            var address = GetBaseAddress(pipeName);
+            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
+        }
+
+        static readonly List<string> _pipes = new List<string>();
+        static void EnsureNoDuplicatePipes(string pipeName)
+        {
+            if(!_pipes.Contains(pipeName))
+                _pipes.Add(pipeName);
+            else
+                throw new ConfigurationException("Duplicate pipe detected: '{0}'".FormatWith(pipeName));
         }
 
         public static UntypedChannel GetCurrentChannelProxy()
@@ -34,7 +51,8 @@ namespace Topshelf.Shelving
         }
         public static WcfChannelProxy GetShelfChannelProxy(AppDomain appDomain)
         {
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(appDomain.FriendlyName)), "shelf");
+            var friendlyName = appDomain.FriendlyName;
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)), "shelf");
         }
         public static UntypedChannel GetHostChannelProxy()
         {
