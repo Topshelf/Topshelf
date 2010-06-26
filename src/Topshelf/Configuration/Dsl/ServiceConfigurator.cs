@@ -21,14 +21,13 @@ namespace Topshelf.Configuration.Dsl
     {
         public IServiceController Create()
         {
-            IServiceController serviceController = new ServiceController<TService>
+            IServiceController serviceController = new ServiceController<TService>(Name)
                                                    {
                                                        StartAction = StartAction,
                                                        StopAction = StopAction,
                                                        PauseAction = PauseAction,
                                                        ContinueAction = ContinueAction,
                                                        BuildService = BuildAction,
-                                                       Name = Name,
                                                    };
 
             return serviceController;

@@ -33,18 +33,16 @@ namespace Topshelf.Specs
             _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
-                                                           () => new ServiceController<TestService>
+                                                           () => new ServiceController<TestService>("test")
                                                                  {
-                                                                     Name = "test",
                                                                      BuildService = s => _service,
                                                                      StartAction = x => x.Start(),
                                                                      StopAction = x => x.Stop(),
                                                                      ContinueAction = x => x.Continue(),
                                                                      PauseAction = x => x.Pause()
                                                                  },
-                                                           () => new ServiceController<TestService2>
+                                                           () => new ServiceController<TestService2>("test2")
                                                                  {
-                                                                     Name = "test2",
                                                                      BuildService = s => _service2,
                                                                      StartAction = x => x.Start(),
                                                                      StopAction = x => x.Stop(),

@@ -91,13 +91,13 @@ namespace Topshelf.Model
 
         #endregion
 
-        public ServiceController()
+        public ServiceController(string name)
         {
+            Name = name;
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
             _myChannel = new ChannelAdapter();
             
-            //TODO: this will error in multiple hosted services - stuff style
-            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel); //service name?
+            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(Name, _myChannel);
 
             //build subscriptions
             _connection = _myChannel.Connect(s =>
@@ -243,7 +243,7 @@ namespace Topshelf.Model
             }
         }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public Type ServiceType
         {

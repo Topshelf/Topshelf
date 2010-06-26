@@ -14,8 +14,12 @@
 namespace Topshelf.Specs.Configuration
 {
     using System.ServiceProcess;
+    using System.Threading;
+    using Magnum.Channels;
+    using Messages;
     using Model;
     using NUnit.Framework;
+    using Shelving;
     using TestObject;
     using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
@@ -24,10 +28,15 @@ namespace Topshelf.Specs.Configuration
     public class RunnerConfigurator_Specs
     {
         private RunConfiguration _runConfiguration;
+        WcfChannelHost _channelHost;
+        ChannelAdapter _host;
 
         [SetUp]
         public void EstablishContext()
         {
+            _host = new ChannelAdapter();
+            
+            _channelHost = WellknownAddresses.GetHostHost(_host);
             TestService s1 = new TestService();
             TestService s2 = new TestService();
 
@@ -61,12 +70,17 @@ namespace Topshelf.Specs.Configuration
 
                 x.RunAs("dru", "pass");
 
-                //x.UseWinFormHost<MyForm>();
-
                 x.DependsOn("ServiceName");
                 x.DependencyOnMsmq();
                 x.DependencyOnMsSql();
             });
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _runConfiguration.Coordinator.Dispose();
+            _channelHost.Dispose();
         }
 
 
@@ -77,6 +91,7 @@ namespace Topshelf.Specs.Configuration
             RunConfiguration cfg = RunnerConfigurator.New(x => { });
             //some thing parses the args
             //Dispatch(args, serviceCoordinator);
+            cfg.Coordinator.Dispose();
         }
 
         [Test]
@@ -138,6 +153,8 @@ namespace Topshelf.Specs.Configuration
 			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
 
 			serviceInfo[0].Name.ShouldEqual(serviceName);
+
+            runConfiguration.Coordinator.Dispose();
 		}
 
 		[Test]
@@ -148,6 +165,8 @@ namespace Topshelf.Specs.Configuration
 			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
 
 			serviceInfo[0].Name.ShouldNotBeNull();
+
+            runConfiguration.Coordinator.Dispose();
 		}
 
     	[Test]
@@ -162,12 +181,22 @@ namespace Topshelf.Specs.Configuration
     		var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
             
 			serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
+
+            runConfiguration.Coordinator.Dispose();
      	}
 
         [Test]
         public void Hosted_service_configuration()
         {
+            var mre = new ManualResetEvent(false);
+            _host.Connect(c =>
+            {
+                c.Consume<ServiceStarted>().Using(m => mre.Set());
+            });
+
             _runConfiguration.Coordinator.Start();
+            mre.WaitOne();
+
             _runConfiguration.Coordinator.HostedServiceCount
                 .ShouldEqual(1);
 
@@ -175,6 +204,7 @@ namespace Topshelf.Specs.Configuration
 
             serviceController.Name
                 .ShouldEqual("my_service");
+
             serviceController.State
                 .ShouldEqual(ServiceState.Started);
         }

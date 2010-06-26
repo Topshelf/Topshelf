@@ -16,6 +16,7 @@ namespace Topshelf.Configuration.Dsl
     using System.Collections.Generic;
     using System.ServiceProcess;
     using Model;
+    using Magnum.Extensions;
 
     public class RunnerConfigurator :
         IRunnerConfigurator

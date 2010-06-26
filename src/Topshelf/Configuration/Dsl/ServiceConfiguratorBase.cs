@@ -41,7 +41,7 @@ namespace Topshelf.Configuration.Dsl
                  return asl.GetInstance<TService>(name);
              };
 
-            Name = "{0}:{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
+            Name = "{0}/{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 
         #region IDisposable Members

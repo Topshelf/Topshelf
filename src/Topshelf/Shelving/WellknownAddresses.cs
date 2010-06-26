@@ -36,6 +36,16 @@ namespace Topshelf.Shelving
             return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
         }
 
+        public static WcfChannelHost GetCurrentShelfHost(string name, ChannelAdapter myChannel)
+        {
+            var pipeName = GetShelfPipeName(name);
+
+            //EnsureNoDuplicatePipes(pipeName);
+
+            var address = GetBaseAddress(pipeName);
+            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
+        }
+
         static readonly List<string> _pipes = new List<string>();
         static void EnsureNoDuplicatePipes(string pipeName)
         {

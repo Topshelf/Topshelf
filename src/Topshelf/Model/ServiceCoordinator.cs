@@ -18,6 +18,7 @@ namespace Topshelf.Model
     using System.Linq;
     using log4net;
     using Messages;
+    using Magnum.Extensions;
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
     public class ServiceCoordinator :
@@ -204,10 +205,7 @@ namespace Topshelf.Model
             if (_disposed) return;
             if (disposing)
             {
-                foreach (var service in Services)
-                {
-                    service.Dispose();
-                }
+                Services.Each(s => s.Dispose());
                 Services.Clear();
             }
             _disposed = true;

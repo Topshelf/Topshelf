@@ -19,7 +19,7 @@ namespace Topshelf.Model
         IDisposable
     {
         Type ServiceType { get; }
-        string Name { get; set; }
+        string Name { get; }
         ServiceState State { get; }
         ServiceBuilder BuildService { get; }
 
