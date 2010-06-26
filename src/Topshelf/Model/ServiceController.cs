@@ -95,7 +95,7 @@ namespace Topshelf.Model
         {
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
             _myChannel = new ChannelAdapter();
-
+            
             //TODO: this will error in multiple hosted services - stuff style
             _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel); //service name?
 
@@ -131,7 +131,7 @@ namespace Topshelf.Model
         protected void Dispose(bool disposing)
         {
             if (!disposing) return;
-            if (!_disposed) return;
+            if (_disposed) return;
 
             if(_connection != null)
                 _connection.Dispose();
