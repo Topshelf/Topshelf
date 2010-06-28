@@ -95,9 +95,9 @@ namespace Topshelf.Model
         {
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
             _myChannel = new ChannelAdapter();
-
+            
             //TODO: this will error in multiple hosted services - stuff style
-            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel); //service name?
+            _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel); //service name?
 
             //build subscriptions
             _connection = _myChannel.Connect(s =>
@@ -131,7 +131,7 @@ namespace Topshelf.Model
         protected void Dispose(bool disposing)
         {
             if (!disposing) return;
-            if (!_disposed) return;
+            if (_disposed) return;
 
             if(_connection != null)
                 _connection.Dispose();
@@ -165,9 +165,7 @@ namespace Topshelf.Model
             if (_instance == null) 
                 throw new CouldntBuildServiceException(Name, typeof(TService));
 
-
             _hostChannel.Send(new ServiceReady());
-
         }
 
         public void Start()

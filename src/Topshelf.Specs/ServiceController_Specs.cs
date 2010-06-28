@@ -14,7 +14,6 @@ namespace Topshelf.Specs
 {
     using Model;
     using NUnit.Framework;
-    using Rhino.Mocks;
     using TestObject;
     using Topshelf.Configuration.Dsl;
 
@@ -39,6 +38,12 @@ namespace Topshelf.Specs
             c.HowToBuildService((name)=> _srv);
             _serviceController = c.Create();
             _serviceController.Start();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _serviceController.Dispose();
         }
 
         [Test]

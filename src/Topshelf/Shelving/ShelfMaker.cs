@@ -23,8 +23,10 @@ namespace Topshelf.Shelving
     using log4net;
     using Magnum.Channels;
     using Magnum.Extensions;
+    using Magnum.StateMachine;
     using Magnum.Threading;
     using Messages;
+    using Event = Magnum.StateMachine.Event;
 
     public class ShelfMaker :
         IDisposable
@@ -183,6 +185,7 @@ namespace Topshelf.Shelving
                                        AppDomain = ad,
                                        ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
                                        ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
+                                       ServiceChannelBuilder = appDomain => WellknownAddresses.GetServiceChannelProxy(appDomain),
                                        ShelfName = name
                                    }));
 
@@ -215,7 +218,7 @@ namespace Topshelf.Shelving
             if (shelf == null)
                 return;
 
-            shelf.ShelfChannel.Send(new StartService());
+            shelf.ServiceChannel.Send(new StartService());
         }
 
         public void StopShelf(string shelfName)
@@ -224,7 +227,7 @@ namespace Topshelf.Shelving
             if (shelf == null)
                 return;
 
-            shelf.ShelfChannel.Send(new StopService());
+            shelf.ServiceChannel.Send(new StopService());
         }
 
         void MarkServiceReadyAndStart(ServiceReady message)
@@ -238,7 +241,7 @@ namespace Topshelf.Shelving
             shelf.CurrentState = ShelfState.Ready;
 
             // if auto start is setup, send start
-            shelf.ShelfChannel.Send(new StartService());
+            shelf.ServiceChannel.Send(new StartService());
 
             StateChanged(oldState, ShelfState.Ready, message.ShelfName);
         }
@@ -286,5 +289,40 @@ namespace Topshelf.Shelving
 
             _shelves.WriteLock(dict => dict.Values.ToList().ForEach(x => AppDomain.Unload(x.AppDomain)));
         }
+    }
+
+    public class ServiceMasterMind : 
+        StateMachine<ServiceMasterMind>
+    {
+        #region State Machine
+        static ServiceMasterMind()
+        {
+            Define(() =>
+            {
+                
+            });
+        }
+
+        //do we have two kinds of shelves (in appdomain / out of appdomain)?
+        public static Event ShelfIsReady { get; set; }
+        public static Event ShelfFault { get; set; }
+        public static Event FileSystemChange { get; set; }
+
+
+        //service calls
+        public static Event ServiceIsInitialized { get; set; }
+        public static Event ServiceIsStarted { get; set; }
+        public static Event ServiceIsStopped { get; set; }
+        public static Event ServiceIsContinued { get; set; }
+        public static Event ServiceIsPaused { get; set; }
+
+        public static Event ServiceIsStarting { get; set; }
+        public static Event ServiceIsStopping { get; set; }
+        public static Event ServiceIsPausing { get; set; }
+        public static Event ServiceIsContinuing { get; set; }
+
+        public static State ServiceState { get; set; }
+        #endregion
+
     }
 }
