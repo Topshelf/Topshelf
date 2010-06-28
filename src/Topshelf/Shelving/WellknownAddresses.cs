@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2008 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,9 +13,7 @@
 namespace Topshelf.Shelving
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using Exceptions;
     using Magnum.Channels;
     using Magnum.Fibers;
 
@@ -30,40 +28,30 @@ namespace Topshelf.Shelving
         {
             var pipeName = GetThisShelfPipeName();
 
-            //EnsureNoDuplicatePipes(pipeName);
-
             var address = GetBaseAddress(pipeName);
             return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
         }
 
-        public static WcfChannelHost GetCurrentShelfHost(string name, ChannelAdapter myChannel)
+        public static WcfChannelHost GetCurrentServiceHost(ChannelAdapter myChannel)
         {
-            var pipeName = GetShelfPipeName(name);
-
-            //EnsureNoDuplicatePipes(pipeName);
+            var pipeName = GetThisShelfPipeName();
 
             var address = GetBaseAddress(pipeName);
-            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
+            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "service");
         }
 
-        static readonly List<string> _pipes = new List<string>();
-        static void EnsureNoDuplicatePipes(string pipeName)
-        {
-            if(!_pipes.Contains(pipeName))
-                _pipes.Add(pipeName);
-            else
-                throw new ConfigurationException("Duplicate pipe detected: '{0}'".FormatWith(pipeName));
-        }
-
-        public static UntypedChannel GetCurrentChannelProxy()
-        {
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetThisShelfPipeName()), "shelf"); 
-        }
         public static WcfChannelProxy GetShelfChannelProxy(AppDomain appDomain)
         {
             var friendlyName = appDomain.FriendlyName;
             return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)), "shelf");
         }
+
+        public static WcfChannelProxy GetServiceChannelProxy(AppDomain appDomain)
+        {
+            var friendlyName = appDomain.FriendlyName;
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)), "service");
+        }
+
         public static UntypedChannel GetHostChannelProxy()
         {
             return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetHostPipeName()), "host");
@@ -73,10 +61,12 @@ namespace Topshelf.Shelving
         {
             return "{0}/{1}".FormatWith(GetPid(),name);
         }
+
         private static string GetThisShelfPipeName()
         {
             return "{0}/{1}".FormatWith(GetPid(), GetFolder());
         }
+
         private static string GetHostPipeName()
         {
             return "{0}/host".FormatWith(GetPid());

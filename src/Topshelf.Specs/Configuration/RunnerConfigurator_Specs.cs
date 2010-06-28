@@ -14,12 +14,8 @@
 namespace Topshelf.Specs.Configuration
 {
     using System.ServiceProcess;
-    using System.Threading;
-    using Magnum.Channels;
-    using Messages;
     using Model;
     using NUnit.Framework;
-    using Shelving;
     using TestObject;
     using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
@@ -28,61 +24,43 @@ namespace Topshelf.Specs.Configuration
     public class RunnerConfigurator_Specs
     {
         private RunConfiguration _runConfiguration;
-        WcfChannelHost _channelHost;
-        ChannelAdapter _host;
 
         [SetUp]
         public void EstablishContext()
         {
-            _host = new ChannelAdapter();
-            
-            _channelHost = WellknownAddresses.GetHostHost(_host);
             TestService s1 = new TestService();
             TestService s2 = new TestService();
 
-            _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
-            {
-                x.SetDisplayName("chris");
-                x.SetServiceName("chris");
-                x.SetDescription("chris's pants");
+            _runConfiguration = RunnerConfigurator.New(x =>
+            	{
+            		x.SetDisplayName("chris");
+            		x.SetServiceName("chris");
+            		x.SetDescription("chris's pants");
 
-                x.ConfigureService<TestService>(c =>
-                {
-                    c.WhenStarted(s => s.Start());
-                    c.WhenStopped(s => s.Stop());
-                    c.WhenPaused(s => { });
-                    c.WhenContinued(s => { });
-                    c.Named("my_service");
-                });
+            		x.ConfigureService<TestService>(c =>
+            			{
+            				c.WhenStarted(s => s.Start());
+            				c.WhenStopped(s => s.Stop());
+            				c.WhenPaused(s => { });
+            				c.WhenContinued(s => { });
+            				c.Named("my_service");
+            			});
 
-                //needs to moved to a custom area for testing
-                //x.ConfigureServiceInIsolation<TestService>(c=>
-                //                                                   {
-                //                                                       c.WhenStarted(s => s.Start());
-                //                                                       c.WhenStopped(s => s.Stop());
-                //                                                       c.WhenPaused(s => { });
-                //                                                       c.WhenContinued(s => { });
-                //                                                       c.HowToBuildService(()=>sl);
-                //                                                   });
-                
+            		x.DoNotStartAutomatically();
 
-                x.DoNotStartAutomatically();
+            		x.RunAs("dru", "pass");
 
-                x.RunAs("dru", "pass");
-
-                x.DependsOn("ServiceName");
-                x.DependencyOnMsmq();
-                x.DependencyOnMsSql();
-            });
+            		x.DependsOn("ServiceName");
+            		x.DependencyOnMsmq();
+            		x.DependencyOnMsSql();
+            	});
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            _runConfiguration.Coordinator.Dispose();
-            _channelHost.Dispose();
-        }
-
+		[TearDown]
+		public void CleanUp()
+		{
+			_runConfiguration.Coordinator.Dispose();
+		}
 
         [Test]
         public void A_pretend_void_main()
@@ -91,7 +69,6 @@ namespace Topshelf.Specs.Configuration
             RunConfiguration cfg = RunnerConfigurator.New(x => { });
             //some thing parses the args
             //Dispatch(args, serviceCoordinator);
-            cfg.Coordinator.Dispose();
         }
 
         [Test]
@@ -153,8 +130,6 @@ namespace Topshelf.Specs.Configuration
 			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
 
 			serviceInfo[0].Name.ShouldEqual(serviceName);
-
-            runConfiguration.Coordinator.Dispose();
 		}
 
 		[Test]
@@ -165,8 +140,6 @@ namespace Topshelf.Specs.Configuration
 			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
 
 			serviceInfo[0].Name.ShouldNotBeNull();
-
-            runConfiguration.Coordinator.Dispose();
 		}
 
     	[Test]
@@ -181,22 +154,12 @@ namespace Topshelf.Specs.Configuration
     		var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
             
 			serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
-
-            runConfiguration.Coordinator.Dispose();
      	}
 
         [Test]
         public void Hosted_service_configuration()
         {
-            var mre = new ManualResetEvent(false);
-            _host.Connect(c =>
-            {
-                c.Consume<ServiceStarted>().Using(m => mre.Set());
-            });
-
             _runConfiguration.Coordinator.Start();
-            mre.WaitOne();
-
             _runConfiguration.Coordinator.HostedServiceCount
                 .ShouldEqual(1);
 
@@ -204,7 +167,6 @@ namespace Topshelf.Specs.Configuration
 
             serviceController.Name
                 .ShouldEqual("my_service");
-
             serviceController.State
                 .ShouldEqual(ServiceState.Started);
         }

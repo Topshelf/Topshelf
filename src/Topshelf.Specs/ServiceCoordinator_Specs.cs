@@ -21,8 +21,6 @@ namespace Topshelf.Specs
     [TestFixture]
     public class ServiceCoordinator_Specs
     {
-        //TODO: need a started SC - its async now
-
         #region Setup/Teardown
 
         [SetUp]
@@ -35,16 +33,18 @@ namespace Topshelf.Specs
             _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
-                                                           () => new ServiceController<TestService>("test")
+                                                           () => new ServiceController<TestService>
                                                                  {
+                                                                     Name = "test",
                                                                      BuildService = s => _service,
                                                                      StartAction = x => x.Start(),
                                                                      StopAction = x => x.Stop(),
                                                                      ContinueAction = x => x.Continue(),
                                                                      PauseAction = x => x.Pause()
                                                                  },
-                                                           () => new ServiceController<TestService2>("test2")
+                                                           () => new ServiceController<TestService2>
                                                                  {
+                                                                     Name = "test2",
                                                                      BuildService = s => _service2,
                                                                      StartAction = x => x.Start(),
                                                                      StopAction = x => x.Stop(),
@@ -56,11 +56,12 @@ namespace Topshelf.Specs
             _serviceCoordinator.RegisterServices(services);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            _serviceCoordinator.Dispose();
-        }
+		[TearDown]
+		public void CleanUp()
+		{
+			_serviceCoordinator.Dispose();
+		}
+
         #endregion
 
         private TestService _service;
