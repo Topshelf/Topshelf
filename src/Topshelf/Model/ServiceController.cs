@@ -97,7 +97,7 @@ namespace Topshelf.Model
             _myChannel = new ChannelAdapter();
             
             //TODO: this will error in multiple hosted services - stuff style
-            _myChannelHost = WellknownAddresses.GetCurrentShelfHost(_myChannel); //service name?
+            _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel); //service name?
 
             //build subscriptions
             _connection = _myChannel.Connect(s =>
@@ -165,9 +165,7 @@ namespace Topshelf.Model
             if (_instance == null) 
                 throw new CouldntBuildServiceException(Name, typeof(TService));
 
-
             _hostChannel.Send(new ServiceReady());
-
         }
 
         public void Start()

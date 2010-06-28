@@ -27,7 +27,14 @@ namespace Topshelf.Shelving
         {
             get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
         }
-		public Func<AppDomain, WcfChannelProxy> ShelfChannelBuilder { private get; set; }
+
+        WcfChannelProxy _serviceChannel = null;
+        public WcfChannelProxy ServiceChannel
+        {
+            get { return _serviceChannel ?? (_serviceChannel = ServiceChannelBuilder(AppDomain)); }
+        }
+        public Func<AppDomain, WcfChannelProxy> ShelfChannelBuilder { private get; set; }
+        public Func<AppDomain, WcfChannelProxy> ServiceChannelBuilder { private get; set; }
 
         // Do we need to hold onto this handle at all?
         internal ObjectHandle ObjectHandle { get; set; }

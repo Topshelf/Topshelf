@@ -185,6 +185,7 @@ namespace Topshelf.Shelving
                                        AppDomain = ad,
                                        ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
                                        ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
+                                       ServiceChannelBuilder = appDomain => WellknownAddresses.GetServiceChannelProxy(appDomain),
                                        ShelfName = name
                                    }));
 
@@ -217,7 +218,7 @@ namespace Topshelf.Shelving
             if (shelf == null)
                 return;
 
-            shelf.ShelfChannel.Send(new StartService());
+            shelf.ServiceChannel.Send(new StartService());
         }
 
         public void StopShelf(string shelfName)
@@ -226,7 +227,7 @@ namespace Topshelf.Shelving
             if (shelf == null)
                 return;
 
-            shelf.ShelfChannel.Send(new StopService());
+            shelf.ServiceChannel.Send(new StopService());
         }
 
         void MarkServiceReadyAndStart(ServiceReady message)
@@ -240,7 +241,7 @@ namespace Topshelf.Shelving
             shelf.CurrentState = ShelfState.Ready;
 
             // if auto start is setup, send start
-            shelf.ShelfChannel.Send(new StartService());
+            shelf.ServiceChannel.Send(new StartService());
 
             StateChanged(oldState, ShelfState.Ready, message.ShelfName);
         }
