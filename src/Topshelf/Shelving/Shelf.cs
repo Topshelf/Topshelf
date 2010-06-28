@@ -15,7 +15,6 @@ namespace Topshelf.Shelving
     using System;
     using System.Linq;
     using Configuration.Dsl;
-    using log4net;
     using Magnum.Channels;
     using Magnum.Reflection;
     using Messages;
@@ -24,17 +23,22 @@ namespace Topshelf.Shelving
     public class Shelf :
         IDisposable
     {
-        static ILog _log = LogManager.GetLogger(typeof(Shelf));
         IServiceController _controller;
         readonly Type _bootstrapperType;
         readonly UntypedChannel _hostChannel;
+        ChannelAdapter _myChannelAdpator;
+        WcfChannelHost _myChannel;
 
         public Shelf(Type bootstraper)
         {
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
+            _myChannelAdpator = new ChannelAdapter();
+            _myChannel = WellknownAddresses.GetCurrentShelfHost(_myChannelAdpator);
             _bootstrapperType = bootstraper;
 
-            Initialize();
+            _myChannelAdpator.Connect(config => config.AddConsumerOf<ReadyService>().UsingConsumer(msg => Initialize()));
+
+            _hostChannel.Send(new ShelfReady());
         }
 
         void Initialize()
@@ -46,7 +50,6 @@ namespace Topshelf.Shelving
 
                 var serviceType = bootstrapper.GetType().GetInterfaces()[0].GetGenericArguments()[0];
                 var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(serviceType));
-
 
                 this.FastInvoke(new[] { serviceType }, "InitializeAndCreateHostedService", bootstrapper, cfg);
 
@@ -125,14 +128,14 @@ namespace Topshelf.Shelving
             }
             catch (Exception)
             {
-                _log.Error("Shelf '{0}' is having a bad day.", exception);
                 // eat the exception for now
             }
         }
 
         public void Dispose()
         {
-            //TODO: what 
+            if (_myChannel != null)
+                _myChannel.Dispose();
         }
     }
 }

@@ -46,18 +46,18 @@ namespace Topshelf.Shelving
             //TODO:this should move to the service coordinator
             _myChannel.Connect(s =>
             {
-                s.Consume<ShelfReady>().Using(m => MarkShelfReadyAndInitService(m));
-                s.Consume<ServiceReady>().Using(m => MarkServiceReadyAndStart(m));
-                s.Consume<ServiceStopped>().Using(m => MarkShelvedServiceStopped(m));
-                s.Consume<ServiceStarted>().Using(m => HandleShelfStateChange(m, ShelfState.Started));
-                s.Consume<FileSystemChange>().Using(m => ReloadShelf(m));
-                s.Consume<ServiceContinued>().Using(m => HandleShelfStateChange(m, ShelfState.Started));
-                s.Consume<ServicePaused>().Using(m => HandleShelfStateChange(m, ShelfState.Paused));
-                s.Consume<ServiceStarting>().Using(m => HandleShelfStateChange(m, ShelfState.Starting));
-                s.Consume<ServiceStopping>().Using(m => HandleShelfStateChange(m, ShelfState.Stopping));
-                s.Consume<ShelfFault>().Using(m => HandleShelfFault(m));
-                s.Consume<ServicePausing>().Using(m => HandleShelfStateChange(m, ShelfState.Pausing));
-                s.Consume<ServiceContinuing>().Using(m => HandleShelfStateChange(m, ShelfState.Continuing));
+                s.AddConsumerOf<ShelfReady>().UsingConsumer(MarkShelfReadyAndInitService);
+				s.AddConsumerOf<ServiceReady>().UsingConsumer(MarkServiceReadyAndStart);
+				s.AddConsumerOf<ServiceStopped>().UsingConsumer(MarkShelvedServiceStopped);
+				s.AddConsumerOf<ServiceStarted>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Started));
+				s.AddConsumerOf<FileSystemChange>().UsingConsumer(ReloadShelf);
+				s.AddConsumerOf<ServiceContinued>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Started));
+				s.AddConsumerOf<ServicePaused>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Paused));
+				s.AddConsumerOf<ServiceStarting>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Starting));
+				s.AddConsumerOf<ServiceStopping>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Stopping));
+				s.AddConsumerOf<ShelfFault>().UsingConsumer(HandleShelfFault);
+				s.AddConsumerOf<ServicePausing>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Pausing));
+				s.AddConsumerOf<ServiceContinuing>().UsingConsumer(m => HandleShelfStateChange(m, ShelfState.Continuing));
             });
 
             _log.Debug("ShelfMaker started.");
@@ -185,6 +185,7 @@ namespace Topshelf.Shelving
                                        AppDomain = ad,
                                        ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
                                        ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
+                                       ServiceChannelBuilder = appDomain => WellknownAddresses.GetServiceChannelProxy(appDomain),
                                        ShelfName = name
                                    }));
 
@@ -217,7 +218,7 @@ namespace Topshelf.Shelving
             if (shelf == null)
                 return;
 
-            shelf.ShelfChannel.Send(new StartService());
+            shelf.ServiceChannel.Send(new StartService());
         }
 
         public void StopShelf(string shelfName)
@@ -226,7 +227,7 @@ namespace Topshelf.Shelving
             if (shelf == null)
                 return;
 
-            shelf.ShelfChannel.Send(new StopService());
+            shelf.ServiceChannel.Send(new StopService());
         }
 
         void MarkServiceReadyAndStart(ServiceReady message)
@@ -240,7 +241,7 @@ namespace Topshelf.Shelving
             shelf.CurrentState = ShelfState.Ready;
 
             // if auto start is setup, send start
-            shelf.ShelfChannel.Send(new StartService());
+            shelf.ServiceChannel.Send(new StartService());
 
             StateChanged(oldState, ShelfState.Ready, message.ShelfName);
         }

@@ -25,7 +25,10 @@ namespace Topshelf.Specs
     {
         [SetUp]
         public void Setup()
-        {
+        {         
+            if (Directory.Exists("Services"))
+                Directory.Delete("Services", true);
+            
             Directory.CreateDirectory("Services");
             var bobPath = Path.Combine("Services", "bob");
             Directory.CreateDirectory(bobPath);
@@ -35,13 +38,7 @@ namespace Topshelf.Specs
             DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
             DirectoryMonitor_Specs.CopyFileToDir("System.CoreEx.dll", bobPath);
             DirectoryMonitor_Specs.CopyFileToDir("System.Reactive.dll", bobPath);
-        }
-
-        [SetUp]
-        public void EnsureClean()
-        {
-            if (Directory.Exists("Services"))
-                Directory.Delete("Services", true);
+            DirectoryMonitor_Specs.CopyFileToDir("log4net.dll", bobPath);
         }
 
         [TearDown]
