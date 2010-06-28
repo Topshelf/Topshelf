@@ -21,6 +21,8 @@ namespace Topshelf.Specs
     [TestFixture]
     public class ServiceCoordinator_Specs
     {
+        //TODO: need a started SC - its async now
+
         #region Setup/Teardown
 
         [SetUp]
@@ -54,6 +56,11 @@ namespace Topshelf.Specs
             _serviceCoordinator.RegisterServices(services);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _serviceCoordinator.Dispose();
+        }
         #endregion
 
         private TestService _service;
