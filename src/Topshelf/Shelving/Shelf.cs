@@ -36,7 +36,7 @@ namespace Topshelf.Shelving
             _myChannel = WellknownAddresses.GetCurrentShelfHost(_myChannelAdpator);
             _bootstrapperType = bootstraper;
 
-            _myChannelAdpator.Connect(config => config.Consume<ReadyService>().Using(msg => Initialize()));
+            _myChannelAdpator.Connect(config => config.AddConsumerOf<ReadyService>().UsingConsumer(msg => Initialize()));
 
             _hostChannel.Send(new ShelfReady());
         }

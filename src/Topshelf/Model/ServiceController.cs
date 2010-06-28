@@ -102,13 +102,12 @@ namespace Topshelf.Model
             //build subscriptions
             _connection = _myChannel.Connect(s =>
             {
-                s.Consume<ReadyService>().Using(m => Initialize());
-                s.Consume<StopService>().Using(m => Stop());
-                s.Consume<StartService>().Using(m => Start());
-                s.Consume<PauseService>().Using(m => Pause());
-                s.Consume<ContinueService>().Using(m => Continue());
+                s.AddConsumerOf<ReadyService>().UsingConsumer(m => Initialize());
+				s.AddConsumerOf<StopService>().UsingConsumer(m => Stop());
+				s.AddConsumerOf<StartService>().UsingConsumer(m => Start());
+				s.AddConsumerOf<PauseService>().UsingConsumer(m => Pause());
+				s.AddConsumerOf<ContinueService>().UsingConsumer(m => Continue());
             });
-
         }
 
         TService _instance;
@@ -157,8 +156,13 @@ namespace Topshelf.Model
 
         #region IServiceController Members
 
+		// TODO: this is not pretty - Shelf can't have init() called here but bottling needs it.
+    	bool _hasInitialized;
         public void Initialize()
         {
+			if (_hasInitialized)
+				return;
+        	
             _instance = (TService)BuildService(Name);
             
             //TODO: send fault
@@ -166,7 +170,9 @@ namespace Topshelf.Model
                 throw new CouldntBuildServiceException(Name, typeof(TService));
 
             _hostChannel.Send(new ServiceReady());
-        }
+
+        	_hasInitialized = true;
+		}
 
         public void Start()
         {

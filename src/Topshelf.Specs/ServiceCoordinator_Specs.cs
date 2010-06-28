@@ -56,6 +56,12 @@ namespace Topshelf.Specs
             _serviceCoordinator.RegisterServices(services);
         }
 
+		[TearDown]
+		public void CleanUp()
+		{
+			_serviceCoordinator.Dispose();
+		}
+
         #endregion
 
         private TestService _service;

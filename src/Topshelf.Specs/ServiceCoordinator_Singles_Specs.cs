@@ -14,9 +14,10 @@ namespace Topshelf.Specs
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
+    using Magnum.Extensions;
     using Model;
     using NUnit.Framework;
-    using Rhino.Mocks;
     using TestObject;
 
     [TestFixture]
@@ -57,7 +58,15 @@ namespace Topshelf.Specs
 
             _serviceCoordinator.RegisterServices(services);
             _serviceCoordinator.Start();
+
+        	Thread.Sleep(2.Seconds());
         }
+
+		[TearDown]
+		public void CleanUp()
+		{
+			_serviceCoordinator.Dispose();
+		}
 
         #endregion
 

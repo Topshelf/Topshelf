@@ -31,44 +31,36 @@ namespace Topshelf.Specs.Configuration
             TestService s1 = new TestService();
             TestService s2 = new TestService();
 
-            _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
-            {
-                x.SetDisplayName("chris");
-                x.SetServiceName("chris");
-                x.SetDescription("chris's pants");
+            _runConfiguration = RunnerConfigurator.New(x =>
+            	{
+            		x.SetDisplayName("chris");
+            		x.SetServiceName("chris");
+            		x.SetDescription("chris's pants");
 
-                x.ConfigureService<TestService>(c =>
-                {
-                    c.WhenStarted(s => s.Start());
-                    c.WhenStopped(s => s.Stop());
-                    c.WhenPaused(s => { });
-                    c.WhenContinued(s => { });
-                    c.Named("my_service");
-                });
+            		x.ConfigureService<TestService>(c =>
+            			{
+            				c.WhenStarted(s => s.Start());
+            				c.WhenStopped(s => s.Stop());
+            				c.WhenPaused(s => { });
+            				c.WhenContinued(s => { });
+            				c.Named("my_service");
+            			});
 
-                //needs to moved to a custom area for testing
-                //x.ConfigureServiceInIsolation<TestService>(c=>
-                //                                                   {
-                //                                                       c.WhenStarted(s => s.Start());
-                //                                                       c.WhenStopped(s => s.Stop());
-                //                                                       c.WhenPaused(s => { });
-                //                                                       c.WhenContinued(s => { });
-                //                                                       c.HowToBuildService(()=>sl);
-                //                                                   });
-                
+            		x.DoNotStartAutomatically();
 
-                x.DoNotStartAutomatically();
+            		x.RunAs("dru", "pass");
 
-                x.RunAs("dru", "pass");
-
-                //x.UseWinFormHost<MyForm>();
-
-                x.DependsOn("ServiceName");
-                x.DependencyOnMsmq();
-                x.DependencyOnMsSql();
-            });
+            		x.DependsOn("ServiceName");
+            		x.DependencyOnMsmq();
+            		x.DependencyOnMsSql();
+            	});
         }
 
+		[TearDown]
+		public void CleanUp()
+		{
+			_runConfiguration.Coordinator.Dispose();
+		}
 
         [Test]
         public void A_pretend_void_main()
