@@ -35,6 +35,7 @@ namespace Topshelf.Specs
             DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
             DirectoryMonitor_Specs.CopyFileToDir("System.CoreEx.dll", bobPath);
             DirectoryMonitor_Specs.CopyFileToDir("System.Reactive.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("log4net.dll", bobPath);
         }
 
         [SetUp]
