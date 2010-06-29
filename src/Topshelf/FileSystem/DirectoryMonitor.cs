@@ -13,20 +13,24 @@
 namespace Topshelf.FileSystem
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using Magnum.Channels;
+    using Magnum.Extensions;
     using Magnum.Fibers;
+    using Magnum.FileSystem;
+    using Magnum.FileSystem.Events;
     using Messages;
     using Shelving;
 
     public class DirectoryMonitor :
         IDisposable
     {
-        FileSystemWatcher _fileSystemWatcher;
         readonly string _baseDir;
         readonly UntypedChannel _hostChannel;
+        ChannelAdapter _channel;
+        Scheduler _scheduler;
+        PollingFileSystemEventProducer _producer;
 
         public DirectoryMonitor(string directory)
         {
@@ -40,30 +44,30 @@ namespace Topshelf.FileSystem
             if (!Directory.Exists(_baseDir))
                 Directory.CreateDirectory(_baseDir);
 
-            _fileSystemWatcher = new FileSystemWatcher(_baseDir)
-                                     {
-                                         IncludeSubdirectories = true,
-                                         EnableRaisingEvents = true,
-                                     };
+            _channel = new ChannelAdapter();
+            FiberFactory fiberFactory = () => new SynchronousFiber();
+            _scheduler = new TimerScheduler(fiberFactory());
+            _producer = new PollingFileSystemEventProducer(_baseDir, _channel, _scheduler, fiberFactory(),
+                                                           2.Minutes());
 
-            _fileSystemWatcher
-                .GetEvents()
-                .Select(e => GetChangedDirectory(e.EventArgs.FullPath))
-                .BufferWithTime(TimeSpan.FromSeconds(3))
-                .Where(e => e.Count() > 0)
-                .Select(e => e.Distinct())
-                .Subscribe(e =>
-                {
-                    e.ToList().ForEach(str => _hostChannel.Send(new FileSystemChange {ShelfName = str}));
-                });
+            _channel.Connect(config => config
+                                           .AddConsumerOf<FileSystemEvent>()
+                                           .DistinctlyBufferWithTime(3.Seconds(), fsEvent => GetChangedDirectory(fsEvent.Path))
+                                           .UsingConsumer(fsEvents => fsEvents.Keys.ToList().ForEach(key => _hostChannel.Send(new FileSystemChange { ShelfName = key }))));
         }
 
         public void Stop()
         {
-            if (_fileSystemWatcher != null)
+            if (_producer != null)
             {
-                _fileSystemWatcher.Dispose();
-                _fileSystemWatcher = null;
+                _producer.Dispose();
+                _producer = null;
+            }
+
+            if (_scheduler != null)
+            {
+                _scheduler.Stop();
+                _scheduler = null;
             }
         }
 
@@ -77,21 +81,11 @@ namespace Topshelf.FileSystem
 
         public void Dispose()
         {
-            if (_fileSystemWatcher != null)
-                _fileSystemWatcher.Dispose();
-        }
-    }
+            if (_scheduler != null)
+                _scheduler.Stop();
 
-    public static class Extentions
-    {
-        public static IObservable<IEvent<FileSystemEventArgs>> GetEvents(this FileSystemWatcher fileSystemWatcher)
-        {
-            IObservable<IEvent<FileSystemEventArgs>> changed = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Changed");
-            IObservable<IEvent<FileSystemEventArgs>> created = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Created");
-            IObservable<IEvent<FileSystemEventArgs>> deleted = Observable.FromEvent<FileSystemEventArgs>(fileSystemWatcher, "Deleted");
-            IObservable<IEvent<FileSystemEventArgs>> renamed = Observable.FromEvent<RenamedEventArgs>(fileSystemWatcher, "Renamed").Cast<IEvent<FileSystemEventArgs>>();
-
-            return Observable.Merge(changed, created, deleted, renamed);
+            if (_producer != null)
+                _producer.Dispose();
         }
     }
 }

@@ -255,7 +255,7 @@
             <param name="consumer"></param>
             <returns></returns>
         </member>
-        <member name="M:Magnum.Channels.ExtensionsForIntervalChannels.Every``1(Magnum.Channels.Configuration.ChannelConnectionConfigurator{``0},System.TimeSpan)">
+        <member name="M:Magnum.Channels.ExtensionsForIntervalChannels.BufferWithTime``1(Magnum.Channels.Configuration.ChannelConnectionConfigurator{``0},System.TimeSpan)">
             <summary>
             Specifies an interval at which the consumer should be called with a collection
             of messages received during that period.
@@ -293,6 +293,24 @@
             </summary>
             <typeparam name="TChannel"></typeparam>
         </member>
+        <member name="T:Magnum.Future`1">
+            <summary>
+            A future object that supports both callbacks and asynchronous waits once a future value becomes available.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:Magnum.Channels.Channel`1">
+            <summary>
+            A one-way communication containing messages of the specified type
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Magnum.Channels.Channel`1.Send(`0)">
+            <summary>
+            Send a message to the channel
+            </summary>
+            <param name="message">The message to send</param>
+        </member>
         <member name="T:Magnum.Channels.InstanceChannelProvider`2">
             <summary>
             Creates an instance of a class and returns the channel from the class
@@ -306,18 +324,6 @@
             specified Fiber
             </summary>
             <typeparam name="T">The type of message delivered on the channel</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Channel`1">
-            <summary>
-            A one-way communication containing messages of the specified type
-            </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="M:Magnum.Channels.Channel`1.Send(`0)">
-            <summary>
-            Send a message to the channel
-            </summary>
-            <param name="message">The message to send</param>
         </member>
         <member name="M:Magnum.Channels.SelectiveConsumerChannel`1.#ctor(Magnum.Fibers.Fiber,Magnum.Channels.SelectiveConsumer{`0})">
             <summary>
@@ -479,14 +485,51 @@
             </summary>
             <typeparam name="TOutput">The output channel type</typeparam>
         </member>
-        <member name="T:Magnum.Concurrency.ImmutableReference`1">
+        <member name="T:Magnum.Concurrency.Atomic">
+            <summary>
+            The factory to create atomic instances/references
+            </summary>
+        </member>
+        <member name="T:Magnum.Concurrency.Atomic`1">
+            <summary>
+            An atomic value that can be modified using a mutator function.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Magnum.Concurrency.Atomic`1.Set(System.Func{`0,`0})">
+            <summary>
+            Sets the value to the result of the mutator. Each attempt to set the value
+            will call the mutator, which could result in multiple calls with different
+            values on each call.
+            </summary>
+            <param name="mutator">A function that takes in the current value and returns the new value</param>
+            <returns>The value that was replaced</returns>
+        </member>
+        <member name="T:Magnum.Concurrency.Internal.AtomicObject">
             <summary>
             Maintains a reference to an immutable object, allowing a mutator function to 
             change the reference pointed to in an atomic fashion
             </summary>
             <typeparam name="T"></typeparam>
         </member>
-        <member name="M:Magnum.Concurrency.ImmutableReference`1.Set(System.Func{`0,`0})">
+        <member name="M:Magnum.Concurrency.Internal.AtomicObject.Set(System.Func{System.Object,System.Object})">
+            <summary>
+            Applies a change method to the value, passing the current value to the mutator
+            and attempting to set the value to the returned value. if the value has not been
+            changed by another thread, the operation completes, otherwise it is attempted 
+            again by calling the mutator function with the new value.
+            </summary>
+            <param name="mutator">A function that, given the current value, returns the changed value</param>
+            <returns>The previous value</returns>
+        </member>
+        <member name="T:Magnum.Concurrency.Internal.AtomicReference`1">
+            <summary>
+            Maintains a reference to an immutable object, allowing a mutator function to 
+            change the reference pointed to in an atomic fashion
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Magnum.Concurrency.Internal.AtomicReference`1.Set(System.Func{`0,`0})">
             <summary>
             Applies a change method to the value, passing the current value to the mutator
             and attempting to set the value to the returned value. if the value has not been
@@ -601,12 +644,6 @@
             Wraps an anonymous method in a ChannelProvider
             </summary>
             <typeparam name="T">The channel type</typeparam>
-        </member>
-        <member name="T:Magnum.Channels.Future`1">
-            <summary>
-            A future object that supports asynchronous waits and channel sends, in addition to a regular complete method
-            </summary>
-            <typeparam name="T"></typeparam>
         </member>
         <member name="M:Magnum.Channels.Interceptor`1.OnSend(`0)">
             <summary>
