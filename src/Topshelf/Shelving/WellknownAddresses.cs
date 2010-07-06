@@ -17,11 +17,12 @@ namespace Topshelf.Shelving
     using Magnum.Channels;
     using Magnum.Fibers;
 
+
     public static class WellknownAddresses
     {
         public static WcfChannelHost GetHostHost(UntypedChannel hostProxy)
         {
-            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress( GetHostPipeName()),"host");
+            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress(GetHostPipeName()), "host");
         }
 
         public static WcfChannelHost GetCurrentShelfHost(ChannelAdapter myChannel)
@@ -32,12 +33,12 @@ namespace Topshelf.Shelving
             return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
         }
 
-        public static WcfChannelHost GetCurrentServiceHost(ChannelAdapter myChannel)
+        public static WcfChannelHost GetCurrentServiceHost(ChannelAdapter myChannel, string serviceName)
         {
             var pipeName = GetThisShelfPipeName();
 
             var address = GetBaseAddress(pipeName);
-            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "service");
+            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, serviceName);
         }
 
         public static WcfChannelProxy GetShelfChannelProxy(AppDomain appDomain)
@@ -46,10 +47,11 @@ namespace Topshelf.Shelving
             return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)), "shelf");
         }
 
-        public static WcfChannelProxy GetServiceChannelProxy(AppDomain appDomain)
+        public static WcfChannelProxy GetServiceChannelProxy(AppDomain appDomain, string serviceName)
         {
             var friendlyName = appDomain.FriendlyName;
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)), "service");
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)),
+                                       serviceName);
         }
 
         public static UntypedChannel GetHostChannelProxy()
@@ -57,31 +59,32 @@ namespace Topshelf.Shelving
             return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetHostPipeName()), "host");
         }
 
-        private static string GetShelfPipeName(string name)
+        static string GetShelfPipeName(string name)
         {
-            return "{0}/{1}".FormatWith(GetPid(),name);
+            return "{0}/{1}".FormatWith(GetPid(), name);
         }
 
-        private static string GetThisShelfPipeName()
+        static string GetThisShelfPipeName()
         {
             return "{0}/{1}".FormatWith(GetPid(), GetFolder());
         }
 
-        private static string GetHostPipeName()
+        static string GetHostPipeName()
         {
             return "{0}/host".FormatWith(GetPid());
         }
 
-        private static Uri GetBaseAddress(string name)
+        static Uri GetBaseAddress(string name)
         {
             return new Uri("net.pipe://localhost/topshelf/{0}".FormatWith(name));
         }
 
-        private static int GetPid()
+        static int GetPid()
         {
             return Process.GetCurrentProcess().Id;
         }
-        private static string GetFolder()
+
+        static string GetFolder()
         {
             return AppDomain.CurrentDomain.FriendlyName;
         }

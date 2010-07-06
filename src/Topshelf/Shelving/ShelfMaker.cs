@@ -185,7 +185,7 @@ namespace Topshelf.Shelving
                                        AppDomain = ad,
                                        ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
                                        ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
-                                       ServiceChannelBuilder = appDomain => WellknownAddresses.GetServiceChannelProxy(appDomain),
+                                       ServiceChannelBuilder = appDomain => WellknownAddresses.GetServiceChannelProxy(appDomain, ad.FriendlyName),
                                        ShelfName = name
                                    }));
 
@@ -323,6 +323,5 @@ namespace Topshelf.Shelving
 
         public static State ServiceState { get; set; }
         #endregion
-
     }
 }

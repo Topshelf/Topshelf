@@ -20,14 +20,15 @@ namespace Topshelf.Shelving
     using Messages;
     using Model;
 
+
     public class Shelf :
         IDisposable
     {
         IServiceController _controller;
         readonly Type _bootstrapperType;
         readonly UntypedChannel _hostChannel;
-        ChannelAdapter _myChannelAdpator;
-        WcfChannelHost _myChannel;
+        readonly ChannelAdapter _myChannelAdpator;
+        readonly WcfChannelHost _myChannel;
 
         public Shelf(Type bootstraper)
         {
@@ -51,7 +52,7 @@ namespace Topshelf.Shelving
                 var serviceType = bootstrapper.GetType().GetInterfaces()[0].GetGenericArguments()[0];
                 var cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(serviceType));
 
-                this.FastInvoke(new[] { serviceType }, "InitializeAndCreateHostedService", bootstrapper, cfg);
+                this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
 
                 _controller.Initialize();
             }
@@ -59,15 +60,14 @@ namespace Topshelf.Shelving
             {
                 SendFault(ex);
             }
-
         }
-        
+
         //Converts the cfg to the closed type from the object type
-        private void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
+        void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
             where T : class
         {
             bootstrapper.FastInvoke("InitializeHostedService", cfg);
-           
+
             _controller = cfg.Create();
         }
 
@@ -78,15 +78,15 @@ namespace Topshelf.Shelving
                 if (bootstrapper.GetInterfaces().Where(IsBootstrapperType).Count() > 0)
                     return bootstrapper;
 
-                throw new InvalidOperationException("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
+                throw new InvalidOperationException(
+                    "Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().
+                                                                                                  Name));
             }
 
             // check configuration first
             ShelfConfiguration config = ShelfConfiguration.GetConfig();
             if (config != null)
-            {
                 return config.BootstrapperType;
-            }
 
             var possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
@@ -102,25 +102,19 @@ namespace Topshelf.Shelving
             return possibleTypes.Single();
         }
 
-        private static bool IsBootstrapperType(Type t)
+        static bool IsBootstrapperType(Type t)
         {
             if (t.IsGenericType)
-            {
                 return t.GetGenericTypeDefinition() == typeof(Bootstrapper<>);
-            }
             return false;
         }
 
-
         public string Name
         {
-            get
-            {
-                return AppDomain.CurrentDomain.FriendlyName;
-            }
+            get { return AppDomain.CurrentDomain.FriendlyName; }
         }
 
-        private void SendFault(Exception exception)
+        void SendFault(Exception exception)
         {
             try
             {

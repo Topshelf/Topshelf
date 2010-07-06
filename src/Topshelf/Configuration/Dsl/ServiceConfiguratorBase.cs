@@ -20,7 +20,7 @@ namespace Topshelf.Configuration.Dsl
     {
         bool _disposed;
        
-        public string Name { get; private set; }
+        public string Name { get; protected set; }
         public Action<TService> ContinueAction { get; private set;}
         public Action<TService> PauseAction { get; private set;}
         public Action<TService> StartAction { get; private set; }
@@ -41,7 +41,7 @@ namespace Topshelf.Configuration.Dsl
                  return asl.GetInstance<TService>(name);
              };
 
-            Name = "{0}/{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
+            //Name = "{0}/{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 
         #region IDisposable Members

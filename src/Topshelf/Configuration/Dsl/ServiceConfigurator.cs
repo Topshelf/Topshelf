@@ -15,6 +15,7 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using Model;
 
+
     public class ServiceConfigurator<TService> :
         ServiceConfiguratorBase<TService>,
         IServiceConfigurator<TService>
@@ -22,19 +23,26 @@ namespace Topshelf.Configuration.Dsl
     {
         public IServiceController Create()
         {
-            IServiceController serviceController = new ServiceController<TService>
-                                                   {
-                                                       Name = string.IsNullOrEmpty(Name) ? Guid.NewGuid().ToString() : Name,
-                                                       StartAction = StartAction,
-                                                       StopAction = StopAction,
-                                                       PauseAction = PauseAction,
-                                                       ContinueAction = ContinueAction,
-                                                       BuildService = BuildAction,
-                                                   };
+            string serviceName = Name;
+
+            if(string.IsNullOrEmpty(Name))
+            {
+                if (AppDomain.CurrentDomain.IsDefaultAppDomain())
+                    serviceName = Guid.NewGuid().ToString();
+                else
+                    serviceName = AppDomain.CurrentDomain.FriendlyName;
+            }
+
+            IServiceController serviceController = new ServiceController<TService>(serviceName)
+                    {
+                        StartAction = StartAction,
+                        StopAction = StopAction,
+                        PauseAction = PauseAction,
+                        ContinueAction = ContinueAction,
+                        BuildService = BuildAction,
+                    };
 
             return serviceController;
         }
-
-
     }
 }

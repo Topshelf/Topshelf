@@ -139,49 +139,55 @@ namespace Topshelf.Specs.Configuration
     [TestFixture]
     public class RunnerConfigurator_without_pre_generated_runner_specs 
     {
+        RunConfiguration _runner;
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (_runner != null)
+            {
+                _runner.Coordinator.Dispose();
+                _runner = null;
+            }
+        }
+
         [Test]
         public void when_specified_service_names_are_used_in_the_service_configuration()
         {
             const string serviceName = "service name";
 
-            var runConfiguration = RunnerConfigurator.New(x =>
+            _runner = RunnerConfigurator.New(x =>
             {
                 x.ConfigureService<TestService>(c => c.Named(serviceName));
             });
 
-            var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+            var serviceInfo = _runner.Coordinator.GetServiceInfo();
 
             serviceInfo[0].Name.ShouldEqual(serviceName);
-
-            runConfiguration.Coordinator.Dispose();
         }
 
         [Test]
         public void when_not_specified_service_names_are_assigned()
         {
-            var runConfiguration = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
+            _runner = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
 
-            var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+            var serviceInfo = _runner.Coordinator.GetServiceInfo();
 
             serviceInfo[0].Name.ShouldNotBeNull();
-
-            runConfiguration.Coordinator.Dispose();
         }
 
         [Test]
         public void when_not_specified_automatic_service_names_should_be_unique_for_services_of_the_same_type()
         {
-            var runConfiguration = RunnerConfigurator.New(x =>
+            _runner = RunnerConfigurator.New(x =>
             {
                 x.ConfigureService<TestService>(c => { });
                 x.ConfigureService<TestService>(c => { });
             });
 
-            var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+            var serviceInfo = _runner.Coordinator.GetServiceInfo();
 
             serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
-
-            runConfiguration.Coordinator.Dispose();
         }
     }
 }

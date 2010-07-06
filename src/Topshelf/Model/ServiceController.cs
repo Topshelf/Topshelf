@@ -21,6 +21,7 @@ namespace Topshelf.Model
     using Messages;
     using Shelving;
 
+
     [DebuggerDisplay("Service({Name}) is {State}")]
     public class ServiceController<TService> :
         StateMachine<ServiceController<TService>>,
@@ -34,31 +35,31 @@ namespace Topshelf.Model
         static ServiceController()
         {
             Define(() =>
-            {
-                Initially(
-                    When(OnStart)
-                        .Then(sc => sc.Initialize())
-                        .Then(sc => sc.StartAction(sc._instance))
-                        .TransitionTo(Started)
-                    );
+                {
+                    Initially(
+                              When(OnStart)
+                                  .Then(sc => sc.Initialize())
+                                  .Then(sc => sc.StartAction(sc._instance))
+                                  .TransitionTo(Started)
+                        );
 
-                During(Started,
-                       When(OnPause)
-                           .Then(sc => sc.PauseAction(sc._instance))
-                           .TransitionTo(Paused));
+                    During(Started,
+                           When(OnPause)
+                               .Then(sc => sc.PauseAction(sc._instance))
+                               .TransitionTo(Paused));
 
-                During(Paused,
-                       When(OnContinue)
-                           .Then(sc => sc.ContinueAction(sc._instance))
-                           .TransitionTo(Started));
+                    During(Paused,
+                           When(OnContinue)
+                               .Then(sc => sc.ContinueAction(sc._instance))
+                               .TransitionTo(Started));
 
 
-                Anytime(
-                    When(OnStop)
-                        .Then(sc => sc.StopAction(sc._instance))
-                        .TransitionTo(Stopped)
-                    );
-            });
+                    Anytime(
+                            When(OnStop)
+                                .Then(sc => sc.StopAction(sc._instance))
+                                .TransitionTo(Stopped)
+                        );
+                });
         }
 
         public static Event OnStart { get; set; }
@@ -83,31 +84,29 @@ namespace Topshelf.Model
 
         public UntypedChannel ControllerChannel
         {
-            get
-            {
-                return _myChannel;
-            }
+            get { return _myChannel; }
         }
 
         #endregion
 
-        public ServiceController()
+        public ServiceController(string serviceName)
         {
+            Name = serviceName;
+
             _hostChannel = WellknownAddresses.GetHostChannelProxy();
             _myChannel = new ChannelAdapter();
-            
-            //TODO: this will error in multiple hosted services - stuff style
-            _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel); //service name?
+
+            _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel, serviceName);
 
             //build subscriptions
             _connection = _myChannel.Connect(s =>
-            {
-                s.AddConsumerOf<ReadyService>().UsingConsumer(m => Initialize());
-				s.AddConsumerOf<StopService>().UsingConsumer(m => Stop());
-				s.AddConsumerOf<StartService>().UsingConsumer(m => Start());
-				s.AddConsumerOf<PauseService>().UsingConsumer(m => Pause());
-				s.AddConsumerOf<ContinueService>().UsingConsumer(m => Continue());
-            });
+                {
+                    s.AddConsumerOf<ReadyService>().UsingConsumer(m => Initialize());
+                    s.AddConsumerOf<StopService>().UsingConsumer(m => Stop());
+                    s.AddConsumerOf<StartService>().UsingConsumer(m => Start());
+                    s.AddConsumerOf<PauseService>().UsingConsumer(m => Pause());
+                    s.AddConsumerOf<ContinueService>().UsingConsumer(m => Continue());
+                });
         }
 
         TService _instance;
@@ -129,15 +128,17 @@ namespace Topshelf.Model
 
         protected void Dispose(bool disposing)
         {
-            if (!disposing) return;
-            if (_disposed) return;
+            if (!disposing)
+                return;
+            if (_disposed)
+                return;
 
-            if(_connection != null)
+            if (_connection != null)
                 _connection.Dispose();
-            
-            if(_myChannelHost != null)
+
+            if (_myChannelHost != null)
                 _myChannelHost.Dispose();
-            
+
             _instance = default(TService);
             StartAction = null;
             StopAction = null;
@@ -156,23 +157,23 @@ namespace Topshelf.Model
 
         #region IServiceController Members
 
-		// TODO: this is not pretty - Shelf can't have init() called here but bottling needs it.
-    	bool _hasInitialized;
+        bool _hasInitialized;
+
         public void Initialize()
         {
-			if (_hasInitialized)
-				return;
-        	
+            if (_hasInitialized)
+                return;
+
             _instance = (TService)BuildService(Name);
-            
+
             //TODO: send fault
-            if (_instance == null) 
+            if (_instance == null)
                 throw new CouldntBuildServiceException(Name, typeof(TService));
 
             _hostChannel.Send(new ServiceReady());
 
-        	_hasInitialized = true;
-		}
+            _hasInitialized = true;
+        }
 
         public void Start()
         {
@@ -200,7 +201,6 @@ namespace Topshelf.Model
             {
                 SendFault(ex);
             }
-            
         }
 
         public void Pause()
@@ -215,7 +215,6 @@ namespace Topshelf.Model
             {
                 SendFault(ex);
             }
-
         }
 
         public void Continue()
@@ -234,7 +233,7 @@ namespace Topshelf.Model
 
         //dispose 
 
-        private void SendFault(Exception exception)
+        void SendFault(Exception exception)
         {
             try
             {
@@ -247,7 +246,7 @@ namespace Topshelf.Model
             }
         }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public Type ServiceType
         {
@@ -256,7 +255,7 @@ namespace Topshelf.Model
 
         public ServiceState State
         {
-            get { return (ServiceState) Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
+            get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
         }
 
         #endregion
