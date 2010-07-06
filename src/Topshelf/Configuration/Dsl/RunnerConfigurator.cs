@@ -143,7 +143,6 @@ namespace Topshelf.Configuration.Dsl
         /// Configures a service using the specified configuration action or set of configuration actions.
         /// </summary>
         /// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-        /// <param name="name">The name used to identify the service</param>
         /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
         public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
         {

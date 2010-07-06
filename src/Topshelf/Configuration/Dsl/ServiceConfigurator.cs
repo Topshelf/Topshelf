@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
+    using System;
     using Model;
 
     public class ServiceConfigurator<TService> :
@@ -23,6 +24,7 @@ namespace Topshelf.Configuration.Dsl
         {
             IServiceController serviceController = new ServiceController<TService>
                                                    {
+                                                       Name = string.IsNullOrEmpty(Name) ? Guid.NewGuid().ToString() : Name,
                                                        StartAction = StartAction,
                                                        StopAction = StopAction,
                                                        PauseAction = PauseAction,

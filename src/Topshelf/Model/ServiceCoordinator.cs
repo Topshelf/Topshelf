@@ -186,7 +186,7 @@ namespace Topshelf.Model
 
         public IServiceController GetService(string name)
         {
-            return Services.Where(x=>x.Name == name).First();
+            return Services.Where(x=>x.Name == name).FirstOrDefault();
         }
 
         #region Dispose Crap
