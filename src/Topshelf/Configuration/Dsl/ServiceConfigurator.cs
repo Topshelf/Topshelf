@@ -21,7 +21,7 @@ namespace Topshelf.Configuration.Dsl
     {
         public IServiceController Create()
         {
-            IServiceController serviceController = new ServiceController<TService>(Name)
+            IServiceController serviceController = new ServiceController<TService>
                                                    {
                                                        StartAction = StartAction,
                                                        StopAction = StopAction,
