@@ -15,6 +15,7 @@ namespace Topshelf.Specs
     using NUnit.Framework;
     using Shelving;
 
+
     [TestFixture]
     public class ShelfConfiguration_Specs
     {

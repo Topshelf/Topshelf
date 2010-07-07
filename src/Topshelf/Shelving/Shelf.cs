@@ -63,12 +63,14 @@ namespace Topshelf.Shelving
         }
 
         //Converts the cfg to the closed type from the object type
+// ReSharper disable UnusedMember.Local
         void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
+// ReSharper restore UnusedMember.Local
             where T : class
         {
             bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
-            _controller = cfg.Create();
+            _controller = cfg.Create(AppDomain.CurrentDomain.FriendlyName);
         }
 
         public static Type FindBootstrapperImplementationType(Type bootstrapper)

@@ -20,17 +20,19 @@ namespace Topshelf.Model
     using Messages;
     using Magnum.Extensions;
 
+
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
     public class ServiceCoordinator :
         IServiceCoordinator
     {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceCoordinator));
-        private readonly Action<IServiceCoordinator> _afterStop;
-        private readonly Action<IServiceCoordinator> _beforeStart;
-        private readonly Action<IServiceCoordinator> _beforeStartingServices;
-        private readonly IList<IServiceController> _services = new List<IServiceController>();
+        static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
+        readonly Action<IServiceCoordinator> _afterStop;
+        readonly Action<IServiceCoordinator> _beforeStart;
+        readonly Action<IServiceCoordinator> _beforeStartingServices;
+        readonly IList<IServiceController> _services = new List<IServiceController>();
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices, Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
+                                  Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
         {
             _beforeStartingServices = beforeStartingServices;
             _beforeStart = beforeStart;
@@ -38,29 +40,29 @@ namespace Topshelf.Model
             _serviceConfigurators = new List<Func<IServiceController>>();
         }
 
-		public IList<IServiceController> Services
-		{
-			get
-			{
-				LoadNewServiceConfigurations();
+        public IList<IServiceController> Services
+        {
+            get
+            {
+                LoadNewServiceConfigurations();
 
-				return _services;
-			}
-		}
+                return _services;
+            }
+        }
 
-    	private void LoadNewServiceConfigurations()
-    	{
-    		if (_serviceConfigurators.Any())
-    		{
-    			foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
-    			{
-    				IServiceController serviceController = serviceConfigurator();
-    				_services.Add(serviceController);
-    			}
+        void LoadNewServiceConfigurations()
+        {
+            if (_serviceConfigurators.Any())
+            {
+                foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
+                {
+                    IServiceController serviceController = serviceConfigurator();
+                    _services.Add(serviceController);
+                }
 
-    			_serviceConfigurators.Clear();
-    		}
-    	}
+                _serviceConfigurators.Clear();
+            }
+        }
 
         public void AddNewService(IServiceController controller)
         {
@@ -68,20 +70,20 @@ namespace Topshelf.Model
             //TODO: How to best call start here?
         }
 
-    	public void Start()
+        public void Start()
         {
             //TODO: With Shelving this feels like it needs to become before 'host' start
             _log.Debug("Calling BeforeStartingServices");
             _beforeStartingServices(this);
             _log.Info("BeforeStart complete");
-            
+
             _log.Debug("Start is now starting any subordinate services");
 
-        	foreach (var serviceController in Services)
-        	{
-				_log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
-				serviceController.ControllerChannel.Send(new StartService());
-        	}
+            foreach (var serviceController in Services)
+            {
+                _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
+                serviceController.ControllerChannel.Send(new StartService());
+            }
 
             //TODO: This feels like it should be after 'host' stop
             _log.Debug("Calling BeforeStart");
@@ -143,7 +145,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x=>x.Name == name).First().Stop();
+            Services.Where(x => x.Name == name).First().Stop();
         }
 
         public void PauseService(string name)
@@ -151,7 +153,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x=>x.Name == name).First().Pause();
+            Services.Where(x => x.Name == name).First().Pause();
         }
 
         public void ContinueService(string name)
@@ -159,7 +161,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x=>x.Name == name).First().Continue();
+            Services.Where(x => x.Name == name).First().Continue();
         }
 
         public int HostedServiceCount
@@ -167,7 +169,7 @@ namespace Topshelf.Model
             get { return Services.Count; }
         }
 
-    	public IList<ServiceInformation> GetServiceInfo()
+        public IList<ServiceInformation> GetServiceInfo()
         {
             LoadNewServiceConfigurations();
             var result = new List<ServiceInformation>();
@@ -175,25 +177,25 @@ namespace Topshelf.Model
             foreach (var serviceController in Services)
             {
                 result.Add(new ServiceInformation
-                           {
-                               Name = serviceController.Name,
-                               State = serviceController.State,
-                               Type = serviceController.ServiceType.Name
-                           });
+                    {
+                        Name = serviceController.Name,
+                        State = serviceController.State,
+                        Type = serviceController.ServiceType.Name
+                    });
             }
 
-			return result;
+            return result;
         }
 
         public IServiceController GetService(string name)
         {
-            return Services.Where(x=>x.Name == name).FirstOrDefault();
+            return Services.Where(x => x.Name == name).FirstOrDefault();
         }
 
         #region Dispose Crap
 
-        private readonly List<Func<IServiceController>> _serviceConfigurators;
-        private bool _disposed;
+        readonly List<Func<IServiceController>> _serviceConfigurators;
+        bool _disposed;
 
         public void Dispose()
         {
@@ -201,9 +203,10 @@ namespace Topshelf.Model
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+                return;
             if (disposing)
             {
                 Services.Each(s => s.Dispose());
@@ -224,7 +227,7 @@ namespace Topshelf.Model
             _serviceConfigurators.AddRange(services);
         }
 
-        private void CreateServices()
+        void CreateServices()
         {
             foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
             {

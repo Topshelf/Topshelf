@@ -110,7 +110,6 @@ namespace Topshelf.Specs
 					                        		}));
 
 					Console.WriteLine(baseDir);
-					//Thread.Sleep(1.Seconds());
 					Console.WriteLine("-- Directories");
 
 					Directory.CreateDirectory(Path.Combine(baseDir, "Service1"));

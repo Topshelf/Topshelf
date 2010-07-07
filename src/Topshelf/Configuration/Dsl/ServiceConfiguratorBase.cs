@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -15,14 +15,15 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using Model;
 
+
     public class ServiceConfiguratorBase<TService> :
         IDisposable
     {
         bool _disposed;
-       
+
         public string Name { get; protected set; }
-        public Action<TService> ContinueAction { get; private set;}
-        public Action<TService> PauseAction { get; private set;}
+        public Action<TService> ContinueAction { get; private set; }
+        public Action<TService> PauseAction { get; private set; }
         public Action<TService> StartAction { get; private set; }
         public Action<TService> StopAction { get; private set; }
 
@@ -30,18 +31,18 @@ namespace Topshelf.Configuration.Dsl
 
         public ServiceConfiguratorBase()
         {
-             PauseAction = NoOp;
-             StartAction = NoOp;
-             StopAction = NoOp;
-             ContinueAction = NoOp;
+            PauseAction = NoOp;
+            StartAction = NoOp;
+            StopAction = NoOp;
+            ContinueAction = NoOp;
 
-             BuildAction = name =>
-             {
-                 var asl = new ActivatorServiceLocator();
-                 return asl.GetInstance<TService>(name);
-             };
+            BuildAction = name =>
+                {
+                    var asl = new ActivatorServiceLocator();
+                    return asl.GetInstance<TService>(name);
+                };
 
-            //Name = "{0}/{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
+            Name = "{0}/{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 
         #region IDisposable Members
@@ -86,8 +87,10 @@ namespace Topshelf.Configuration.Dsl
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposing) return;
-            if (_disposed) return;
+            if (!disposing)
+                return;
+            if (_disposed)
+                return;
 
             StartAction = null;
             StopAction = null;

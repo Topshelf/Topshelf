@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-    using System;
     using Model;
 
 
@@ -23,24 +22,19 @@ namespace Topshelf.Configuration.Dsl
     {
         public IServiceController Create()
         {
-            string serviceName = Name;
+            return Create(Name);
+        }
 
-            if(string.IsNullOrEmpty(Name))
-            {
-                if (AppDomain.CurrentDomain.IsDefaultAppDomain())
-                    serviceName = Guid.NewGuid().ToString();
-                else
-                    serviceName = AppDomain.CurrentDomain.FriendlyName;
-            }
-
+        public IServiceController Create(string serviceName)
+        {
             IServiceController serviceController = new ServiceController<TService>(serviceName)
-                    {
-                        StartAction = StartAction,
-                        StopAction = StopAction,
-                        PauseAction = PauseAction,
-                        ContinueAction = ContinueAction,
-                        BuildService = BuildAction,
-                    };
+                {
+                    StartAction = StartAction,
+                    StopAction = StopAction,
+                    PauseAction = PauseAction,
+                    ContinueAction = ContinueAction,
+                    BuildService = BuildAction,
+                };
 
             return serviceController;
         }

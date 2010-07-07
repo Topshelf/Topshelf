@@ -43,7 +43,8 @@ namespace Topshelf.Specs
 				c.WhenStopped(s => s.Stop());
 				c.WhenPaused(s => { _wasPaused = true; });
 				c.WhenContinued(s => { _wasContinued = true; });
-				c.HowToBuildService((name) => _srv);
+				c.HowToBuildService(name => _srv);
+
 				_serviceController = c.Create();
 				_serviceController.Start();
 

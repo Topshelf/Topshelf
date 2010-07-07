@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -19,7 +19,7 @@ namespace Topshelf.Specs
     using Shelving;
     using Topshelf.Configuration.Dsl;
 
-    //a place to learn about app-domains
+    
     [TestFixture]
     public class AppDomain_Specs
     {
