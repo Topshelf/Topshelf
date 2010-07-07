@@ -17,8 +17,10 @@ namespace Topshelf.Model
     using System.Diagnostics;
     using System.Linq;
     using log4net;
+    using Magnum.Channels;
     using Messages;
     using Magnum.Extensions;
+    using Shelving;
 
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
@@ -38,6 +40,10 @@ namespace Topshelf.Model
             _beforeStart = beforeStart;
             _afterStop = afterStop;
             _serviceConfigurators = new List<Func<IServiceController>>();
+            _myChannel = new ChannelAdapter();
+            _hostChannel = WellknownAddresses.GetHostHost(_myChannel);
+
+            _myChannel.Connect(s => { });
         }
 
         public IList<IServiceController> Services
@@ -196,6 +202,8 @@ namespace Topshelf.Model
 
         readonly List<Func<IServiceController>> _serviceConfigurators;
         bool _disposed;
+        ChannelAdapter _myChannel;
+        WcfChannelHost _hostChannel;
 
         public void Dispose()
         {
@@ -211,6 +219,9 @@ namespace Topshelf.Model
             {
                 Services.Each(s => s.Dispose());
                 Services.Clear();
+
+                if (_hostChannel != null)
+                    _hostChannel.Dispose();
             }
             _disposed = true;
         }

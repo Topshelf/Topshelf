@@ -54,8 +54,7 @@ namespace Topshelf.Model
                                .TransitionTo(Started));
 
 
-                    Anytime(
-                            When(OnStop)
+                    Anytime(When(OnStop)
                                 .Then(sc => sc.StopAction(sc._instance))
                                 .TransitionTo(Stopped)
                         );
