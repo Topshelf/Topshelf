@@ -22,6 +22,7 @@ namespace Topshelf.Shelving
     using System.Threading;
     using log4net;
     using Magnum.Channels;
+    using Magnum.Concurrency;
     using Magnum.Extensions;
     using Magnum.StateMachine;
     using Magnum.Threading;
@@ -277,9 +278,25 @@ namespace Topshelf.Shelving
 
         public void Dispose()
         {
-            //NEW STUFF
-            _shelves.WriteLock(dict => dict.Values.ToList().ForEach(shelf => shelf.ShelfChannel.Send(new StopService())));
+        	int count = 0;
+        	_shelves.ReadLock(dict => count = dict.Values.Count(x => x.CurrentState != ShelfState.Stopped));
 
+			if (count > 0)
+			{
+				ManualResetEvent shutDown = new ManualResetEvent(false);
+				CountdownLatch stopCountdown = new CountdownLatch(count, () =>
+					{
+						shutDown.Set();
+					});
+				OnShelfStateChanged += (sender, args) => {
+					if (args.CurrentShelfState == ShelfState.Stopped)
+						stopCountdown.CountDown();
+				};
+				
+				_shelves.WriteLock(dict => dict.Values.ToList().ForEach(shelf => shelf.ShelfChannel.Send(new StopService())));
+
+				shutDown.WaitOne(20.Seconds());
+			}
             //how to wait for everything to have changed to stop + a timeout
 
             if (_myChannelHost != null)
