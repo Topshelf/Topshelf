@@ -53,7 +53,16 @@ namespace Topshelf.FileSystem
             _channel.Connect(config => config
                                            .AddConsumerOf<FileSystemEvent>()
                                            .DistinctlyBufferWithTime(3.Seconds(), fsEvent => GetChangedDirectory(fsEvent.Path))
-                                           .UsingConsumer(fsEvents => fsEvents.Keys.ToList().ForEach(key => _hostChannel.Send(new FileSystemChange { ShelfName = key }))));
+                                           .UsingConsumer(fsEvents => fsEvents.Keys.ToList().ForEach(key =>
+                                               {
+                                                   if (key == _baseDir)
+                                                       return;
+                                                   
+                                                   _hostChannel.Send(new FileSystemChange
+                                                       {
+                                                           ShelfName = key
+                                                       });
+                                               })));
         }
 
         public void Stop()

@@ -88,7 +88,7 @@ namespace Topshelf.Model
             foreach (var serviceController in Services)
             {
                 _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
-                serviceController.ControllerChannel.Send(new StartService());
+                serviceController.Start();
             }
 
             //TODO: This feels like it should be after 'host' stop
