@@ -52,7 +52,7 @@ namespace Topshelf.Shelving
         public void Dispose()
         {
             if (StopHandle != null)
-                StopHandle.Dispose();
+                StopHandle.Close();
         }
     }
 }

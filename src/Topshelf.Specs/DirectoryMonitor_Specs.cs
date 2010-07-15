@@ -74,8 +74,6 @@ namespace Topshelf.Specs
 				CopyFileToDir("TopShelf.dll", bobDir);
 				CopyFileToDir("TopShelf.Specs.dll", bobDir);
 				CopyFileToDir("Magnum.dll", bobDir);
-				CopyFileToDir("System.CoreEx.dll", bobDir);
-				CopyFileToDir("System.Reactive.dll", bobDir);
 				CopyFileToDir("log4net.dll", bobDir);
 				File.Copy("service.config", Path.Combine(bobDir, "bob.config"));
 				Console.WriteLine("Files copied, waiting for bob to start.");

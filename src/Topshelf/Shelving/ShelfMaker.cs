@@ -179,7 +179,7 @@ namespace Topshelf.Shelving
             }
 
             ObjectHandle shelfHandle = ad.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null, new object[] { bootstrapper },
-                                                         null, null);
+                                                         null, null, null);
 
             _shelves.WriteLock(dict => dict.Add(name, new ShelfHandle
                                    {
@@ -200,9 +200,9 @@ namespace Topshelf.Shelving
             //TODO: Is this better?
             if (name == "TopShelf.DirectoryWatcher") return settings;
 
-            settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name);
+            settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Path.Combine("Services", name));
             _log.DebugFormat("Shelf[{0}].ApplicationBase = {1}", name, settings.ApplicationBase);
-            settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services", name, name + ".config");
+            settings.ConfigurationFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Path.Combine("Services", Path.Combine(name, name + ".config")));
             _log.DebugFormat("Shelf[{0}].ConfigurationFile = {1}", name, settings.ConfigurationFile);
             return settings;
         }
