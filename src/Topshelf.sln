@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Host", "Topshelf.H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StuffOnAShelf", "Samples\StuffOnAShelf\StuffOnAShelf.csproj", "{6C0B10B8-259E-4A1B-8415-4343F0B77054}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Bottles", "Topshelf.Bottles\Topshelf.Bottles.csproj", "{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,16 @@ Global
 		{6C0B10B8-259E-4A1B-8415-4343F0B77054}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6C0B10B8-259E-4A1B-8415-4343F0B77054}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6C0B10B8-259E-4A1B-8415-4343F0B77054}.Release|x86.ActiveCfg = Release|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
