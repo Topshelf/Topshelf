@@ -22,9 +22,9 @@ namespace Topshelf.Configuration.Dsl
     {
         readonly IList<Func<IServiceController>> _serviceConfigurators;
         readonly WinServiceSettings _winServiceSettings;
-        Action<IServiceCoordinator> _afterStop = c => { };
-        Action<IServiceCoordinator> _beforeStart = c => { };
         Action<IServiceCoordinator> _beforeStartingServices = c => { };
+        Action<IServiceCoordinator> _afterStartingServices = c => { };
+        Action<IServiceCoordinator> _afterStoppingServices = c => { };
         Credentials _credentials;
         bool _disposed;
 
@@ -170,30 +170,34 @@ namespace Topshelf.Configuration.Dsl
             });
         }
 
+        /// <summary>
+        /// Defines an action to perform before starting the services.
+        /// </summary>
+        /// <remarks>
+        /// This is the best place to set up, for example, any IoC containers.
+        /// </remarks>
+        /// <param name="action">The action that will be performed before the services start.</param>
         public void BeforeStartingServices(Action<IServiceCoordinator> action)
         {
             _beforeStartingServices = action;
         }
 
         /// <summary>
-        /// Defines an action or a set of actions to perform before the service starts.
+        /// Defines an action to perform after starting the services.
         /// </summary>
-        /// <remarks>
-        /// This is the best place to set up, for example, any IoC containers.
-        /// </remarks>
-        /// <param name="action">The action or actions that will be performed before the service starts.</param>
-        public void BeforeStartingTheHost(Action<IServiceCoordinator> action)
+        /// <param name="action">The action that will be performed after the services start.</param>
+        public void AfterStartingServices(Action<IServiceCoordinator> action)
         {
-            _beforeStart = action;
+            _afterStartingServices = action;
         }
 
         /// <summary>
-        /// Defines an action or a set of actions to perform after the service stops.
+        /// Defines an action to perform after stopping the services.
         /// </summary>
-        /// <param name="action">The action or actions that will be performed after the service stops.</param>
-        public void AfterStoppingTheHost(Action<IServiceCoordinator> action)
+        /// <param name="action">The action that will be performed after services stop.</param>
+        public void AfterStoppingServices(Action<IServiceCoordinator> action)
         {
-            _afterStop = action;
+            _afterStoppingServices = action;
         }
 
         /// <summary>
@@ -242,7 +246,7 @@ namespace Topshelf.Configuration.Dsl
 
         RunConfiguration Create()
         {
-            var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, _beforeStart, _afterStop);
+            var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, _afterStartingServices, _afterStoppingServices);
             serviceCoordinator.RegisterServices(_serviceConfigurators);
             _winServiceSettings.Credentials = _credentials;
             var cfg = new RunConfiguration

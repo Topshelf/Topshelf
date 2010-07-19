@@ -136,24 +136,24 @@ namespace Topshelf.Configuration.Dsl
         void DependencyOnEventLog();
 
         /// <summary>
-        /// Defines an action or a set of actions to perform before starting the services
-        /// </summary>
-        /// <param name="action"></param>
-        void BeforeStartingServices(Action<IServiceCoordinator> action);
-
-        /// <summary>
-        /// Defines an action or a set of actions to perform before the service starts.
+        /// Defines an action to perform before starting the services.
         /// </summary>
         /// <remarks>
         /// This is the best place to set up, for example, any IoC containers.
         /// </remarks>
-        /// <param name="action">The action or actions that will be performed before the service starts.</param>
-        void BeforeStartingTheHost(Action<IServiceCoordinator> action);
+        /// <param name="action">The action that will be performed before the services start.</param>
+        void BeforeStartingServices(Action<IServiceCoordinator> action);
 
         /// <summary>
-        /// Defines an action or a set of actions to perform after the service stops.
+        /// Defines an action to perform after starting the services.
         /// </summary>
-        /// <param name="action">The action or actions that will be performed after the service stops.</param>
-        void AfterStoppingTheHost(Action<IServiceCoordinator> action);
+        /// <param name="action">The action that will be performed after the services start.</param>
+        void AfterStartingServices(Action<IServiceCoordinator> action);
+
+        /// <summary>
+        /// Defines an action to perform after stopping the services.
+        /// </summary>
+        /// <param name="action">The action that will be performed after services stop.</param>
+        void AfterStoppingServices(Action<IServiceCoordinator> action);
     }
 }
