@@ -9,6 +9,7 @@ namespace Topshelf.Specs.TestObject
         public bool Paused;
         public bool HasBeenContinued;
         public bool HasBeenStarted;
+        public Action StartAction;
 
         public TestService()
         {
@@ -21,6 +22,11 @@ namespace Topshelf.Specs.TestObject
 
         public void Start()
         {
+            if (StartAction != null)
+            {
+                StartAction();
+            }
+
             HasBeenStarted = true;
             Started = true;
             Stopped = false;

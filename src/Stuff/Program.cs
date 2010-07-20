@@ -27,7 +27,7 @@ namespace Stuff
             XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
             RunConfiguration cfg = RunnerConfigurator.New(x =>
             {
-                x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
+                x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
 
                 x.ConfigureServiceInIsolation<TownCrier>(s =>
                 {

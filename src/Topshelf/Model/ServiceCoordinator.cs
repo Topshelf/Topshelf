@@ -24,16 +24,16 @@ namespace Topshelf.Model
         IServiceCoordinator
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceCoordinator));
-        private readonly Action<IServiceCoordinator> _afterStop;
-        private readonly Action<IServiceCoordinator> _beforeStart;
         private readonly Action<IServiceCoordinator> _beforeStartingServices;
+        private readonly Action<IServiceCoordinator> _afterStartingServices;
+        private readonly Action<IServiceCoordinator> _afterStoppingServices;
         private readonly IList<IServiceController> _services = new List<IServiceController>();
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices, Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices, Action<IServiceCoordinator> afterStartingServices, Action<IServiceCoordinator> afterStoppingServices)
         {
             _beforeStartingServices = beforeStartingServices;
-            _beforeStart = beforeStart;
-            _afterStop = afterStop;
+            _afterStartingServices = afterStartingServices;
+            _afterStoppingServices = afterStoppingServices;
             _serviceConfigurators = new List<Func<IServiceController>>();
         }
 
@@ -65,7 +65,7 @@ namespace Topshelf.Model
         {
             _log.Debug("Calling BeforeStartingServices");
             _beforeStartingServices(this);
-            _log.Info("BeforeStart complete");
+            _log.Info("BeforeStartingServices complete");
             
             _log.Debug("Start is now starting any subordinate services");
 
@@ -75,9 +75,9 @@ namespace Topshelf.Model
 				serviceController.Start();
         	}
 
-            _log.Debug("Calling BeforeStart");
-            _beforeStart(this);
-            _log.Info("BeforeStart complete");
+            _log.Debug("Calling AfterStartingServices");
+            _afterStartingServices(this);
+            _log.Info("AfterStartingServices complete");
         }
 
         public void Stop()
@@ -95,9 +95,10 @@ namespace Topshelf.Model
                 }
             }
 
-            _log.Debug("pre after stop");
-            _afterStop(this);
-            _log.Info("AfterStop complete");
+            _log.Debug("Calling AfterStoppingServices");
+            _afterStoppingServices(this);
+            _log.Info("AfterStoppingServices complete");
+
             OnStopped();
         }
 

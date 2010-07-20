@@ -29,8 +29,11 @@ namespace Topshelf.Specs
             _service = new TestService();
             _service2 = new TestService2();
 
+            _beforeStartingServicesInvoked = false;
+            _afterStartingServicesInvoked = false;
+            _afterStoppingServicesInvoked = false;
 
-            _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
+            _serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; }, x => { _afterStartingServicesInvoked = true; }, x => { _afterStoppingServicesInvoked = true; });
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
                                                            () => new ServiceController<TestService>
@@ -61,9 +64,12 @@ namespace Topshelf.Specs
         private TestService _service;
         private TestService2 _service2;
         private ServiceCoordinator _serviceCoordinator;
+        private bool _beforeStartingServicesInvoked;
+        private bool _afterStartingServicesInvoked;
+        private bool _afterStoppingServicesInvoked;
 
         [Test]
-        public void Continueing_the_coordintaro_should_continue_services()
+        public void Continuing_the_coordinator_should_continue_services()
         {
             _serviceCoordinator.Start();
             _serviceCoordinator.Pause();
@@ -92,11 +98,29 @@ namespace Topshelf.Specs
         [Test]
         public void Starting_the_coordinator_should_start_all_services()
         {
+            bool beforeStartingServicesWasInvokedBeforeServiceStart = false;
+            bool afterStartingServicesWasInvokedBeforeServiceStart = false;
+
+            _service.StartAction = () =>
+            {
+                beforeStartingServicesWasInvokedBeforeServiceStart = _beforeStartingServicesInvoked;
+                afterStartingServicesWasInvokedBeforeServiceStart = _afterStartingServicesInvoked;
+            };
+
             _serviceCoordinator.Start();
             _service.HasBeenStarted
                 .ShouldBeTrue();
             _service2.HasBeenStarted
                 .ShouldBeTrue();
+
+            _beforeStartingServicesInvoked
+                .ShouldBeTrue();
+            _afterStartingServicesInvoked
+                .ShouldBeTrue();
+            beforeStartingServicesWasInvokedBeforeServiceStart
+                .ShouldBeTrue();
+            afterStartingServicesWasInvokedBeforeServiceStart
+                .ShouldBeFalse();
         }
 
         [Test]
@@ -113,6 +137,9 @@ namespace Topshelf.Specs
             _service2.HasBeenStarted
                 .ShouldBeTrue();
             _service2.Stopped
+                .ShouldBeTrue();
+
+            _afterStoppingServicesInvoked
                 .ShouldBeTrue();
         }
 
