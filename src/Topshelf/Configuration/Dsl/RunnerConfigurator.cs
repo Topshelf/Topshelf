@@ -290,6 +290,11 @@ namespace Topshelf.Configuration.Dsl
             _credentials = Credentials.Interactive;
         }
 
+        public void RunAsNetworkService()
+        {
+            _credentials = new Credentials(string.Empty, string.Empty, ServiceAccount.NetworkService);
+        }
+
         /// <summary>
         /// The application will run with the credentials specified in the commandline arguments.
         /// </summary>
