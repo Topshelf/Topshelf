@@ -86,6 +86,7 @@
     <Compile Include="Pipeline_Play.cs" />
     <Compile Include="Scenarios\Scenario.cs" />
     <Compile Include="Scenarios\ScenarioContext.cs" />
+    <Compile Include="ServiceCoordinator_Fault_Specs.cs" />
     <Compile Include="ServiceCoordinator_Specs.cs" />
     <Compile Include="ServiceController_Specs.cs" />
     <Compile Include="ServiceCoordinator_Singles_Specs.cs" />
