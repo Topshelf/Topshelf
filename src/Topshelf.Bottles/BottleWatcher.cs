@@ -31,13 +31,13 @@ namespace Topshelf.Bottles
             _factory = new FileSystemEventProducerFactory();
         }
 
-        public List<IDisposable> Watch(string directoryToWatch, Action<Directory> actionToTake)
+        public IDisposable Watch(string directoryToWatch, Action<Directory> actionToTake)
         {
             _actionToTake = actionToTake;
             _eventChannel = new ChannelAdapter();
             _eventChannel.Connect(x => x.AddConsumerOf<FileCreated>().UsingConsumer(ProcessNewFile));
             var listeners = _factory.CreateFileSystemEventProducers(directoryToWatch, true, true, _eventChannel, 1.Minutes());
-            return listeners;
+            return new MultiDisposer(listeners);
         }
 
         void ProcessNewFile(FileCreated message)
@@ -55,6 +55,21 @@ namespace Topshelf.Bottles
                     string msg = "There was an error processing the bottle '{0}'".FormatWith(message.Path);
                     throw new BottleException(msg, ex);
                 }
+            }
+        }
+
+        class MultiDisposer : IDisposable
+        {
+            readonly List<IDisposable> _listeners;
+
+            public MultiDisposer(List<IDisposable> listeners)
+            {
+                _listeners = listeners;
+            }
+
+            public void Dispose()
+            {
+                _listeners.Each(l => l.Dispose());
             }
         }
     }
