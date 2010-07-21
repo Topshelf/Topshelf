@@ -16,10 +16,13 @@ namespace Topshelf.Model
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
     using log4net;
     using Magnum.Channels;
-    using Messages;
+    using Magnum.Concurrency;
     using Magnum.Extensions;
+    using Magnum.Threading;
+    using Messages;
     using Shelving;
 
 
@@ -31,6 +34,14 @@ namespace Topshelf.Model
         readonly Action<IServiceCoordinator> _afterStop;
         readonly Action<IServiceCoordinator> _beforeStart;
         readonly Action<IServiceCoordinator> _beforeStartingServices;
+
+        readonly ReaderWriterLockedObject<Queue<KeyValuePair<string, Exception>>> _exceptions =
+            new ReaderWriterLockedObject<Queue<KeyValuePair<string, Exception>>>(new Queue<KeyValuePair<string, Exception>>());
+
+        readonly WcfChannelHost _hostChannel;
+        readonly ChannelAdapter _myChannel;
+        readonly List<Func<IServiceController>> _serviceConfigurators;
+
         readonly IList<IServiceController> _services = new List<IServiceController>();
 
         public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
@@ -43,7 +54,11 @@ namespace Topshelf.Model
             _myChannel = new ChannelAdapter();
             _hostChannel = WellknownAddresses.GetHostHost(_myChannel);
 
-            _myChannel.Connect(s => { });
+            _myChannel.Connect(s =>
+                {
+                    s.AddConsumerOf<ShelfFault>().UsingConsumer(HandleServiceFault);
+                    s.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => ServiceStartedAction.Invoke(msg));
+                });
         }
 
         public IList<IServiceController> Services
@@ -56,26 +71,6 @@ namespace Topshelf.Model
             }
         }
 
-        void LoadNewServiceConfigurations()
-        {
-            if (_serviceConfigurators.Any())
-            {
-                foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
-                {
-                    IServiceController serviceController = serviceConfigurator();
-                    _services.Add(serviceController);
-                }
-
-                _serviceConfigurators.Clear();
-            }
-        }
-
-        public void AddNewService(IServiceController controller)
-        {
-            _services.Add(controller);
-            //TODO: How to best call start here?
-        }
-
         public void Start()
         {
             //TODO: With Shelving this feels like it needs to become before 'host' start
@@ -83,12 +78,46 @@ namespace Topshelf.Model
             _beforeStartingServices(this);
             _log.Info("BeforeStart complete");
 
-            _log.Debug("Start is now starting any subordinate services");
+            int unstartedCount = Services.Count(x => x.State != ServiceState.Started);
+            bool completed; 
 
-            foreach (var serviceController in Services)
+            using (var startedLatch = new ManualResetEvent(false))
             {
-                _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
-                serviceController.Start();
+                var countDown = new CountdownLatch(unstartedCount, () => startedLatch.Set());
+
+                Action<ServiceStarted> action = msg => countDown.CountDown();
+
+                ServiceStartedAction += action;
+
+                _log.Debug("Start is now starting any subordinate services");
+                foreach (IServiceController serviceController in Services)
+                {
+                    _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
+                    serviceController.ControllerChannel.Send(new StartService());
+                }
+
+                completed = startedLatch.WaitOne(30.Seconds());
+                ServiceStartedAction -= action;
+            }
+            
+            if (!completed)
+            {
+                var qCount = _exceptions.ReadLock(q => q.Count);
+                Exception ex = null;
+
+                if (qCount > 0)
+                {
+                    var kvp = _exceptions.WriteLock(s => s.Dequeue());
+                    ex = kvp.Value;
+                }
+
+                throw new Exception("One or more services failed to start in a timely manner.", ex);
+            }
+
+            int serviceExCount = _exceptions.ReadLock(q => q.Select(x => x.Key).Distinct().Count());
+            if (serviceExCount >= HostedServiceCount)
+            {
+                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()).Value);
             }
 
             //TODO: This feels like it should be after 'host' stop
@@ -101,7 +130,7 @@ namespace Topshelf.Model
         {
             //TODO: PRE STOP
 
-            foreach (var service in Services.Reverse())
+            foreach (IServiceController service in Services.Reverse())
             {
                 try
                 {
@@ -121,7 +150,7 @@ namespace Topshelf.Model
 
         public void Pause()
         {
-            foreach (var service in Services)
+            foreach (IServiceController service in Services)
             {
                 _log.InfoFormat("Pausing sub service '{0}'", service.Name);
                 service.Pause();
@@ -130,7 +159,7 @@ namespace Topshelf.Model
 
         public void Continue()
         {
-            foreach (var service in Services)
+            foreach (IServiceController service in Services)
             {
                 _log.InfoFormat("Continuing sub service '{0}'", service.Name);
                 service.Continue();
@@ -180,7 +209,7 @@ namespace Topshelf.Model
             LoadNewServiceConfigurations();
             var result = new List<ServiceInformation>();
 
-            foreach (var serviceController in Services)
+            foreach (IServiceController serviceController in Services)
             {
                 result.Add(new ServiceInformation
                     {
@@ -200,10 +229,7 @@ namespace Topshelf.Model
 
         #region Dispose Crap
 
-        readonly List<Func<IServiceController>> _serviceConfigurators;
         bool _disposed;
-        ChannelAdapter _myChannel;
-        WcfChannelHost _hostChannel;
 
         public void Dispose()
         {
@@ -233,6 +259,28 @@ namespace Topshelf.Model
 
         #endregion
 
+        event Action<ServiceStarted> ServiceStartedAction;
+
+        void LoadNewServiceConfigurations()
+        {
+            if (_serviceConfigurators.Any())
+            {
+                foreach (var serviceConfigurator in _serviceConfigurators)
+                {
+                    IServiceController serviceController = serviceConfigurator();
+                    _services.Add(serviceController);
+                }
+
+                _serviceConfigurators.Clear();
+            }
+        }
+
+        public void AddNewService(IServiceController controller)
+        {
+            _services.Add(controller);
+            //TODO: How to best call start here?
+        }
+
         public void RegisterServices(IList<Func<IServiceController>> services)
         {
             _serviceConfigurators.AddRange(services);
@@ -240,11 +288,24 @@ namespace Topshelf.Model
 
         void CreateServices()
         {
-            foreach (Func<IServiceController> serviceConfigurator in _serviceConfigurators)
+            foreach (var serviceConfigurator in _serviceConfigurators)
             {
                 IServiceController serviceController = serviceConfigurator();
                 Services.Add(serviceController);
             }
+        }
+
+        public event Action<KeyValuePair<string, Exception>> ShelfFaulted;
+
+        void HandleServiceFault(ShelfFault faultMessage)
+        {
+            var fault = new KeyValuePair<string, Exception>(faultMessage.ShelfName, faultMessage.Exception);
+
+            _exceptions.WriteLock(s => s.Enqueue(fault));
+
+            Action<KeyValuePair<string, Exception>> handle = ShelfFaulted;
+            if (handle != null)
+                handle.Invoke(fault);
         }
     }
 }
