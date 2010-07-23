@@ -16,36 +16,43 @@ namespace Topshelf.Bottles
     using System.Collections.Generic;
     using Magnum.Channels;
     using Magnum.Extensions;
+    using Magnum.Fibers;
     using Magnum.FileSystem;
     using Magnum.FileSystem.Events;
     using Magnum.FileSystem.Zip;
 
     public class BottleWatcher
     {
-        readonly FileSystemEventProducerFactory _factory;
         ChannelAdapter _eventChannel;
         Action<Directory> _actionToTake;
-
+        PollingFileSystemEventProducer _watcher;
+        Scheduler _scheduler;
+        Func<Fiber> _fiberFactory = () => new SynchronousFiber();
         public BottleWatcher()
         {
-            _factory = new FileSystemEventProducerFactory();
         }
 
         public IDisposable Watch(string directoryToWatch, Action<Directory> actionToTake)
         {
+            if (!System.IO.Directory.Exists(directoryToWatch))
+                System.IO.Directory.CreateDirectory(directoryToWatch);
+
             _actionToTake = actionToTake;
             _eventChannel = new ChannelAdapter();
             _eventChannel.Connect(x => x.AddConsumerOf<FileCreated>().UsingConsumer(ProcessNewFile));
-            var listeners = _factory.CreateFileSystemEventProducers(directoryToWatch, true, true, _eventChannel, 1.Minutes());
-            return new MultiDisposer(listeners);
+
+            _scheduler = new TimerScheduler(_fiberFactory());
+            _watcher = new PollingFileSystemEventProducer(directoryToWatch, _eventChannel, _scheduler, _fiberFactory(), 1.Seconds());
+
+
+            return _watcher;
         }
 
         void ProcessNewFile(FileCreated message)
         {
             if (message.Path.EndsWith("bottle"))
             {
-                //TODO: is this ok - the null?
-                Directory dir = new ZippedDirectory(DirectoryName.GetDirectoryName(message.Path), null);
+                Directory dir = new ZipFileDirectory(PathName.GetPathName(message.Path));
                 try
                 {
                     _actionToTake(dir);
@@ -55,21 +62,6 @@ namespace Topshelf.Bottles
                     string msg = "There was an error processing the bottle '{0}'".FormatWith(message.Path);
                     throw new BottleException(msg, ex);
                 }
-            }
-        }
-
-        class MultiDisposer : IDisposable
-        {
-            readonly List<IDisposable> _listeners;
-
-            public MultiDisposer(List<IDisposable> listeners)
-            {
-                _listeners = listeners;
-            }
-
-            public void Dispose()
-            {
-                _listeners.Each(l => l.Dispose());
             }
         }
     }
