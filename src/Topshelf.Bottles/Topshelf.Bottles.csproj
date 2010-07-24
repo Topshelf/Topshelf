@@ -47,8 +47,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BottleException.cs" />
+    <Compile Include="BottleService.cs" />
     <Compile Include="BottleWatcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Topshelf\Topshelf.csproj">
+      <Project>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</Project>
+      <Name>Topshelf</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
