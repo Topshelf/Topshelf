@@ -41,8 +41,8 @@ namespace Topshelf.FileSystem
         public void Start()
         {
             // file system watcher will fail if directory isn't there, ensure it is
-            if (!Directory.Exists(_baseDir))
-                Directory.CreateDirectory(_baseDir);
+            if (!System.IO.Directory.Exists(_baseDir))
+                System.IO.Directory.CreateDirectory(_baseDir);
 
             _channel = new ChannelAdapter();
             FiberFactory fiberFactory = () => new SynchronousFiber();

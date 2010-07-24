@@ -109,10 +109,6 @@
     <Compile Include="TypeCoercionPlay.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Topshelf.Bottles\Topshelf.Bottles.csproj">
-      <Project>{48422B0B-E8C1-4132-8A9E-CB8CEFF9AC20}</Project>
-      <Name>Topshelf.Bottles</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">
       <Project>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</Project>
       <Name>Topshelf</Name>

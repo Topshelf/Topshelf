@@ -51,6 +51,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\..\lib\Magnum\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
@@ -58,6 +61,9 @@
     <Reference Include="Magnum, Version=0.8.180.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
+    </Reference>
+    <Reference Include="Magnum.FileSystem">
+      <HintPath>..\..\lib\Magnum\Magnum.FileSystem.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -78,6 +84,9 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="Bottles\BottleException.cs" />
+    <Compile Include="Bottles\BottleService.cs" />
+    <Compile Include="Bottles\BottleWatcher.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\RunCommand.cs" />
     <Compile Include="Commands\InstallService.cs" />
