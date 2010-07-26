@@ -79,13 +79,18 @@ namespace Topshelf.Model
             _log.Info("BeforeStart complete");
 
             int unstartedCount = Services.Count(x => x.State != ServiceState.Started);
-            bool completed; 
+            bool completed;
+            long startedServices = 0;
 
             using (var startedLatch = new ManualResetEvent(false))
             {
                 var countDown = new CountdownLatch(unstartedCount, () => startedLatch.Set());
 
-                Action<ServiceStarted> action = msg => countDown.CountDown();
+                Action<ServiceStarted> action = msg =>
+                    {
+                        countDown.CountDown();
+                        Interlocked.Increment(ref startedServices);
+                    };
 
                 ServiceStartedAction += action;
 
@@ -100,7 +105,7 @@ namespace Topshelf.Model
                 ServiceStartedAction -= action;
             }
             
-            if (!completed)
+            if (!completed && (HostedServiceCount == 1 || startedServices == 0))
             {
                 var qCount = _exceptions.ReadLock(q => q.Count);
                 Exception ex = null;
