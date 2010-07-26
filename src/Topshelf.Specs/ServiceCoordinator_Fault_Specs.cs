@@ -83,7 +83,7 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Pause(), Throws.InstanceOf<Exception>());
         }
 
-        [Test]
+        [Test, Category("Slow")]
         public void Fault_when_service_starts()
         {
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
@@ -102,7 +102,7 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Start(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Explicit("Behavior not yet supported")]
+        [Test, Category("Slow")]
         public void Fault_when_service_stops()
         {
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
@@ -153,6 +153,7 @@ namespace Topshelf.Specs
             _serviceCoordinator.Start();
 
             future.WaitUntilCompleted(5.Seconds()).ShouldBeTrue();
+            future.Value.Key.ShouldEqual("test");
         }
     }
 }

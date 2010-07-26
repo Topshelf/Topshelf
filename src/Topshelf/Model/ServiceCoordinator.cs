@@ -135,18 +135,53 @@ namespace Topshelf.Model
         {
             //TODO: PRE STOP
 
-            foreach (IServiceController service in Services.Reverse())
+            int unstoppedCount = Services.Count(x => x.State != ServiceState.Stopped);
+            bool completed;
+            long stoppedServices = 0;
+
+            using (var startedLatch = new ManualResetEvent(false))
             {
-                try
+                var countDown = new CountdownLatch(unstoppedCount, () => startedLatch.Set());
+
+                Action<ServiceStopped> action = msg =>
                 {
-                    _log.InfoFormat("Stopping sub service '{0}'", service.Name);
-                    service.Stop();
-                }
-                catch (Exception ex)
+                    countDown.CountDown();
+                    Interlocked.Increment(ref stoppedServices);
+                };
+
+                ServiceStoppedAction += action;
+
+                _log.Debug("Start is now stopping any subordinate services");
+                foreach (IServiceController serviceController in Services)
                 {
-                    _log.Error("Exception stopping sub service " + service.Name, ex);
+                    _log.InfoFormat("Stopping sub service '{0}'", serviceController.Name);
+                    serviceController.ControllerChannel.Send(new StopService());
                 }
+
+                completed = startedLatch.WaitOne(30.Seconds());
+                ServiceStoppedAction -= action;
             }
+
+            if (!completed && (HostedServiceCount == 1 || stoppedServices == 0))
+            {
+                var qCount = _exceptions.ReadLock(q => q.Count);
+                Exception ex = null;
+
+                if (qCount > 0)
+                {
+                    var kvp = _exceptions.WriteLock(s => s.Dequeue());
+                    ex = kvp.Value;
+                }
+
+                throw new Exception("One or more services failed to stop in a timely manner.", ex);
+            }
+
+            int serviceExCount = _exceptions.ReadLock(q => q.Select(x => x.Key).Distinct().Count());
+            if (serviceExCount >= HostedServiceCount)
+            {
+                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()).Value);
+            }
+
             //TODO: Need to wait for shut down
             _log.Debug("pre after stop");
             _afterStop(this);
@@ -265,6 +300,7 @@ namespace Topshelf.Model
         #endregion
 
         event Action<ServiceStarted> ServiceStartedAction;
+        event Action<ServiceStopped> ServiceStoppedAction;
 
         void LoadNewServiceConfigurations()
         {
