@@ -123,7 +123,7 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Stop(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Explicit("Concurrency bug?")]
+        [Test, Category("Slow")]
         public void No_exception_when_only_some_services_start()
         {
             Future<KeyValuePair<string, Exception>> future = new Future<KeyValuePair<string, Exception>>();
