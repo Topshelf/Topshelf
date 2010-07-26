@@ -14,6 +14,7 @@ namespace Topshelf.Specs
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Magnum;
     using Magnum.Extensions;
     using Model;
@@ -38,14 +39,48 @@ namespace Topshelf.Specs
             _serviceCoordinator.Dispose();
         }
 
-        [Test]
+        [Test, Explicit("Behavior not yet supported")]
         public void Fault_when_service_continues()
         {
+            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
+                {
+                    () => new ServiceController<TestService>("test")
+                        {
+                            BuildService = s => new TestService(),
+                            StartAction = x => x.Start(),
+                            StopAction = x => x.Stop(),
+                            ContinueAction = x => { throw new Exception(); },
+                            PauseAction = x => x.Continue()
+                        }
+                };
+
+            _serviceCoordinator.RegisterServices(services);
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Services.ToList().ForEach(x => (x.State == ServiceState.Started).ShouldBeTrue());
+            _serviceCoordinator.Pause();
+            _serviceCoordinator.Services.ToList().ForEach(x => (x.State == ServiceState.Paused).ShouldBeTrue());
+            Assert.That(() => _serviceCoordinator.Continue(), Throws.InstanceOf<Exception>());
         }
 
-        [Test]
+        [Test, Explicit("Behavior not yet supported")]
         public void Fault_when_service_pauses()
         {
+            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
+                {
+                    () => new ServiceController<TestService>("test")
+                        {
+                            BuildService = s => new TestService(),
+                            StartAction = x => x.Start(),
+                            StopAction = x => x.Stop(),
+                            ContinueAction = x => x.Continue(),
+                            PauseAction = x => { throw new Exception(); }
+                        }
+                };
+
+            _serviceCoordinator.RegisterServices(services);
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Services.ToList().ForEach(x => (x.State == ServiceState.Started).ShouldBeTrue());
+            Assert.That(() => _serviceCoordinator.Pause(), Throws.InstanceOf<Exception>());
         }
 
         [Test]
@@ -67,12 +102,28 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Start(), Throws.InstanceOf<Exception>());
         }
 
-        [Test]
+        [Test, Explicit("Behavior not yet supported")]
         public void Fault_when_service_stops()
         {
+            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
+                {
+                    () => new ServiceController<TestService>("test")
+                        {
+                            BuildService = s => new TestService(),
+                            StartAction = x => x.Start(),
+                            StopAction = x => { throw new Exception(); },
+                            ContinueAction = x => x.Continue(),
+                            PauseAction = x => x.Pause()
+                        }
+                };
+
+            _serviceCoordinator.RegisterServices(services);
+            _serviceCoordinator.Start();
+            _serviceCoordinator.Services.ToList().ForEach(x => (x.State == ServiceState.Started).ShouldBeTrue());
+            Assert.That(() => _serviceCoordinator.Stop(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Explicit]
+        [Test, Explicit("Concurrency bug?")]
         public void No_exception_when_only_some_services_start()
         {
             Future<KeyValuePair<string, Exception>> future = new Future<KeyValuePair<string, Exception>>();
