@@ -51,6 +51,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip, Version=1.9.1.5, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Magnum\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
@@ -58,6 +62,13 @@
     <Reference Include="Magnum, Version=0.8.180.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
+    </Reference>
+    <Reference Include="Magnum.FileSystem, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Magnum\Magnum.FileSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Magnum.TestFramework">
+      <HintPath>..\..\lib\Magnum\Magnum.TestFramework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.5.2.9222, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -79,6 +90,7 @@
     <Compile Include="ArgParsing_Specs.cs" />
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />
+    <Compile Include="Bottle\Bottle_Specs.cs" />
     <Compile Include="Configuration\RunnerConfigurator_Specs.cs">
     </Compile>
     <Compile Include="Configuration\Credential_Specs.cs" />
@@ -86,7 +98,6 @@
     <Compile Include="Pipeline_Play.cs" />
     <Compile Include="Scenarios\Scenario.cs" />
     <Compile Include="Scenarios\ScenarioContext.cs" />
-    <Compile Include="ServiceCoordinator_Fault_Specs.cs" />
     <Compile Include="ServiceCoordinator_Specs.cs" />
     <Compile Include="ServiceController_Specs.cs" />
     <Compile Include="ServiceCoordinator_Singles_Specs.cs" />
@@ -130,7 +141,11 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Bottle\sample.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
