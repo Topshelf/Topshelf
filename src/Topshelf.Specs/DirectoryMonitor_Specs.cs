@@ -101,6 +101,9 @@ namespace Topshelf.Specs
 					myChannel.Connect(sc => sc.AddConsumerOf<FileSystemChange>()
 					                        	.UsingConsumer(fsc =>
 					                        		{
+                                                        if (fsc.ShelfName.Equals("bottle", StringComparison.OrdinalIgnoreCase))
+                                                            return; // gotta skip the bottle directory
+
 					                        			long localCount = Interlocked.Increment(ref count);
 					                        			Console.WriteLine(fsc.ShelfName);
 					                        			if (localCount%2 == 0)
@@ -119,9 +122,9 @@ namespace Topshelf.Specs
 
 					Console.WriteLine("-- Files");
 
-					File.AppendAllText(Path.Combine(baseDir, "Service1", "test.out"), "Testing stuff");
-					File.AppendAllText(Path.Combine(baseDir, "Service2", "test.out"), "Testing stuff");
-					File.AppendAllText(Path.Combine(baseDir, "Service1", "test2.out"), "Testing stuff");
+                    File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test.out")), "Testing stuff");
+					File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service2", "test.out")), "Testing stuff");
+                    File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test2.out")), "Testing stuff");
 
 					manualResetEvent.WaitOne(10.Seconds());
 

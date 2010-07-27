@@ -96,8 +96,8 @@ namespace Topshelf.Specs
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
 
-                readyEvent.Dispose();
-                stopEvent.Dispose();
+                //readyEvent.Dispose();
+                //stopEvent.Dispose();
             }
         }
     }

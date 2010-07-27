@@ -17,6 +17,7 @@ namespace Topshelf.Specs
     using System.Linq;
     using Magnum;
     using Magnum.Extensions;
+    using Magnum.TestFramework;
     using Model;
     using NUnit.Framework;
     using TestObject;
@@ -39,7 +40,7 @@ namespace Topshelf.Specs
             _serviceCoordinator.Dispose();
         }
 
-        [Test, Explicit("Behavior not yet supported")]
+        [Test, Slow]
         public void Fault_when_service_continues()
         {
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
@@ -62,7 +63,7 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Continue(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Explicit("Behavior not yet supported")]
+        [Test, Slow]
         public void Fault_when_service_pauses()
         {
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
@@ -83,7 +84,7 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Pause(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Category("Slow")]
+        [Test, Slow]
         public void Fault_when_service_starts()
         {
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
@@ -102,7 +103,7 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Start(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Category("Slow")]
+        [Test, Slow]
         public void Fault_when_service_stops()
         {
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
@@ -123,10 +124,10 @@ namespace Topshelf.Specs
             Assert.That(() => _serviceCoordinator.Stop(), Throws.InstanceOf<Exception>());
         }
 
-        [Test, Category("Slow")]
+        [Test, Slow]
         public void No_exception_when_only_some_services_start()
         {
-            Future<KeyValuePair<string, Exception>> future = new Future<KeyValuePair<string, Exception>>();
+            Future<Exception> future = new Future<Exception>();
             _serviceCoordinator.ShelfFaulted += future.Complete;
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                 {
@@ -153,7 +154,6 @@ namespace Topshelf.Specs
             _serviceCoordinator.Start();
 
             future.WaitUntilCompleted(5.Seconds()).ShouldBeTrue();
-            future.Value.Key.ShouldEqual("test");
         }
     }
 }

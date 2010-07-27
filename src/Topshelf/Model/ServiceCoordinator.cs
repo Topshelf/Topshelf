@@ -35,8 +35,8 @@ namespace Topshelf.Model
         readonly Action<IServiceCoordinator> _beforeStart;
         readonly Action<IServiceCoordinator> _beforeStartingServices;
 
-        readonly ReaderWriterLockedObject<Queue<KeyValuePair<string, Exception>>> _exceptions =
-            new ReaderWriterLockedObject<Queue<KeyValuePair<string, Exception>>>(new Queue<KeyValuePair<string, Exception>>());
+        readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
+            new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
 
         readonly WcfChannelHost _hostChannel;
         readonly ChannelAdapter _myChannel;
@@ -58,6 +58,9 @@ namespace Topshelf.Model
                 {
                     s.AddConsumerOf<ShelfFault>().UsingConsumer(HandleServiceFault);
                     s.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => ServiceStartedAction.Invoke(msg));
+                    s.AddConsumerOf<ServiceStopped>().UsingConsumer(msg => ServiceStoppedAction.Invoke(msg));
+                    s.AddConsumerOf<ServiceContinued>().UsingConsumer(msg => ServiceContinuedAction.Invoke(msg));
+                    s.AddConsumerOf<ServicePaused>().UsingConsumer(msg => ServicePausedAction.Invoke(msg));
                 });
         }
 
@@ -71,6 +74,52 @@ namespace Topshelf.Model
             }
         }
 
+        void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction, ref Action<TRecieved> stateEvent, ServiceState targetState)
+            where TRecieved : ServiceMessage
+            where TSent : ServiceMessage
+        {
+            int servicesNotInTargetState = Services.Count(x => x.State != targetState);
+            bool completed;
+            long serviceReachedTargetState = 0;
+
+            using (var startedLatch = new ManualResetEvent(false))
+            {
+                var countDown = new CountdownLatch(servicesNotInTargetState, () => startedLatch.Set());
+
+                Action<TRecieved> action = msg =>
+                {
+                    countDown.CountDown();
+                    Interlocked.Increment(ref serviceReachedTargetState);
+                };
+
+                stateEvent += action;
+
+                _log.Debug("{0} is now {1} any subordinate services".FormatWith(printableMethod, printableAction));
+                foreach (IServiceController serviceController in Services)
+                {
+                    _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
+                    serviceController.ControllerChannel.Send(default(TSent));
+                }
+
+                completed = startedLatch.WaitOne(30.Seconds());
+                stateEvent -= action;
+            }
+
+            if (!completed && (HostedServiceCount == 1 || serviceReachedTargetState == 0))
+            {
+                int qCount = _exceptions.ReadLock(q => q.Count);
+                Exception ex = null;
+
+                if (qCount > 0)
+                    ex = _exceptions.WriteLock(s => s.Dequeue());
+
+                throw new Exception("One or more services failed to {0} in a timely manner.".FormatWith(printableMethod), ex);
+            }
+
+            if (!Services.Any(x => x.State == targetState))
+                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
+        }
+
         public void Start()
         {
             //TODO: With Shelving this feels like it needs to become before 'host' start
@@ -78,52 +127,7 @@ namespace Topshelf.Model
             _beforeStartingServices(this);
             _log.Info("BeforeStart complete");
 
-            int unstartedCount = Services.Count(x => x.State != ServiceState.Started);
-            bool completed;
-            long startedServices = 0;
-
-            using (var startedLatch = new ManualResetEvent(false))
-            {
-                var countDown = new CountdownLatch(unstartedCount, () => startedLatch.Set());
-
-                Action<ServiceStarted> action = msg =>
-                    {
-                        countDown.CountDown();
-                        Interlocked.Increment(ref startedServices);
-                    };
-
-                ServiceStartedAction += action;
-
-                _log.Debug("Start is now starting any subordinate services");
-                foreach (IServiceController serviceController in Services)
-                {
-                    _log.InfoFormat("Starting subordinate service '{0}'", serviceController.Name);
-                    serviceController.ControllerChannel.Send(new StartService());
-                }
-
-                completed = startedLatch.WaitOne(30.Seconds());
-                ServiceStartedAction -= action;
-            }
-            
-            if (!completed && (HostedServiceCount == 1 || startedServices == 0))
-            {
-                var qCount = _exceptions.ReadLock(q => q.Count);
-                Exception ex = null;
-
-                if (qCount > 0)
-                {
-                    var kvp = _exceptions.WriteLock(s => s.Dequeue());
-                    ex = kvp.Value;
-                }
-
-                throw new Exception("One or more services failed to start in a timely manner.", ex);
-            }
-
-            int serviceExCount = _exceptions.ReadLock(q => q.Select(x => x.Key).Distinct().Count());
-            if (serviceExCount >= HostedServiceCount)
-            {
-                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()).Value);
-            }
+            ProcessEvent<StartService, ServiceStarted>("Start", "starting", ref ServiceStartedAction, ServiceState.Started);
 
             //TODO: This feels like it should be after 'host' stop
             _log.Debug("Calling BeforeStart");
@@ -135,52 +139,7 @@ namespace Topshelf.Model
         {
             //TODO: PRE STOP
 
-            int unstoppedCount = Services.Count(x => x.State != ServiceState.Stopped);
-            bool completed;
-            long stoppedServices = 0;
-
-            using (var startedLatch = new ManualResetEvent(false))
-            {
-                var countDown = new CountdownLatch(unstoppedCount, () => startedLatch.Set());
-
-                Action<ServiceStopped> action = msg =>
-                {
-                    countDown.CountDown();
-                    Interlocked.Increment(ref stoppedServices);
-                };
-
-                ServiceStoppedAction += action;
-
-                _log.Debug("Start is now stopping any subordinate services");
-                foreach (IServiceController serviceController in Services)
-                {
-                    _log.InfoFormat("Stopping sub service '{0}'", serviceController.Name);
-                    serviceController.ControllerChannel.Send(new StopService());
-                }
-
-                completed = startedLatch.WaitOne(30.Seconds());
-                ServiceStoppedAction -= action;
-            }
-
-            if (!completed && (HostedServiceCount == 1 || stoppedServices == 0))
-            {
-                var qCount = _exceptions.ReadLock(q => q.Count);
-                Exception ex = null;
-
-                if (qCount > 0)
-                {
-                    var kvp = _exceptions.WriteLock(s => s.Dequeue());
-                    ex = kvp.Value;
-                }
-
-                throw new Exception("One or more services failed to stop in a timely manner.", ex);
-            }
-
-            int serviceExCount = _exceptions.ReadLock(q => q.Select(x => x.Key).Distinct().Count());
-            if (serviceExCount >= HostedServiceCount)
-            {
-                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()).Value);
-            }
+            ProcessEvent<StopService, ServiceStopped>("Stop", "stopping", ref ServiceStoppedAction, ServiceState.Stopped);
 
             //TODO: Need to wait for shut down
             _log.Debug("pre after stop");
@@ -190,20 +149,12 @@ namespace Topshelf.Model
 
         public void Pause()
         {
-            foreach (IServiceController service in Services)
-            {
-                _log.InfoFormat("Pausing sub service '{0}'", service.Name);
-                service.Pause();
-            }
+            ProcessEvent<PauseService, ServicePaused>("Pause", "pausing", ref ServicePausedAction, ServiceState.Paused);
         }
 
         public void Continue()
         {
-            foreach (IServiceController service in Services)
-            {
-                _log.InfoFormat("Continuing sub service '{0}'", service.Name);
-                service.Continue();
-            }
+            ProcessEvent<ContinueService, ServiceContinued>("Continue", "continuing", ref ServiceContinuedAction, ServiceState.Started);
         }
 
         public void StartService(string name)
@@ -247,19 +198,15 @@ namespace Topshelf.Model
         public IList<ServiceInformation> GetServiceInfo()
         {
             LoadNewServiceConfigurations();
-            var result = new List<ServiceInformation>();
 
-            foreach (IServiceController serviceController in Services)
-            {
-                result.Add(new ServiceInformation
+            return Services
+                .ToList()
+                .ConvertAll(serviceController => new ServiceInformation
                     {
                         Name = serviceController.Name,
                         State = serviceController.State,
                         Type = serviceController.ServiceType.Name
                     });
-            }
-
-            return result;
         }
 
         public IServiceController GetService(string name)
@@ -301,6 +248,9 @@ namespace Topshelf.Model
 
         event Action<ServiceStarted> ServiceStartedAction;
         event Action<ServiceStopped> ServiceStoppedAction;
+        event Action<ServicePaused> ServicePausedAction;
+        event Action<ServiceContinued> ServiceContinuedAction;
+        public event Action<Exception> ShelfFaulted;
 
         void LoadNewServiceConfigurations()
         {
@@ -336,17 +286,13 @@ namespace Topshelf.Model
             }
         }
 
-        public event Action<KeyValuePair<string, Exception>> ShelfFaulted;
-
         void HandleServiceFault(ShelfFault faultMessage)
         {
-            var fault = new KeyValuePair<string, Exception>(faultMessage.ShelfName, faultMessage.Exception);
+            _exceptions.WriteLock(s => s.Enqueue(faultMessage.Exception));
 
-            _exceptions.WriteLock(s => s.Enqueue(fault));
-
-            Action<KeyValuePair<string, Exception>> handle = ShelfFaulted;
+            Action<Exception> handle = ShelfFaulted;
             if (handle != null)
-                handle.Invoke(fault);
+                handle.Invoke(faultMessage.Exception);
         }
     }
 }
