@@ -10,15 +10,16 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Specs
+namespace Topshelf.Specs.ServiceCoordinator
 {
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using Magnum.Extensions;
-    using Model;
+    using Topshelf.Model;
     using NUnit.Framework;
-    using TestObject;
+    using Topshelf.Specs.TestObject;
+
 
     [TestFixture]
     public class ServiceCoordinator_Singles_Specs

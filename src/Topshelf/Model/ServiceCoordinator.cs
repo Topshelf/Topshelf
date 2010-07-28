@@ -43,9 +43,18 @@ namespace Topshelf.Model
         readonly List<Func<IServiceController>> _serviceConfigurators;
 
         readonly IList<IServiceController> _services = new List<IServiceController>();
+        readonly TimeSpan _timeout;
 
         public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
                                   Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
+            : this(beforeStartingServices, beforeStart, afterStop, 30.Seconds())
+        {
+        }
+
+        // TODO: Should this be public? 
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
+                                    Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop,
+                                    TimeSpan waitTime)
         {
             _beforeStartingServices = beforeStartingServices;
             _beforeStart = beforeStart;
@@ -53,6 +62,7 @@ namespace Topshelf.Model
             _serviceConfigurators = new List<Func<IServiceController>>();
             _myChannel = new ChannelAdapter();
             _hostChannel = WellknownAddresses.GetHostHost(_myChannel);
+            _timeout = waitTime;
 
             _myChannel.Connect(s =>
                 {
@@ -74,52 +84,6 @@ namespace Topshelf.Model
             }
         }
 
-        void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction, ref Action<TRecieved> stateEvent, ServiceState targetState)
-            where TRecieved : ServiceMessage
-            where TSent : ServiceMessage
-        {
-            int servicesNotInTargetState = Services.Count(x => x.State != targetState);
-            bool completed;
-            long serviceReachedTargetState = 0;
-
-            using (var startedLatch = new ManualResetEvent(false))
-            {
-                var countDown = new CountdownLatch(servicesNotInTargetState, () => startedLatch.Set());
-
-                Action<TRecieved> action = msg =>
-                {
-                    countDown.CountDown();
-                    Interlocked.Increment(ref serviceReachedTargetState);
-                };
-
-                stateEvent += action;
-
-                _log.Debug("{0} is now {1} any subordinate services".FormatWith(printableMethod, printableAction));
-                foreach (IServiceController serviceController in Services)
-                {
-                    _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
-                    serviceController.ControllerChannel.Send(default(TSent));
-                }
-
-                completed = startedLatch.WaitOne(30.Seconds());
-                stateEvent -= action;
-            }
-
-            if (!completed && (HostedServiceCount == 1 || serviceReachedTargetState == 0))
-            {
-                int qCount = _exceptions.ReadLock(q => q.Count);
-                Exception ex = null;
-
-                if (qCount > 0)
-                    ex = _exceptions.WriteLock(s => s.Dequeue());
-
-                throw new Exception("One or more services failed to {0} in a timely manner.".FormatWith(printableMethod), ex);
-            }
-
-            if (!Services.Any(x => x.State == targetState))
-                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
-        }
-
         public void Start()
         {
             //TODO: With Shelving this feels like it needs to become before 'host' start
@@ -127,7 +91,8 @@ namespace Topshelf.Model
             _beforeStartingServices(this);
             _log.Info("BeforeStart complete");
 
-            ProcessEvent<StartService, ServiceStarted>("Start", "starting", ref ServiceStartedAction, ServiceState.Started);
+            ProcessEvent<StartService, ServiceStarted>("Start", "starting", ref ServiceStartedAction,
+                                                       ServiceState.Started);
 
             //TODO: This feels like it should be after 'host' stop
             _log.Debug("Calling BeforeStart");
@@ -154,7 +119,8 @@ namespace Topshelf.Model
 
         public void Continue()
         {
-            ProcessEvent<ContinueService, ServiceContinued>("Continue", "continuing", ref ServiceContinuedAction, ServiceState.Started);
+            ProcessEvent<ContinueService, ServiceContinued>("Continue", "continuing", ref ServiceContinuedAction,
+                                                            ServiceState.Started);
         }
 
         public void StartService(string name)
@@ -245,6 +211,54 @@ namespace Topshelf.Model
         }
 
         #endregion
+
+        void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction,
+                                            ref Action<TRecieved> stateEvent, ServiceState targetState)
+            where TRecieved : ServiceMessage
+            where TSent : ServiceMessage
+        {
+            int servicesNotInTargetState = Services.Count(x => x.State != targetState);
+            bool completed;
+            long serviceReachedTargetState = 0;
+
+            using (var latch = new ManualResetEvent(false))
+            {
+                var countDown = new CountdownLatch(servicesNotInTargetState, () => latch.Set());
+
+                Action<TRecieved> action = msg =>
+                    {
+                        countDown.CountDown();
+                        Interlocked.Increment(ref serviceReachedTargetState);
+                    };
+
+                stateEvent += action;
+
+                _log.Debug("{0} is now {1} any subordinate services".FormatWith(printableMethod, printableAction));
+                foreach (IServiceController serviceController in Services)
+                {
+                    _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
+                    serviceController.ControllerChannel.Send(default(TSent));
+                }
+
+                completed = latch.WaitOne(_timeout);
+                stateEvent -= action;
+            }
+
+            if (!completed && (HostedServiceCount == 1 || serviceReachedTargetState == 0))
+            {
+                int qCount = _exceptions.ReadLock(q => q.Count);
+                Exception ex = null;
+
+                if (qCount > 0)
+                    ex = _exceptions.WriteLock(s => s.Dequeue());
+
+                throw new Exception(
+                    "One or more services failed to {0} in a timely manner.".FormatWith(printableMethod), ex);
+            }
+
+            if (!Services.Any(x => x.State == targetState))
+                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
+        }
 
         event Action<ServiceStarted> ServiceStartedAction;
         event Action<ServiceStopped> ServiceStoppedAction;
