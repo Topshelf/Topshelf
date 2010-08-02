@@ -35,7 +35,7 @@ namespace Topshelf.Hosts
 
         public void Host()
         {
-            _log.Info("Received service start notification");
+            _log.Info("Starting up as a winservice application");
 
             if (!WinServiceHelper.IsInstalled(_fullServiceName.FullName))
             {

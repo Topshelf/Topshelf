@@ -43,13 +43,10 @@ namespace Topshelf.Commands
             if (Process.GetCurrentProcess().GetParent().ProcessName == "services")
             {
                 _log.Debug("Detected that I am running in the windows services");
-                _log.Debug("Starting up as a win service application");
                 host = new WinServiceHost(_coordinator, _serviceName);
             }
             else
             {
-                _log.Debug("Starting up as a console application");
-
                 host = new CommandLineHost(_serviceName, _coordinator);
             }
 

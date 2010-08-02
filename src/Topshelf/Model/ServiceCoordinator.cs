@@ -31,9 +31,10 @@ namespace Topshelf.Model
         IServiceCoordinator
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
-        readonly Action<IServiceCoordinator> _afterStop;
-        readonly Action<IServiceCoordinator> _beforeStart;
-        readonly Action<IServiceCoordinator> _beforeStartingServices;
+        readonly Action<IServiceCoordinator> _afterStoppingHost;
+        readonly Action<IServiceCoordinator> _afterStartingHost;
+        readonly Action<IServiceCoordinator> _beforeStartingHost;
+        readonly Action<IServiceCoordinator> _beforeStoppingHost;
 
         readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
@@ -45,21 +46,24 @@ namespace Topshelf.Model
         readonly IList<IServiceController> _services = new List<IServiceController>();
         readonly TimeSpan _timeout;
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
-                                  Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop)
-            : this(beforeStartingServices, beforeStart, afterStop, 30.Seconds())
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingHost,
+                                  Action<IServiceCoordinator> afterStartingHost, Action<IServiceCoordinator> afterStoppingHost)
+            : this(beforeStartingHost, afterStartingHost, afterStoppingHost, 30.Seconds())
         {
         }
 
-        // TODO: Should this be public? 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
-                                    Action<IServiceCoordinator> beforeStart, Action<IServiceCoordinator> afterStop,
+
+        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingHost,
+                                    Action<IServiceCoordinator> afterStartingHost, Action<IServiceCoordinator> afterStoppingHost,
                                     TimeSpan waitTime)
         {
-            _beforeStartingServices = beforeStartingServices;
-            _beforeStart = beforeStart;
-            _afterStop = afterStop;
+            _beforeStoppingHost = GetLogWrapper("BeforeStoppingHost", sc => { });
+            _beforeStartingHost = GetLogWrapper("BeforeStartingHost", beforeStartingHost);
+            _afterStartingHost = GetLogWrapper("AfterStartingHost", afterStartingHost);
+            _afterStoppingHost = GetLogWrapper("AfterStoppingHost", afterStoppingHost);
+
             _serviceConfigurators = new List<Func<IServiceController>>();
+
             _myChannel = new ChannelAdapter();
             _hostChannel = WellknownAddresses.GetHostHost(_myChannel);
             _timeout = waitTime;
@@ -86,41 +90,31 @@ namespace Topshelf.Model
 
         public void Start()
         {
-            //TODO: With Shelving this feels like it needs to become before 'host' start
-            _log.Debug("Calling BeforeStartingServices");
-            _beforeStartingServices(this);
-            _log.Info("BeforeStart complete");
+            _beforeStartingHost(this);
 
-            ProcessEvent<StartService, ServiceStarted>("Start", "starting", ref ServiceStartedAction,
-                                                       ServiceState.Started);
+            ProcessEvent<StartService, ServiceStarted>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
 
-            //TODO: This feels like it should be after 'host' stop
-            _log.Debug("Calling BeforeStart");
-            _beforeStart(this);
-            _log.Info("BeforeStart complete");
+            _afterStartingHost(this);
         }
 
         public void Stop()
         {
-            //TODO: PRE STOP
+            _beforeStoppingHost(this);
 
-            ProcessEvent<StopService, ServiceStopped>("Stop", "stopping", ref ServiceStoppedAction, ServiceState.Stopped);
+            ProcessEvent<StopService, ServiceStopped>("Stop", "Stopping", ref ServiceStoppedAction, ServiceState.Stopped);
 
             //TODO: Need to wait for shut down
-            _log.Debug("pre after stop");
-            _afterStop(this);
-            _log.Info("AfterStop complete");
+            _afterStoppingHost(this);
         }
 
         public void Pause()
         {
-            ProcessEvent<PauseService, ServicePaused>("Pause", "pausing", ref ServicePausedAction, ServiceState.Paused);
+            ProcessEvent<PauseService, ServicePaused>("Pause", "Pausing", ref ServicePausedAction, ServiceState.Paused);
         }
 
         public void Continue()
         {
-            ProcessEvent<ContinueService, ServiceContinued>("Continue", "continuing", ref ServiceContinuedAction,
-                                                            ServiceState.Started);
+            ProcessEvent<ContinueService, ServiceContinued>("Continue", "Continuing", ref ServiceContinuedAction,ServiceState.Started);
         }
 
         public void StartService(string name)
@@ -129,7 +123,7 @@ namespace Topshelf.Model
                 CreateServices();
 
             Services.Where(x => x.Name == name).First().ControllerChannel.Send(new StartService());
-            //need a way to pause here
+            //TODO:need a way to pause here
         }
 
         public void StopService(string name)
@@ -180,7 +174,7 @@ namespace Topshelf.Model
             return Services.Where(x => x.Name == name).FirstOrDefault();
         }
 
-        #region Dispose Crap
+        #region Dispose
 
         bool _disposed;
 
@@ -233,7 +227,7 @@ namespace Topshelf.Model
 
                 stateEvent += action;
 
-                _log.Debug("{0} is now {1} any subordinate services".FormatWith(printableMethod, printableAction));
+                _log.Debug("{0} is now {1} all '{2}' subordinate services".FormatWith(printableMethod, printableAction.ToLower(), Services.Count));
                 foreach (IServiceController serviceController in Services)
                 {
                     _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
@@ -307,6 +301,16 @@ namespace Topshelf.Model
             Action<Exception> handle = ShelfFaulted;
             if (handle != null)
                 handle.Invoke(faultMessage.Exception);
+        }
+
+        Action<IServiceCoordinator> GetLogWrapper(string name, Action<IServiceCoordinator> action)
+        {
+            return sc =>
+            {
+                _log.DebugFormat("Calling {0}", name);
+                action(sc);
+                _log.InfoFormat("{0} complete", name);
+            };
         }
     }
 }
