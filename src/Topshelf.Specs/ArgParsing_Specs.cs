@@ -12,26 +12,89 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
+    using Magnum.TestFramework;
     using NUnit.Framework;
     using Topshelf.Configuration;
 
-    [TestFixture]
-    public class ArgParsing_Specs
+    [Scenario]
+    public class Given_a_command_line
     {
-        string _args;
-
-        [SetUp]
-        public void Establish_Context()
+        protected string CommandLine
         {
-            _args = "install /instance:bob";
+            set
+            {
+                Arguments = TopshelfArgumentParser.Parse(value);
+            }
+        }
+        protected TopshelfArguments Arguments { get; set; }
+    }
+
+    [Scenario]
+    public class Given_no_command_line :
+        Given_a_command_line
+    {
+        [Given]
+        public void An_empty_command_line()
+        {
+            CommandLine = string.Empty;
         }
 
-        [Test]
-        public void InstanceName()
+        [Then]
+        public void Action_should_be_run()
         {
-            TopshelfArguments a = TopshelfArgumentParser.Parse(_args);
-            a.Instance.ShouldEqual("bob");
-            a.ActionName.ShouldEqual(ServiceActionNames.Install);
+            Arguments.ActionName.ShouldEqual(ServiceActionNames.Run);
+        }
+        
+        [Then]
+        public void Instance_should_be_empty()
+        {
+            Arguments.Instance.ShouldBeEmpty();
+        }
+    }
+
+    [Scenario, Explicit("Not Yet Implemented")]
+    public class Given_service_install_command_line :
+        Given_a_command_line
+    {
+        [Given]
+        public void Service_install_command_line()
+        {
+            CommandLine = "service install";
+        }
+
+        [Then]
+        public void Action_should_be_install()
+        {
+            Arguments.ActionName.ShouldEqual(ServiceActionNames.Install);
+        }
+
+        [Then]
+        public void Instance_should_be_empty()
+        {
+            Arguments.Instance.ShouldBeEmpty();
+        }
+    }
+
+    [Scenario]
+    public class Give_install_with_an_instance :
+        Given_a_command_line
+    {
+        [Given]
+        public void An_empty_command_line()
+        {
+            CommandLine = "install /instance:bob";
+        }
+
+        [Then]
+        public void Action_should_be_install()
+        {
+            Arguments.ActionName.ShouldEqual(ServiceActionNames.Install);
+        }
+
+        [Then]
+        public void Instance_should_be_bob()
+        {
+            Arguments.Instance.ShouldEqual("bob");
         }
     }
 }
