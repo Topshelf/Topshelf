@@ -98,6 +98,7 @@
     <Compile Include="Pipeline_Play.cs" />
     <Compile Include="Scenarios\Scenario.cs" />
     <Compile Include="Scenarios\ScenarioContext.cs" />
+    <Compile Include="ServiceCoordinator\Given_a_failing_build_action.cs" />
     <Compile Include="ServiceCoordinator\Given_a_failing_continue_event.cs" />
     <Compile Include="ServiceCoordinator\Given_a_failing_pause_event.cs" />
     <Compile Include="ServiceCoordinator\Given_a_failing_start_event.cs" />

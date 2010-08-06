@@ -7,16 +7,22 @@ namespace Topshelf.Exceptions
     public class CouldntBuildServiceException : 
         Exception
     {
-        public CouldntBuildServiceException(string name) : base(string.Format("Couldn't find '{0}' in the ServiceLocator", name))
+        public CouldntBuildServiceException(string name) : base(string.Format("Couldn't build '{0}'.", name))
         {
             
         }
 
         public CouldntBuildServiceException(string name, Type serviceType)
-            : base(string.Format("Couldn't find service '{0}' named '{1}' in the ServiceLocator", serviceType.Name, name))
+            : base(string.Format("Couldn't build service '{0}' named '{1}'.", serviceType.Name, name))
         {
 
         }
+
+		public CouldntBuildServiceException(string name, Type serviceType, Exception innerException)
+			: base(string.Format("Couldn't build service '{0}' named '{1}'.", serviceType.Name, name), innerException)
+		{
+
+		}
 
         public CouldntBuildServiceException()
         {

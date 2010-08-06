@@ -163,13 +163,26 @@ namespace Topshelf.Model
             if (_hasInitialized)
                 return;
 
-            _instance = (TService)BuildService(Name);
+        	bool hasFaulted = false;
 
-            //TODO: send fault
+        	try
+        	{
+				_instance = (TService)BuildService(Name);
+        	}
+        	catch (Exception ex)
+        	{
+				_hostChannel.Send(new ShelfFault(new CouldntBuildServiceException(Name, typeof(TService), ex)));
+        		hasFaulted = true;
+        	}
+            
             if (_instance == null)
-                throw new CouldntBuildServiceException(Name, typeof(TService));
+			{
+				_hostChannel.Send(new ShelfFault(new CouldntBuildServiceException(Name, typeof(TService))));
+				hasFaulted = true;
+			}
 
-            _hostChannel.Send(new ServiceReady());
+			if (!hasFaulted)
+				_hostChannel.Send(new ServiceReady());
 
             _hasInitialized = true;
         }
