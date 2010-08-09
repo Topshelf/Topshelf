@@ -64,9 +64,9 @@ namespace Topshelf.Shelving
             _log.Debug("ShelfMaker started.");
         }
 
-        static ShelfHandle GetShelfStatus(IDictionary<string, ShelfHandle> dictionary, string key)
+        ShelfHandle GetShelfStatus(string key)
         {
-            return dictionary.ContainsKey(key) ? dictionary[key] : null;
+            return _shelves.UpgradeableReadLock(dict => dict.ContainsKey(key) ? dict[key] : null);
         }
 
         void ReloadShelf(ServiceMessage message)
@@ -74,7 +74,7 @@ namespace Topshelf.Shelving
             try
             {
                 _log.DebugFormat("Reloading shelf {0}", message.ShelfName);
-                ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+                ShelfHandle shelf = GetShelfStatus(message.ShelfName);
                 if (shelf != null)
                 {
                     if (shelf.CurrentState == ShelfState.Started)
@@ -108,7 +108,7 @@ namespace Topshelf.Shelving
 
         void MarkShelvedServiceStopped(ServiceStopped message)
         {
-            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            ShelfHandle shelf = GetShelfStatus(message.ShelfName);
             if (shelf == null)
                 return;
 
@@ -124,7 +124,7 @@ namespace Topshelf.Shelving
         void HandleShelfFault(ShelfFault message)
         {
             _log.Error("Error in shelf '{0}' -> '{1}'".FormatWith(message.ShelfName, message.Exception.Message), message.Exception);
-            ShelfHandle shelfStatus = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            ShelfHandle shelfStatus = GetShelfStatus(message.ShelfName);
             if (shelfStatus == null)
                 return;
 
@@ -133,7 +133,7 @@ namespace Topshelf.Shelving
 
         void HandleShelfStateChange(ServiceMessage message, ShelfState newState)
         {
-            ShelfHandle shelfStatus = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            ShelfHandle shelfStatus = GetShelfStatus(message.ShelfName);
             if (shelfStatus == null)
                 return;
 
@@ -147,7 +147,7 @@ namespace Topshelf.Shelving
         public void MakeShelf(string name, Type bootstrapper, params AssemblyName[] assemblies)
         {
             _log.DebugFormat("Making shelf {0}", name);
-            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, name));
+            ShelfHandle shelf = GetShelfStatus(name);
             if (shelf != null)
             {
                 _log.WarnFormat("Shelf '{0}' aleady exists. Cannot create.", name);
@@ -209,13 +209,13 @@ namespace Topshelf.Shelving
 
         public ShelfState GetState(string shelfName)
         {
-            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
+            ShelfHandle shelf = GetShelfStatus(shelfName);
             return shelf == null ? ShelfState.Unavailable : shelf.CurrentState;
         }
 
         public void StartShelf(string shelfName)
         {
-            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
+            ShelfHandle shelf = GetShelfStatus(shelfName);
             if (shelf == null)
                 return;
 
@@ -224,7 +224,7 @@ namespace Topshelf.Shelving
 
         public void StopShelf(string shelfName)
         {
-            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, shelfName));
+            ShelfHandle shelf = GetShelfStatus(shelfName);
             if (shelf == null)
                 return;
 
@@ -233,7 +233,7 @@ namespace Topshelf.Shelving
 
         void MarkServiceReadyAndStart(ServiceReady message)
         {
-            ShelfHandle shelf = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            ShelfHandle shelf = GetShelfStatus(message.ShelfName);
             if (shelf == null)
                 return;
 
@@ -249,7 +249,7 @@ namespace Topshelf.Shelving
 
         void MarkShelfReadyAndInitService(ShelfReady message)
         {
-            ShelfHandle shelfStatus = _shelves.UpgradeableReadLock(dict => GetShelfStatus(dict, message.ShelfName));
+            ShelfHandle shelfStatus = GetShelfStatus(message.ShelfName);
             if (shelfStatus == null)
                 return;
 
