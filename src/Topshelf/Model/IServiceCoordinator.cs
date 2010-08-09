@@ -18,20 +18,58 @@ namespace Topshelf.Model
     public interface IServiceCoordinator :
         IDisposable
     {
+        /// <summary>
+        /// Starts all registered services, blocking the thread while they start
+        /// </summary>
         void Start();
+        /// <summary>
+        /// Stops all registered services, blocking the thread while they stop
+        /// </summary>
         void Stop();
+        /// <summary>
+        /// Pause all started services, blocking the thread while they stop
+        /// </summary>
         void Pause();
+        /// <summary>
+        /// Continue all paused services, blocking the thread while they continue
+        /// </summary>
         void Continue();
 
+        /// <summary>
+        /// Starts a given service, without blocking the current thread
+        /// </summary>
+        /// <param name="name">name of the service</param>
         void StartService(string name);
+        /// <summary>
+        /// Stops a given service, without blocking the current thread
+        /// </summary>
+        /// <param name="name">name of the service</param>
         void StopService(string name);
+        /// <summary>
+        /// Pauses a given service, without blocking the current thread
+        /// </summary>
+        /// <param name="name">name of the service</param>
         void PauseService(string name);
+        /// <summary>
+        /// Continues a given service, without blocking the current thread
+        /// </summary>
+        /// <param name="name">name of the service</param>
         void ContinueService(string name);
 
-
-        //TODO: Do these functions belong on the Host?
+        /// <summary>
+        /// The number of services currently hosted, mostly used for testing
+        /// </summary>
         int HostedServiceCount { get; }
+        /// <summary>
+        /// Get the service controller for a given service, mostly used for testing
+        /// </summary>
+        /// <param name="s">name of the service</param>
+        /// <returns>A service controller for the service in question</returns>
         IServiceController GetService(string s);
+        /// <summary>
+        /// Provides a list of details about the hosted services
+        /// </summary>
+        /// <returns>List of ServiceInformation, describing the hosted services</returns>
         IList<ServiceInformation> GetServiceInfo();
     }
 }
