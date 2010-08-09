@@ -15,9 +15,7 @@ namespace Topshelf.Bottles
     using System;
     using System.Configuration;
     using System.IO;
-    using Configuration.Dsl;
     using Magnum.FileSystem;
-    using Shelving;
     using Directory = Magnum.FileSystem.Directory;
 
     public class BottleService
@@ -50,20 +48,5 @@ namespace Topshelf.Bottles
             _watcher = null;
             _cleanup.Dispose();
         }
-    }
-
-    public class BottleServiceBootstrapper :
-        Bootstrapper<BottleService>
-    {
-        #region Bootstrapper<BottleService> Members
-
-        public void InitializeHostedService(IServiceConfigurator<BottleService> cfg)
-        {
-            cfg.HowToBuildService(name => new BottleService());
-            cfg.WhenStarted(s => s.Start());
-            cfg.WhenStopped(s => s.Stop());
-        }
-
-        #endregion
     }
 }

@@ -16,7 +16,6 @@ namespace Topshelf
     using System.IO;
     using Configuration;
     using log4net;
-    using Magnum.Pipeline;
 
     /// <summary>
     /// Entry point into the Host infrastructure
@@ -24,7 +23,6 @@ namespace Topshelf
     public static class Runner
     {
         static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
-        static readonly ISubscriptionScope _scope;
 
         static Runner()
         {
@@ -42,9 +40,8 @@ namespace Topshelf
         /// </summary>
         public static void Host(RunConfiguration configuration, string[] args)
         {
-            _log.Info("Starting Host");
             if (args.Length > 0)
-                _log.DebugFormat("Arguments: {0}", args);
+                _log.DebugFormat("Command Line Arguments: '{0}'", args);
 
             var a = TopshelfArgumentParser.Parse(args);
             TopshelfDispatcher.Dispatch(configuration, a);

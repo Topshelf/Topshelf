@@ -46,7 +46,7 @@ namespace Topshelf.Hosts
             Console.CancelKeyPress += delegate
                                           {
                                               _log.Info("Control+C detected, exiting.");
-                                              _log.Info("Stopping the service");
+                                              _log.Info("Stopping the Topshelf");
 
                                               _coordinator.Stop(); //user stop
                                               _coordinator.Dispose();
@@ -56,7 +56,7 @@ namespace Topshelf.Hosts
             _coordinator.Start(); //user code starts
 
 
-            _log.InfoFormat("The service is running, press Control+C to exit.");
+            _log.InfoFormat("Topshelf is running, press Control+C to exit.");
 
             WaitHandle.WaitAny(waitHandles); //will wait until a termination trigger occurs
         }
