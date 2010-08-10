@@ -31,7 +31,7 @@ namespace Topshelf.Model
         IServiceCoordinator
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
-        readonly Action<IServiceCoordinator> _beforeStartingHost;
+        readonly Action<IServiceCoordinator> _beforeStartingServices;
         private readonly Action<IServiceCoordinator> _afterStartingServices;
         private readonly Action<IServiceCoordinator> _afterStoppingServices;
 
@@ -56,7 +56,6 @@ namespace Topshelf.Model
                                     Action<IServiceCoordinator> afterStartingServices, Action<IServiceCoordinator> afterStoppingServices,
                                     TimeSpan waitTime)
         {
-            _beforeStoppingServices = GetLogWrapper("BeforeStoppingServices", sc => { });
             _beforeStartingServices = GetLogWrapper("BeforeStartingServices", beforeStartingServices);
             _afterStartingServices = GetLogWrapper("AfterStartingServices", afterStartingServices);
             _afterStoppingServices = GetLogWrapper("AfterStoppingServices", afterStoppingServices);
@@ -89,7 +88,7 @@ namespace Topshelf.Model
 
         public void Start()
         {
-            _beforeStartingHost(this);
+            _beforeStartingServices(this);
 
             ProcessEvent<StartService, ServiceStarted>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
 
@@ -98,8 +97,6 @@ namespace Topshelf.Model
 
         public void Stop()
         {
-            _beforeStoppingServices(this);
-
             ProcessEvent<StopService, ServiceStopped>("Stop", "Stopping", ref ServiceStoppedAction, ServiceState.Stopped);
 
             _afterStoppingServices(this);

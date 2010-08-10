@@ -30,7 +30,7 @@ namespace Topshelf.Host
 
 			RunConfiguration cfg = RunnerConfigurator.New(x =>
 				{
-					x.AfterStoppingTheHost(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
+					x.AfterStoppingServices(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
 
 					x.ConfigureService<TopshelfHostService>(s =>
 						{
