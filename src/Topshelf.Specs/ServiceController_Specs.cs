@@ -34,7 +34,7 @@ namespace Topshelf.Specs
 				_srv = new TestService();
 
 				_channelAdaptor = new ChannelAdapter();
-				_hostChannel = WellknownAddresses.GetHostHost(_channelAdaptor);
+				_hostChannel = WellknownAddresses.GetServiceCoordinatorHost(_channelAdaptor);
 
 				_connection = _channelAdaptor.Connect(config => config.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => startEvent.Set()));
 
@@ -45,7 +45,7 @@ namespace Topshelf.Specs
 				c.WhenContinued(s => { _wasContinued = true; });
 				c.HowToBuildService(name => _srv);
 
-				_serviceController = c.Create();
+				_serviceController = c.Create(WellknownAddresses.GetServiceCoordinatorProxy());
 				_serviceController.Start();
 
 				startEvent.WaitOne(5.Seconds());
@@ -141,7 +141,7 @@ namespace Topshelf.Specs
 			c.WhenStarted(s => s.Start());
 			c.WhenStopped(s => s.Stop());
 
-			IServiceController service = c.Create();
+			IServiceController service = c.Create(WellknownAddresses.GetServiceCoordinatorProxy());
 			service.Start();
 
 			service.State

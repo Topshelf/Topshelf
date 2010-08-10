@@ -18,6 +18,7 @@ namespace Topshelf.Specs.ServiceCoordinator
     using Magnum.Extensions;
     using Magnum.TestFramework;
     using Model;
+    using Shelving;
     using TestObject;
 
 
@@ -34,7 +35,7 @@ namespace Topshelf.Specs.ServiceCoordinator
             ServiceCoordinator.ShelfFaulted += _future.Complete;
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                 {
-                    () => new ServiceController<TestService>("test")
+                    () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
                         {
                             BuildService = s => new TestService(),
                             StartAction = x => { throw new Exception(); },
@@ -42,7 +43,7 @@ namespace Topshelf.Specs.ServiceCoordinator
                             ContinueAction = x => x.Continue(),
                             PauseAction = x => x.Pause()
                         },
-                    () => new ServiceController<TestService>("test2")
+                    () => new ServiceController<TestService>("test2", WellknownAddresses.GetServiceCoordinatorProxy())
                         {
                             BuildService = s => new TestService(),
                             StartAction = x => x.Start(),

@@ -88,11 +88,11 @@ namespace Topshelf.Model
 
         #endregion
 
-        public ServiceController(string serviceName)
+        public ServiceController(string serviceName, UntypedChannel hostChannel)
         {
             Name = serviceName;
 
-            _hostChannel = WellknownAddresses.GetHostChannelProxy();
+            _hostChannel = hostChannel;
             _myChannel = new ChannelAdapter();
 
             _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel, serviceName);

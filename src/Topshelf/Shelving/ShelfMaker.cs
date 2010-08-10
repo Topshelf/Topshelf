@@ -42,9 +42,8 @@ namespace Topshelf.Shelving
             _shelves = new ReaderWriterLockedObject<Dictionary<string, ShelfHandle>>(new Dictionary<string, ShelfHandle>());
 
             _myChannel = new ChannelAdapter();
-            _myChannelHost = WellknownAddresses.GetHostHost(_myChannel);
+            _myChannelHost = WellknownAddresses.GetShelfMakerHost(_myChannel);
 
-            //TODO:this should move to the service coordinator
             _myChannel.Connect(s =>
             {
                 s.AddConsumerOf<ShelfReady>().UsingConsumer(MarkShelfReadyAndInitService);

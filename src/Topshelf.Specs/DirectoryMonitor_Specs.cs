@@ -94,7 +94,7 @@ namespace Topshelf.Specs
 			using (var dm = new DirectoryMonitor("."))
 			{
 				var myChannel = new ChannelAdapter();
-				using (WellknownAddresses.GetHostHost(myChannel))
+				using (WellknownAddresses.GetShelfMakerHost(myChannel))
 				{
 					dm.Start();
 

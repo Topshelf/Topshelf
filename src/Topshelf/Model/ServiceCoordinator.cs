@@ -65,7 +65,7 @@ namespace Topshelf.Model
             _serviceConfigurators = new List<Func<IServiceController>>();
 
             _myChannel = new ChannelAdapter();
-            _hostChannel = WellknownAddresses.GetHostHost(_myChannel);
+            _hostChannel = WellknownAddresses.GetServiceCoordinatorHost(_myChannel);
             _timeout = waitTime;
 
             _myChannel.Connect(s =>
@@ -103,7 +103,6 @@ namespace Topshelf.Model
 
             ProcessEvent<StopService, ServiceStopped>("Stop", "Stopping", ref ServiceStoppedAction, ServiceState.Stopped);
 
-            //TODO: Need to wait for shut down
             _afterStoppingHost(this);
         }
 
@@ -123,7 +122,6 @@ namespace Topshelf.Model
                 CreateServices();
 
             Services.Where(x => x.Name == name).First().ControllerChannel.Send(new StartService());
-            //TODO:need a way to pause here
         }
 
         public void StopService(string name)

@@ -35,7 +35,7 @@ namespace Topshelf.FileSystem
         public DirectoryMonitor(string directory)
         {
             _baseDir = directory;
-            _hostChannel = WellknownAddresses.GetHostChannelProxy();
+            _hostChannel = WellknownAddresses.GetShelfMakerProxy();
         }
 
         public void Start()

@@ -32,7 +32,7 @@ namespace Topshelf.Shelving
 
         public Shelf(Type bootstraper)
         {
-            _hostChannel = WellknownAddresses.GetHostChannelProxy();
+            _hostChannel = WellknownAddresses.GetShelfMakerProxy();
             _myChannelAdpator = new ChannelAdapter();
             _myChannel = WellknownAddresses.GetCurrentShelfHost(_myChannelAdpator);
             _bootstrapperType = bootstraper;
@@ -61,8 +61,8 @@ namespace Topshelf.Shelving
                 SendFault(ex);
             }
         }
-
-        //Converts the cfg to the closed type from the object type
+        
+        
 // ReSharper disable UnusedMember.Local
         void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
 // ReSharper restore UnusedMember.Local
@@ -70,7 +70,7 @@ namespace Topshelf.Shelving
         {
             bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
-            _controller = cfg.Create(AppDomain.CurrentDomain.FriendlyName);
+            _controller = cfg.Create(AppDomain.CurrentDomain.FriendlyName, _hostChannel);
         }
 
         public static Type FindBootstrapperImplementationType(Type bootstrapper)

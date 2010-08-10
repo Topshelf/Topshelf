@@ -16,9 +16,10 @@ namespace Topshelf.Specs.ServiceCoordinator
     using System.Collections.Generic;
     using System.Threading;
     using Magnum.Extensions;
-    using Topshelf.Model;
+    using Shelving;
+    using Model;
     using NUnit.Framework;
-    using Topshelf.Specs.TestObject;
+    using TestObject;
 
 
     [TestFixture]
@@ -36,7 +37,7 @@ namespace Topshelf.Specs.ServiceCoordinator
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
                                                            () =>
-                                                           new ServiceController<TestService>("test")
+                                                           new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
                                                            {
                                                                BuildService = s=> _service,
                                                                StartAction = x => x.Start(),
@@ -45,7 +46,7 @@ namespace Topshelf.Specs.ServiceCoordinator
                                                                PauseAction = x => x.Pause()
                                                            },
                                                            () =>
-                                                           new ServiceController<TestService2>("test2")
+                                                           new ServiceController<TestService2>("test2", WellknownAddresses.GetServiceCoordinatorProxy())
                                                            {
                                                                BuildService = s=> _service2,
                                                                StartAction = x => x.Start(),

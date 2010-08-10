@@ -20,9 +20,17 @@ namespace Topshelf.Shelving
 
     public static class WellknownAddresses
     {
-        public static WcfChannelHost GetHostHost(UntypedChannel hostProxy)
+        const string ServiceCoordinatorEndpoint = "ServiceCoordinator";
+        const string ShelfMakerEndpoint = "ShelfMaker";
+
+        public static WcfChannelHost GetServiceCoordinatorHost(UntypedChannel hostProxy)
         {
-            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress(GetHostPipeName()), "host");
+            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress(GetServiceControllerPipeName()), ServiceCoordinatorEndpoint);
+        }
+
+        public static WcfChannelHost GetShelfMakerHost(UntypedChannel hostProxy)
+        {
+            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress(GetShelfMakerPipeName()), ShelfMakerEndpoint);
         }
 
         public static WcfChannelHost GetCurrentShelfHost(ChannelAdapter myChannel)
@@ -54,9 +62,26 @@ namespace Topshelf.Shelving
                                        serviceName);
         }
 
-        public static UntypedChannel GetHostChannelProxy()
+        public static UntypedChannel GetServiceCoordinatorProxy()
         {
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetHostPipeName()), "host");
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetServiceControllerPipeName()),
+                                       ServiceCoordinatorEndpoint);
+        }
+        
+        static string GetServiceControllerPipeName()
+        {
+            return "{0}/servicecontroller".FormatWith(GetPid());
+        }
+
+        public static UntypedChannel GetShelfMakerProxy()
+        {
+            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfMakerPipeName()),
+                                       ShelfMakerEndpoint);
+        }
+
+        static string GetShelfMakerPipeName()
+        {
+            return "{0}/shelfmaker".FormatWith(GetPid());
         }
 
         static string GetShelfPipeName(string name)
@@ -67,11 +92,6 @@ namespace Topshelf.Shelving
         static string GetThisShelfPipeName()
         {
             return "{0}/{1}".FormatWith(GetPid(), GetFolder());
-        }
-
-        static string GetHostPipeName()
-        {
-            return "{0}/host".FormatWith(GetPid());
         }
 
         static Uri GetBaseAddress(string name)
