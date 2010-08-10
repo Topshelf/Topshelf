@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -15,26 +15,34 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using Model;
 
+
     public class ServiceConfiguratorBase<TService> :
         IDisposable
     {
-        protected Action<TService> _continueAction = NoOp;
-        
         bool _disposed;
-        protected string _name;
-        protected Action<TService> _pauseAction = NoOp;
-        protected Action<TService> _startAction = NoOp;
-        protected Action<TService> _stopAction = NoOp;
 
-        protected ServiceBuilder _buildAction = name =>
-        {
-            var asl = new ActivatorServiceLocator();
-            return asl.GetInstance<TService>(name);
-        };
+        public string Name { get; protected set; }
+        public Action<TService> ContinueAction { get; private set; }
+        public Action<TService> PauseAction { get; private set; }
+        public Action<TService> StartAction { get; private set; }
+        public Action<TService> StopAction { get; private set; }
+
+        public ServiceBuilder BuildAction { get; private set; }
 
         public ServiceConfiguratorBase()
         {
-            _name = "{0}:{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
+            PauseAction = NoOp;
+            StartAction = NoOp;
+            StopAction = NoOp;
+            ContinueAction = NoOp;
+
+            BuildAction = name =>
+                {
+                    var asl = new ActivatorServiceLocator();
+                    return asl.GetInstance<TService>(name);
+                };
+
+            Name = "{0}/{1}".FormatWith(typeof(TService).Name,  Guid.NewGuid());
         }
 
         #region IDisposable Members
@@ -49,44 +57,46 @@ namespace Topshelf.Configuration.Dsl
 
         public void Named(string name)
         {
-            _name = name;
+            Name = name;
         }
 
         public void WhenStarted(Action<TService> startAction)
         {
-            _startAction = startAction;
+            StartAction = startAction;
         }
 
         public void WhenStopped(Action<TService> stopAction)
         {
-            _stopAction = stopAction;
+            StopAction = stopAction;
         }
 
         public void WhenPaused(Action<TService> pauseAction)
         {
-            _pauseAction = pauseAction;
+            PauseAction = pauseAction;
         }
 
         public void WhenContinued(Action<TService> continueAction)
         {
-            _continueAction = continueAction;
+            ContinueAction = continueAction;
         }
 
         public void HowToBuildService(ServiceBuilder builder)
         {
-            _buildAction = builder;
+            BuildAction = builder;
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposing) return;
-            if (_disposed) return;
+            if (!disposing)
+                return;
+            if (_disposed)
+                return;
 
-            _startAction = null;
-            _stopAction = null;
-            _pauseAction = null;
-            _continueAction = null;
-            _buildAction = null;
+            StartAction = null;
+            StopAction = null;
+            PauseAction = null;
+            ContinueAction = null;
+            BuildAction = null;
 
             _disposed = true;
         }

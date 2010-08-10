@@ -13,14 +13,19 @@
 namespace Topshelf.Model
 {
     using System;
+    using Magnum.Channels;
 
     public interface IServiceController :
         IDisposable
     {
         Type ServiceType { get; }
-        string Name { get; set; }
+        string Name { get; }
         ServiceState State { get; }
         ServiceBuilder BuildService { get; }
+
+        UntypedChannel ControllerChannel { get; }
+
+        void Initialize();
         void Start();
         void Stop();
         void Pause();

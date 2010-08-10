@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -16,6 +16,8 @@ namespace Topshelf.Configuration.Dsl
     using System.Collections.Generic;
     using System.ServiceProcess;
     using Model;
+    using Shelving;
+
 
     public class RunnerConfigurator :
         IRunnerConfigurator
@@ -73,7 +75,7 @@ namespace Topshelf.Configuration.Dsl
         /// <param name="serviceName">The name of the service.</param>
         public void SetServiceName(string serviceName)
         {
-            _winServiceSettings.ServiceName = serviceName;
+            _winServiceSettings.ServiceName = new ServiceName(serviceName);
         }
 
         /// <summary>
@@ -142,32 +144,15 @@ namespace Topshelf.Configuration.Dsl
         /// Configures a service using the specified configuration action or set of configuration actions.
         /// </summary>
         /// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-        /// <param name="name">The name used to identify the service</param>
         /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
         public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
         {
             var configurator = new ServiceConfigurator<TService>();
             _serviceConfigurators.Add(() =>
-            {
-                action(configurator);
-                return configurator.Create();
-            });
-        }
-
-        /// <summary>
-        /// Configures an isolated service using the specified configuration action or set of configuration actions.
-        /// </summary>
-        /// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
-        /// <param name="name">The name used to identify the service</param>
-        /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-        public void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action) where TService : class
-        {
-            var configurator = new IsolatedServiceConfigurator<TService>();
-            _serviceConfigurators.Add(() =>
-            {
-                action(configurator);
-                return configurator.Create();
-            });
+                {
+                    action(configurator);
+                    return configurator.Create(WellknownAddresses.GetServiceCoordinatorProxy());
+                });
         }
 
         /// <summary>
@@ -221,26 +206,15 @@ namespace Topshelf.Configuration.Dsl
         }
 
         /// <summary>
-        /// Configures an isolated service using the default configuration.
-        /// </summary>
-        /// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
-        public void ConfigureServiceInIsolation<TService>()
-            where TService : MarshalByRefObject
-        {
-            ConfigureServiceInIsolation<TService>(x => { });
-        }
-
-        /// <summary>
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
         void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+                return;
             if (disposing)
-            {
                 _serviceConfigurators.Clear();
-            }
             _disposed = true;
         }
 
@@ -250,10 +224,10 @@ namespace Topshelf.Configuration.Dsl
             serviceCoordinator.RegisterServices(_serviceConfigurators);
             _winServiceSettings.Credentials = _credentials;
             var cfg = new RunConfiguration
-                      {
-                          WinServiceSettings = _winServiceSettings,
-                          Coordinator = serviceCoordinator
-                      };
+                {
+                    WinServiceSettings = _winServiceSettings,
+                    Coordinator = serviceCoordinator
+                };
 
             return cfg;
         }

@@ -26,13 +26,6 @@ namespace Topshelf.Configuration.Dsl
         void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class;
 
         /// <summary>
-        /// Configures an isolated service using the specified configuration action or set of configuration actions.
-        /// </summary>
-        /// <typeparam name="TService">The type of the isolated service that will be configured.</typeparam>
-        /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
-        void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action) where TService : class;
-
-        /// <summary>
         /// Sets the display name of the service within the Service Control Manager.
         /// </summary>
         /// <param name="displayName">The display name of the service.</param>

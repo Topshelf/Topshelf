@@ -12,12 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Configuration;
     using Magnum.CommandLineParser;
 
     public static class TopshelfArgumentParser
     {
+        public static TopshelfArguments Parse(string[] args)
+        {
+            string argv = args.Aggregate("", (l, r) => "{0} {1}".FormatWith(l, r));
+            return Parse(argv);
+        }
         public static TopshelfArguments Parse(string commandLine)
         {
             var result = new TopshelfArguments();
@@ -30,16 +37,20 @@ namespace Topshelf
         static void Set(TopshelfArguments args, IEnumerable<ICommandLineElement> commandLineElements)
         {
             var command = commandLineElements
-                .Take(1)
-                .Select(x => (IArgumentElement) x)
-                .Select(x => x.Id)
-                .DefaultIfEmpty("commandline")
+                .DefaultIfEmpty(new ArgumentElement("Run"))
+                .ToList()
+                .OfType<IArgumentElement>()
+                .Select(x=>x.Id)
                 .SingleOrDefault();
 
+            args.ActionName = (command ?? "Run").ToEnum<ServiceActionNames>();
 
-            args.Command = command;
-            //leftovers
-            args.CommandArgs = commandLineElements.Skip(1).ToList();
+            args.Instance = commandLineElements
+                .OfType<IDefinitionElement>()
+                .Where(x => x.Key == "instance")
+                .Select(x => x.Value)
+                .DefaultIfEmpty("")
+                .Single();
         }
 
         static IEnumerable<ICommandLineElement> P(string commandLine)

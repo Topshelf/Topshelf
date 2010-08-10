@@ -27,21 +27,20 @@
   <property name="file.custom.step.before" value="${dirs.build_scripts_custom}\${file.current.no_extension}.pre.step" />
   <property name="file.custom.step.after" value="${dirs.build_scripts_custom}\${file.current.no_extension}.post.step" />
   <property name="file.custom.step.replace" value="${dirs.build_scripts_custom}\${file.current.no_extension}.replace.step" />
+  <property name="is.replaced" value="false" />
 
   <target name="go" depends="run_tasks" />
 
   <target name="run_tasks">
     <echo message="Running ${project::get-name()} tasks." />
-    <call target="prepare" if="${target::exists('prepare')}" />
     <call target="custom_tasks_before" if="${target::exists('custom_tasks_before')}"  />
-    <call target="run_normal_tasks" if="${not file::exists(file.custom.step.replace)}" />
-    <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
-    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <call target="custom_tasks_replace" if="${target::exists('custom_tasks_replace')}"  />
+    <call target="run_normal_tasks" if="${not is.replaced}" />
     <call target="custom_tasks_after" if="${target::exists('custom_tasks_after')}" />
   </target>
 
   <target name="run_normal_tasks"
-          depends="build_artifacts, app, web, db, reports, file_server, environment_files, deployment_scripts, settings_files, build_deployment_files, build_info_file, documentation"
+          depends="prepare, build_artifacts, app, web, db, reports, file_server, environment_files, deployment_scripts, settings_files, build_deployment_files, build_info_file, documentation"
           description="Packaging project." />
 
   <target name="prepare">
@@ -53,6 +52,26 @@
   <target name="custom_tasks_before">
     <echo message="Running custom tasks if ${file.custom.step.before} exists." />
     <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.before + '.ps1')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.before + '.ps1')}" />
+    </exec>
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.before + '.rb')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.before + '.rb')}" />
+    </exec>
+  </target>
+
+  <target name="custom_tasks_replace">
+    <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
+    <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace)}" />
+    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.ps1')}" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.replace + '.ps1')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.replace + '.ps1')}" />
+    </exec>
+    <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.rb')}" />
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.replace + '.rb')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.replace + '.rb')}" />
+    </exec>
   </target>
 
   <target name="build_artifacts">
@@ -129,6 +148,13 @@
         <include name="**/*.*" />
       </fileset>
     </copy>
+    
+    <echo message="Packaging output fileserver items to ${dirs.drop}\FileServer."/>
+     <copy todir="${dirs.drop}\FileServer">
+      <fileset basedir="${dirs.build}\${folder.app.drop}\FileServer">
+        <include name="**/**" />
+      </fileset>
+    </copy>
   </target>
 
   <target name="environment_files">
@@ -167,23 +193,23 @@
 
   <target name="build_info_file">
     <echo message="Copying ${file.build_info} to ${folder.build_artifacts}, ${folder.app.drop}, and ${folder.deployment} in the ${dirs.drop} folder."/>
-    
-     <copy
-      file="${file.build_info}"
-      todir="${dirs.drop}\${folder.build_artifacts}"
+
+    <copy
+     file="${file.build_info}"
+     todir="${dirs.drop}\${folder.build_artifacts}"
       />
-    
-     <copy
-      file="${file.build_info}"
-      todir="${dirs.drop}\${folder.app.drop}"
+
+    <copy
+     file="${file.build_info}"
+     todir="${dirs.drop}\${folder.app.drop}"
       />
-    
+
     <copy
       file="${file.build_info}"
       todir="${dirs.drop}\${folder.deployment}"
       />
   </target>
-    
+
   <target name="documentation">
     <echo message="Packaging documentation files to ${dirs.drop}\${folder.documentation}."/>
     <copy todir="${dirs.drop}\${folder.documentation}">
@@ -196,6 +222,12 @@
   <target name="custom_tasks_after">
     <echo message="Running custom tasks if ${file.custom.step.after} exists." />
     <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="false" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.after + '.ps1')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.after + '.ps1')}" />
+    </exec>
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.after + '.rb')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.after + '.rb')}" />
+    </exec>
   </target>
 
 </project>

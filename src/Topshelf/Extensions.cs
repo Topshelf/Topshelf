@@ -17,10 +17,27 @@ namespace Topshelf
 
     public static class Extensions
     {
+        public static E ToEnum<E>(this string label)
+        {
+            return (E) Enum.Parse(typeof (E), label, true);
+        }
 
         public static string FormatWith(this string format, params object[] args)
         {
             return string.Format(format, args);
+        }
+        public static void IfNotNull(this IServiceController serviceController, Action<IServiceController> action)
+        {
+            if (serviceController != null)
+                action(serviceController);
+        }
+
+        public static TT IfNotNull<TT>(this IServiceController serviceController, Func<IServiceController, TT> action, TT ifNull)
+        {
+            if (serviceController != null)
+                return action(serviceController);
+
+            return ifNull;
         }
 
 

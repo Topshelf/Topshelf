@@ -14,7 +14,6 @@ namespace Topshelf
 {
     using System;
     using System.IO;
-    using System.Linq;
     using Configuration;
     using log4net;
 
@@ -23,7 +22,7 @@ namespace Topshelf
     /// </summary>
     public static class Runner
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof(Runner));
+        static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
 
         static Runner()
         {
@@ -41,13 +40,10 @@ namespace Topshelf
         /// </summary>
         public static void Host(RunConfiguration configuration, string[] args)
         {
-            _log.Info("Starting Host");
             if (args.Length > 0)
-                _log.DebugFormat("Arguments: {0}", args);
+                _log.DebugFormat("Command Line Arguments: '{0}'", args);
 
-            //make it so this can be passed in
-            var argv = args.Aggregate("", (l, r) => "{0} {1}".FormatWith(l, r));
-            var a = TopshelfArgumentParser.Parse(argv);
+            var a = TopshelfArgumentParser.Parse(args);
             TopshelfDispatcher.Dispatch(configuration, a);
         }
     }

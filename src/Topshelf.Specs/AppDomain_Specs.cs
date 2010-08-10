@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,53 +12,105 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using System;
+    using System.IO;
+    using System.Threading;
+    using Magnum.Extensions;
     using NUnit.Framework;
+    using Shelving;
+    using Topshelf.Configuration.Dsl;
 
-    //a place to learn about app-domains
+    
     [TestFixture]
     public class AppDomain_Specs
     {
+        [SetUp]
+        public void Setup()
+        {         
+            if (Directory.Exists("Services"))
+                Directory.Delete("Services", true);
+            
+            Directory.CreateDirectory("Services");
+            var bobPath = Path.Combine("Services", "bob");
+            Directory.CreateDirectory(bobPath);
+
+            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
+            DirectoryMonitor_Specs.CopyFileToDir("log4net.dll", bobPath);
+        }
+
+        [TearDown]
+        public void CleanUp()
+        {
+            Directory.Delete("Services", true);
+        }
+
         [Test]
-        public void NAME()
+        public void Init_and_ready_service_in_seperate_app_domain()
         {
-            var settings = AppDomain.CurrentDomain.SetupInformation;
-            settings.ShadowCopyFiles = "true";
-            var ad = AppDomain.CreateDomain("bob", null, settings);
-            var type = typeof (Bill);
-            Func<int> func = () => 3;
-
-            var bill = (Bill)ad.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new []{func}, null, null, null);
-
-            bill.ShouldNotBeNull();
-            bill.Yo.ShouldEqual(3);
-            bill.AppDomainName.ShouldEqual("bob");
-            //bill.ThreadInfo.ShouldEqual("STA"); //fails on the nunit runner which is MTA
-            Bill.Sup.ShouldEqual(2);
-            //AppDomain.CurrentDomain.FriendlyName.ShouldEqual("domain-nunit.addin.dll");
-        }
-    }
-
-    public class Bill : MarshalByRefObject {
-        public Bill(Func<int> i)
-        {
-            Yo = i();
-            Sup = i();
-        }
-        public static int Sup = 2;
-        public int Yo;
-        public string AppDomainName
-        {
-            get { return AppDomain.CurrentDomain.FriendlyName; }
-        }
-        public string ThreadInfo
-        {
-            get
+            using (var sm = new ShelfMaker())
             {
-                var a = System.Threading.Thread.CurrentThread.GetApartmentState();
-                return a.ToString();
+                using (var manualResetEvent = new ManualResetEvent(false))
+                {
+                    sm.OnShelfStateChanged += (sender, args) =>
+                        {
+                            if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
+                                manualResetEvent.Set();
+                        };
+
+                    sm.MakeShelf("bob", typeof (AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+
+                    manualResetEvent.WaitOne(20.Seconds());
+
+                    sm.GetState("bob").ShouldEqual(ShelfState.Ready);
+                }
+            }
+        }
+
+        [Test]
+        public void Stop_a_shelf()
+        {
+            using (var sm = new ShelfMaker())
+            {
+                var readyEvent = new ManualResetEvent(false);
+                var stopEvent = new ManualResetEvent(false);
+
+                sm.OnShelfStateChanged += (sender, args) =>
+                {
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Started)
+                        readyEvent.Set();
+
+                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Stopped)
+                        stopEvent.Set();
+                };
+
+                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+
+                readyEvent.WaitOne(30.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Started);
+
+                sm.StopShelf("bob");
+
+                stopEvent.WaitOne(30.Seconds());
+
+                sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
+
+                //readyEvent.Dispose();
+                //stopEvent.Dispose();
             }
         }
     }
 
+    public class AppDomain_Specs_Bootstrapper :
+        Bootstrapper<object>
+    {
+        public void InitializeHostedService(IServiceConfigurator<object> cfg)
+        {
+            cfg.HowToBuildService(serviceBuilder => new object());
+
+            cfg.WhenStarted(a => { });
+            cfg.WhenStopped(a => { });
+        }
+    }
 }

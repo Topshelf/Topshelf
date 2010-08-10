@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,109 +12,140 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using Model;
-    using NUnit.Framework;
-    using Rhino.Mocks;
-    using TestObject;
-    using Topshelf.Configuration.Dsl;
+	using System.Threading;
+	using Magnum.Channels;
+	using Magnum.Extensions;
+	using Messages;
+	using Model;
+	using NUnit.Framework;
+	using Shelving;
+	using TestObject;
+	using Topshelf.Configuration.Dsl;
 
-    [TestFixture]
-    public class ServiceController_Specs
-    {
-        private IServiceController _serviceController;
-        private TestService _srv;
-        private bool _wasPaused;
-        private bool _wasContinued;
 
-        [SetUp]
-        public void EstablishContext()
-        {
-            _srv = new TestService();
+	[TestFixture]
+	public class ServiceController_Specs
+	{
+		[SetUp]
+		public void EstablishContext()
+		{
+			using (var startEvent = new ManualResetEvent(false))
+			{
+				_srv = new TestService();
 
-            ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>();
-            c.WhenStarted(s => s.Start());
-            c.WhenStopped(s => s.Stop());
-            c.WhenPaused(s => { _wasPaused = true; });
-            c.WhenContinued(s => { _wasContinued = true; });
-            c.HowToBuildService((name)=> _srv);
-            _serviceController = c.Create();
-            _serviceController.Start();
-        }
+				_channelAdaptor = new ChannelAdapter();
+				_hostChannel = WellknownAddresses.GetServiceCoordinatorHost(_channelAdaptor);
 
-        [Test]
-        public void Should_stop()
-        {
-            _serviceController.Stop();
+				_connection = _channelAdaptor.Connect(config => config.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => startEvent.Set()));
 
-            _serviceController.State
-                .ShouldEqual(ServiceState.Stopped);
+				ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>();
+				c.WhenStarted(s => s.Start());
+				c.WhenStopped(s => s.Stop());
+				c.WhenPaused(s => { _wasPaused = true; });
+				c.WhenContinued(s => { _wasContinued = true; });
+				c.HowToBuildService(name => _srv);
 
-            _srv.Stopped
-                .ShouldBeTrue();
-        }
+				_serviceController = c.Create(WellknownAddresses.GetServiceCoordinatorProxy());
+				_serviceController.Start();
 
-        [Test]
-        public void Should_start()
-        {
-            _serviceController.State
-                .ShouldEqual(ServiceState.Started);
+				startEvent.WaitOne(5.Seconds());
 
-            _srv.Stopped
-                .ShouldBeFalse();
-            _srv.Started
-                .ShouldBeTrue();
-        }
+				_serviceController.State.ShouldEqual(ServiceState.Started);
+			}
+		}
 
-        [Test]
-        public void Should_pause()
-        {
-            _serviceController.Pause();
+		[TearDown]
+		public void TearDown()
+		{
+			_connection.Disconnect();
+			_connection.Dispose();
+			_serviceController.Dispose();
+			_hostChannel.Dispose();
+		}
 
-            _serviceController.State
-                .ShouldEqual(ServiceState.Paused);
+		[Test]
+		public void Should_continue()
+		{
+			_serviceController.Pause();
 
-            _wasPaused
-                .ShouldBeTrue();
-        }
+			_serviceController.Continue();
 
-        [Test]
-        public void Should_continue()
-        {
-            _serviceController.Pause();
+			_serviceController.State
+				.ShouldEqual(ServiceState.Started);
+			_wasContinued
+				.ShouldBeTrue();
+		}
 
-            _serviceController.Continue();
+		[Test]
+		public void Should_expose_contained_type()
+		{
+			_serviceController.ServiceType
+				.ShouldEqual(typeof(TestService));
+		}
 
-            _serviceController.State
-                .ShouldEqual(ServiceState.Started);
-            _wasContinued
-                .ShouldBeTrue();
-        }
+		[Test]
+		public void Should_pause()
+		{
+			_serviceController.Pause();
 
-        [Test]
-        public void Should_expose_contained_type()
-        {
-            _serviceController.ServiceType
-                .ShouldEqual(typeof(TestService));
-        }
+			_serviceController.State
+				.ShouldEqual(ServiceState.Paused);
 
-        //TODO: state transition tests
-    }
+			_wasPaused
+				.ShouldBeTrue();
+		}
 
-    [TestFixture]
-    public class SimpleServiceContainerStuff
-    {
-        [Test]
-        public void Should_work()
-        {
-            var c = new ServiceConfigurator<TestService>();
-            c.WhenStarted(s => s.Start());
-            c.WhenStopped(s => s.Stop());
+		[Test]
+		public void Should_start()
+		{
+			_serviceController.State
+				.ShouldEqual(ServiceState.Started);
 
-            var service = c.Create();
-            service.Start();
+			_srv.Stopped
+				.ShouldBeFalse();
+			_srv.Started
+				.ShouldBeTrue();
+		}
 
-            service.State
-                .ShouldEqual(ServiceState.Started);
-        }
-    }
+		[Test]
+		public void Should_stop()
+		{
+			_serviceController.Stop();
+
+			_serviceController.State
+				.ShouldEqual(ServiceState.Stopped);
+
+			_srv.Stopped
+				.ShouldBeTrue();
+		}
+
+		IServiceController _serviceController;
+		TestService _srv;
+		bool _wasPaused;
+		bool _wasContinued;
+		ChannelAdapter _channelAdaptor;
+		WcfChannelHost _hostChannel;
+		ChannelConnection _connection;
+
+		//TODO: state transition tests
+	}
+
+
+	[TestFixture]
+	public class SimpleServiceContainerStuff
+	{
+		[Test]
+		public void Should_work()
+		{
+			var c = new ServiceConfigurator<TestService>();
+			c.WhenStarted(s => s.Start());
+			c.WhenStopped(s => s.Stop());
+
+			IServiceController service = c.Create(WellknownAddresses.GetServiceCoordinatorProxy());
+			service.Start();
+
+			service.State
+				.ShouldEqual(ServiceState.Started);
+		}
+	}
 }

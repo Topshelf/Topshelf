@@ -21,19 +21,22 @@
   <property name="version.uppercut" value="0" />
   <property name="version.revision" value="0" />
   <property name="version.build" value="0" />
+  <property name="allow.powershell.unrestricted" value="false" overwrite="false" />
+  <property name="file.uppercut.assembly" value="uppercut.tasks.dll" />
+  <property name="path.uppercut.assembly" value="${dirs.current}\${file.uppercut.assembly}" />
   <property name="file.custom.step.before" value="${dirs.build_scripts_custom}\${file.current.no_extension}.pre.build" />
   <property name="file.custom.step.after" value="${dirs.build_scripts_custom}\${file.current.no_extension}.post.build" />
   <property name="file.custom.step.replace" value="${dirs.build_scripts_custom}\${file.current.no_extension}.replace.build" />
+  <property name="is.replaced" value="false" />
 
-  <target name="go" depends="report_uppercut_version, run_tasks, report_finish_time" />
+  <target name="go" depends="load_uppercut_assemblies, allow_powershell_unrestricted, report_uppercut_version, run_tasks, report_finish_time" />
 
   <target name="run_tasks">
     <echo message="Running ${project::get-name()} tasks." />
     <call target="prepare" if="${target::exists('prepare')}" />
     <call target="custom_tasks_before" if="${target::exists('custom_tasks_before')}"  />
-    <call target="run_normal_tasks" if="${not file::exists(file.custom.step.replace)}" />
-    <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
-    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <call target="custom_tasks_replace" if="${target::exists('custom_tasks_replace')}"  />
+    <call target="run_normal_tasks" if="${not is.replaced}" />
     <call target="custom_tasks_after" if="${target::exists('custom_tasks_after')}" />
   </target>
 
@@ -44,6 +47,26 @@
   <target name="custom_tasks_before">
     <echo message="Running custom tasks if ${file.custom.step.before} exists." />
     <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.before + '.ps1')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.before + '.ps1')}" />
+    </exec>
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.before + '.rb')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.before + '.rb')}" />
+    </exec>
+  </target>
+
+  <target name="custom_tasks_replace">
+    <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
+    <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace)}" />
+    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.ps1')}" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.replace + '.ps1')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.replace + '.ps1')}" />
+    </exec>
+    <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.rb')}" />
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.replace + '.rb')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.replace + '.rb')}" />
+    </exec>
   </target>
 
   <target name="prepare">
@@ -72,9 +95,10 @@
   </target>
 
   <target name="get_revision">
-    <nant buildfile="${dirs.current}\versioners\svn.step" inheritall="true" if="${source_control_type=='svn'}" />
-    <nant buildfile="${dirs.current}\versioners\tfs.step" inheritall="true" if="${source_control_type=='tfs'}" />
-    <nant buildfile="${dirs.current}\versioners\git.step" inheritall="true" if="${source_control_type=='git'}" />
+    <nant buildfile="${dirs.current}\versioners\svn.step" inheritall="true" if="${source_control_type=='svn'}" failonerror="false" />
+    <nant buildfile="${dirs.current}\versioners\tfs.step" inheritall="true" if="${source_control_type=='tfs'}" failonerror="false" />
+    <nant buildfile="${dirs.current}\versioners\git.step" inheritall="true" if="${source_control_type=='git'}" failonerror="false" />
+    <nant buildfile="${dirs.current}\versioners\hg.step" inheritall="true" if="${source_control_type=='hg'}" failonerror="false" />
     <!--<nant buildfile="${dirs.current}\versioners\vault.step" inheritall="true" if="${source_control_type=='vault'}" />-->
     <!--<nant buildfile="${dirs.current}\versioners\vss.step" inheritall="true" if="${source_control_type=='vss'}" />-->
 
@@ -97,6 +121,12 @@
   <target name="custom_tasks_after">
     <echo message="Running custom tasks if ${file.custom.step.after} exists." />
     <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="false" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.after + '.ps1')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.after + '.ps1')}" />
+    </exec>
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.after + '.rb')}" failonerror="false">
+      <arg value="${path::get-full-path(file.custom.step.after + '.rb')}" />
+    </exec>
   </target>
 
   <target name="report_finish_time">
@@ -110,6 +140,21 @@
       property="version.uppercut"
       failonerror="false" />
     <echo message="Using UppercuT version: ${version.uppercut}." />
+  </target>
+
+  <target name="load_uppercut_assemblies">
+    <loadtasks assembly="${path.uppercut.assembly}" if="${file::exists(path.uppercut.assembly)}" />
+  </target>
+
+  <target name="allow_powershell_unrestricted">
+    <!-- powershell 1.0 -->
+    <exec program="powershell.exe" if="${allow.powershell.unrestricted}" failonerror="false">
+      <arg value="set-executionpolicy unrestricted" />
+    </exec>
+    <!-- powershell 2.0 -->
+    <exec program="powershell.exe" if="${allow.powershell.unrestricted}" failonerror="false">
+      <arg value="set-executionpolicy unrestricted -force -scope CurrentUser" />
+    </exec>
   </target>
 
 </project>

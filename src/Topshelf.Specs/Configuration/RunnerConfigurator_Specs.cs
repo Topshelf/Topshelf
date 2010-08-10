@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -10,10 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-
 namespace Topshelf.Specs.Configuration
 {
     using System.ServiceProcess;
+    using System.Threading;
+    using Magnum.Extensions;
     using Model;
     using NUnit.Framework;
     using TestObject;
@@ -31,46 +32,38 @@ namespace Topshelf.Specs.Configuration
             TestService s1 = new TestService();
             TestService s2 = new TestService();
 
-            _runConfiguration = (RunConfiguration)RunnerConfigurator.New(x =>
-            {
-                x.SetDisplayName("chris");
-                x.SetServiceName("chris");
-                x.SetDescription("chris's pants");
-
-                x.ConfigureService<TestService>(c =>
+            _runConfiguration = RunnerConfigurator.New(x =>
                 {
-                    c.WhenStarted(s => s.Start());
-                    c.WhenStopped(s => s.Stop());
-                    c.WhenPaused(s => { });
-                    c.WhenContinued(s => { });
-                    c.Named("my_service");
+                    x.SetDisplayName("chris");
+                    x.SetServiceName("chris");
+                    x.SetDescription("chris's pants");
+
+                    x.ConfigureService<TestService>(c =>
+                        {
+                            c.WhenStarted(s => s.Start());
+                            c.WhenStopped(s => s.Stop());
+                            c.WhenPaused(s => { });
+                            c.WhenContinued(s => { });
+                            c.Named("my_service");
+                        });
+
+                    x.DoNotStartAutomatically();
+
+                    x.RunAs("dru", "pass");
+
+                    x.DependsOn("ServiceName");
+                    x.DependencyOnMsmq();
+                    x.DependencyOnMsSql();
                 });
-
-                //needs to moved to a custom area for testing
-                //x.ConfigureServiceInIsolation<TestService>(c=>
-                //                                                   {
-                //                                                       c.WhenStarted(s => s.Start());
-                //                                                       c.WhenStopped(s => s.Stop());
-                //                                                       c.WhenPaused(s => { });
-                //                                                       c.WhenContinued(s => { });
-                //                                                       c.HowToBuildService(()=>sl);
-                //                                                   });
-                
-
-                x.DoNotStartAutomatically();
-
-                x.RunAs("dru", "pass");
-
-                //x.UseWinFormHost<MyForm>();
-
-                x.DependsOn("ServiceName");
-                x.DependencyOnMsmq();
-                x.DependencyOnMsSql();
-            });
         }
 
+        [TearDown]
+        public void CleanUp()
+        {
+            _runConfiguration.Coordinator.Dispose();
+        }
 
-        [Test]
+        [Test, Ignore("This test does nothing.")]
         public void A_pretend_void_main()
         {
             string[] args = new string[0];
@@ -98,7 +91,7 @@ namespace Topshelf.Specs.Configuration
             _runConfiguration.WinServiceSettings.FullDisplayName
                 .ShouldEqual("chris");
 
-            _runConfiguration.WinServiceSettings.FullServiceName
+            _runConfiguration.WinServiceSettings.ServiceName.FullName
                 .ShouldEqual("chris");
 
             _runConfiguration.WinServiceSettings.Description
@@ -125,45 +118,6 @@ namespace Topshelf.Specs.Configuration
                 .ShouldEqual(ServiceAccount.User);
         }
 
-		[Test]
-		public void when_specified_service_names_are_used_in_the_service_configuration()
-		{
-			const string serviceName = "service name";
-
-			var runConfiguration = RunnerConfigurator.New(x =>
-			{
-				x.ConfigureService<TestService>(c => c.Named(serviceName));
-			});
-
-			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
-
-			serviceInfo[0].Name.ShouldEqual(serviceName);
-		}
-
-		[Test]
-		public void when_not_specified_service_names_are_assigned()
-		{
-			var runConfiguration = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
-
-			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
-
-			serviceInfo[0].Name.ShouldNotBeNull();
-		}
-
-    	[Test]
-    	public void when_not_specified_automatic_service_names_should_be_unique_for_services_of_the_same_type()
-     	{
-    		var runConfiguration = RunnerConfigurator.New(x =>
-    		{
-				x.ConfigureService<TestService>(c => { });
-    			x.ConfigureService<TestService>(c => { });
-    		});
-            
-    		var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
-            
-			serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
-     	}
-
         [Test]
         public void Hosted_service_configuration()
         {
@@ -171,12 +125,69 @@ namespace Topshelf.Specs.Configuration
             _runConfiguration.Coordinator.HostedServiceCount
                 .ShouldEqual(1);
 
+            Thread.Sleep(1.Seconds());
+
             IServiceController serviceController = _runConfiguration.Coordinator.GetService("my_service");
 
             serviceController.Name
                 .ShouldEqual("my_service");
             serviceController.State
                 .ShouldEqual(ServiceState.Started);
+        }
+    }
+
+    [TestFixture]
+    public class RunnerConfigurator_without_pre_generated_runner_specs 
+    {
+        RunConfiguration _runner;
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (_runner != null)
+            {
+                _runner.Coordinator.Dispose();
+                _runner = null;
+            }
+        }
+
+        [Test]
+        public void when_specified_service_names_are_used_in_the_service_configuration()
+        {
+            const string serviceName = "service name";
+
+            _runner = RunnerConfigurator.New(x =>
+            {
+                x.ConfigureService<TestService>(c => c.Named(serviceName));
+            });
+
+            var serviceInfo = _runner.Coordinator.GetServiceInfo();
+
+            serviceInfo[0].Name.ShouldEqual(serviceName);
+        }
+
+        [Test]
+        public void when_not_specified_service_names_are_assigned()
+        {
+            _runner = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
+
+            var serviceInfo = _runner.Coordinator.GetServiceInfo();
+
+            serviceInfo[0].Name.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void when_not_specified_automatic_service_names_should_be_unique_for_services_of_the_same_type()
+        {
+            _runner = RunnerConfigurator.New(x =>
+            {
+                x.ConfigureService<TestService>(c => { });
+                x.ConfigureService<TestService>(c => { });
+            });
+
+            var serviceInfo = _runner.Coordinator.GetServiceInfo();
+
+            serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
         }
     }
 }

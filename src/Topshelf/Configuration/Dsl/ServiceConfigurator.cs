@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,28 +12,32 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
+    using Magnum.Channels;
     using Model;
+
 
     public class ServiceConfigurator<TService> :
         ServiceConfiguratorBase<TService>,
         IServiceConfigurator<TService>
         where TService : class
     {
-        public IServiceController Create()
+        public IServiceController Create(UntypedChannel hostChannel)
         {
-            IServiceController serviceController = new ServiceController<TService>
-                                                   {
-                                                       StartAction = _startAction,
-                                                       StopAction = _stopAction,
-                                                       PauseAction = _pauseAction,
-                                                       ContinueAction = _continueAction,
-                                                       BuildService = _buildAction,
-                                                       Name = _name,
-                                                   };
+            return Create(Name, hostChannel);
+        }
+
+        public IServiceController Create(string serviceName, UntypedChannel hostChannel)
+        {
+            IServiceController serviceController = new ServiceController<TService>(serviceName, hostChannel)
+                {
+                    StartAction = StartAction,
+                    StopAction = StopAction,
+                    PauseAction = PauseAction,
+                    ContinueAction = ContinueAction,
+                    BuildService = BuildAction,
+                };
 
             return serviceController;
         }
-
-
     }
 }
