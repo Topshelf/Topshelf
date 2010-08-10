@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,17 +12,18 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Bottles
 {
-    using Configuration.Dsl;
-    using Shelving;
+	using Configuration.Dsl;
+	using Shelving;
 
-    public class BottleServiceBootstrapper :
-        Bootstrapper<BottleService>
-    {
-        public void InitializeHostedService(IServiceConfigurator<BottleService> cfg)
-        {
-            cfg.HowToBuildService(name => new BottleService());
-            cfg.WhenStarted(s => s.Start());
-            cfg.WhenStopped(s => s.Stop());
-        }
-    }
+
+	public class BottleServiceBootstrapper :
+		Bootstrapper<BottleService>
+	{
+		public void InitializeHostedService(IServiceConfigurator<BottleService> cfg)
+		{
+			cfg.HowToBuildService(name => new BottleService());
+			cfg.WhenStarted(s => s.Start());
+			cfg.WhenStopped(s => s.Stop());
+		}
+	}
 }

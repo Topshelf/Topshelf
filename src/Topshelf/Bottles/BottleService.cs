@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,41 +12,42 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Bottles
 {
-    using System;
-    using System.Configuration;
-    using System.IO;
-    using Magnum.FileSystem;
-    using Directory = Magnum.FileSystem.Directory;
+	using System;
+	using System.Configuration;
+	using System.IO;
+	using Magnum.FileSystem;
 
-    public class BottleService
-    {
-        IDisposable _cleanup;
-        FileSystem _fs;
-        BottleWatcher _watcher;
 
-        public void Start()
-        {
-            //TODO: how to find the services dir
-            //TODO: how to get the bottles dir
-            //TODO: do we need a custom config?
-            string baseDir = ConfigurationManager.AppSettings["BottlesDirectory"] ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Bottles");
-            _fs = new DotNetFileSystem();
-            Directory bottlesDir = _fs.GetDirectory(baseDir);
-            _watcher = new BottleWatcher();
-            _cleanup = _watcher.Watch(bottlesDir.Name.GetPath(), CopyToServices);
-        }
+	public class BottleService
+	{
+		IDisposable _cleanup;
+		FileSystem _fs;
+		BottleWatcher _watcher;
 
-        void CopyToServices(Directory obj)
-        {
-            string serviceName = obj.Name.GetName();
-            Directory targetDir = _fs.GetDirectory("Services").GetChildDirectory(serviceName);
-            obj.CopyTo(targetDir.Name);
-        }
+		public void Start()
+		{
+			//TODO: how to find the services dir
+			//TODO: how to get the bottles dir
+			//TODO: do we need a custom config?
+			string baseDir = ConfigurationManager.AppSettings["BottlesDirectory"]
+			                 ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Bottles");
+			_fs = new DotNetFileSystem();
+			Magnum.FileSystem.Directory bottlesDir = _fs.GetDirectory(baseDir);
+			_watcher = new BottleWatcher();
+			_cleanup = _watcher.Watch(bottlesDir.Name.GetPath(), CopyToServices);
+		}
 
-        public void Stop()
-        {
-            _watcher = null;
-            _cleanup.Dispose();
-        }
-    }
+		public void Stop()
+		{
+			_watcher = null;
+			_cleanup.Dispose();
+		}
+
+		void CopyToServices(Magnum.FileSystem.Directory obj)
+		{
+			string serviceName = obj.Name.GetName();
+			Magnum.FileSystem.Directory targetDir = _fs.GetDirectory("Services").GetChildDirectory(serviceName);
+			obj.CopyTo(targetDir.Name);
+		}
+	}
 }
