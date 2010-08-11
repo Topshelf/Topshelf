@@ -15,6 +15,7 @@ namespace Topshelf.Shelving
     using System;
     using System.Linq;
     using Configuration.Dsl;
+    using log4net;
     using Magnum.Channels;
     using Magnum.Reflection;
     using Messages;
@@ -29,9 +30,12 @@ namespace Topshelf.Shelving
         readonly UntypedChannel _hostChannel;
         readonly ChannelAdapter _myChannelAdpator;
         readonly WcfChannelHost _myChannel;
+        readonly ILog _log = LogManager.GetLogger(typeof(Shelf));
 
         public Shelf(Type bootstraper)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            
             _hostChannel = WellknownAddresses.GetShelfMakerProxy();
             _myChannelAdpator = new ChannelAdapter();
             _myChannel = WellknownAddresses.GetCurrentShelfHost(_myChannelAdpator);
@@ -40,6 +44,16 @@ namespace Topshelf.Shelving
             _myChannelAdpator.Connect(config => config.AddConsumerOf<ReadyService>().UsingConsumer(msg => Initialize()));
 
             _hostChannel.Send(new ShelfReady());
+        }
+
+        void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "", AppDomain.CurrentDomain.FriendlyName, e.ExceptionObject));
+
+            if (e.IsTerminating && _hostChannel != null)
+            {
+                _hostChannel.Send(new ShelfFault(e.ExceptionObject as Exception));
+            }
         }
 
         void Initialize()

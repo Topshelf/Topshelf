@@ -15,12 +15,13 @@ namespace Topshelf.Specs
     using System.IO;
     using System.Threading;
     using Magnum.Extensions;
+    using Magnum.TestFramework;
     using NUnit.Framework;
     using Shelving;
     using Topshelf.Configuration.Dsl;
 
     
-    [TestFixture]
+    [TestFixture, Explicit]
     public class AppDomain_Specs
     {
         [SetUp]
@@ -67,7 +68,7 @@ namespace Topshelf.Specs
             }
         }
 
-        [Test, Category("slow")]
+        [Test, Slow]
         public void Stop_a_shelf()
         {
             using (var sm = new ShelfMaker())

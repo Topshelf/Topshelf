@@ -18,12 +18,13 @@ namespace Topshelf.Specs
 	using FileSystem;
 	using Magnum.Channels;
 	using Magnum.Extensions;
+	using Magnum.TestFramework;
 	using Messages;
 	using NUnit.Framework;
 	using Shelving;
 
 
-	[TestFixture]
+	[TestFixture, Explicit]
 	public class DirectoryMonitor_Specs
 	{
 		[TearDown]
@@ -60,14 +61,14 @@ namespace Topshelf.Specs
 				string srvDir = Path.Combine(".", "Services");
 				Directory.CreateDirectory(srvDir);
 
-				Console.WriteLine("Starting TopShelf.DirectoryWatcher");
+				//Console.WriteLine("Starting TopShelf.DirectoryWatcher");
 				sm.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
 				dwStarted.WaitOne(20.Seconds());
 				sm.GetState("TopShelf.DirectoryWatcher").ShouldEqual(ShelfState.Started);
-				Console.WriteLine("TopShelf.DirectoryWatcher started");
+				//Console.WriteLine("TopShelf.DirectoryWatcher started");
 
 				// This isn't in setup, because we want the events to fire off to generate the shelf
-				Console.WriteLine("Copying files...");
+				//Console.WriteLine("Copying files...");
 				string bobDir = Path.Combine(srvDir, "bob");
 				Directory.CreateDirectory(bobDir);
 
@@ -76,7 +77,7 @@ namespace Topshelf.Specs
 				CopyFileToDir("Magnum.dll", bobDir);
 				CopyFileToDir("log4net.dll", bobDir);
 				File.Copy("service.config", Path.Combine(bobDir, "bob.config"));
-				Console.WriteLine("Files copied, waiting for bob to start.");
+				//Console.WriteLine("Files copied, waiting for bob to start.");
 
 				// let the service automagically start; using 'Starting' to speed up test
 				bobStaring.WaitOne(20.Seconds());
@@ -105,13 +106,13 @@ namespace Topshelf.Specs
                                                             return; // gotta skip the bottle directory
 
 					                        			long localCount = Interlocked.Increment(ref count);
-					                        			Console.WriteLine(fsc.ShelfName);
+					                        			//Console.WriteLine(fsc.ShelfName);
 					                        			if (localCount%2 == 0)
 					                        				manualResetEvent.Set();
 					                        		}));
 
-					Console.WriteLine(baseDir);
-					Console.WriteLine("-- Directories");
+					//Console.WriteLine(baseDir);
+					//Console.WriteLine("-- Directories");
 
 					Directory.CreateDirectory(Path.Combine(baseDir, "Service1"));
 					Directory.CreateDirectory(Path.Combine(baseDir, "Service2"));
@@ -120,7 +121,7 @@ namespace Topshelf.Specs
 					count.ShouldEqual(2);
 					manualResetEvent.Reset();
 
-					Console.WriteLine("-- Files");
+					//Console.WriteLine("-- Files");
 
                     File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test.out")), "Testing stuff");
 					File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service2", "test.out")), "Testing stuff");
@@ -128,7 +129,7 @@ namespace Topshelf.Specs
 
 					manualResetEvent.WaitOne(10.Seconds());
 
-					Console.WriteLine("-- Done");
+					//Console.WriteLine("-- Done");
 
 					count.ShouldEqual(4);
 				}

@@ -196,7 +196,6 @@ namespace Topshelf.Shelving
             var settings = AppDomain.CurrentDomain.SetupInformation;
             settings.ShadowCopyFiles = "true";
 
-            //TODO: Is this better?
             if (name == "TopShelf.DirectoryWatcher") return settings;
 
             settings.ApplicationBase = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Path.Combine("Services", name));

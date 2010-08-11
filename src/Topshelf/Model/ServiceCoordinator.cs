@@ -56,6 +56,11 @@ namespace Topshelf.Model
                                     Action<IServiceCoordinator> afterStartingServices, Action<IServiceCoordinator> afterStoppingServices,
                                     TimeSpan waitTime)
         {
+            ServiceStartedAction += msg => { };
+            ServiceStoppedAction += msg => { };
+            ServiceContinuedAction += msg => { };
+            ServicePausedAction += msg => { };
+
             _beforeStartingServices = GetLogWrapper("BeforeStartingServices", beforeStartingServices);
             _afterStartingServices = GetLogWrapper("AfterStartingServices", afterStartingServices);
             _afterStoppingServices = GetLogWrapper("AfterStoppingServices", afterStoppingServices);
