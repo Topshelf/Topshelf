@@ -59,7 +59,6 @@
     <nant buildfile="${dirs.current}\analyzers\test.step" inheritall="true" />
     <nant buildfile="${dirs.current}\analyzers\ncover.step" inheritall="true" failonerror="false" />
     <nant buildfile="${dirs.current}\analyzers\ndepend.step" inheritall="true" failonerror="false" />
-    <nant buildfile="${dirs.current}\analyzers\nitriq.step" inheritall="true" failonerror="false" />
     <nant buildfile="${dirs.current}\analyzers\moma.step" inheritall="true" failonerror="false" />
   </target>
 

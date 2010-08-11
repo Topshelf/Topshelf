@@ -21,7 +21,7 @@
   <property name="dirs.test_results" value="${dirs.build_artifacts}\nunit" overwrite="false" />
   <property name="file.test_results" value="index" overwrite="false" />
   <property name="tests.excluded_categories.comma_separated" value="Database,Integration,Slow,NotWorking,Ignore,database,integration,slow,notworking,ignore" overwrite="false" />
-  <property name="test.args" value="/xml=&quot;${dirs.test_results}\nunit-results.xml&quot; /nologo /framework=${microsoft.framework}" />
+  <property name="test.args" value="/xml=&quot;${dirs.test_results}\nunit-results.xml&quot; /nologo /framework=net-3.5" />
   <property name="test.args.exclude" value="/exclude=&quot;${tests.excluded_categories.comma_separated}&quot;" />
   <property name="app.nunit.console" value="${path::get-full-path(dirs.lib)}\NUnit\nunit-console.exe" overwrite="false" />
   <property name="file.custom.step.before" value="${dirs.build_scripts_custom}\${file.current.no_extension}.pre.step" />

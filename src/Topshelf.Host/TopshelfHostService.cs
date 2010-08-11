@@ -32,7 +32,7 @@ namespace Topshelf.Host
 
             Directory.GetDirectories(serviceDir)
                 .ToList()
-                .ConvertAll(Path.GetFileName)
+                .ConvertAll<string>(Path.GetFileName)
                 .ForEach(dir => _shelfMaker.MakeShelf(dir));
         }
 
