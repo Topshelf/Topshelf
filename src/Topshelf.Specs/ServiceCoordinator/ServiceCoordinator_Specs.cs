@@ -14,6 +14,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 {
     using System;
     using System.Collections.Generic;
+    using Magnum.Extensions;
     using Model;
     using NUnit.Framework;
     using Shelving;
@@ -35,7 +36,7 @@ namespace Topshelf.Specs.ServiceCoordinator
             _afterStartingServicesInvoked = false;
             _afterStoppingServicesInvoked = false;
 
-            _serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; }, x => { _afterStartingServicesInvoked = true; }, x => { _afterStoppingServicesInvoked = true; });
+            _serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; }, x => { _afterStartingServicesInvoked = true; }, x => { _afterStoppingServicesInvoked = true; }, 10.Seconds());
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
                                                            () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())

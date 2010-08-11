@@ -33,7 +33,7 @@ namespace Topshelf.Specs.ServiceCoordinator
             _service = new TestService();
             _service2 = new TestService2();
 
-            _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { });
+            _serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
                                                            () =>

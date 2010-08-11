@@ -89,6 +89,33 @@
     <Compile Include="DirectoryMonitor_Specs.cs" />
     <Compile Include="Pipeline_Play.cs" />
     <Compile Include="ServiceController_Specs.cs" />
+    <Compile Include="ServiceCoordinator\Given_a_failing_build_action.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\Given_a_failing_continue_event.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\Given_a_failing_pause_event.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\Given_a_failing_start_event.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\Given_a_failing_stop_event.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\Given_a_partially_failing_start_event.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\ServiceCoordinator_Singles_Specs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\ServiceCoordinator_Specs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ServiceCoordinator\ServiceCoordinator_SpecsBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ServiceTests\Bob.cs" />
     <Compile Include="ShelfConfiguration_Specs.cs" />
     <Compile Include="TestObject\TestService.cs" />
