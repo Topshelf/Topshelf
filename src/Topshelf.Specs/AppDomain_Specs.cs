@@ -67,7 +67,7 @@ namespace Topshelf.Specs
             }
         }
 
-        [Test]
+        [Test, Category("slow")]
         public void Stop_a_shelf()
         {
             using (var sm = new ShelfMaker())
@@ -86,16 +86,16 @@ namespace Topshelf.Specs
 
                 sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                readyEvent.WaitOne(30.Seconds());
+                readyEvent.WaitOne(60.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Started);
 
                 sm.StopShelf("bob");
 
-                stopEvent.WaitOne(30.Seconds());
+                stopEvent.WaitOne(60.Seconds());
 
                 sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
-
+                
                 //readyEvent.Dispose();
                 //stopEvent.Dispose();
             }
