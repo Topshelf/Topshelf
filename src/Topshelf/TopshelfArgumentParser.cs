@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-// 
+// Copyright 2007-2010 The Apache Software Foundation.
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,11 +12,11 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Configuration;
     using Magnum.CommandLineParser;
+
 
     public static class TopshelfArgumentParser
     {
@@ -25,6 +25,7 @@ namespace Topshelf
             string argv = args.Aggregate("", (l, r) => "{0} {1}".FormatWith(l, r));
             return Parse(argv);
         }
+
         public static TopshelfArguments Parse(string commandLine)
         {
             var result = new TopshelfArguments();
@@ -36,11 +37,11 @@ namespace Topshelf
 
         static void Set(TopshelfArguments args, IEnumerable<ICommandLineElement> commandLineElements)
         {
-            var command = commandLineElements
+            string command = commandLineElements
                 .DefaultIfEmpty(new ArgumentElement("Run"))
                 .ToList()
                 .OfType<IArgumentElement>()
-                .Select(x=>x.Id)
+                .Select(x => x.Id)
                 .SingleOrDefault();
 
             args.ActionName = (command ?? "Run").ToEnum<ServiceActionNames>();

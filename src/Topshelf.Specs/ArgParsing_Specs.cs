@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -16,18 +16,18 @@ namespace Topshelf.Specs
     using NUnit.Framework;
     using Topshelf.Configuration;
 
+
     [Scenario]
     public class Given_a_command_line
     {
         protected string CommandLine
         {
-            set
-            {
-                Arguments = TopshelfArgumentParser.Parse(value);
-            }
+            set { Arguments = TopshelfArgumentParser.Parse(value); }
         }
+
         protected TopshelfArguments Arguments { get; set; }
     }
+
 
     [Scenario]
     public class Given_no_command_line :
@@ -44,7 +44,7 @@ namespace Topshelf.Specs
         {
             Arguments.ActionName.ShouldEqual(ServiceActionNames.Run);
         }
-        
+
         [Then]
         public void Instance_should_be_empty()
         {
@@ -52,7 +52,27 @@ namespace Topshelf.Specs
         }
     }
 
-    [Scenario, Explicit("Not Yet Implemented")]
+
+    [Scenario]
+    public class Given_a_dash_parameter :
+        Given_a_command_line
+    {
+        [Given]
+        public void Dash_something_or_other_command_line()
+        {
+            CommandLine = "-SomethingOrOther";
+        }
+
+        [Then]
+        public void Action_should_be_run()
+        {
+            Arguments.ActionName.ShouldEqual(ServiceActionNames.Run);
+        }
+    }
+
+
+    [Scenario]
+    [Explicit("Not Yet Implemented")]
     public class Given_service_install_command_line :
         Given_a_command_line
     {
@@ -74,6 +94,7 @@ namespace Topshelf.Specs
             Arguments.Instance.ShouldBeEmpty();
         }
     }
+
 
     [Scenario]
     public class Give_install_with_an_instance :
