@@ -112,13 +112,11 @@
     <Compile Include="Shelving\ShelfHandle.cs" />
     <Compile Include="Shelving\ShelfState.cs" />
     <Compile Include="Shelving\ShelfStateChangedEventArgs.cs" />
-    <Compile Include="SpecialLoggers.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
     <Compile Include="Exceptions\CouldntBuildServiceException.cs" />
-    <Compile Include="HostPipeline.cs" />
     <Compile Include="Hosts\CommandLineHost.cs" />
     <Compile Include="Hosts\Host.cs" />
     <Compile Include="Hosts\WinServiceHost.cs" />

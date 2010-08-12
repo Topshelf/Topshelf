@@ -15,6 +15,7 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using System.Collections.Generic;
     using System.ServiceProcess;
+    using Magnum.Extensions;
     using Model;
     using Shelving;
 
@@ -27,10 +28,10 @@ namespace Topshelf.Configuration.Dsl
         Action<IServiceCoordinator> _beforeStartingServices = c => { };
         Action<IServiceCoordinator> _afterStartingServices = c => { };
         Action<IServiceCoordinator> _afterStoppingServices = c => { };
+        TimeSpan _timeout = 30.Seconds();
         Credentials _credentials;
         bool _disposed;
-
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="RunnerConfigurator"/> class.
         /// </summary>
@@ -43,94 +44,46 @@ namespace Topshelf.Configuration.Dsl
 
         #region WinServiceSettings
 
-        /// <summary>
-        /// Sets the display name of the service within the Service Control Manager.
-        /// </summary>
-        /// <param name="displayName">The display name of the service.</param>
         public void SetDisplayName(string displayName)
         {
             _winServiceSettings.DisplayName = displayName;
         }
 
-        /// <summary>
-        /// Sets the name of the service.
-        /// </summary>
-        /// <remarks>
-        /// This is the name of the service that will be used when starting or stopping the service from the
-        /// commandline.
-        /// </remarks>
-        /// <example>
-        /// <para>For the following configuration:</para>
-        /// <code><![CDATA[IRunConfiguration config = RunnerConfiguration.New(c =>
-        /// {
-        ///		c.SetDisplayName("MyService");
-        ///	});
-        /// ]]>
-        /// </code>
-        /// <para>the service will be started with the following:</para>
-        /// <code>
-        /// net start MyService
-        /// </code>
-        /// </example>
-        /// <param name="serviceName">The name of the service.</param>
         public void SetServiceName(string serviceName)
         {
             _winServiceSettings.ServiceName = new ServiceName(serviceName);
         }
 
-        /// <summary>
-        /// Sets the description of the service as it will appear in the Service Control Manager.
-        /// </summary>
-        /// <param name="description">The description of the service.</param>
         public void SetDescription(string description)
         {
             _winServiceSettings.Description = description;
         }
 
-        /// <summary>
-        /// We set the service to start automatically by default. This sets the service to manual instead.
-        /// </summary>
         public void DoNotStartAutomatically()
         {
             _winServiceSettings.StartMode = ServiceStartMode.Manual;
         }
 
-        /// <summary>
-        /// Registers a dependency on a named Windows service that must start before this service.
-        /// </summary>
-        /// <param name="serviceName">The name of the service that must start before this service.</param>
         public void DependsOn(string serviceName)
         {
             _winServiceSettings.Dependencies.Add(serviceName);
         }
 
-        /// <summary>
-        /// Registers a dependency on the Microsoft Message Queue service.
-        /// </summary>
         public void DependencyOnMsmq()
         {
             DependsOn(KnownServiceNames.Msmq);
         }
 
-        /// <summary>
-        /// Registers a dependency on the Microsoft SQL Server service.
-        /// </summary>
         public void DependencyOnMsSql()
         {
             DependsOn(KnownServiceNames.SqlServer);
         }
 
-        /// <summary>
-        /// Registers a dependency on the Event Log service.
-        /// </summary>
         public void DependencyOnEventLog()
         {
             DependsOn(KnownServiceNames.EventLog);
         }
 
-        /// <summary>
-        /// Registers a dependency on the Internet Information Server service.
-        /// </summary>
         public void DependencyOnIis()
         {
             DependsOn(KnownServiceNames.IIS);
@@ -140,11 +93,6 @@ namespace Topshelf.Configuration.Dsl
 
         #region IRunnerConfigurator Members
 
-        /// <summary>
-        /// Configures a service using the specified configuration action or set of configuration actions.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-        /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
         public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
         {
             var configurator = new ServiceConfigurator<TService>();
@@ -155,43 +103,24 @@ namespace Topshelf.Configuration.Dsl
                 });
         }
 
-        /// <summary>
-        /// Defines an action to perform before starting the services.
-        /// </summary>
-        /// <remarks>
-        /// This is the best place to set up, for example, any IoC containers.
-        /// </remarks>
-        /// <param name="action">The action that will be performed before the services start.</param>
         public void BeforeStartingServices(Action<IServiceCoordinator> action)
         {
             _beforeStartingServices = action;
         }
 
-        /// <summary>
-        /// Defines an action to perform after starting the services.
-        /// </summary>
-        /// <param name="action">The action that will be performed after the services start.</param>
         public void AfterStartingServices(Action<IServiceCoordinator> action)
         {
             _afterStartingServices = action;
         }
 
-        /// <summary>
-        /// Defines an action to perform after stopping the services.
-        /// </summary>
-        /// <param name="action">The action that will be performed after services stop.</param>
         public void AfterStoppingServices(Action<IServiceCoordinator> action)
         {
             _afterStoppingServices = action;
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
+        public void SetEventTimeout(TimeSpan timeout)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            _timeout = timeout;
         }
 
         #endregion
@@ -208,7 +137,8 @@ namespace Topshelf.Configuration.Dsl
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; 
+        /// <see langword="false"/> to release only unmanaged resources.</param>
         void Dispose(bool disposing)
         {
             if (_disposed)
@@ -218,9 +148,21 @@ namespace Topshelf.Configuration.Dsl
             _disposed = true;
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         RunConfiguration Create()
         {
-            var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, _afterStartingServices, _afterStoppingServices);
+            var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, 
+                                                            _afterStartingServices, 
+                                                            _afterStoppingServices, 
+                                                            _timeout);
             serviceCoordinator.RegisterServices(_serviceConfigurators);
             _winServiceSettings.Credentials = _credentials;
             var cfg = new RunConfiguration
@@ -252,17 +194,11 @@ namespace Topshelf.Configuration.Dsl
 
         #region Credentials
 
-        /// <summary>
-        /// The application will run with the Local System credentials.
-        /// </summary>
         public void RunAsLocalSystem()
         {
             _credentials = Credentials.LocalSystem;
         }
 
-        /// <summary>
-        /// The application will run with the Local System credentials, with the ability to interact with the desktop.
-        /// </summary>
         public void RunAsFromInteractive()
         {
             _credentials = Credentials.Interactive;
@@ -273,29 +209,11 @@ namespace Topshelf.Configuration.Dsl
             _credentials = new Credentials(string.Empty, string.Empty, ServiceAccount.NetworkService);
         }
 
-        /// <summary>
-        /// The application will run with the credentials specified in the commandline arguments.
-        /// </summary>
-        /// <example>
-        /// The commandline arguments should be in the format:
-        /// <code><![CDATA[MyApplication.exe /credentials:username#password]]>
-        /// 	</code>
-        /// This means that <c>#</c> will not be a valid character to use in the password.
-        /// </example>
         public void RunAsFromCommandLine()
         {
             throw new NotImplementedException("soon though");
         }
 
-        /// <summary>
-        /// The application will run with the specified credentials.
-        /// </summary>
-        /// <param name="username">The name of the user that the application will run as.</param>
-        /// <param name="password">The password of the user that the application will run as.</param>
-        /// <remarks>
-        /// If the application is a Windows service, then ensure that the user account has sufficient
-        /// privileges to install and run services.
-        /// </remarks>
         public void RunAs(string username, string password)
         {
             _credentials = Credentials.Custom(username, password);

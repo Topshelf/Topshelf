@@ -148,5 +148,12 @@ namespace Topshelf.Configuration.Dsl
         /// </summary>
         /// <param name="action">The action that will be performed after services stop.</param>
         void AfterStoppingServices(Action<IServiceCoordinator> action);
+
+        /// <summary>
+        /// Sets the length of time the system will wait for events to complete, such as starting or stopping
+        /// services.
+        /// </summary>
+        /// <param name="timeout">The wait timeout</param>
+        void SetEventTimeout(TimeSpan timeout);
     }
 }

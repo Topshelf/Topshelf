@@ -46,15 +46,17 @@ namespace Topshelf.Model
         readonly TimeSpan _timeout;
 
         public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingHost,
-                                  Action<IServiceCoordinator> afterStartingHost, Action<IServiceCoordinator> afterStoppingHost)
+                                  Action<IServiceCoordinator> afterStartingHost, 
+                                  Action<IServiceCoordinator> afterStoppingHost)
             : this(beforeStartingHost, afterStartingHost, afterStoppingHost, 30.Seconds())
         {
         }
 
 
         public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
-                                    Action<IServiceCoordinator> afterStartingServices, Action<IServiceCoordinator> afterStoppingServices,
-                                    TimeSpan waitTime)
+                                  Action<IServiceCoordinator> afterStartingServices, 
+                                  Action<IServiceCoordinator> afterStoppingServices,
+                                  TimeSpan waitTime)
         {
             ServiceStartedAction += msg => { };
             ServiceStoppedAction += msg => { };
