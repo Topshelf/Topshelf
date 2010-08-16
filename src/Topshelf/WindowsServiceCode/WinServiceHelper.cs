@@ -43,7 +43,7 @@ namespace Topshelf.WindowsServiceCode
                                 Description = settings.Description,
                                 DisplayName = settings.FullDisplayName,
                                 ServicesDependedOn = settings.Dependencies.ToArray(),
-                                StartType = ServiceStartMode.Automatic
+                                StartType = settings.StartMode
                             };
 
             return installer;
