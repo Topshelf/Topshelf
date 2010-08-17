@@ -21,7 +21,7 @@ namespace Topshelf.Specs.Configuration
     using Topshelf.Configuration;
     using Topshelf.Configuration.Dsl;
 
-    [TestFixture]
+    [TestFixture, Explicit]
     public class RunnerConfigurator_Specs
     {
         private RunConfiguration _runConfiguration;
@@ -29,9 +29,6 @@ namespace Topshelf.Specs.Configuration
         [SetUp]
         public void EstablishContext()
         {
-            TestService s1 = new TestService();
-            TestService s2 = new TestService();
-
             _runConfiguration = RunnerConfigurator.New(x =>
                 {
                     x.SetDisplayName("chris");

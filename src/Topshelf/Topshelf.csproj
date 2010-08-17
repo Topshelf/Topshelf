@@ -108,6 +108,8 @@
     <Compile Include="Messages\ServiceStopping.cs" />
     <Compile Include="Messages\StartService.cs" />
     <Compile Include="Messages\StopService.cs" />
+    <Compile Include="Shelving\HostHost.cs" />
+    <Compile Include="Shelving\HostProxy.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
     <Compile Include="Shelving\ShelfHandle.cs" />
     <Compile Include="Shelving\ShelfState.cs" />

@@ -76,8 +76,8 @@ namespace Topshelf.Model
 
         #region Messaging Start
 
-        readonly UntypedChannel _hostChannel;
-        readonly WcfChannelHost _myChannelHost;
+        readonly HostProxy _hostChannel;
+        readonly HostHost _myChannelHost;
         readonly ChannelAdapter _myChannel;
         readonly ChannelConnection _connection;
 
@@ -88,7 +88,7 @@ namespace Topshelf.Model
 
         #endregion
 
-        public ServiceController(string serviceName, UntypedChannel hostChannel)
+        public ServiceController(string serviceName, HostProxy hostChannel)
         {
             Name = serviceName;
 

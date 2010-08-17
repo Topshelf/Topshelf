@@ -15,7 +15,6 @@ namespace Topshelf.Shelving
     using System;
     using System.Diagnostics;
     using Magnum.Channels;
-    using Magnum.Fibers;
 
 
     public static class WellknownAddresses
@@ -23,49 +22,48 @@ namespace Topshelf.Shelving
         const string ServiceCoordinatorEndpoint = "ServiceCoordinator";
         const string ShelfMakerEndpoint = "ShelfMaker";
 
-        public static WcfChannelHost GetServiceCoordinatorHost(UntypedChannel hostProxy)
+        public static HostHost GetServiceCoordinatorHost(UntypedChannel hostProxy)
         {
-            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress(GetServiceControllerPipeName()), ServiceCoordinatorEndpoint);
+            return new HostHost(hostProxy, GetBaseAddress(GetServiceControllerPipeName()), ServiceCoordinatorEndpoint);
         }
 
-        public static WcfChannelHost GetShelfMakerHost(UntypedChannel hostProxy)
+        public static HostHost GetShelfMakerHost(UntypedChannel hostProxy)
         {
-            return new WcfChannelHost(new SynchronousFiber(), hostProxy, GetBaseAddress(GetShelfMakerPipeName()), ShelfMakerEndpoint);
+            return new HostHost(hostProxy, GetBaseAddress(GetShelfMakerPipeName()), ShelfMakerEndpoint);
         }
 
-        public static WcfChannelHost GetCurrentShelfHost(ChannelAdapter myChannel)
+        public static HostHost GetCurrentShelfHost(ChannelAdapter myChannel)
         {
             var pipeName = GetThisShelfPipeName();
 
             var address = GetBaseAddress(pipeName);
-            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, "shelf");
+            return new HostHost(myChannel, address, "shelf");
         }
 
-        public static WcfChannelHost GetCurrentServiceHost(ChannelAdapter myChannel, string serviceName)
+        public static HostHost GetCurrentServiceHost(ChannelAdapter myChannel, string serviceName)
         {
             var pipeName = GetThisShelfPipeName();
 
             var address = GetBaseAddress(pipeName);
-            return new WcfChannelHost(new ThreadPoolFiber(), myChannel, address, serviceName);
+            return new HostHost(myChannel, address, serviceName);
         }
 
-        public static WcfChannelProxy GetShelfChannelProxy(AppDomain appDomain)
+        public static HostProxy GetShelfChannelProxy(AppDomain appDomain)
         {
             var friendlyName = appDomain.FriendlyName;
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)), "shelf");
+            return new HostProxy(GetBaseAddress(GetShelfPipeName(friendlyName)), "shelf");
         }
 
-        public static WcfChannelProxy GetServiceChannelProxy(AppDomain appDomain, string serviceName)
+        public static HostProxy GetServiceChannelProxy(AppDomain appDomain, string serviceName)
         {
             var friendlyName = appDomain.FriendlyName;
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfPipeName(friendlyName)),
-                                       serviceName);
+
+            return new HostProxy(GetBaseAddress(GetShelfPipeName(friendlyName)), serviceName);
         }
 
-        public static UntypedChannel GetServiceCoordinatorProxy()
+        public static HostProxy GetServiceCoordinatorProxy()
         {
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetServiceControllerPipeName()),
-                                       ServiceCoordinatorEndpoint);
+            return new HostProxy(GetBaseAddress(GetServiceControllerPipeName()), ServiceCoordinatorEndpoint);
         }
         
         static string GetServiceControllerPipeName()
@@ -73,10 +71,9 @@ namespace Topshelf.Shelving
             return "{0}/servicecontroller".FormatWith(GetPid());
         }
 
-        public static UntypedChannel GetShelfMakerProxy()
+        public static HostProxy GetShelfMakerProxy()
         {
-            return new WcfChannelProxy(new ThreadPoolFiber(), GetBaseAddress(GetShelfMakerPipeName()),
-                                       ShelfMakerEndpoint);
+            return new HostProxy(GetBaseAddress(GetShelfMakerPipeName()), ShelfMakerEndpoint);
         }
 
         static string GetShelfMakerPipeName()

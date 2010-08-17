@@ -22,7 +22,7 @@ namespace Topshelf.Specs.ServiceCoordinator
     using TestObject;
 
 
-    [TestFixture]
+    [TestFixture, Explicit]
     public class ServiceCoordinator_Singles_Specs
     {
         #region Setup/Teardown

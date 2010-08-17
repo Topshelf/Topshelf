@@ -21,7 +21,7 @@ namespace Topshelf.Specs.ServiceCoordinator
     using TestObject;
 
 
-    [TestFixture]
+    [TestFixture, Explicit]
     public class ServiceCoordinator_Specs
     {
         #region Setup/Teardown
@@ -36,7 +36,11 @@ namespace Topshelf.Specs.ServiceCoordinator
             _afterStartingServicesInvoked = false;
             _afterStoppingServicesInvoked = false;
 
-            _serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; }, x => { _afterStartingServicesInvoked = true; }, x => { _afterStoppingServicesInvoked = true; }, 10.Seconds());
+            _serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; }, 
+                                                         x => { _afterStartingServicesInvoked = true; }, 
+                                                         x => { _afterStoppingServicesInvoked = true; }, 
+                                                         10.Seconds());
+
             IList<Func<IServiceController>> services = new List<Func<IServiceController>>
                                                        {
                                                            () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())

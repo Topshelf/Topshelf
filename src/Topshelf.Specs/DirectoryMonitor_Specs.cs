@@ -18,7 +18,6 @@ namespace Topshelf.Specs
 	using FileSystem;
 	using Magnum.Channels;
 	using Magnum.Extensions;
-	using Magnum.TestFramework;
 	using Messages;
 	using NUnit.Framework;
 	using Shelving;

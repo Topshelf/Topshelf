@@ -27,9 +27,9 @@ namespace Topshelf.Shelving
     {
         IServiceController _controller;
         readonly Type _bootstrapperType;
-        readonly UntypedChannel _hostChannel;
+        readonly HostProxy _hostChannel;
         readonly ChannelAdapter _myChannelAdpator;
-        readonly WcfChannelHost _myChannel;
+        readonly HostHost _myChannel;
         readonly ILog _log = LogManager.GetLogger(typeof(Shelf));
 
         public Shelf(Type bootstraper)

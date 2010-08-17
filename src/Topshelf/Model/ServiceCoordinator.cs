@@ -38,7 +38,7 @@ namespace Topshelf.Model
         readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
 
-        readonly WcfChannelHost _hostChannel;
+        readonly HostHost _hostChannel;
         readonly ChannelAdapter _myChannel;
         readonly List<Func<IServiceController>> _serviceConfigurators;
 

@@ -16,25 +16,25 @@ namespace Topshelf.Shelving
     using System.Diagnostics;
     using System.Runtime.Remoting;
     using System.Threading;
-    using Magnum.Channels;
+
 
     [DebuggerDisplay("{ShelfName}: {CurrentState}")]
     public class ShelfHandle :
         IDisposable
     {
-        private WcfChannelProxy _shelfChannel = null;
-		public WcfChannelProxy ShelfChannel
+        private HostProxy _shelfChannel = null;
+        public HostProxy ShelfChannel
         {
             get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
         }
 
-        WcfChannelProxy _serviceChannel = null;
-        public WcfChannelProxy ServiceChannel
+        HostProxy _serviceChannel = null;
+        public HostProxy ServiceChannel
         {
             get { return _serviceChannel ?? (_serviceChannel = ServiceChannelBuilder(AppDomain)); }
         }
-        public Func<AppDomain, WcfChannelProxy> ShelfChannelBuilder { private get; set; }
-        public Func<AppDomain, WcfChannelProxy> ServiceChannelBuilder { private get; set; }
+        public Func<AppDomain, HostProxy> ShelfChannelBuilder { private get; set; }
+        public Func<AppDomain, HostProxy> ServiceChannelBuilder { private get; set; }
 
         // Do we need to hold onto this handle at all?
         internal ObjectHandle ObjectHandle { get; set; }
