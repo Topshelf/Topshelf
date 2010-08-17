@@ -1,0 +1,1549 @@
+NAnt 0.86 (Build 0.86.3412.0; nightly; 5/5/2009)
+Copyright (C) 2001-2009 Gerry Shaw
+http://nant.sourceforge.net
+
+Buildfile: file:///D:/Development/git-topshelf/build/default.build
+Target framework: Microsoft .NET Framework 3.5
+Target(s) specified: go 
+
+
+load_uppercut_assemblies:
+
+[loadtasks] Scanning assembly "uppercut.tasks" for extensions.
+
+allow_powershell_unrestricted:
+
+
+report_uppercut_version:
+
+  [xmlpeek] Peeking at 'D:\Development\git-topshelf\build\UppercuT.xml' with XPath expression '/uppercut/version'.
+  [xmlpeek] Found '1' nodes with the XPath expression '/uppercut/version'.
+     [echo] Using UppercuT version: 0.9.0.346.
+
+run_tasks:
+
+     [echo] Running UppercuTBuild tasks.
+
+prepare:
+
+     [echo] Removing and adding D:\Development\git-topshelf\build\..\build_output.
+   [delete] Deleting directory 'D:\Development\git-topshelf\build_output'.
+    [mkdir] Creating directory 'D:\Development\git-topshelf\build_output'.
+
+custom_tasks_before:
+
+     [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\default.pre.build exists.
+
+custom_tasks_replace:
+
+     [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\default.replace.build exists.
+
+error_check:
+
+
+build:
+
+
+get_revision:
+
+     [nant] D:\Development\git-topshelf\build\versioners\git.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/versioners/git.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running SVNVersioner tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\versioners\..\..\build.custom\versioners\git.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\versioners\..\..\build.custom\versioners\git.replace.step exists.
+            
+            get_revision:
+            
+                 [echo] Getting revision number from working directory D:\Development\git-topshelf\build or remotely at git://github.com/Topshelf/Topshelf.git.
+            Attempting to resolve version. Must have a tag to get versioning from. If you do not, one will be created.
+            D:\Development\git-topshelf\build\versioners
+            Running cmd /c git describe --abbrev=64 on git://github.com/Topshelf/Topshelf.git
+            
+            D:\Development\git-topshelf\build\versioners
+            Running cmd /c git log -1 --pretty=oneline on git://github.com/Topshelf/Topshelf.git
+            
+              [xmlpeek] Peeking at 'D:\Development\git-topshelf\build\versioners\_revision.xml' with XPath expression '/version/revision'.
+              [xmlpeek] Found '1' nodes with the XPath expression '/version/revision'.
+              [xmlpeek] Peeking at 'D:\Development\git-topshelf\build\versioners\_revision.xml' with XPath expression '/version/hash'.
+              [xmlpeek] Found '1' nodes with the XPath expression '/version/hash'.
+               [delete] Deleting file D:\Development\git-topshelf\build\versioners\_revision.xml.
+            
+            get_externally_provided_revision:
+            
+            
+            set_version_environment_variable:
+            
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\versioners\..\..\build.custom\versioners\git.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.5 seconds.
+            
+     [echo] Using revision number: 48 and hash: 9ac846a9281ae314acfe6d696bb25c238e4c37f5.
+
+get_build_number:
+
+     [echo] Using build number 0.
+
+get_drop_directory:
+
+     [echo] Compiled code drop directory will be D:\Development\git-topshelf\code_drop.
+     [nant] D:\Development\git-topshelf\build\policyChecks.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/policyChecks.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running PolicyEnforcer tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\policyChecks.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\policyChecks.replace.step exists.
+            
+            install_document_policy:
+            
+                 [echo] Checking for the existence of D:\Development\git-topshelf\docs\Installation\TopshelfInstallation.doc. Do we fail the build if it is missing? false
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\policyChecks.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\versionBuilder.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/versionBuilder.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running VersionBuilder tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\versionBuilder.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\versionBuilder.replace.step exists.
+            
+            error_check:
+            
+            
+            determine_language:
+            
+            
+            generate_assembly_info:
+            
+                 [echo] Generating SolutionVersion.cs with assembly version 2.0.0.48.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\versionBuilder.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.5 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\generateBuildInfo.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/generateBuildInfo.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running BuildInformation tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\generateBuildInfo.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\generateBuildInfo.replace.step exists.
+            
+            generate_build_info_file:
+            
+                 [echo] Generating XML file with some information to possibly get merged in at D:\Development\git-topshelf\build\..\build_output\_BuildInfo.xml.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\generateBuildInfo.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\compile.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/compile.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running Compiler tasks.
+            
+            check_for_multitargeting:
+            
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\compile.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\compile.replace.step exists.
+            
+            error_check:
+            
+            
+            build_code:
+            
+                 [echo] Compiling D:\Development\git-topshelf\build\..\.\src\Topshelf.sln.
+            
+            build_dotNET_code:
+            
+            
+            build_dotNet_code_framework:
+            
+                 [echo] Building on 3.5
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Topshelf -> D:\Development\git-topshelf\build_output\Topshelf\Topshelf.dll
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   StuffOnAShelf -> D:\Development\git-topshelf\build_output\Topshelf\StuffOnAShelf.dll
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Stuff -> D:\Development\git-topshelf\build_output\Topshelf\Stuff.exe
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Topshelf.Specs -> D:\Development\git-topshelf\build_output\Topshelf\Topshelf.Specs.dll
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Topshelf.Host -> D:\Development\git-topshelf\build_output\Topshelf\Topshelf.Host.exe
+            
+            copy_documentation:
+            
+                 [echo] Building documentation files to D:\Development\git-topshelf\build\..\build_output\docs.
+            
+            copy_db:
+            
+                 [echo] Building database files to D:\Development\git-topshelf\build\..\build_output\Topshelf.Database.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\compile.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\environmentBuilder.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/environmentBuilder.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running EnvironmentBuilder tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\environmentBuilder.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\environmentBuilder.replace.step exists.
+            
+            build_code_environment_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\Topshelf" and building to directory "D:\Development\git-topshelf\build\..\build_output\environment.files".
+            I found settings for "LOCAL" with settings file "LOCAL.settings".
+            
+            build_database_environment_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\Topshelf.Database" and building to directory "D:\Development\git-topshelf\build\..\build_output\Topshelf.Database".
+            I found settings for "LOCAL" with settings file "LOCAL.settings".
+            
+            build_doc_environment_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\docs" and building to directory "D:\Development\git-topshelf\build\..\build_output\docs".
+            I found settings for "LOCAL" with settings file "LOCAL.settings".
+            
+            build_other_documentation_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\docs" and building to directory "D:\Development\git-topshelf\build\..\build_output\docs".
+            I found settings for "LOCAL" with settings file "LOCAL.settings".
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\environmentBuilder.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.2 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\analyze.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/analyze.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running Analyzer tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\analyze.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\analyze.replace.step exists.
+            
+            run_analyzers:
+            
+                 [nant] D:\Development\git-topshelf\build\analyzers\test.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/test.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running TestRunner tasks.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\test.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\test.replace.step exists.
+                        
+                        run_tests:
+                        
+                        
+                        set_normal_failure_mode:
+                        
+                        
+                        run_normal_tasks:
+                        
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\test.post.step exists.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\ncover.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/ncover.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running NCover tasks.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\ncover.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\ncover'.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ncover.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ncover.replace.step exists.
+                        
+                        get_test_dlls:
+                        
+                             [echo] Getting test dlls based on name in directory D:\Development\git-topshelf\build_output\Topshelf.
+                             [echo] Running NCover against these test dlls -  Magnum.TestFramework.dll Topshelf.Specs.dll.
+                        
+                        ncover_explorer:
+                        
+                             [echo] Attempting to run NCoverExplorer. Creating HTML results file at Topshelf.CodeCoverageSummary-results.html and XML results file at Topshelf.CodeCoverageSummary-results.xml.
+                        [ncoverexplorer] No matching coverage files found in the <fileset> specified in your <ncoverexplorer> NAnt task.
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ncover.post.step exists.
+                        
+                        BUILD SUCCEEDED - 1 non-fatal error(s), 0 warning(s)
+                        
+                        Total time: 0.2 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\ndepend.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/ndepend.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running NDepend tasks.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\ndepend.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\ndepend'.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ndepend.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ndepend.replace.step exists.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\ndepend.
+                           [delete] Deleting directory 'D:\Development\git-topshelf\build_output\build_artifacts\ndepend'.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\ndepend'.
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ndepend.post.step exists.
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\nitriq.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/nitriq.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        precheck:
+                        
+                             [echo] Attempting to locate console edition of Nitriq.
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\moma.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/moma.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running Mono Migration Analyzer tasks.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\monoMigrationAnalyzer.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\monoMigrationAnalyzer'.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\moma.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\moma.replace.step exists.
+                        
+                        get_regular_dlls:
+                        
+                             [echo] Getting output dlls based on name in directory D:\Development\git-topshelf\build_output\Topshelf.
+                             [echo] Running Mono Migration Analyzer against these files -  log4net.dll Magnum.dll Stuff.exe StuffOnAShelf.dll Topshelf.dll Topshelf.Host.exe.
+                        
+                        moma:
+                        
+                             [echo] Attempting to run Mono Migration Analyzer. Creating file at Topshelf.MoMAReport.html and logging at Topshelf.moma.log.
+                        
+                        run_normal_tasks:
+                        
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\moma.post.step exists.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 3.5 seconds.
+                        
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\analyze.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 4.2 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\package.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/package.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running PackageBuilder tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\package.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\package.replace.step exists.
+            
+            prepare:
+            
+                 [echo] Removing and adding D:\Development\git-topshelf\build\..\code_drop.
+               [delete] Deleting directory 'D:\Development\git-topshelf\code_drop'.
+                [mkdir] Creating directory 'D:\Development\git-topshelf\code_drop'.
+            
+            build_artifacts:
+            
+                 [echo] Packaging build artifacts (such as test results) to D:\Development\git-topshelf\build\..\code_drop\build_artifacts.
+                 [copy] Copying 7 files to 'D:\Development\git-topshelf\code_drop\build_artifacts'.
+            
+            app:
+            
+                 [echo] Packaging application items to D:\Development\git-topshelf\build\..\code_drop\Topshelf.
+                 [copy] Copying 17 files to 'D:\Development\git-topshelf\code_drop\Topshelf'.
+            
+            web:
+            
+                 [echo] Packaging website to D:\Development\git-topshelf\build\..\code_drop\_PublishedWebSites.
+            
+            db:
+            
+                 [echo] Packaging database files to D:\Development\git-topshelf\build\..\code_drop\Topshelf.Database.
+            
+            reports:
+            
+                 [echo] Packaging reports to D:\Development\git-topshelf\build\..\code_drop\Topshelf.Reports.
+            
+            file_server:
+            
+                 [echo] Packaging file server items to D:\Development\git-topshelf\build\..\code_drop\file.server.
+                 [echo] Packaging output fileserver items to D:\Development\git-topshelf\build\..\code_drop\FileServer.
+            
+            environment_files:
+            
+                 [echo] Packaging environment files to D:\Development\git-topshelf\build\..\code_drop\environment.files.
+            
+            deployment_scripts:
+            
+                 [echo] Packaging deployment scripts to D:\Development\git-topshelf\build\..\code_drop\deployment.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\deployment'.
+            
+            settings_files:
+            
+                 [echo] Packaging settings files to D:\Development\git-topshelf\build\..\code_drop\settings.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\settings'.
+            
+            build_deployment_files:
+            
+                 [echo] Building Deployment Files.
+                 [nant] D:\Development\git-topshelf\build\deploymentBuilder.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/deploymentBuilder.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running DeploymentBuilder tasks.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\deploymentBuilder.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\deploymentBuilder.replace.step exists.
+                        
+                        build_deployments:
+                        
+                        Looking for template files starting in "D:\Development\git-topshelf\build\..\deployment\templates" and building to directory "D:\Development\git-topshelf\build\..\code_drop\deployment".
+                        I found settings for "LOCAL" with settings file "LOCAL.settings".
+                        Copying file "AppDeployment.bat" to directory "D:\Development\git-topshelf\code_drop\deployment" as "LOCAL.AppDeployment.bat".
+                        Copying file "DBDeployment.bat" to directory "D:\Development\git-topshelf\code_drop\deployment" as "LOCAL.DBDeployment.bat".
+                        Copying file "DBDeployment.RESTORE.bat" to directory "D:\Development\git-topshelf\code_drop\deployment" as "LOCAL.DBDeployment.RESTORE.bat".
+                        
+                        run_normal_tasks:
+                        
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\deploymentBuilder.post.step exists.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+            
+            build_info_file:
+            
+                 [echo] Copying D:\Development\git-topshelf\build\..\build_output\_BuildInfo.xml to build_artifacts, Topshelf, and deployment in the D:\Development\git-topshelf\build\..\code_drop folder.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\build_artifacts'.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\Topshelf'.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\deployment'.
+            
+            documentation:
+            
+                 [echo] Packaging documentation files to D:\Development\git-topshelf\build\..\code_drop\docs.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\package.post.step exists.
+                 [nant] D:\Development\git-topshelf\build.custom\package.post.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build.custom/package.post.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        move_samples:
+                        
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\code_drop\Topshelf\samples'.
+                             [move] 10 files moved.
+                           [delete] Deleting directory 'D:\Development\git-topshelf\code_drop\Topshelf\Bottle'.
+                        
+                        build_ilmerge:
+                        
+                             [copy] Copying 2 files to 'D:\Development\git-topshelf\code_drop\ilmerge'.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.7 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\gemsPrepare.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/gemsPrepare.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\gemsBuild.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/gemsBuild.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+
+run_normal_tasks:
+
+
+custom_tasks_after:
+
+     [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\default.post.build exists.
+
+report_finish_time:
+
+     [echo] Build finished at 08/17/2010 08:14:47 with UppercuT version 0.9.0.346.
+
+go:
+
+
+BUILD SUCCEEDED
+
+Total time: 7.8 seconds.
+
+NAnt 0.86 (Build 0.86.3412.0; nightly; 5/5/2009)
+Copyright (C) 2001-2009 Gerry Shaw
+http://nant.sourceforge.net
+
+Buildfile: file:///D:/Development/git-topshelf/build/default.build
+Target framework: Microsoft .NET Framework 3.5
+Target(s) specified: go 
+
+
+load_uppercut_assemblies:
+
+[loadtasks] Scanning assembly "uppercut.tasks" for extensions.
+
+allow_powershell_unrestricted:
+
+
+report_uppercut_version:
+
+  [xmlpeek] Peeking at 'D:\Development\git-topshelf\build\UppercuT.xml' with XPath expression '/uppercut/version'.
+  [xmlpeek] Found '1' nodes with the XPath expression '/uppercut/version'.
+     [echo] Using UppercuT version: 0.9.0.346.
+
+run_tasks:
+
+     [echo] Running UppercuTBuild tasks.
+
+prepare:
+
+     [echo] Removing and adding D:\Development\git-topshelf\build\..\build_output.
+   [delete] Deleting directory 'D:\Development\git-topshelf\build_output'.
+    [mkdir] Creating directory 'D:\Development\git-topshelf\build_output'.
+
+custom_tasks_before:
+
+     [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\default.pre.build exists.
+
+custom_tasks_replace:
+
+     [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\default.replace.build exists.
+
+error_check:
+
+
+build:
+
+
+get_revision:
+
+     [nant] D:\Development\git-topshelf\build\versioners\git.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/versioners/git.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running SVNVersioner tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\versioners\..\..\build.custom\versioners\git.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\versioners\..\..\build.custom\versioners\git.replace.step exists.
+            
+            get_revision:
+            
+                 [echo] Getting revision number from working directory D:\Development\git-topshelf\build or remotely at git://github.com/Topshelf/Topshelf.git.
+            Attempting to resolve version. Must have a tag to get versioning from. If you do not, one will be created.
+            D:\Development\git-topshelf\build\versioners
+            Running cmd /c git describe --abbrev=64 on git://github.com/Topshelf/Topshelf.git
+            
+            D:\Development\git-topshelf\build\versioners
+            Running cmd /c git log -1 --pretty=oneline on git://github.com/Topshelf/Topshelf.git
+            
+              [xmlpeek] Peeking at 'D:\Development\git-topshelf\build\versioners\_revision.xml' with XPath expression '/version/revision'.
+              [xmlpeek] Found '1' nodes with the XPath expression '/version/revision'.
+              [xmlpeek] Peeking at 'D:\Development\git-topshelf\build\versioners\_revision.xml' with XPath expression '/version/hash'.
+              [xmlpeek] Found '1' nodes with the XPath expression '/version/hash'.
+               [delete] Deleting file D:\Development\git-topshelf\build\versioners\_revision.xml.
+            
+            get_externally_provided_revision:
+            
+            
+            set_version_environment_variable:
+            
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\versioners\..\..\build.custom\versioners\git.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.5 seconds.
+            
+     [echo] Using revision number: 48 and hash: 9ac846a9281ae314acfe6d696bb25c238e4c37f5.
+
+get_build_number:
+
+     [echo] Using build number 0.
+
+get_drop_directory:
+
+     [echo] Compiled code drop directory will be D:\Development\git-topshelf\code_drop.
+     [nant] D:\Development\git-topshelf\build\policyChecks.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/policyChecks.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running PolicyEnforcer tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\policyChecks.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\policyChecks.replace.step exists.
+            
+            install_document_policy:
+            
+                 [echo] Checking for the existence of D:\Development\git-topshelf\docs\Installation\TopshelfInstallation.doc. Do we fail the build if it is missing? false
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\policyChecks.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\versionBuilder.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/versionBuilder.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running VersionBuilder tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\versionBuilder.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\versionBuilder.replace.step exists.
+            
+            error_check:
+            
+            
+            determine_language:
+            
+            
+            generate_assembly_info:
+            
+                 [echo] Generating SolutionVersion.cs with assembly version 2.0.0.48.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\versionBuilder.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.5 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\generateBuildInfo.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/generateBuildInfo.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running BuildInformation tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\generateBuildInfo.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\generateBuildInfo.replace.step exists.
+            
+            generate_build_info_file:
+            
+                 [echo] Generating XML file with some information to possibly get merged in at D:\Development\git-topshelf\build\..\build_output\_BuildInfo.xml.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\generateBuildInfo.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\compile.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/compile.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running Compiler tasks.
+            
+            check_for_multitargeting:
+            
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\compile.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\compile.replace.step exists.
+            
+            error_check:
+            
+            
+            build_code:
+            
+                 [echo] Compiling D:\Development\git-topshelf\build\..\.\src\Topshelf.sln.
+            
+            build_dotNET_code:
+            
+            
+            build_dotNet_code_framework:
+            
+                 [echo] Building on 3.5
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Topshelf -> D:\Development\git-topshelf\build_output\Topshelf\Topshelf.dll
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   StuffOnAShelf -> D:\Development\git-topshelf\build_output\Topshelf\StuffOnAShelf.dll
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Stuff -> D:\Development\git-topshelf\build_output\Topshelf\Stuff.exe
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Topshelf.Specs -> D:\Development\git-topshelf\build_output\Topshelf\Topshelf.Specs.dll
+              [msbuild] Project file contains ToolsVersion="4.0", which is not supported by this version of MSBuild. Treating the project as if it had ToolsVersion="3.5".
+              [msbuild] CopyFilesToOutputDirectory:
+              [msbuild]   Topshelf.Host -> D:\Development\git-topshelf\build_output\Topshelf\Topshelf.Host.exe
+            
+            copy_documentation:
+            
+                 [echo] Building documentation files to D:\Development\git-topshelf\build\..\build_output\docs.
+            
+            copy_db:
+            
+                 [echo] Building database files to D:\Development\git-topshelf\build\..\build_output\Topshelf.Database.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\compile.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.9 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\environmentBuilder.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/environmentBuilder.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running EnvironmentBuilder tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\environmentBuilder.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\environmentBuilder.replace.step exists.
+            
+            build_code_environment_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\Topshelf" and building to directory "D:\Development\git-topshelf\build\..\build_output\environment.files".
+            
+            build_database_environment_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\Topshelf.Database" and building to directory "D:\Development\git-topshelf\build\..\build_output\Topshelf.Database".
+            
+            build_doc_environment_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\docs" and building to directory "D:\Development\git-topshelf\build\..\build_output\docs".
+            
+            build_other_documentation_files:
+            
+            Looking for template files starting in "D:\Development\git-topshelf\build\..\build_output\docs" and building to directory "D:\Development\git-topshelf\build\..\build_output\docs".
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\environmentBuilder.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.1 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\analyze.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/analyze.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running Analyzer tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\analyze.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\analyze.replace.step exists.
+            
+            run_analyzers:
+            
+                 [nant] D:\Development\git-topshelf\build\analyzers\test.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/test.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running TestRunner tasks.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\test.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\test.replace.step exists.
+                        
+                        run_tests:
+                        
+                        
+                        set_normal_failure_mode:
+                        
+                        
+                        run_normal_tasks:
+                        
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\test.post.step exists.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\ncover.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/ncover.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running NCover tasks.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\ncover.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\ncover'.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ncover.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ncover.replace.step exists.
+                        
+                        get_test_dlls:
+                        
+                             [echo] Getting test dlls based on name in directory D:\Development\git-topshelf\build_output\Topshelf.
+                             [echo] Running NCover against these test dlls -  Magnum.TestFramework.dll Topshelf.Specs.dll.
+                        
+                        ncover_explorer:
+                        
+                             [echo] Attempting to run NCoverExplorer. Creating HTML results file at Topshelf.CodeCoverageSummary-results.html and XML results file at Topshelf.CodeCoverageSummary-results.xml.
+                        [ncoverexplorer] No matching coverage files found in the <fileset> specified in your <ncoverexplorer> NAnt task.
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ncover.post.step exists.
+                        
+                        BUILD SUCCEEDED - 1 non-fatal error(s), 0 warning(s)
+                        
+                        Total time: 0.2 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\ndepend.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/ndepend.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running NDepend tasks.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\ndepend.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\ndepend'.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ndepend.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ndepend.replace.step exists.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\ndepend.
+                           [delete] Deleting directory 'D:\Development\git-topshelf\build_output\build_artifacts\ndepend'.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\ndepend'.
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\ndepend.post.step exists.
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\nitriq.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/nitriq.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        precheck:
+                        
+                             [echo] Attempting to locate console edition of Nitriq.
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+                 [nant] D:\Development\git-topshelf\build\analyzers\moma.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/analyzers/moma.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running Mono Migration Analyzer tasks.
+                        
+                        prepare:
+                        
+                             [echo] Removing and adding D:\Development\git-topshelf\build_output\build_artifacts\monoMigrationAnalyzer.
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\build_output\build_artifacts\monoMigrationAnalyzer'.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\moma.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\moma.replace.step exists.
+                        
+                        get_regular_dlls:
+                        
+                             [echo] Getting output dlls based on name in directory D:\Development\git-topshelf\build_output\Topshelf.
+                             [echo] Running Mono Migration Analyzer against these files -  log4net.dll Magnum.dll Stuff.exe StuffOnAShelf.dll Topshelf.dll Topshelf.Host.exe.
+                        
+                        moma:
+                        
+                             [echo] Attempting to run Mono Migration Analyzer. Creating file at Topshelf.MoMAReport.html and logging at Topshelf.moma.log.
+                        
+                        run_normal_tasks:
+                        
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\analyzers\..\..\build.custom\analyzers\moma.post.step exists.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 3.6 seconds.
+                        
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\analyze.post.step exists.
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 4.3 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\package.step 
+            Buildfile: file:///D:/Development/git-topshelf/build/package.step
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            run_tasks:
+            
+                 [echo] Running PackageBuilder tasks.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\package.pre.step exists.
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\package.replace.step exists.
+            
+            prepare:
+            
+                 [echo] Removing and adding D:\Development\git-topshelf\build\..\code_drop.
+               [delete] Deleting directory 'D:\Development\git-topshelf\code_drop'.
+                [mkdir] Creating directory 'D:\Development\git-topshelf\code_drop'.
+            
+            build_artifacts:
+            
+                 [echo] Packaging build artifacts (such as test results) to D:\Development\git-topshelf\build\..\code_drop\build_artifacts.
+                 [copy] Copying 7 files to 'D:\Development\git-topshelf\code_drop\build_artifacts'.
+            
+            app:
+            
+                 [echo] Packaging application items to D:\Development\git-topshelf\build\..\code_drop\Topshelf.
+                 [copy] Copying 17 files to 'D:\Development\git-topshelf\code_drop\Topshelf'.
+            
+            web:
+            
+                 [echo] Packaging website to D:\Development\git-topshelf\build\..\code_drop\_PublishedWebSites.
+            
+            db:
+            
+                 [echo] Packaging database files to D:\Development\git-topshelf\build\..\code_drop\Topshelf.Database.
+            
+            reports:
+            
+                 [echo] Packaging reports to D:\Development\git-topshelf\build\..\code_drop\Topshelf.Reports.
+            
+            file_server:
+            
+                 [echo] Packaging file server items to D:\Development\git-topshelf\build\..\code_drop\file.server.
+                 [echo] Packaging output fileserver items to D:\Development\git-topshelf\build\..\code_drop\FileServer.
+            
+            environment_files:
+            
+                 [echo] Packaging environment files to D:\Development\git-topshelf\build\..\code_drop\environment.files.
+            
+            deployment_scripts:
+            
+                 [echo] Packaging deployment scripts to D:\Development\git-topshelf\build\..\code_drop\deployment.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\deployment'.
+            
+            settings_files:
+            
+                 [echo] Packaging settings files to D:\Development\git-topshelf\build\..\code_drop\settings.
+            
+            build_deployment_files:
+            
+                 [echo] Building Deployment Files.
+                 [nant] D:\Development\git-topshelf\build\deploymentBuilder.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build/deploymentBuilder.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        run_tasks:
+                        
+                             [echo] Running DeploymentBuilder tasks.
+                        
+                        custom_tasks_before:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\deploymentBuilder.pre.step exists.
+                        
+                        custom_tasks_replace:
+                        
+                             [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\deploymentBuilder.replace.step exists.
+                        
+                        build_deployments:
+                        
+                        Looking for template files starting in "D:\Development\git-topshelf\build\..\deployment\templates" and building to directory "D:\Development\git-topshelf\build\..\code_drop\deployment".
+                        
+                        run_normal_tasks:
+                        
+                        
+                        custom_tasks_after:
+                        
+                             [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\deploymentBuilder.post.step exists.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+            
+            build_info_file:
+            
+                 [echo] Copying D:\Development\git-topshelf\build\..\build_output\_BuildInfo.xml to build_artifacts, Topshelf, and deployment in the D:\Development\git-topshelf\build\..\code_drop folder.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\build_artifacts'.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\Topshelf'.
+                 [copy] Copying 1 file to 'D:\Development\git-topshelf\code_drop\deployment'.
+            
+            documentation:
+            
+                 [echo] Packaging documentation files to D:\Development\git-topshelf\build\..\code_drop\docs.
+            
+            run_normal_tasks:
+            
+            
+            custom_tasks_after:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\package.post.step exists.
+                 [nant] D:\Development\git-topshelf\build.custom\package.post.step 
+                        Buildfile: file:///D:/Development/git-topshelf/build.custom/package.post.step
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        move_samples:
+                        
+                            [mkdir] Creating directory 'D:\Development\git-topshelf\code_drop\Topshelf\samples'.
+                             [move] 10 files moved.
+                           [delete] Deleting directory 'D:\Development\git-topshelf\code_drop\Topshelf\Bottle'.
+                        
+                        build_ilmerge:
+                        
+                             [copy] Copying 2 files to 'D:\Development\git-topshelf\code_drop\ilmerge'.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+            
+            go:
+            
+            
+            BUILD SUCCEEDED
+            
+            Total time: 0.7 seconds.
+            
+     [nant] D:\Development\git-topshelf\build\ilmerge.build 
+            Buildfile: file:///D:/Development/git-topshelf/build/ilmerge.build
+            Target framework: Microsoft .NET Framework 3.5
+            Target(s) specified: go 
+            
+            
+            load_uppercut_assemblies:
+            
+            [loadtasks] Scanning assembly "uppercut.tasks" for extensions.
+            
+            allow_powershell_unrestricted:
+            
+            
+            run_tasks:
+            
+                 [echo] Running ILMergeBuilder tasks.
+            
+            prepare:
+            
+                [mkdir] Creating directory 'D:\Development\git-topshelf\code_drop\build_artifacts\ilmerge'.
+                [mkdir] Creating directory 'D:\Development\git-topshelf\code_drop\merge'.
+            
+            custom_tasks_before:
+            
+                 [echo] Running custom tasks if D:\Development\git-topshelf\build\..\build.custom\ilmerge.pre.build exists.
+                 [nant] D:\Development\git-topshelf\build.custom\ilmerge.pre.build 
+                        Buildfile: file:///D:/Development/git-topshelf/build.custom/ilmerge.pre.build
+                        Target framework: Microsoft .NET Framework 3.5
+                        Target(s) specified: go 
+                        
+                        
+                        set_environment_variables:
+                        
+                        
+                        prepare_merge_from_directory:
+                        
+                             [echo] Before merging - Get things into D:\Development\git-topshelf\build\..\code_drop\ilmerge.
+                        
+                        go:
+                        
+                        
+                        BUILD SUCCEEDED
+                        
+                        Total time: 0.1 seconds.
+                        
+            
+            custom_tasks_replace:
+            
+                 [echo] Running custom tasks instead of normal tasks if D:\Development\git-topshelf\build\..\build.custom\ilmerge.replace.build exists.
+            
+            set_environment_variables:
+            
+            
+            error_check:
+            
+            
+            get_regular_dlls:
+            
+                 [echo] Getting output dlls based on name in directory D:\Development\git-topshelf\code_drop\ilmerge.
+            
+            run_ilmerge:
+            
+                 [echo] Merging the the contents of D:\Development\git-topshelf\build\..\code_drop\ilmerge into a single executable - D:\Development\git-topshelf\build\..\code_drop\merge\Topshelf.dll. This will fail if all dependencies are not resolved.
+                 [echo] Running this: D:\Development\git-topshelf\build\..\lib\ILMerge\ILMerge.exe /internalize /target:dll /out:D:\Development\git-topshelf\build\..\code_drop\merge\Topshelf.dll /log:D:\Development\git-topshelf\build\..\code_drop\build_artifacts\ilmerge\ilmerge.log /ndebug /allowDup Topshelf.dll   Magnum.dll
+            
+            BUILD FAILED
+            
+            D:\Development\git-topshelf\build\ilmerge.build(123,6):
+            External Program Failed: D:\Development\git-topshelf\build\..\lib\ILMerge\ILMerge.exe (return code was 1)
+            
+            Total time: 7.6 seconds.
+            
+
+BUILD FAILED
+
+Nested build failed.  Refer to build log for exact reason.
+
+Total time: 15.1 seconds.
+

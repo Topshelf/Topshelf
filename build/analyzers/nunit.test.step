@@ -16,18 +16,24 @@
   <property name="dirs.build.code" value="${dirs.build}\${folder.app.drop}" overwrite="false" />
   <property name="folder.references" value="lib" overwrite="false" />
   <property name="dirs.lib" value="${dirs.current}\${path.to.toplevel}\${folder.references}" overwrite="false" />
+  <property name="microsoft.framework" value="net-3.5" overwrite="false" />
   <property name="folder.build_artifacts" value="build_artifacts" overwrite="false" />
   <property name="dirs.build_artifacts" value="${path::get-full-path(dirs.build)}\${folder.build_artifacts}" />
   <property name="dirs.test_results" value="${dirs.build_artifacts}\nunit" overwrite="false" />
   <property name="file.test_results" value="index" overwrite="false" />
   <property name="tests.excluded_categories.comma_separated" value="Database,Integration,Slow,NotWorking,Ignore,database,integration,slow,notworking,ignore" overwrite="false" />
-  <property name="test.args" value="/xml=&quot;${dirs.test_results}\nunit-results.xml&quot; /nologo /framework=net-3.5" />
+  <property name="test.args" value="/xml=&quot;${dirs.test_results}\nunit-results.xml&quot; /nologo" />
+  <!--property name="test.args" value="/xml=&quot;${dirs.test_results}\nunit-results.xml&quot; /nologo /framework=${microsoft.framework}" /-->
   <property name="test.args.exclude" value="/exclude=&quot;${tests.excluded_categories.comma_separated}&quot;" />
   <property name="app.nunit.console" value="${path::get-full-path(dirs.lib)}\NUnit\nunit-console.exe" overwrite="false" />
+  <property name="dlls.test" value="" />
+  <property name="tests.ran" value="false" />
+  
   <property name="file.custom.step.before" value="${dirs.build_scripts_custom}\${file.current.no_extension}.pre.step" />
   <property name="file.custom.step.after" value="${dirs.build_scripts_custom}\${file.current.no_extension}.post.step" />
   <property name="file.custom.step.replace" value="${dirs.build_scripts_custom}\${file.current.no_extension}.replace.step" />
   <property name="is.replaced" value="false" />
+  <property name="fail.build.on.error" value="true" />
  
   <target name="go" depends="run_tasks" />
 
@@ -48,11 +54,11 @@
 
   <target name="custom_tasks_before">
     <echo message="Running custom tasks if ${file.custom.step.before} exists." />
-    <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
-    <exec program="powershell.exe" if="${file::exists(file.custom.step.before + '.ps1')}" failonerror="false">
+    <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="${fail.build.on.error}" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.before + '.ps1')}" failonerror="${fail.build.on.error}">
       <arg value="${path::get-full-path(file.custom.step.before + '.ps1')}" />
     </exec>
-    <exec program="ruby.exe" if="${file::exists(file.custom.step.before + '.rb')}" failonerror="false">
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.before + '.rb')}" failonerror="${fail.build.on.error}">
       <arg value="${path::get-full-path(file.custom.step.before + '.rb')}" />
     </exec>
   </target>
@@ -60,13 +66,13 @@
   <target name="custom_tasks_replace">
     <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
     <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace)}" />
-    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" failonerror="${fail.build.on.error}" />
     <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.ps1')}" />
-    <exec program="powershell.exe" if="${file::exists(file.custom.step.replace + '.ps1')}" failonerror="false">
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.replace + '.ps1')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.replace + '.ps1')}" />
     </exec>
     <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.rb')}" />
-    <exec program="ruby.exe" if="${file::exists(file.custom.step.replace + '.rb')}" failonerror="false">
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.replace + '.rb')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.replace + '.rb')}" />
     </exec>
   </target>
@@ -87,20 +93,21 @@
     <foreach item="File" property="dll.filename">
       <in>
         <items>
-          <exclude name="${dirs.build.code}\*Database*dll" />
-          <exclude name="${dirs.build.code}\*.Integration*dll" />
-          <exclude name="${dirs.build.code}\TestFu.dll" />
-          <include name="${dirs.build.code}\*Test*dll" />
-          <include name="${dirs.build.code}\*Spec*dll" />
+          <exclude name="${dirs.build.code}\lib\**" />
+          <exclude name="${dirs.build.code}\**\*Database*dll" />
+          <exclude name="${dirs.build.code}\**\*.Integration*dll" />
+          <exclude name="${dirs.build.code}\**\TestFu.dll" />
+          <include name="${dirs.build.code}\**\*Test*dll" />
+          <include name="${dirs.build.code}\**\*Spec*dll" />
         </items>
       </in>
       <do>
-        <property name="dll.names" value="${dll.names + ' ' + path::get-file-name(dll.filename)}" />
+        <property name="dll.names" value="${dll.names + ' ' + string::replace(dll.filename,path::get-full-path(dirs.build.code) + '\','') + ''}" />
       </do>
     </foreach>
 
     <property name="dlls.test" value="${dll.names}" />
-    <echo message="Running NCover against these test dlls - ${dlls.test}." />
+    <echo message="Running NUnit against these test dlls - ${dlls.test}." />
 
     <property name="args.test_runner" value="${dlls.test} ${test.args} ${test.args.exclude}" />
   </target>
@@ -111,39 +118,51 @@
     <foreach item="File" property="dll.filename">
       <in>
         <items>
-          <exclude name="${dirs.build.code}\TestFu.dll" />
-          <include name="${dirs.build.code}\*Test*dll" />
-          <include name="${dirs.build.code}\*Spec*dll" />
+          <exclude name="${dirs.build.code}\lib\**" />
+          <exclude name="${dirs.build.code}\**\TestFu.dll" />
+          <include name="${dirs.build.code}\**\*Test*dll" />
+          <include name="${dirs.build.code}\**\*Spec*dll" />
         </items>
       </in>
       <do>
-        <property name="dll.names" value="${dll.names + ' ' + path::get-file-name(dll.filename)}" />
+        <property name="dll.names" value="${dll.names + ' ' + string::replace(dll.filename,path::get-full-path(dirs.build.code) + '\','') + ''}" />
       </do>
     </foreach>
 
     <property name="dlls.test" value="${dll.names}" />
-    <echo message="Running NCover against these test dlls - ${dlls.test}." />
+    <echo message="Running NUnit against these test dlls - ${dlls.test}." />
 
     <property name="args.test_runner" value="${dlls.test} ${test.args}" />
   </target>
   
   <target name="run_tests" depends="prepare" description="Running Unit Tests">
-    <echo message="Running tests using NUnit and putting results in ${dirs.test_results}."/>
+  
+    <if test="${dlls.test !=''}">
+      <echo message="Running tests using NUnit and putting results in ${dirs.test_results}."/>
 
-    <exec 
-        program="${app.nunit.console}" 
-        workingdir="${dirs.build.code}"
-        failonerror="true">
-      <arg value="${args.test_runner}" />
-    </exec>
+      <exec 
+          program="${app.nunit.console}" 
+          workingdir="${dirs.build.code}"
+          failonerror="true">
+        <arg value="${args.test_runner}" />
+      </exec>
+      <property name="tests.ran" value="true" />
+      
+    </if>
+    <if test="${dlls.test ==''}">
+      <echo message="No test dlls to run against" />
+    </if>
+   
   </target>
 
   <target name="generate_report">
-    <nunit2report todir="${dirs.test_results}" failonerror="false" >
-      <fileset>
-        <include name="${dirs.test_results}\*-results.xml"/>
-      </fileset>
-    </nunit2report>
+    <if test="${tests.ran}">
+      <nunit2report todir="${dirs.test_results}" failonerror="false" >
+        <fileset>
+          <include name="${dirs.test_results}\*-results.xml"/>
+        </fileset>
+      </nunit2report>
+    </if>
   </target>
 
   <target name="open_results">
@@ -158,11 +177,11 @@
 
   <target name="custom_tasks_after">
     <echo message="Running custom tasks if ${file.custom.step.after} exists." />
-    <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="false" />
-    <exec program="powershell.exe" if="${file::exists(file.custom.step.after + '.ps1')}" failonerror="false">
+    <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="${fail.build.on.error}" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.after + '.ps1')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.after + '.ps1')}" />
     </exec>
-    <exec program="ruby.exe" if="${file::exists(file.custom.step.after + '.rb')}" failonerror="false">
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.after + '.rb')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.after + '.rb')}" />
     </exec>
   </target>

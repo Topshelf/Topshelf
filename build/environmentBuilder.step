@@ -28,6 +28,7 @@
   <property name="file.custom.step.after" value="${dirs.build_scripts_custom}\${file.current.no_extension}.post.step" />
   <property name="file.custom.step.replace" value="${dirs.build_scripts_custom}\${file.current.no_extension}.replace.step" />
   <property name="is.replaced" value="false" />
+  <property name="fail.build.on.error" value="true" />
 
   <target name="go" depends="run_tasks" />
 
@@ -46,11 +47,11 @@
 
   <target name="custom_tasks_before">
     <echo message="Running custom tasks if ${file.custom.step.before} exists." />
-    <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="false" />
-    <exec program="powershell.exe" if="${file::exists(file.custom.step.before + '.ps1')}" failonerror="false">
+    <nant buildfile="${file.custom.step.before}" inheritall="true" if="${file::exists(file.custom.step.before)}" failonerror="${fail.build.on.error}" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.before + '.ps1')}" failonerror="${fail.build.on.error}">
       <arg value="${path::get-full-path(file.custom.step.before + '.ps1')}" />
     </exec>
-    <exec program="ruby.exe" if="${file::exists(file.custom.step.before + '.rb')}" failonerror="false">
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.before + '.rb')}" failonerror="${fail.build.on.error}">
       <arg value="${path::get-full-path(file.custom.step.before + '.rb')}" />
     </exec>
   </target>
@@ -58,13 +59,13 @@
   <target name="custom_tasks_replace">
     <echo message="Running custom tasks instead of normal tasks if ${file.custom.step.replace} exists." />
     <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace)}" />
-    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" />
+    <nant buildfile="${file.custom.step.replace}" inheritall="true" if="${file::exists(file.custom.step.replace)}" failonerror="${fail.build.on.error}" />
     <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.ps1')}" />
-    <exec program="powershell.exe" if="${file::exists(file.custom.step.replace + '.ps1')}" failonerror="false">
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.replace + '.ps1')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.replace + '.ps1')}" />
     </exec>
     <property name="is.replaced" value="true" if="${file::exists(file.custom.step.replace + '.rb')}" />
-    <exec program="ruby.exe" if="${file::exists(file.custom.step.replace + '.rb')}" failonerror="false">
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.replace + '.rb')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.replace + '.rb')}" />
     </exec>
   </target>
@@ -106,11 +107,11 @@
 
   <target name="custom_tasks_after">
     <echo message="Running custom tasks if ${file.custom.step.after} exists." />
-    <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="false" />
-    <exec program="powershell.exe" if="${file::exists(file.custom.step.after + '.ps1')}" failonerror="false">
+    <nant buildfile="${file.custom.step.after}" inheritall="true" if="${file::exists(file.custom.step.after)}" failonerror="${fail.build.on.error}" />
+    <exec program="powershell.exe" if="${file::exists(file.custom.step.after + '.ps1')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.after + '.ps1')}" />
     </exec>
-    <exec program="ruby.exe" if="${file::exists(file.custom.step.after + '.rb')}" failonerror="false">
+    <exec program="ruby.exe" if="${file::exists(file.custom.step.after + '.rb')}" failonerror="${fail.build.on.error}" >
       <arg value="${path::get-full-path(file.custom.step.after + '.rb')}" />
     </exec>
   </target>
