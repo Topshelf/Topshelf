@@ -14,6 +14,7 @@ namespace Topshelf.Configuration.Dsl
 {
     using Magnum.Channels;
     using Model;
+    using Shelving;
 
 
     public class ServiceConfigurator<TService> :
@@ -21,12 +22,12 @@ namespace Topshelf.Configuration.Dsl
         IServiceConfigurator<TService>
         where TService : class
     {
-        public IServiceController Create(UntypedChannel hostChannel)
+        public IServiceController Create(HostProxy hostChannel)
         {
             return Create(Name, hostChannel);
         }
 
-        public IServiceController Create(string serviceName, UntypedChannel hostChannel)
+        public IServiceController Create(string serviceName, HostProxy hostChannel)
         {
             IServiceController serviceController = new ServiceController<TService>(serviceName, hostChannel)
                 {

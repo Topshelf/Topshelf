@@ -163,8 +163,11 @@ namespace Topshelf.Configuration.Dsl
                                                             _afterStartingServices, 
                                                             _afterStoppingServices, 
                                                             _timeout);
+
             serviceCoordinator.RegisterServices(_serviceConfigurators);
+            
             _winServiceSettings.Credentials = _credentials;
+            
             var cfg = new RunConfiguration
                 {
                     WinServiceSettings = _winServiceSettings,

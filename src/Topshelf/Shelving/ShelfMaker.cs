@@ -32,7 +32,7 @@ namespace Topshelf.Shelving
     public class ShelfMaker :
         IDisposable
     {
-        readonly WcfChannelHost _myChannelHost;
+        readonly HostHost _myChannelHost;
         readonly ChannelAdapter _myChannel;
         readonly ReaderWriterLockedObject<Dictionary<string, ShelfHandle>> _shelves;
         static readonly ILog _log = LogManager.GetLogger(typeof(ShelfMaker));

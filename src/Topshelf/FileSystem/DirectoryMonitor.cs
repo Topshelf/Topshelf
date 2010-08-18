@@ -27,7 +27,7 @@ namespace Topshelf.FileSystem
         IDisposable
     {
         readonly string _baseDir;
-        readonly UntypedChannel _hostChannel;
+        readonly HostProxy _hostChannel;
         ChannelAdapter _channel;
         Scheduler _scheduler;
         PollingFileSystemEventProducer _producer;
