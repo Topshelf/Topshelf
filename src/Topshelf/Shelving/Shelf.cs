@@ -13,50 +13,79 @@
 namespace Topshelf.Shelving
 {
     using System;
+    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using Configuration.Dsl;
     using log4net;
+    using log4net.Config;
     using Magnum.Channels;
     using Magnum.Reflection;
     using Messages;
     using Model;
 
 
-    public class Shelf :
+	[DebuggerDisplay("Shelf[{ServiceName}]")]
+	public class Shelf :
         IDisposable
     {
         IServiceController _controller;
-        readonly Type _bootstrapperType;
-        readonly HostProxy _hostChannel;
-        readonly ChannelAdapter _myChannelAdpator;
-        readonly HostHost _myChannel;
-        readonly ILog _log = LogManager.GetLogger(typeof(Shelf));
+    	readonly Type _bootstrapperType;
+        readonly OutboundChannel _coordinatorChannel;
+        readonly InboundChannel _channel;
+		readonly ILog _log;
+    	readonly string _serviceName;
+    	readonly string _pipeName;
+    	readonly Uri _address;
 
-        public Shelf(Type bootstraper)
-        {
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            
-            _hostChannel = WellknownAddresses.GetShelfMakerProxy();
-            _myChannelAdpator = new ChannelAdapter();
-            _myChannel = WellknownAddresses.GetCurrentShelfHost(_myChannelAdpator);
-            _bootstrapperType = bootstraper;
 
-            _myChannelAdpator.Connect(config => config.AddConsumerOf<ReadyService>().UsingConsumer(msg => Initialize()));
+    	public Shelf(Type bootstrapperType)
+    	{
+    		BootstrapLogger();
 
-            _hostChannel.Send(new ShelfReady());
-        }
+    		_log = LogManager.GetLogger(typeof(Shelf));
 
-        void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    		_serviceName = AppDomain.CurrentDomain.FriendlyName;
+
+    		AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+    		_address = WellknownAddresses.GetShelfServiceAddress(AppDomain.CurrentDomain);
+    		_pipeName = WellknownAddresses.GetShelfServicePipeName(AppDomain.CurrentDomain);
+    		_channel = new InboundChannel(_address,
+    		                              _pipeName,
+    		                              x =>
+    		                              	{
+    		                              		x.AddConsumerOf<StartService>()
+    		                              			.UsingConsumer(msg => Start());
+    		                              	});
+
+    		_coordinatorChannel = new OutboundChannel(WellknownAddresses.ShelfServiceCoordinatorAddress,
+    		                                          WellknownAddresses.ShelfServiceCoordinatorPipeName);
+
+    		_bootstrapperType = bootstrapperType;
+
+    		_coordinatorChannel.Send(new ShelfCreated
+    			{
+					ServiceName = _serviceName,
+					Address = _address,
+					PipeName = _pipeName,
+    			});
+    	}
+
+    	void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "", AppDomain.CurrentDomain.FriendlyName, e.ExceptionObject));
 
-            if (e.IsTerminating && _hostChannel != null)
+            if (e.IsTerminating && _coordinatorChannel != null)
             {
-                _hostChannel.Send(new ShelfFault(e.ExceptionObject as Exception));
+            	_coordinatorChannel.Send(new ShelfFault(e.ExceptionObject as Exception)
+            		{
+            			ServiceName = _serviceName
+					});
             }
         }
 
-        void Initialize()
+        void Start()
         {
             try
             {
@@ -84,7 +113,7 @@ namespace Topshelf.Shelving
         {
             bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
-            _controller = cfg.Create(AppDomain.CurrentDomain.FriendlyName, _hostChannel);
+            _controller = cfg.Create(AppDomain.CurrentDomain.FriendlyName, _coordinatorChannel);
         }
 
         public static Type FindBootstrapperImplementationType(Type bootstrapper)
@@ -125,16 +154,16 @@ namespace Topshelf.Shelving
             return false;
         }
 
-        public string Name
+        public string ServiceName
         {
-            get { return AppDomain.CurrentDomain.FriendlyName; }
+            get { return _serviceName; }
         }
 
         void SendFault(Exception exception)
         {
             try
             {
-                _hostChannel.Send(new ShelfFault(exception));
+                _coordinatorChannel.Send(new ShelfFault(exception));
             }
             catch (Exception)
             {
@@ -144,8 +173,21 @@ namespace Topshelf.Shelving
 
         public void Dispose()
         {
-            if (_myChannel != null)
-                _myChannel.Dispose();
+            if (_channel != null)
+                _channel.Dispose();
         }
+
+		static void BootstrapLogger()
+		{
+			string assemblyPath = Path.GetDirectoryName(typeof(Shelf).Assembly.Location);
+
+			string configurationFilePath = Path.Combine(assemblyPath, "log4net.config");
+
+			var configurationFile = new FileInfo(configurationFilePath);
+
+			XmlConfigurator.ConfigureAndWatch(configurationFile);
+
+			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}", configurationFilePath);
+		}
     }
 }

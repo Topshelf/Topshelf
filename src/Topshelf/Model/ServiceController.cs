@@ -30,9 +30,7 @@ namespace Topshelf.Model
     {
         ILog _log = LogManager.GetLogger(typeof(ServiceController<TService>));
 
-        #region StateMachine
-
-        static ServiceController()
+    	static ServiceController()
         {
             Define(() =>
                 {
@@ -72,35 +70,23 @@ namespace Topshelf.Model
         public static State Paused { get; set; }
         public static State Completed { get; set; }
 
-        #endregion
-
-        #region Messaging Start
-
-        readonly HostProxy _hostChannel;
-        readonly HostHost _myChannelHost;
-        readonly ChannelAdapter _myChannel;
-        readonly ChannelConnection _connection;
+    	readonly OutboundChannel _hostChannel;
+        readonly InboundChannel _myChannelHost;
 
         public UntypedChannel ControllerChannel
         {
-            get { return _myChannel; }
+			get { return _myChannelHost; }
         }
 
-        #endregion
-
-        public ServiceController(string serviceName, HostProxy hostChannel)
+    	public ServiceController(string serviceName, OutboundChannel hostChannel)
         {
             Name = serviceName;
 
             _hostChannel = hostChannel;
-            _myChannel = new ChannelAdapter();
 
-            _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel, serviceName);
-
-            //build subscriptions
-            _connection = _myChannel.Connect(s =>
+            _myChannelHost = WellknownAddresses.GetServiceHost(serviceName, s =>
                 {
-                    s.AddConsumerOf<ReadyService>().UsingConsumer(m => Initialize());
+                    s.AddConsumerOf<CreateService>().UsingConsumer(m => Initialize());
                     s.AddConsumerOf<StopService>().UsingConsumer(m => Stop());
                     s.AddConsumerOf<StartService>().UsingConsumer(m => Start());
                     s.AddConsumerOf<PauseService>().UsingConsumer(m => Pause());
@@ -115,9 +101,7 @@ namespace Topshelf.Model
         public Action<TService> ContinueAction { get; set; }
         public ServiceBuilder BuildService { get; set; }
 
-        #region Dispose Stuff
-
-        bool _disposed;
+    	bool _disposed;
 
         public void Dispose()
         {
@@ -131,9 +115,6 @@ namespace Topshelf.Model
                 return;
             if (_disposed)
                 return;
-
-            if (_connection != null)
-                _connection.Dispose();
 
             if (_myChannelHost != null)
                 _myChannelHost.Dispose();
@@ -152,11 +133,7 @@ namespace Topshelf.Model
             Dispose(false);
         }
 
-        #endregion
-
-        #region IServiceController Members
-
-        bool _hasInitialized;
+    	bool _hasInitialized;
 
         public void Initialize()
         {
@@ -182,7 +159,7 @@ namespace Topshelf.Model
 			}
 
 			if (!hasFaulted)
-				_hostChannel.Send(new ServiceReady());
+				_hostChannel.Send(new ServiceCreated(Name));
 
             _hasInitialized = true;
         }
@@ -191,9 +168,9 @@ namespace Topshelf.Model
         {
             try
             {
-                _hostChannel.Send(new ServiceStarting());
+                _hostChannel.Send(new ServiceStarting(Name));
                 RaiseEvent(OnStart);
-                _hostChannel.Send(new ServiceStarted());
+                _hostChannel.Send(new ServiceRunning(Name));
             }
             catch (Exception ex)
             {
@@ -205,9 +182,9 @@ namespace Topshelf.Model
         {
             try
             {
-                _hostChannel.Send(new ServiceStopping());
+                _hostChannel.Send(new ServiceStopping(Name));
                 RaiseEvent(OnStop);
-                _hostChannel.Send(new ServiceStopped());
+                _hostChannel.Send(new ServiceStopped(Name));
             }
             catch (Exception ex)
             {
@@ -219,9 +196,9 @@ namespace Topshelf.Model
         {
             try
             {
-                _hostChannel.Send(new ServicePausing());
+                _hostChannel.Send(new ServicePausing(Name));
                 RaiseEvent(OnPause);
-                _hostChannel.Send(new ServicePaused());
+                _hostChannel.Send(new ServicePaused(Name));
             }
             catch (Exception ex)
             {
@@ -233,9 +210,9 @@ namespace Topshelf.Model
         {
             try
             {
-                _hostChannel.Send(new ServiceContinuing());
+                _hostChannel.Send(new ServiceContinuing(Name));
                 RaiseEvent(OnContinue);
-                _hostChannel.Send(new ServiceContinued());
+                _hostChannel.Send(new ServiceRunning(Name));
             }
             catch (Exception ex)
             {
@@ -267,7 +244,5 @@ namespace Topshelf.Model
         {
             get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
         }
-
-        #endregion
     }
 }

@@ -12,16 +12,16 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	public class ServicePaused :
+	public class ServiceRunning :
 		ServiceEvent
 	{
-		public ServicePaused(string name)
+		public ServiceRunning(string name)
 			: base(name)
 		{
-			EventType = ServiceEventType.Paused;
+			EventType = ServiceEventType.Running;
 		}
 
-		protected ServicePaused()
+		protected ServiceRunning()
 		{
 		}
 	}

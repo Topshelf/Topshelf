@@ -12,13 +12,22 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
-    using System;
+	using Magnum.StateMachine;
 
-    public class ShelfStateChangedEventArgs :
-        EventArgs
-    {
-        public string ShelfName { get; set; }
-        public ShelfState PreviousShelfState { get; set; }
-        public ShelfState CurrentShelfState { get; set; }
-    }
+
+	public class ShelfServiceBinding :
+		StateMachineBinding<ShelfService, string>
+	{
+		public ShelfServiceBinding()
+		{
+			Id(x => x.Name);
+
+			Bind(ShelfService.OnCreate, x => x.ServiceName);
+			Bind(ShelfService.OnStart, x => x.ServiceName);
+			Bind(ShelfService.OnStop, x => x.ServiceName);
+			Bind(ShelfService.OnReload, x => x.ServiceName);
+			Bind(ShelfService.OnShelfCreated, x => x.ServiceName);
+			Bind(ShelfService.OnServiceStopped, x => x.ServiceName);
+		}
+	}
 }

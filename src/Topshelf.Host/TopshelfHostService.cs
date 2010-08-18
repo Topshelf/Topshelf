@@ -16,29 +16,59 @@ namespace Topshelf.Host
 	using System.IO;
 	using System.Linq;
 	using FileSystem;
+	using log4net;
 	using Shelving;
 
 
 	public class TopshelfHostService
 	{
-		ShelfMaker _shelfMaker;
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+
+		IShelfServiceController _controller;
 
 		public void Start()
 		{
-			_shelfMaker = new ShelfMaker();
-			_shelfMaker.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
+			_controller = new ShelfServiceController();
 
+			StartDirectoryMonitor();
+
+			StartExistingServices();
+		}
+
+		void StartDirectoryMonitor()
+		{
+			_controller.CreateShelfService("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
+			//_shelfMaker = new ShelfMaker();
+			//_shelfMaker.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
+		}
+
+		void StartExistingServices()
+		{
 			string serviceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
 
 			Directory.GetDirectories(serviceDir)
 				.ToList()
-                .ConvertAll<string>(Path.GetFileName)
-				.ForEach(dir => _shelfMaker.MakeShelf(dir));
+				.ConvertAll(Path.GetFileName)
+				.ForEach(StartShelfService);
+
+			//.ForEach(dir => _shelfMaker.MakeShelf(dir));
+		}
+
+		void StartShelfService(string directoryName)
+		{
+			try
+			{
+				_controller.CreateShelfService(directoryName);
+			}
+			catch (Exception ex)
+			{
+				_log.Error("The service {0} could not be created".FormatWith(directoryName), ex);
+			}
 		}
 
 		public void Stop()
 		{
-			_shelfMaker.Dispose();
+			_controller.Dispose();
 		}
 	}
 }

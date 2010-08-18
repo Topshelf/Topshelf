@@ -38,8 +38,7 @@ namespace Topshelf.Model
         readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
 
-        readonly HostHost _hostChannel;
-        readonly ChannelAdapter _myChannel;
+        readonly InboundChannel _hostChannel;
         readonly List<Func<IServiceController>> _serviceConfigurators;
 
         readonly IList<IServiceController> _services = new List<IServiceController>();
@@ -60,7 +59,6 @@ namespace Topshelf.Model
         {
             ServiceStartedAction += msg => { };
             ServiceStoppedAction += msg => { };
-            ServiceContinuedAction += msg => { };
             ServicePausedAction += msg => { };
 
             _beforeStartingServices = GetLogWrapper("BeforeStartingServices", beforeStartingServices);
@@ -69,16 +67,12 @@ namespace Topshelf.Model
 
             _serviceConfigurators = new List<Func<IServiceController>>();
 
-            _myChannel = new ChannelAdapter();
-            _hostChannel = WellknownAddresses.GetServiceCoordinatorHost(_myChannel);
-            _timeout = waitTime;
-
-            _myChannel.Connect(s =>
+			_timeout = waitTime;
+			_hostChannel = WellknownAddresses.GetServiceCoordinatorHost(s =>
                 {
                     s.AddConsumerOf<ShelfFault>().UsingConsumer(HandleServiceFault);
-                    s.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => ServiceStartedAction.Invoke(msg));
+                    s.AddConsumerOf<ServiceRunning>().UsingConsumer(msg => ServiceStartedAction.Invoke(msg));
                     s.AddConsumerOf<ServiceStopped>().UsingConsumer(msg => ServiceStoppedAction.Invoke(msg));
-                    s.AddConsumerOf<ServiceContinued>().UsingConsumer(msg => ServiceContinuedAction.Invoke(msg));
                     s.AddConsumerOf<ServicePaused>().UsingConsumer(msg => ServicePausedAction.Invoke(msg));
                 });
         }
@@ -97,7 +91,7 @@ namespace Topshelf.Model
         {
             _beforeStartingServices(this);
 
-            ProcessEvent<StartService, ServiceStarted>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
+            ProcessEvent<StartService, ServiceRunning>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
 
             _afterStartingServices(this);
         }
@@ -117,7 +111,7 @@ namespace Topshelf.Model
 
         public void Continue()
         {
-            ProcessEvent<ContinueService, ServiceContinued>("Continue", "Continuing", ref ServiceContinuedAction,ServiceState.Started);
+            ProcessEvent<ContinueService, ServiceRunning>("Continue", "Continuing", ref ServiceContinuedAction,ServiceState.Started);
         }
 
         public void StartService(string name)
@@ -210,9 +204,9 @@ namespace Topshelf.Model
 
         void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction,
                                             ref Action<TRecieved> stateEvent, ServiceState targetState)
-            where TRecieved : ServiceMessage
-            where TSent : ServiceMessage
-        {
+            where TSent : ServiceCommand
+			where TRecieved : ServiceEvent
+		{
             int servicesNotInTargetState = Services.Count(x => x.State != targetState);
             bool completed;
             long serviceReachedTargetState = 0;
@@ -256,10 +250,10 @@ namespace Topshelf.Model
                 throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
         }
 
-        event Action<ServiceStarted> ServiceStartedAction;
+        event Action<ServiceRunning> ServiceStartedAction;
         event Action<ServiceStopped> ServiceStoppedAction;
         event Action<ServicePaused> ServicePausedAction;
-        event Action<ServiceContinued> ServiceContinuedAction;
+        event Action<ServiceRunning> ServiceContinuedAction;
         public event Action<Exception> ShelfFaulted;
 
         void LoadNewServiceConfigurations()

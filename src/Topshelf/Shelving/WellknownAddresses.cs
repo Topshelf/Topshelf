@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,98 +12,83 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
-    using System;
-    using System.Diagnostics;
-    using Magnum.Channels;
+	using System;
+	using System.Diagnostics;
+	using Magnum.Channels;
+	using Magnum.Channels.Configuration;
+	using Magnum.Extensions;
 
 
-    public static class WellknownAddresses
-    {
-        const string ServiceCoordinatorEndpoint = "ServiceCoordinator";
-        const string ShelfMakerEndpoint = "ShelfMaker";
+	public static class WellknownAddresses
+	{
+		public static Uri ShelfServiceCoordinatorAddress
+		{
+			get { return GetServiceUri().AppendPath("ShelfCoordinator"); }
+		}
 
-        public static HostHost GetServiceCoordinatorHost(UntypedChannel hostProxy)
-        {
-            return new HostHost(hostProxy, GetBaseAddress(GetServiceControllerPipeName()), ServiceCoordinatorEndpoint);
-        }
+		public static Uri ServiceCoordinatorAddress
+		{
+			get { return GetServiceUri().AppendPath("Coordinator"); }
+		}
 
-        public static HostHost GetShelfMakerHost(UntypedChannel hostProxy)
-        {
-            return new HostHost(hostProxy, GetBaseAddress(GetShelfMakerPipeName()), ShelfMakerEndpoint);
-        }
+		public static string ShelfServiceCoordinatorPipeName
+		{
+			get { return "{0}/ShelfServiceCoordinator".FormatWith(GetPid()); }
+		}
 
-        public static HostHost GetCurrentShelfHost(ChannelAdapter myChannel)
-        {
-            var pipeName = GetThisShelfPipeName();
+		public static string ServiceCoordinatorPipeName
+		{
+			get { return "{0}/ServiceCoordinator".FormatWith(GetPid()); }
+		}
 
-            var address = GetBaseAddress(pipeName);
-            return new HostHost(myChannel, address, "shelf");
-        }
+		static int GetPid()
+		{
+			return Process.GetCurrentProcess().Id;
+		}
 
-        public static HostHost GetCurrentServiceHost(ChannelAdapter myChannel, string serviceName)
-        {
-            var pipeName = GetThisShelfPipeName();
+		static Uri GetServiceUri()
+		{
+			return new Uri("net.pipe://localhost/topshelf/{0}".FormatWith(GetPid()));
+		}
 
-            var address = GetBaseAddress(pipeName);
-            return new HostHost(myChannel, address, serviceName);
-        }
+		public static Uri GetShelfServiceAddress(AppDomain appDomain)
+		{
+			return GetServiceUri().AppendPath("Shelf").AppendPath(appDomain.FriendlyName);
+		}
 
-        public static HostProxy GetShelfChannelProxy(AppDomain appDomain)
-        {
-            var friendlyName = appDomain.FriendlyName;
-            return new HostProxy(GetBaseAddress(GetShelfPipeName(friendlyName)), "shelf");
-        }
+		public static Uri GetServiceAddress(string serviceName)
+		{
+			return GetServiceUri().AppendPath("Service").AppendPath(serviceName);
+		}
 
-        public static HostProxy GetServiceChannelProxy(AppDomain appDomain, string serviceName)
-        {
-            var friendlyName = appDomain.FriendlyName;
+		public static string GetShelfServicePipeName(AppDomain appDomain)
+		{
+			return "{0}/Shelf/{1}".FormatWith(GetPid(), appDomain.FriendlyName);
+		}
 
-            return new HostProxy(GetBaseAddress(GetShelfPipeName(friendlyName)), serviceName);
-        }
+		public static string GetServicePipeName(string serviceName)
+		{
+			return "{0}/Shelf/{1}".FormatWith(GetPid(), serviceName);
+		}
 
-        public static HostProxy GetServiceCoordinatorProxy()
-        {
-            return new HostProxy(GetBaseAddress(GetServiceControllerPipeName()), ServiceCoordinatorEndpoint);
-        }
-        
-        static string GetServiceControllerPipeName()
-        {
-            return "{0}/servicecontroller".FormatWith(GetPid());
-        }
+		public static OutboundChannel GetServiceCoordinatorProxy()
+		{
+			return new OutboundChannel(ServiceCoordinatorAddress,ServiceCoordinatorPipeName);
+		}
 
-        public static HostProxy GetShelfMakerProxy()
-        {
-            return new HostProxy(GetBaseAddress(GetShelfMakerPipeName()), ShelfMakerEndpoint);
-        }
+		public static InboundChannel GetServiceCoordinatorHost(Action<ConnectionConfigurator> cfg)
+		{
+			return new InboundChannel(ShelfServiceCoordinatorAddress, ShelfServiceCoordinatorPipeName, cfg);
+		}
 
-        static string GetShelfMakerPipeName()
-        {
-            return "{0}/shelfmaker".FormatWith(GetPid());
-        }
+		public static OutboundChannel GetShelfServiceCoordinatorProxy()
+		{
+			return new OutboundChannel(ShelfServiceCoordinatorAddress, ShelfServiceCoordinatorPipeName);
+		}
 
-        static string GetShelfPipeName(string name)
-        {
-            return "{0}/{1}".FormatWith(GetPid(), name);
-        }
-
-        static string GetThisShelfPipeName()
-        {
-            return "{0}/{1}".FormatWith(GetPid(), GetFolder());
-        }
-
-        static Uri GetBaseAddress(string name)
-        {
-            return new Uri("net.pipe://localhost/topshelf/{0}".FormatWith(name));
-        }
-
-        static int GetPid()
-        {
-            return Process.GetCurrentProcess().Id;
-        }
-
-        static string GetFolder()
-        {
-            return AppDomain.CurrentDomain.FriendlyName;
-        }
-    }
+		public static InboundChannel GetServiceHost(string serviceName, Action<ConnectionConfigurator> cfg)
+		{
+			return new InboundChannel(GetServiceAddress(serviceName), GetServicePipeName(serviceName), cfg);
+		}
+	}
 }

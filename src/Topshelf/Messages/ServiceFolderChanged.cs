@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,17 +12,17 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	public class ServicePaused :
-		ServiceEvent
-	{
-		public ServicePaused(string name)
+    public class ServiceFolderChanged :
+        ServiceEvent
+    {
+		public ServiceFolderChanged(string name)
 			: base(name)
 		{
-			EventType = ServiceEventType.Paused;
+			EventType = ServiceEventType.FolderChanged;
 		}
 
-		protected ServicePaused()
+		protected ServiceFolderChanged()
 		{
 		}
-	}
+    }
 }

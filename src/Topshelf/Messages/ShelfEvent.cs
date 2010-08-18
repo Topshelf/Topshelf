@@ -12,17 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	public class ServicePaused :
-		ServiceEvent
+	/// <summary>
+	/// A service event, published by a service as the state changes
+	/// </summary>
+	public abstract class ShelfEvent
 	{
-		public ServicePaused(string name)
-			: base(name)
-		{
-			EventType = ServiceEventType.Paused;
-		}
+		/// <summary>
+		/// The name of the service that sourced this event
+		/// </summary>
+		public string ServiceName { get; set; }
 
-		protected ServicePaused()
-		{
-		}
+		/// <summary>
+		/// The event type that was published
+		/// </summary>
+		public ShelfEventType EventType { get; protected set; }
 	}
 }

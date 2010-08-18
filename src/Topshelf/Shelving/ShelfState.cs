@@ -12,17 +12,17 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
-    public enum ShelfState
-    {
-        Unavailable,
-        Readying,
-        Ready,
-        Starting,
-        Started,
-        Pausing,
-        Paused,
-        Stopping,
-        Stopped,
-        Continuing
-    }
+//    public enum ShelfState
+//    {
+//        Unavailable,
+//        Readying,
+//        Ready,
+//        Starting,
+//        Started,
+//        Pausing,
+//        Paused,
+//        Stopping,
+//        Stopped,
+//        Continuing
+//    }
 }

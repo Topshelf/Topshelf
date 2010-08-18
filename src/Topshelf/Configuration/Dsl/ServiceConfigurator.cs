@@ -22,12 +22,12 @@ namespace Topshelf.Configuration.Dsl
         IServiceConfigurator<TService>
         where TService : class
     {
-        public IServiceController Create(HostProxy hostChannel)
+        public IServiceController Create(OutboundChannel hostChannel)
         {
             return Create(Name, hostChannel);
         }
 
-        public IServiceController Create(string serviceName, HostProxy hostChannel)
+        public IServiceController Create(string serviceName, OutboundChannel hostChannel)
         {
             IServiceController serviceController = new ServiceController<TService>(serviceName, hostChannel)
                 {

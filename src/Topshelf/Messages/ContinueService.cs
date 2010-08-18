@@ -13,7 +13,7 @@
 namespace Topshelf.Messages
 {
 	public class ContinueService :
-		ServiceMessage
+		ServiceCommand
 	{
 	}
 }
