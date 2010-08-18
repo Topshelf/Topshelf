@@ -15,6 +15,7 @@ namespace Topshelf.Specs
 	using System.Threading;
 	using Magnum.Channels;
 	using Magnum.Extensions;
+	using Magnum.TestFramework;
 	using Messages;
 	using Model;
 	using NUnit.Framework;
@@ -64,7 +65,7 @@ namespace Topshelf.Specs
 			_serviceController.Dispose();
 		}
 
-		[Test]
+		[Test, Slow]
 		public void Should_continue()
 		{
 			_serviceController.Pause();
@@ -77,14 +78,14 @@ namespace Topshelf.Specs
 				.ShouldBeTrue();
 		}
 
-        [Test, Explicit]
+        [Test, Slow]
 		public void Should_expose_contained_type()
 		{
 			_serviceController.ServiceType
 				.ShouldEqual(typeof(TestService));
 		}
 
-        [Test, Explicit]
+        [Test, Slow]
 		public void Should_pause()
 		{
 			_serviceController.Pause();
@@ -96,7 +97,7 @@ namespace Topshelf.Specs
 				.ShouldBeTrue();
 		}
 
-        [Test, Explicit]
+        [Test, Slow]
 		public void Should_start()
 		{
 			_serviceController.State
@@ -108,7 +109,7 @@ namespace Topshelf.Specs
 				.ShouldBeTrue();
 		}
 
-		[Test, Explicit]
+        [Test, Slow]
 		public void Should_stop()
 		{
 			_serviceController.Stop();

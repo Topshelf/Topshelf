@@ -14,35 +14,46 @@ namespace Topshelf.Shelving
 {
     using System;
     using Magnum.Channels;
+    using Magnum.Fibers;
 
 
     public class HostProxy :
         IDisposable
     {
-        ChannelConnection _connection;
+        readonly ChannelConnection _connection;
         readonly ChannelAdapter _proxyChannel;
+        readonly Fiber _fiber;
+        bool _disposed;
 
         public HostProxy(Uri address, string endpoint)
         {
             _proxyChannel = new ChannelAdapter();
+            _fiber = new ThreadPoolFiber();
             _connection = _proxyChannel.Connect(cc =>
                 {
-                    cc.SendToWcfChannel(address, endpoint).ExecuteOnThreadPoolFiber();
+                    cc.SendToWcfChannel(address, endpoint)
+                        .ExecuteOnFiber(_fiber);
                 });
         }
 
         public void Send<T>(T message)
         {
-            _proxyChannel.Send(message);
+            if (!_disposed)
+                _proxyChannel.Send(message);
         }
 
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+        
+            if (_fiber != null)
+                _fiber.Stop();
+
             if (_connection != null)
-            {
                 _connection.Dispose();
-                _connection = null;
-            }
         }
     }
 }

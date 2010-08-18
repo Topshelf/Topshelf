@@ -32,8 +32,8 @@ namespace Topshelf.Model
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
         readonly Action<IServiceCoordinator> _beforeStartingServices;
-        private readonly Action<IServiceCoordinator> _afterStartingServices;
-        private readonly Action<IServiceCoordinator> _afterStoppingServices;
+        readonly Action<IServiceCoordinator> _afterStartingServices;
+        readonly Action<IServiceCoordinator> _afterStoppingServices;
 
         readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());

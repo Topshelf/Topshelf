@@ -20,8 +20,8 @@ namespace Topshelf.Specs
     using Shelving;
     using Topshelf.Configuration.Dsl;
 
-    
-    [TestFixture, Explicit]
+
+    [TestFixture, Slow]
     public class AppDomain_Specs
     {
         [SetUp]

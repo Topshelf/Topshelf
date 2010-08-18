@@ -243,8 +243,6 @@ namespace Topshelf.Model
             }
         }
 
-        //dispose 
-
         void SendFault(Exception exception)
         {
             try

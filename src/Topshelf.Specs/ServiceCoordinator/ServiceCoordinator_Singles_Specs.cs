@@ -16,13 +16,14 @@ namespace Topshelf.Specs.ServiceCoordinator
     using System.Collections.Generic;
     using System.Threading;
     using Magnum.Extensions;
+    using Magnum.TestFramework;
     using Shelving;
     using Model;
     using NUnit.Framework;
     using TestObject;
 
 
-    [TestFixture, Explicit]
+    [TestFixture, Slow]
     public class ServiceCoordinator_Singles_Specs
     {
         #region Setup/Teardown
