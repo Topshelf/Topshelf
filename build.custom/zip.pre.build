@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="ZipPreRunner" default="go">
+  <!-- Project UppercuT - http://projectuppercut.org -->
+  <property name="build.config.settings" value="__NONE__" overwrite="false" />
+  <include buildfile="${build.config.settings}" if="${file::exists(build.config.settings)}" />
+  <property name="dirs.current" value="${directory::get-parent-directory(project::get-buildfile-path())}" />
+  <property name="folder.code_drop" value="code_drop" overwrite="false" />
+  <property name="dirs.drop" value="${dirs.current}\..\${folder.code_drop}" overwrite="false" />
+  <property name="folder.build_artifacts" value="build_artifacts" overwrite="false" />
+  <property name="dirs.drop.build.artifacts" value="${dirs.drop}\${folder.build_artifacts}" overwrite="false" />
+  <property name="folder.app.drop" value="app" overwrite="false" />
+  <property name="folder.deployment" value="deployment" overwrite="false" />
+  <property name="dirs.lib" value="${dirs.current}\..\lib" overwrite="false" />
+
+  <target name="go" depends="remove_build_artifacts" description="Packaging" />
+  
+  <target name="remove_build_artifacts">
+    <echo message="Removing ${dirs.drop.build.artifacts}."/>
+    <delete dir="${dirs.drop.build.artifacts}" failonerror="false" />
+    <delete dir="${dirs.drop}\deployment" failonerror="false" />
+  </target>
+  
+  
+</project>
