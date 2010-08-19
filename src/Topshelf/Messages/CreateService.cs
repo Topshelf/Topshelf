@@ -12,16 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	using System;
-	using System.Reflection;
-	using Shelving;
-
-
 	public class CreateService :
 		ServiceCommand
 	{
-		public ShelfType ShelfType { get; set; }
-		public Type BootstrapperType { get; set; }
-		public AssemblyName[] AssemblyNames { get; set; }
 	}
 }

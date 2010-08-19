@@ -86,7 +86,7 @@ namespace Topshelf.Shelving
 			return new OutboundChannel(ShelfServiceCoordinatorAddress, ShelfServiceCoordinatorPipeName);
 		}
 
-		public static InboundChannel GetServiceHost(string serviceName, Action<ConnectionConfigurator> cfg)
+		public static InboundChannel CreateServiceChannel(string serviceName, Action<ConnectionConfigurator> cfg)
 		{
 			return new InboundChannel(GetServiceAddress(serviceName), GetServicePipeName(serviceName), cfg);
 		}

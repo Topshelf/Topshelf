@@ -98,7 +98,7 @@ namespace Topshelf.Shelving
 
 		public string Name { get; set; }
 
-		public static Event<CreateService> OnCreate { get; set; }
+		public static Event<CreateShelfService> OnCreate { get; set; }
 		public static Event<StartService> OnStart { get; set; }
 		public static Event<StopService> OnStop { get; set; }
 		public static Event<ReloadService> OnReload { get; set; }
@@ -137,7 +137,7 @@ namespace Topshelf.Shelving
 //		public Func<AppDomain, HostProxy> ServiceChannelBuilder { private get; set; }
 //
 
-		void Initialize(CreateService message)
+		void Initialize(CreateShelfService message)
 		{
 			_log.Debug("Creating shelf service: " + message.ServiceName);
 

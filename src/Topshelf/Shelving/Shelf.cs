@@ -97,7 +97,7 @@ namespace Topshelf.Shelving
 
                 this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
 
-                _controller.Initialize();
+                _controller.Send(new CreateService());
             }
             catch (Exception ex)
             {

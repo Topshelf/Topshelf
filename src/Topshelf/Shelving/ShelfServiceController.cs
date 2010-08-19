@@ -69,7 +69,7 @@ namespace Topshelf.Shelving
 
 		public void CreateShelfService(string serviceName, Type bootstrapperType)
 		{
-			var command = new CreateService
+			var command = new CreateShelfService
 				{
 					ServiceName = serviceName,
 					ShelfType = ShelfType.Internal,
@@ -81,7 +81,7 @@ namespace Topshelf.Shelving
 
 		public void CreateShelfService(string serviceName)
 		{
-			var command = new CreateService
+			var command = new CreateShelfService
 				{
 					ServiceName = serviceName,
 					ShelfType = ShelfType.Folder,

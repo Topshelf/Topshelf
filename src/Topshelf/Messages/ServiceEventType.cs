@@ -22,6 +22,7 @@ namespace Topshelf.Messages
 		Continuing,
 		Stopping,
 		Stopped,
-		FolderChanged
+		FolderChanged,
+		Fault
 	}
 }

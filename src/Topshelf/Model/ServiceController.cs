@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-// 
+// Copyright 2007-2010 The Apache Software Foundation.
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,237 +12,218 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-    using System;
-    using System.Diagnostics;
-    using Exceptions;
-    using log4net;
-    using Magnum.Channels;
-    using Magnum.StateMachine;
-    using Messages;
-    using Shelving;
+	using System;
+	using System.Diagnostics;
+	using Exceptions;
+	using log4net;
+	using Magnum.Channels;
+	using Magnum.Extensions;
+	using Magnum.Fibers;
+	using Magnum.Reflection;
+	using Magnum.StateMachine;
+	using Messages;
+	using Shelving;
 
 
-    [DebuggerDisplay("Service({Name}) is {State}")]
-    public class ServiceController<TService> :
-        StateMachine<ServiceController<TService>>,
-        IServiceController
-        where TService : class
-    {
-        ILog _log = LogManager.GetLogger(typeof(ServiceController<TService>));
+	[DebuggerDisplay("Service({Name}) is {State}")]
+	public class ServiceController<TService> :
+		StateMachine<ServiceController<TService>>,
+		IServiceController
+		where TService : class
+	{
+		readonly OutboundChannel _coordinatorChannel;
+		InboundChannel _channel;
+		bool _created;
+		bool _disposed;
+		Fiber _fiber;
+		TService _instance;
+		ILog _log = LogManager.GetLogger(typeof(ServiceController<TService>));
 
-    	static ServiceController()
-        {
-            Define(() =>
-                {
-                    Initially(
-                              When(OnStart)
-                                  .Then(sc => sc.Initialize())
-                                  .Then(sc => sc.StartAction(sc._instance))
-                                  .TransitionTo(Started)
-                        );
+		static ServiceController()
+		{
+			Define(() =>
+				{
+					Initially(
+					          When(OnCreate)
+					          	.Call((instance, message) => instance.Create(),
+					          	      InCaseOf<CouldntBuildServiceException>()
+					          	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
+					          	      	.TransitionTo(Failed))
+					          	.TransitionTo(Created));
 
-                    During(Started,
-                           When(OnPause)
-                               .Then(sc => sc.PauseAction(sc._instance))
-                               .TransitionTo(Paused));
+					During(Created,
+					       When(OnStart)
+					       	.Call((instance, message) => instance.Start(),
+					       	      InCaseOf<Exception>()
+					       	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
+					       	      	.TransitionTo(Failed))
+					       	.TransitionTo(Running));
 
-                    During(Paused,
-                           When(OnContinue)
-                               .Then(sc => sc.ContinueAction(sc._instance))
-                               .TransitionTo(Started));
+					During(Running,
+					       When(OnStop)
+					       	.Call((instance, message) => instance.Stop())
+					       	.TransitionTo(Stopped),
+					       When(OnPause)
+					       	.Call((instance) => instance.Pause())
+					       	.TransitionTo(Paused));
+
+					During(Paused,
+					       When(OnContinue)
+					       	.Call(instance => instance.Continue())
+					       	.TransitionTo(Running),
+					       When(OnStop)
+					       	.Call(instance => instance.Stop())
+					       	.TransitionTo(Stopped));
 
 
-                    Anytime(When(OnStop)
-                                .Then(sc => sc.StopAction(sc._instance))
-                                .TransitionTo(Stopped)
-                        );
-                });
-        }
+					Anytime(
+					        When(Created.Enter)
+					        	.Call(instance => instance.Publish<ServiceCreated>()),
+					        When(Running.Enter)
+					        	.Call(instance => instance.Publish<ServiceRunning>()),
+					        When(Paused.Enter)
+					        	.Call(instance => instance.Publish<ServicePaused>()),
+					        When(Stopped.Enter)
+					        	.Call(instance => instance.Publish<ServiceStopped>())
+						);
+				});
+		}
 
-        public static Event OnStart { get; set; }
-        public static Event OnStop { get; set; }
-        public static Event OnPause { get; set; }
-        public static Event OnContinue { get; set; }
+		public ServiceController(string serviceName, OutboundChannel coordinatorChannel)
+		{
+			Name = serviceName;
 
-        public static State Initial { get; set; }
-        public static State Started { get; set; }
-        public static State Stopped { get; set; }
-        public static State Paused { get; set; }
-        public static State Completed { get; set; }
+			_fiber = new ThreadPoolFiber();
+			_coordinatorChannel = coordinatorChannel;
 
-    	readonly OutboundChannel _hostChannel;
-        readonly InboundChannel _myChannelHost;
+			_channel = WellknownAddresses.CreateServiceChannel(serviceName, s =>
+				{
+					s.AddConsumersFor<ServiceController<TService>>()
+						.UsingInstance(this)
+						.ExecuteOnFiber(_fiber);
+				});
+		}
 
-        public UntypedChannel ControllerChannel
-        {
-			get { return _myChannelHost; }
-        }
+		public static Event<CreateService> OnCreate { get; set; }
+		public static Event<StartService> OnStart { get; set; }
+		public static Event<StopService> OnStop { get; set; }
+		public static Event<PauseService> OnPause { get; set; }
+		public static Event<ContinueService> OnContinue { get; set; }
 
-    	public ServiceController(string serviceName, OutboundChannel hostChannel)
-        {
-            Name = serviceName;
+		public static State Initial { get; set; }
+		public static State Created { get; set; }
+		public static State Running { get; set; }
+		public static State Paused { get; set; }
+		public static State Stopped { get; set; }
+		public static State Failed { get; set; }
+		public static State Completed { get; set; }
 
-            _hostChannel = hostChannel;
+		public Action<TService> StartAction { get; set; }
+		public Action<TService> StopAction { get; set; }
+		public Action<TService> PauseAction { get; set; }
+		public Action<TService> ContinueAction { get; set; }
 
-            _myChannelHost = WellknownAddresses.GetServiceHost(serviceName, s =>
-                {
-                    s.AddConsumerOf<CreateService>().UsingConsumer(m => Initialize());
-                    s.AddConsumerOf<StopService>().UsingConsumer(m => Stop());
-                    s.AddConsumerOf<StartService>().UsingConsumer(m => Start());
-                    s.AddConsumerOf<PauseService>().UsingConsumer(m => Pause());
-                    s.AddConsumerOf<ContinueService>().UsingConsumer(m => Continue());
-                });
-        }
+		public ServiceBuilder BuildService { get; set; }
 
-        TService _instance;
-        public Action<TService> StartAction { get; set; }
-        public Action<TService> StopAction { get; set; }
-        public Action<TService> PauseAction { get; set; }
-        public Action<TService> ContinueAction { get; set; }
-        public ServiceBuilder BuildService { get; set; }
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-    	bool _disposed;
+		public void Send<T>(T message)
+		{
+			_channel.Send(message);
+		}
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public string Name { get; private set; }
 
-        protected void Dispose(bool disposing)
-        {
-            if (!disposing)
-                return;
-            if (_disposed)
-                return;
+		public Type ServiceType
+		{
+			get { return typeof(TService); }
+		}
 
-            if (_myChannelHost != null)
-                _myChannelHost.Dispose();
+		public ServiceState State
+		{
+			get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
+		}
 
-            _instance = default(TService);
-            StartAction = null;
-            StopAction = null;
-            PauseAction = null;
-            ContinueAction = null;
-            BuildService = null;
-            _disposed = true;
-        }
+		void Publish<T>()
+			where T : ServiceEvent
+		{
+			T message = FastActivator<T>.Create(Name);
 
-        ~ServiceController()
-        {
-            Dispose(false);
-        }
+			_coordinatorChannel.Send(message);
+		}
 
-    	bool _hasInitialized;
+		void Publish<T>(T message)
+		{
+			_coordinatorChannel.Send(message);
+		}
 
-        public void Initialize()
-        {
-            if (_hasInitialized)
-                return;
+		protected void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+			if (_disposed)
+				return;
 
-        	bool hasFaulted = false;
-
-        	try
-        	{
-				_instance = (TService)BuildService(Name);
-        	}
-        	catch (Exception ex)
-        	{
-				_hostChannel.Send(new ShelfFault(new CouldntBuildServiceException(Name, typeof(TService), ex)));
-        		hasFaulted = true;
-        	}
-            
-            if (_instance == null)
+			if (_channel != null)
 			{
-				_hostChannel.Send(new ShelfFault(new CouldntBuildServiceException(Name, typeof(TService))));
-				hasFaulted = true;
+				_channel.Dispose();
+				_channel = null;
 			}
 
-			if (!hasFaulted)
-				_hostChannel.Send(new ServiceCreated(Name));
+			_instance = default(TService);
 
-            _hasInitialized = true;
-        }
+			_fiber.Shutdown(30.Seconds());
 
-        public void Start()
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceStarting(Name));
-                RaiseEvent(OnStart);
-                _hostChannel.Send(new ServiceRunning(Name));
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+			StartAction = null;
+			StopAction = null;
+			PauseAction = null;
+			ContinueAction = null;
+			BuildService = null;
+			_disposed = true;
+		}
 
-        public void Stop()
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceStopping(Name));
-                RaiseEvent(OnStop);
-                _hostChannel.Send(new ServiceStopped(Name));
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+		~ServiceController()
+		{
+			Dispose(false);
+		}
 
-        public void Pause()
-        {
-            try
-            {
-                _hostChannel.Send(new ServicePausing(Name));
-                RaiseEvent(OnPause);
-                _hostChannel.Send(new ServicePaused(Name));
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+		void Create()
+		{
+			try
+			{
+				_instance = (TService)BuildService(Name);
 
-        public void Continue()
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceContinuing(Name));
-                RaiseEvent(OnContinue);
-                _hostChannel.Send(new ServiceRunning(Name));
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+				if (_instance == null)
+					throw new ArgumentNullException("instance", "The service instance returned was null");
+			}
+			catch (Exception ex)
+			{
+				throw new CouldntBuildServiceException(Name, typeof(TService), ex);
+			}
+		}
 
-        void SendFault(Exception exception)
-        {
-            try
-            {
-                _hostChannel.Send(new ShelfFault(exception));
-            }
-            catch (Exception)
-            {
-                _log.Error("Shelf '{0}' is having a bad day.", exception);
-                // eat the exception for now
-            }
-        }
+		public void Start()
+		{
+			StartAction(_instance);
+		}
 
-        public string Name { get; private set; }
+		public void Stop()
+		{
+			StopAction(_instance);
+		}
 
-        public Type ServiceType
-        {
-            get { return typeof(TService); }
-        }
+		public void Pause()
+		{
+			PauseAction(_instance);
+		}
 
-        public ServiceState State
-        {
-            get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
-        }
-    }
+		public void Continue()
+		{
+			ContinueAction(_instance);
+		}
+	}
 }

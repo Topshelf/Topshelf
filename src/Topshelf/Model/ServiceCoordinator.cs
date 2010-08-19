@@ -44,15 +44,7 @@ namespace Topshelf.Model
         readonly IList<IServiceController> _services = new List<IServiceController>();
         readonly TimeSpan _timeout;
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingHost,
-                                  Action<IServiceCoordinator> afterStartingHost, 
-                                  Action<IServiceCoordinator> afterStoppingHost)
-            : this(beforeStartingHost, afterStartingHost, afterStoppingHost, 30.Seconds())
-        {
-        }
-
-
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
+    	public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
                                   Action<IServiceCoordinator> afterStartingServices, 
                                   Action<IServiceCoordinator> afterStoppingServices,
                                   TimeSpan waitTime)
@@ -119,7 +111,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().ControllerChannel.Send(new StartService());
+            Services.Where(x => x.Name == name).First().Send(new StartService());
         }
 
         public void StopService(string name)
@@ -127,7 +119,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Stop();
+            Services.Where(x => x.Name == name).First().Send(new StopService());
         }
 
         public void PauseService(string name)
@@ -135,7 +127,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Pause();
+            Services.Where(x => x.Name == name).First().Send( new PauseService());
         }
 
         public void ContinueService(string name)
@@ -143,7 +135,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Continue();
+            Services.Where(x => x.Name == name).First().Send(new ContinueService());
         }
 
         public int HostedServiceCount
@@ -227,7 +219,7 @@ namespace Topshelf.Model
                 foreach (IServiceController serviceController in Services)
                 {
                     _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
-                    serviceController.ControllerChannel.Send(default(TSent));
+                    serviceController.Send(default(TSent));
                 }
 
                 completed = latch.WaitOne(_timeout);

@@ -49,7 +49,7 @@ namespace Topshelf.Specs
 					c.HowToBuildService(name => _srv);
 
 					_serviceController = c.Create(WellknownAddresses.GetServiceCoordinatorProxy());
-					_serviceController.Start();
+					_serviceController.Send(new StartService());
 
 					startEvent.WaitOne(5.Seconds());
 
@@ -70,9 +70,9 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_continue()
 		{
-			_serviceController.Pause();
+			_serviceController.Send(new PauseService());
 
-			_serviceController.Continue();
+			_serviceController.Send(new ContinueService());
 
 			_serviceController.State
 				.ShouldEqual(ServiceState.Started);
@@ -92,7 +92,7 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_pause()
 		{
-			_serviceController.Pause();
+			_serviceController.Send(new PauseService());
 
 			_serviceController.State
 				.ShouldEqual(ServiceState.Paused);
@@ -118,7 +118,7 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_stop()
 		{
-			_serviceController.Stop();
+			_serviceController.Send(new StopService());
 
 			_serviceController.State
 				.ShouldEqual(ServiceState.Stopped);
@@ -149,7 +149,7 @@ namespace Topshelf.Specs
 
 			using (IServiceController service = c.Create(WellknownAddresses.GetServiceCoordinatorProxy()))
 			{
-				service.Start();
+				service.Send(new StartService());
 
 				service.State
 					.ShouldEqual(ServiceState.Started);
