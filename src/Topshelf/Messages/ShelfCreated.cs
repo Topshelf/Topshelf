@@ -20,7 +20,7 @@ namespace Topshelf.Messages
 	{
 		public ShelfCreated()
 		{
-			EventType = ShelfEventType.Created;
+			EventType = ServiceEventType.ShelfCreated;
 		}
 
 		public Uri Address { get; set; }

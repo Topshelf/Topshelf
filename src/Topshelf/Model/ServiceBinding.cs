@@ -10,11 +10,27 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Messages
+namespace Topshelf.Model
 {
-	public enum ShelfEventType
+	using Magnum.StateMachine;
+	using Shelving;
+	using Messages;
+
+
+	public class ServiceBinding<TService> :
+		StateMachineBinding<TService, string>
+		where TService : ServiceStateMachine<TService, CreateService, ServiceCreated>
 	{
-		Created,
-		Fault
+		public ServiceBinding()
+		{
+			Id(x => x.Name);
+
+			Bind(ShelfService.OnCreate, x => x.ServiceName);
+			Bind(ShelfService.OnStart, x => x.ServiceName);
+			Bind(ShelfService.OnStop, x => x.ServiceName);
+			Bind(ShelfService.OnReload, x => x.ServiceName);
+			Bind(ShelfService.OnCreated, x => x.ServiceName);
+			Bind(ShelfService.OnStopped, x => x.ServiceName);
+		}
 	}
 }

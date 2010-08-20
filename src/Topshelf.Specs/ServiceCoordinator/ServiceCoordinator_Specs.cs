@@ -12,57 +12,51 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.ServiceCoordinator
 {
-    using System;
-    using System.Collections.Generic;
-    using Magnum.Extensions;
-    using Model;
-    using NUnit.Framework;
-    using Shelving;
-    using TestObject;
+	using System;
+	using System.Collections.Generic;
+	using Magnum.Extensions;
+	using Model;
+	using NUnit.Framework;
+	using TestObject;
 
 
-    [TestFixture, Explicit]
-    public class ServiceCoordinator_Specs
-    {
-        #region Setup/Teardown
+	[TestFixture]
+	[Explicit]
+	public class ServiceCoordinator_Specs
+	{
+		[SetUp]
+		public void EstablishContext()
+		{
+			_service = new TestService();
+			_service2 = new TestService2();
 
-        [SetUp]
-        public void EstablishContext()
-        {
-            _service = new TestService();
-            _service2 = new TestService2();
+			_beforeStartingServicesInvoked = false;
+			_afterStartingServicesInvoked = false;
+			_afterStoppingServicesInvoked = false;
 
-            _beforeStartingServicesInvoked = false;
-            _afterStartingServicesInvoked = false;
-            _afterStoppingServicesInvoked = false;
+			_serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; },
+			                                             x => { _afterStartingServicesInvoked = true; },
+			                                             x => { _afterStoppingServicesInvoked = true; },
+			                                             10.Seconds());
 
-            _serviceCoordinator = new ServiceCoordinator(x => { _beforeStartingServicesInvoked = true; }, 
-                                                         x => { _afterStartingServicesInvoked = true; }, 
-                                                         x => { _afterStoppingServicesInvoked = true; }, 
-                                                         10.Seconds());
+			IList<Func<IService>> services = new List<Func<IService>>
+				{
+					() => new Service<TestService>("test", AddressRegistry.GetServiceCoordinatorProxy(),
+					                               x => x.Start(),
+					                               x => x.Stop(),
+					                               x => x.Pause(),
+					                               x => x.Continue(),
+					                               x => _service),
+					() => new Service<TestService>("test2", AddressRegistry.GetServiceCoordinatorProxy(),
+					                               x => x.Start(),
+					                               x => x.Stop(),
+					                               x => x.Pause(),
+					                               x => x.Continue(),
+					                               x => _service2)
+				};
 
-            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-                                                       {
-                                                           () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-                                                                 {
-                                                                     BuildService = s => _service,
-                                                                     StartAction = x => x.Start(),
-                                                                     StopAction = x => x.Stop(),
-                                                                     ContinueAction = x => x.Continue(),
-                                                                     PauseAction = x => x.Pause()
-                                                                 },
-                                                           () => new ServiceController<TestService2>("test2", WellknownAddresses.GetServiceCoordinatorProxy())
-                                                                 {
-                                                                     BuildService = s => _service2,
-                                                                     StartAction = x => x.Start(),
-                                                                     StopAction = x => x.Stop(),
-                                                                     ContinueAction = x => x.Continue(),
-                                                                     PauseAction = x => x.Pause()
-                                                                 }
-                                                       };
-
-            _serviceCoordinator.RegisterServices(services);
-        }
+			_serviceCoordinator.RegisterServices(services);
+		}
 
 		[TearDown]
 		public void CleanUp()
@@ -70,107 +64,107 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_serviceCoordinator.Dispose();
 		}
 
-        #endregion
+		[Test]
+		public void Continuing_the_coordinator_should_continue_services()
+		{
+			_serviceCoordinator.Start();
+			_serviceCoordinator.Pause();
+			_serviceCoordinator.Continue();
 
-        private TestService _service;
-        private TestService2 _service2;
-        private ServiceCoordinator _serviceCoordinator;
-        private bool _beforeStartingServicesInvoked;
-        private bool _afterStartingServicesInvoked;
-        private bool _afterStoppingServicesInvoked;
+			_service.WasRunning
+				.ShouldBeTrue();
+			_service.WasContinued
+				.ShouldBeTrue();
+			_service.Running
+				.ShouldBeTrue();
+		}
 
-        [Test]
-        public void Continuing_the_coordinator_should_continue_services()
-        {
-            _serviceCoordinator.Start();
-            _serviceCoordinator.Pause();
-            _serviceCoordinator.Continue();
+		[Test]
+		public void Pausing_the_coordinator_should_pause_services()
+		{
+			_serviceCoordinator.Start();
+			_serviceCoordinator.Pause();
 
-            _service.HasBeenStarted
-                .ShouldBeTrue();
-            _service.HasBeenContinued
-                .ShouldBeTrue();
-            _service.Started
-                .ShouldBeTrue();
-        }
+			_service.WasRunning
+				.ShouldBeTrue();
+			_service.Paused
+				.ShouldBeTrue();
+		}
 
-        [Test]
-        public void Pausing_the_coordinator_should_pause_services()
-        {
-            _serviceCoordinator.Start();
-            _serviceCoordinator.Pause();
+		[Test]
+		public void Starting_the_coordinator_should_start_all_services()
+		{
+			bool beforeStartingServicesWasInvokedBeforeServiceStart = false;
+			bool afterStartingServicesWasInvokedBeforeServiceStart = false;
 
-            _service.HasBeenStarted
-                .ShouldBeTrue();
-            _service.Paused
-                .ShouldBeTrue();
-        }
+			_service.StartAction = () =>
+				{
+					beforeStartingServicesWasInvokedBeforeServiceStart = _beforeStartingServicesInvoked;
+					afterStartingServicesWasInvokedBeforeServiceStart = _afterStartingServicesInvoked;
+				};
 
-        [Test]
-        public void Starting_the_coordinator_should_start_all_services()
-        {
-            bool beforeStartingServicesWasInvokedBeforeServiceStart = false;
-            bool afterStartingServicesWasInvokedBeforeServiceStart = false;
+			_serviceCoordinator.Start();
+			_service.WasRunning
+				.ShouldBeTrue();
+			_service2.WasRunning
+				.ShouldBeTrue();
 
-            _service.StartAction = () =>
-            {
-                beforeStartingServicesWasInvokedBeforeServiceStart = _beforeStartingServicesInvoked;
-                afterStartingServicesWasInvokedBeforeServiceStart = _afterStartingServicesInvoked;
-            };
+			_beforeStartingServicesInvoked
+				.ShouldBeTrue();
+			_afterStartingServicesInvoked
+				.ShouldBeTrue();
+			beforeStartingServicesWasInvokedBeforeServiceStart
+				.ShouldBeTrue();
+			afterStartingServicesWasInvokedBeforeServiceStart
+				.ShouldBeFalse();
+		}
 
-            _serviceCoordinator.Start();
-            _service.HasBeenStarted
-                .ShouldBeTrue();
-            _service2.HasBeenStarted
-                .ShouldBeTrue();
+		[Test]
+		public void Stopping_the_coordinator_should_stop_all_services()
+		{
+			_serviceCoordinator.Start();
+			_serviceCoordinator.Stop();
 
-            _beforeStartingServicesInvoked
-                .ShouldBeTrue();
-            _afterStartingServicesInvoked
-                .ShouldBeTrue();
-            beforeStartingServicesWasInvokedBeforeServiceStart
-                .ShouldBeTrue();
-            afterStartingServicesWasInvokedBeforeServiceStart
-                .ShouldBeFalse();
-        }
+			_service.WasRunning
+				.ShouldBeTrue();
+			_service.Stopped
+				.ShouldBeTrue();
 
-        [Test]
-        public void Stopping_the_coordinator_should_stop_all_services()
-        {
-            _serviceCoordinator.Start();
-            _serviceCoordinator.Stop();
+			_service2.WasRunning
+				.ShouldBeTrue();
+			_service2.Stopped
+				.ShouldBeTrue();
 
-            _service.HasBeenStarted
-                .ShouldBeTrue();
-            _service.Stopped
-                .ShouldBeTrue();
+			_afterStoppingServicesInvoked
+				.ShouldBeTrue();
+		}
 
-            _service2.HasBeenStarted
-                .ShouldBeTrue();
-            _service2.Stopped
-                .ShouldBeTrue();
+		[Test]
+		public void Unstarted_coordinator_should_not_start_services()
+		{
+			_service.WasRunning
+				.ShouldBeFalse();
+		}
 
-            _afterStoppingServicesInvoked
-                .ShouldBeTrue();
-        }
+		[Test]
+		[Ignore]
+		public void You_cant_continue_if_you_arent_currently_paused()
+		{
+			Assert.Fail();
+		}
 
-        [Test]
-        public void Unstarted_coordinator_should_not_start_services()
-        {
-            _service.HasBeenStarted
-                .ShouldBeFalse();
-        }
+		[Test]
+		[Ignore]
+		public void You_cant_pause_if_you_havent_started()
+		{
+			Assert.Fail();
+		}
 
-        [Test, Ignore]
-        public void You_cant_continue_if_you_arent_currently_paused()
-        {
-            Assert.Fail();
-        }
-
-        [Test, Ignore]
-        public void You_cant_pause_if_you_havent_started()
-        {
-            Assert.Fail();
-        }
-    }
+		TestService _service;
+		TestService2 _service2;
+		ServiceCoordinator _serviceCoordinator;
+		bool _beforeStartingServicesInvoked;
+		bool _afterStartingServicesInvoked;
+		bool _afterStoppingServicesInvoked;
+	}
 }

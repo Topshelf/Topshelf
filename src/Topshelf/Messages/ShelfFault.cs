@@ -26,7 +26,7 @@ namespace Topshelf.Messages
 
 		protected ShelfFault()
 		{
-			EventType = ShelfEventType.Fault;
+			EventType = ServiceEventType.Fault;
 		}
 
 		public Exception Exception { get; protected set; }

@@ -23,7 +23,7 @@ namespace Topshelf.Configuration.Dsl
     public class RunnerConfigurator :
         IRunnerConfigurator
     {
-        readonly IList<Func<IServiceController>> _serviceConfigurators;
+        readonly IList<Func<IService>> _serviceConfigurators;
         readonly WinServiceSettings _winServiceSettings;
         Action<IServiceCoordinator> _beforeStartingServices = c => { };
         Action<IServiceCoordinator> _afterStartingServices = c => { };
@@ -39,7 +39,7 @@ namespace Topshelf.Configuration.Dsl
         {
             _winServiceSettings = new WinServiceSettings();
             _credentials = Credentials.LocalSystem;
-            _serviceConfigurators = new List<Func<IServiceController>>();
+            _serviceConfigurators = new List<Func<IService>>();
         }
 
         #region WinServiceSettings
@@ -99,7 +99,7 @@ namespace Topshelf.Configuration.Dsl
             _serviceConfigurators.Add(() =>
                 {
                     action(configurator);
-                    return configurator.Create(WellknownAddresses.GetServiceCoordinatorProxy());
+                    return configurator.Create(AddressRegistry.GetServiceCoordinatorProxy());
                 });
         }
 

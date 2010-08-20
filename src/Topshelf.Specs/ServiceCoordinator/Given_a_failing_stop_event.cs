@@ -12,44 +12,41 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.ServiceCoordinator
 {
-    using System;
-    using System.Collections.Generic;
-    using Magnum.TestFramework;
-    using Model;
-    using NUnit.Framework;
-    using Shelving;
-    using TestObject;
+	using System;
+	using System.Collections.Generic;
+	using Magnum.TestFramework;
+	using Model;
+	using NUnit.Framework;
+	using TestObject;
 
 
-    [Scenario]
-    public class Given_a_failing_stop_event :
-        ServiceCoordinator_SpecsBase
-    {
-        [When]
-        public void A_registered_service_throws_on_stop()
-        {
-            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-                {
-                    () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-                        {
-                            BuildService = s => new TestService(),
-                            StartAction = x => x.Start(),
-                            StopAction = x => { throw new Exception(); },
-                            ContinueAction = x => x.Continue(),
-                            PauseAction = x => x.Pause()
-                        }
-                };
+	[Scenario]
+	public class Given_a_failing_stop_event :
+		ServiceCoordinator_SpecsBase
+	{
+		[When]
+		public void A_registered_service_throws_on_stop()
+		{
+			IList<Func<IService>> services = new List<Func<IService>>
+				{
+					() => new Service<TestService>("test", AddressRegistry.GetServiceCoordinatorProxy(),
+					                               x => x.Start(),
+					                               x => { throw new Exception(); },
+					                               x => x.Pause(),
+					                               x => x.Continue(),
+					                               x => new TestService())
+				};
 
-            ServiceCoordinator.RegisterServices(services);
+			ServiceCoordinator.RegisterServices(services);
 
-            ServiceCoordinator.Start();
-        }
+			ServiceCoordinator.Start();
+		}
 
-        [Then]
-        [Slow]
-        public void An_exception_is_thrown_when_service_is_stopped()
-        {
-            Assert.That(() => ServiceCoordinator.Stop(), Throws.InstanceOf<Exception>());
-        }
-    }
+		[Then]
+		[Slow]
+		public void An_exception_is_thrown_when_service_is_stopped()
+		{
+			Assert.That(() => ServiceCoordinator.Stop(), Throws.InstanceOf<Exception>());
+		}
+	}
 }

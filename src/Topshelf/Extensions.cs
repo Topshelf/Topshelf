@@ -26,13 +26,13 @@ namespace Topshelf
         {
             return string.Format(format, args);
         }
-        public static void IfNotNull(this IServiceController serviceController, Action<IServiceController> action)
+        public static void IfNotNull(this IService serviceController, Action<IService> action)
         {
             if (serviceController != null)
                 action(serviceController);
         }
 
-        public static TT IfNotNull<TT>(this IServiceController serviceController, Func<IServiceController, TT> action, TT ifNull)
+        public static TT IfNotNull<TT>(this IService serviceController, Func<IService, TT> action, TT ifNull)
         {
             if (serviceController != null)
                 return action(serviceController);

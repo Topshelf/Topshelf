@@ -28,17 +28,15 @@ namespace Topshelf.Specs.ServiceCoordinator
         [When]
         public void A_registered_service_throws_on_continue()
         {
-            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-                {
-                    () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-                        {
-                            BuildService = s => new TestService(),
-                            StartAction = x => x.Start(),
-                            StopAction = x => x.Stop(),
-                            ContinueAction = x => { throw new Exception(); },
-                            PauseAction = x => x.Continue()
-                        }
-                };
+            IList<Func<IService>> services = new List<Func<IService>>
+				{
+					() => new Service<TestService>("test", AddressRegistry.GetServiceCoordinatorProxy(),
+					                               x => x.Start(),
+					                               x => x.Stop(),
+					                               x => x.Pause(),
+					                               x => { throw new Exception();},
+					                               x => new TestService())
+				};
 
             ServiceCoordinator.RegisterServices(services);
 

@@ -17,7 +17,6 @@ namespace Topshelf.Specs.ServiceCoordinator
 	using Magnum.TestFramework;
 	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using TestObject;
 
 
@@ -28,16 +27,14 @@ namespace Topshelf.Specs.ServiceCoordinator
 		[When]
 		public void A_registered_service_cannot_be_built()
 		{
-			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
+			IList<Func<IService>> services = new List<Func<IService>>
 				{
-					() => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-						{
-							BuildService = s => { throw new Exception(); },
-							StartAction = x => x.Start(),
-							StopAction = x => x.Stop(),
-							ContinueAction = x => x.Continue(),
-							PauseAction = x => x.Continue()
-						}
+					() => new Service<TestService>("test", AddressRegistry.GetServiceCoordinatorProxy(),
+					                               x => x.Start(),
+					                               x => x.Stop(),
+					                               x => x.Pause(),
+					                               x => x.Continue(),
+					                               x => { throw new Exception(); })
 				};
 
 			ServiceCoordinator.RegisterServices(services);

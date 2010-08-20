@@ -10,16 +10,16 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
-	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
 	using Magnum.Extensions;
+	using Shelving;
 
 
-	public static class WellknownAddresses
+	public static class AddressRegistry
 	{
 		public static Uri ShelfServiceCoordinatorAddress
 		{
@@ -73,7 +73,7 @@ namespace Topshelf.Shelving
 
 		public static OutboundChannel GetServiceCoordinatorProxy()
 		{
-			return new OutboundChannel(ServiceCoordinatorAddress,ServiceCoordinatorPipeName);
+			return new OutboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName);
 		}
 
 		public static InboundChannel GetServiceCoordinatorHost(Action<ConnectionConfigurator> cfg)
@@ -89,6 +89,16 @@ namespace Topshelf.Shelving
 		public static InboundChannel CreateServiceChannel(string serviceName, Action<ConnectionConfigurator> cfg)
 		{
 			return new InboundChannel(GetServiceAddress(serviceName), GetServicePipeName(serviceName), cfg);
+		}
+
+		public static Uri GetShelfServiceInstanceAddress(AppDomain appDomain)
+		{
+			return GetServiceUri().AppendPath("ShelfService").AppendPath(appDomain.FriendlyName);
+		}
+
+		public static string GetShelfServiceInstancePipeName(AppDomain appDomain)
+		{
+			return "{0}/ShelfService/{1}".FormatWith(GetPid(), appDomain.FriendlyName);
 		}
 	}
 }

@@ -20,6 +20,7 @@ namespace Topshelf.Specs
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Messages;
+	using Model;
 	using NUnit.Framework;
 	using Shelving;
 
@@ -95,8 +96,8 @@ namespace Topshelf.Specs
 			using (var dm = new DirectoryMonitor("."))
 			{
 				var myChannel = new ChannelAdapter();
-				using (new InboundChannel(WellknownAddresses.ShelfServiceCoordinatorAddress, 
-					WellknownAddresses.ShelfServiceCoordinatorPipeName))
+				using (new InboundChannel(AddressRegistry.ShelfServiceCoordinatorAddress, 
+					AddressRegistry.ShelfServiceCoordinatorPipeName))
 				{
 					dm.Start();
 

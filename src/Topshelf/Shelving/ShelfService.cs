@@ -13,131 +13,43 @@
 namespace Topshelf.Shelving
 {
 	using System;
-	using System.Diagnostics;
 	using System.Reflection;
 	using log4net;
 	using Magnum.Channels;
 	using Magnum.Extensions;
-	using Magnum.Reflection;
-	using Magnum.StateMachine;
 	using Messages;
+	using Model;
 
 
-	[DebuggerDisplay("{ShelfName}: {CurrentState}")]
 	public class ShelfService :
-		StateMachine<ShelfService>
+		ServiceStateMachine<ShelfService, CreateShelfService, ShelfCreated>
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(ShelfService));
 
-		readonly UntypedChannel _eventChannel;
 		AssemblyName[] _assemblyNames;
 		Type _bootstrapperType;
 		ShelfReference _reference;
 		ShelfType _shelfType;
 
-		static ShelfService()
-		{
-			Define(() =>
-				{
-					Initially(
-					          When(OnCreate)
-					          	.Call((instance, message) => instance.Initialize(message))
-					          	.TransitionTo(Creating));
-
-					During(Creating,
-					       When(OnShelfCreated)
-					       	.Call((instance, message) => instance.ShelfCreated(message))
-					       	.TransitionTo(Created));
-
-					During(Created,
-					       When(OnStart)
-					       	.Call((instance, message) => instance.StartShelfService())
-					       	.TransitionTo(Starting));
-
-					During(Running,
-					       When(OnStop)
-					       	.Call((instance, message) => instance.StopShelfService(message)),
-							When(OnReload)
-							.Call((instance,message) => instance.ReloadShelfService())
-							.TransitionTo(Reloading));
-
-					During(Reloading,
-					       When(OnServiceStopped)
-					       	.Call(instance => instance.UnloadReference())
-					       	.Call(instance => instance.CreateShelfReference())
-					       	.TransitionTo(Creating));
-
-					Anytime(
-					        When(Created.Enter)
-					        	.Call(instance => instance.Publish<ServiceCreated>())
-					        	.Call(instance => instance.StartShelfService()),
-					        When(Starting.Enter)
-					        	.Call(instance => instance.Publish<ServiceStarting>()),
-					        When(Running.Enter)
-					        	.Call(instance => instance.Publish<ServiceRunning>()),
-					        When(Pausing.Enter)
-					        	.Call(instance => instance.Publish<ServicePausing>()),
-					        When(Paused.Enter)
-					        	.Call(instance => instance.Publish<ServicePaused>()),
-					        When(Continuing.Enter)
-					        	.Call(instance => instance.Publish<ServiceContinuing>()),
-					        When(Stopping.Enter)
-					        	.Call(instance => instance.Publish<ServiceStopping>()),
-					        When(Stopped.Enter)
-					        	.Call(instance => instance.Publish<ServiceStopped>())
-						);
-				});
-		}
-
-
 		public ShelfService(string name, UntypedChannel eventChannel)
+			: base(name, eventChannel)
 		{
-			Name = name;
-			_eventChannel = eventChannel;
 		}
 
-		public string Name { get; set; }
 
-		public static Event<CreateShelfService> OnCreate { get; set; }
-		public static Event<StartService> OnStart { get; set; }
-		public static Event<StopService> OnStop { get; set; }
-		public static Event<ReloadService> OnReload { get; set; }
+		void Send<T>(T message)
+		{
+			if (_reference == null || _reference.ShelfChannel == null)
+			{
+				_log.WarnFormat("Unable to send service message due to null channel, service = {0}, message type = {1}",
+				                Name, typeof(T).ToShortTypeName());
+				return;
+			}
 
+			_reference.ShelfChannel.Send(message);
+		}
 
-		public static Event<ShelfCreated> OnShelfCreated { get; set; }
-
-		public static Event<ServiceStopped> OnServiceStopped { get; set; }
-
-
-		public static State Initial { get; set; }
-		public static State Creating { get; set; }
-		public static State Created { get; set; }
-		public static State Starting { get; set; }
-		public static State Running { get; set; }
-		public static State Pausing { get; set; }
-		public static State Paused { get; set; }
-		public static State Continuing { get; set; }
-		public static State Stopping { get; set; }
-		public static State Stopped { get; set; }
-		public static State Reloading { get; set; }
-		public static State Completed { get; set; }
-
-
-//		public HostProxy ShelfChannel
-//		{
-//			get { return _shelfChannel ?? (_shelfChannel = ShelfChannelBuilder(AppDomain)); }
-//		}
-//
-//		public HostProxy ServiceChannel
-//		{
-//			get { return _serviceChannel ?? (_serviceChannel = ServiceChannelBuilder(AppDomain)); }
-//		}
-//
-//		public Func<AppDomain, HostProxy> ShelfChannelBuilder { private get; set; }
-//		public Func<AppDomain, HostProxy> ServiceChannelBuilder { private get; set; }
-//
-
-		void Initialize(CreateShelfService message)
+		protected override void Create(CreateShelfService message)
 		{
 			_log.Debug("Creating shelf service: " + message.ServiceName);
 
@@ -147,10 +59,10 @@ namespace Topshelf.Shelving
 			_bootstrapperType = message.BootstrapperType;
 			_assemblyNames = message.AssemblyNames;
 
-			CreateShelfReference();
+			Create();
 		}
 
-		void CreateShelfReference()
+		protected override void Create()
 		{
 			_reference = new ShelfReference(Name, _shelfType);
 
@@ -163,49 +75,32 @@ namespace Topshelf.Shelving
 				_reference.Create();
 		}
 
-		void ShelfCreated(ShelfCreated message)
+		protected override void ServiceCreated(ShelfCreated message)
 		{
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
 
-		void StartShelfService()
+		protected override void Start()
 		{
-			_log.Debug("Starting shelf: " + Name);
-			_reference.ShelfChannel.Send(new StartService
+			_log.Debug("Starting service: " + Name);
+			Send(new StartService
 				{
 					ServiceName = Name,
 				});
 		}
 
-		void ReloadShelfService()
+		protected override void Stop(StopService message)
 		{
-			_log.Debug("Reloading shelf: " + Name);
-
-			_reference.ShelfChannel.Send(new StopService
-				{
-					ServiceName = Name
-				});
-
-			// TODO likely need to set a timeout for this operation (mailbox would rock here)
+			Send(message);
 		}
 
-		void UnloadReference()
+		protected override void Unload()
 		{
-			_reference.Dispose();
-			_reference = null;
-		}
-
-		void StopShelfService(StopService message)
-		{
-			_reference.ShelfChannel.Send(message);
-		}
-
-		void Publish<T>()
-			where T : ServiceEvent
-		{
-			T message = FastActivator<T>.Create(Name);
-
-			_eventChannel.Send(message);
+			if (_reference != null)
+			{
+				_reference.Dispose();
+				_reference = null;
+			}
 		}
 	}
 }

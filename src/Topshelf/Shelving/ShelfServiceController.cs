@@ -21,6 +21,7 @@ namespace Topshelf.Shelving
 	using Magnum.Extensions;
 	using Magnum.Fibers;
 	using Messages;
+	using Model;
 
 
 	public class ShelfServiceController :
@@ -56,8 +57,8 @@ namespace Topshelf.Shelving
 						.UsingConsumer(OnServiceStopped)
 						.ExecuteOnFiber(_fiber);
 
-					x.ReceiveFromWcfChannel(WellknownAddresses.ShelfServiceCoordinatorAddress,
-					                        WellknownAddresses.ShelfServiceCoordinatorPipeName);
+					x.ReceiveFromWcfChannel(AddressRegistry.ShelfServiceCoordinatorAddress,
+					                        AddressRegistry.ShelfServiceCoordinatorPipeName);
 				});
 		}
 

@@ -21,6 +21,7 @@ namespace Topshelf.FileSystem
     using Magnum.FileSystem;
     using Magnum.FileSystem.Events;
     using Messages;
+    using Model;
     using Shelving;
 
     public class DirectoryMonitor :
@@ -35,7 +36,7 @@ namespace Topshelf.FileSystem
         public DirectoryMonitor(string directory)
         {
             _baseDir = directory;
-            _hostChannel = WellknownAddresses.GetShelfServiceCoordinatorProxy();
+            _hostChannel = AddressRegistry.GetShelfServiceCoordinatorProxy();
         }
 
         public void Start()

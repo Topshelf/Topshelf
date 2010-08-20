@@ -39,9 +39,9 @@ namespace Topshelf.Model
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
 
         readonly InboundChannel _hostChannel;
-        readonly List<Func<IServiceController>> _serviceConfigurators;
+        readonly List<Func<IService>> _serviceConfigurators;
 
-        readonly IList<IServiceController> _services = new List<IServiceController>();
+        readonly IList<IService> _services = new List<IService>();
         readonly TimeSpan _timeout;
 
     	public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
@@ -57,10 +57,10 @@ namespace Topshelf.Model
             _afterStartingServices = GetLogWrapper("AfterStartingServices", afterStartingServices);
             _afterStoppingServices = GetLogWrapper("AfterStoppingServices", afterStoppingServices);
 
-            _serviceConfigurators = new List<Func<IServiceController>>();
+            _serviceConfigurators = new List<Func<IService>>();
 
 			_timeout = waitTime;
-			_hostChannel = WellknownAddresses.GetServiceCoordinatorHost(s =>
+			_hostChannel = AddressRegistry.GetServiceCoordinatorHost(s =>
                 {
                     s.AddConsumerOf<ShelfFault>().UsingConsumer(HandleServiceFault);
                     s.AddConsumerOf<ServiceRunning>().UsingConsumer(msg => ServiceStartedAction.Invoke(msg));
@@ -69,7 +69,7 @@ namespace Topshelf.Model
                 });
         }
 
-        public IList<IServiceController> Services
+        public IList<IService> Services
         {
             get
             {
@@ -157,7 +157,7 @@ namespace Topshelf.Model
                     });
         }
 
-        public IServiceController GetService(string name)
+        public IService GetService(string name)
         {
             return Services.Where(x => x.Name == name).FirstOrDefault();
         }
@@ -216,7 +216,7 @@ namespace Topshelf.Model
                 stateEvent += action;
 
                 _log.Debug("{0} is now {1} all '{2}' subordinate services".FormatWith(printableMethod, printableAction.ToLower(), Services.Count));
-                foreach (IServiceController serviceController in Services)
+                foreach (IService serviceController in Services)
                 {
                     _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
                     serviceController.Send(default(TSent));
@@ -254,7 +254,7 @@ namespace Topshelf.Model
             {
                 foreach (var serviceConfigurator in _serviceConfigurators)
                 {
-                    IServiceController serviceController = serviceConfigurator();
+                    IService serviceController = serviceConfigurator();
                     _services.Add(serviceController);
                 }
 
@@ -262,13 +262,13 @@ namespace Topshelf.Model
             }
         }
 
-        public void AddNewService(IServiceController controller)
+        public void AddNewService(IService controller)
         {
             _services.Add(controller);
             //TODO: How to best call start here?
         }
 
-        public void RegisterServices(IList<Func<IServiceController>> services)
+        public void RegisterServices(IList<Func<IService>> services)
         {
             _serviceConfigurators.AddRange(services);
         }
@@ -277,7 +277,7 @@ namespace Topshelf.Model
         {
             foreach (var serviceConfigurator in _serviceConfigurators)
             {
-                IServiceController serviceController = serviceConfigurator();
+                IService serviceController = serviceConfigurator();
                 Services.Add(serviceController);
             }
         }

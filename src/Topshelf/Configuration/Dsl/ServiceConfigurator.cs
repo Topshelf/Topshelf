@@ -12,33 +12,30 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-    using Magnum.Channels;
-    using Model;
-    using Shelving;
+	using Magnum.Channels;
+	using Model;
 
 
-    public class ServiceConfigurator<TService> :
-        ServiceConfiguratorBase<TService>,
-        IServiceConfigurator<TService>
-        where TService : class
-    {
-        public IServiceController Create(OutboundChannel hostChannel)
-        {
-            return Create(Name, hostChannel);
-        }
+	public class ServiceConfigurator<TService> :
+		ServiceConfiguratorBase<TService>,
+		IServiceConfigurator<TService>
+		where TService : class
+	{
+		public Service<TService> Create(UntypedChannel hostChannel)
+		{
+			return Create(Name, hostChannel);
+		}
 
-        public IServiceController Create(string serviceName, OutboundChannel hostChannel)
-        {
-            IServiceController serviceController = new ServiceController<TService>(serviceName, hostChannel)
-                {
-                    StartAction = StartAction,
-                    StopAction = StopAction,
-                    PauseAction = PauseAction,
-                    ContinueAction = ContinueAction,
-                    BuildService = BuildAction,
-                };
+		public Service<TService> Create(string serviceName, UntypedChannel coordinatorChannel)
+		{
+			var serviceController = new Service<TService>(serviceName, coordinatorChannel,
+			                                              StartAction,
+			                                              StopAction,
+			                                              PauseAction,
+			                                              ContinueAction,
+			                                              BuildAction);
 
-            return serviceController;
-        }
-    }
+			return serviceController;
+		}
+	}
 }

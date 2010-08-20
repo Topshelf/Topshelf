@@ -15,16 +15,8 @@ namespace Topshelf.Messages
 	/// <summary>
 	/// A service event, published by a service as the state changes
 	/// </summary>
-	public abstract class ShelfEvent
+	public abstract class ShelfEvent :
+		ServiceEvent
 	{
-		/// <summary>
-		/// The name of the service that sourced this event
-		/// </summary>
-		public string ServiceName { get; set; }
-
-		/// <summary>
-		/// The event type that was published
-		/// </summary>
-		public ShelfEventType EventType { get; protected set; }
 	}
 }

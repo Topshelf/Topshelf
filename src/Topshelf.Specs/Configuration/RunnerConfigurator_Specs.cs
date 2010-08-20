@@ -124,12 +124,11 @@ namespace Topshelf.Specs.Configuration
 
             Thread.Sleep(1.Seconds());
 
-            IServiceController serviceController = _runConfiguration.Coordinator.GetService("my_service");
+            IService serviceController = _runConfiguration.Coordinator.GetService("my_service");
 
             serviceController.Name
                 .ShouldEqual("my_service");
-            serviceController.State
-                .ShouldEqual(ServiceState.Started);
+            serviceController.CurrentState.Name.ShouldEqual("Running");
         }
     }
 

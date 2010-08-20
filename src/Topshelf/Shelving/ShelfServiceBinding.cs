@@ -26,8 +26,8 @@ namespace Topshelf.Shelving
 			Bind(ShelfService.OnStart, x => x.ServiceName);
 			Bind(ShelfService.OnStop, x => x.ServiceName);
 			Bind(ShelfService.OnReload, x => x.ServiceName);
-			Bind(ShelfService.OnShelfCreated, x => x.ServiceName);
-			Bind(ShelfService.OnServiceStopped, x => x.ServiceName);
+			Bind(ShelfService.OnCreated, x => x.ServiceName);
+			Bind(ShelfService.OnStopped, x => x.ServiceName);
 		}
 	}
 }
