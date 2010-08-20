@@ -41,13 +41,13 @@ namespace Topshelf.Specs
 				c.WhenContinued(s => { _wasContinued = true; });
 				c.HowToBuildService(name => _service);
 
-				_serviceController = c.Create(AddressRegistry.GetServiceCoordinatorProxy());
+				_serviceController = c.Create(AddressRegistry.GetOutboundCoordinatorChannel());
 			}
 
 			_serviceChannel = new InboundChannel(AddressRegistry.GetServiceAddress(_serviceController.Name),
 			                                     AddressRegistry.GetServicePipeName(_serviceController.Name), x =>
 			                                     	{
-			                                     		x.AddConsumersFor<Service<TestService>>()
+			                                     		x.AddConsumersFor<ServiceController<TestService>>()
 			                                     			.UsingInstance(_serviceController)
 															.ExecuteOnProducerThread();
 			                                     	});
@@ -116,7 +116,7 @@ namespace Topshelf.Specs
 
 		FutureChannel<ServiceRunning> _serviceStarted;
 
-		Service<TestService> _serviceController;
+		ServiceController<TestService> _serviceController;
 		TestService _service;
 		bool _wasPaused;
 		bool _wasContinued;
@@ -129,22 +129,22 @@ namespace Topshelf.Specs
 
 	public static class ServiceAssertions
 	{
-		public static void ShouldBeRunning<TService>(this Service<TService> service) 
+		public static void ShouldBeRunning<TService>(this ServiceController<TService> service) 
 			where TService : class
 		{
-			service.CurrentState.ShouldEqual(Service<TService>.Running);
+			service.CurrentState.ShouldEqual(ServiceController<TService>.Running);
 		}
 	
-		public static void ShouldBeStopped<TService>(this Service<TService> service) 
+		public static void ShouldBeStopped<TService>(this ServiceController<TService> service) 
 			where TService : class
 		{
-			service.CurrentState.ShouldEqual(Service<TService>.Stopped);
+			service.CurrentState.ShouldEqual(ServiceController<TService>.Stopped);
 		}
 
-		public static void ShouldBePaused<TService>(this Service<TService> service) 
+		public static void ShouldBePaused<TService>(this ServiceController<TService> service) 
 			where TService : class
 		{
-			service.CurrentState.ShouldEqual(Service<TService>.Paused);
+			service.CurrentState.ShouldEqual(ServiceController<TService>.Paused);
 		}
 	}
 
@@ -159,7 +159,7 @@ namespace Topshelf.Specs
 			c.WhenStarted(s => s.Start());
 			c.WhenStopped(s => s.Stop());
 
-			using (IService service = c.Create(AddressRegistry.GetServiceCoordinatorProxy()))
+			using (IService service = c.Create(AddressRegistry.GetOutboundCoordinatorChannel()))
 			{
 //				service.Send(new StartService());
 

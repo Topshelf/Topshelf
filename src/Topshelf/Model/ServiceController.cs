@@ -19,8 +19,8 @@ namespace Topshelf.Model
 	using Messages;
 
 
-	public class Service<TService> :
-		ServiceStateMachine<Service<TService>, CreateService, ServiceCreated>,
+	public class ServiceController<TService> :
+		ServiceStateMachine,
 		IService<TService>
 		where TService : class
 	{
@@ -31,7 +31,7 @@ namespace Topshelf.Model
 		Action<TService> _startAction;
 		Action<TService> _stopAction;
 
-		public Service(string name, UntypedChannel eventChannel, Action<TService> startAction, Action<TService> stopAction,
+		public ServiceController(string name, UntypedChannel eventChannel, Action<TService> startAction, Action<TService> stopAction,
 		               Action<TService> pauseAction, Action<TService> continueAction, ServiceBuilder buildAction)
 			: base(name, eventChannel)
 		{
@@ -66,7 +66,7 @@ namespace Topshelf.Model
 			}
 			catch (Exception ex)
 			{
-				throw new CouldntBuildServiceException(Name, typeof(TService), ex);
+				throw new BuildServiceException(Name, typeof(TService), ex);
 			}
 		}
 
@@ -108,6 +108,7 @@ namespace Topshelf.Model
 				_stopAction = null;
 				_pauseAction = null;
 				_continueAction = null;
+				_buildAction = null;
 			}
 		}
 	}

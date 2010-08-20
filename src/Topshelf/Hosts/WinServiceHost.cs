@@ -24,10 +24,10 @@ namespace Topshelf.Hosts
         Host
     {
         readonly ILog _log = LogManager.GetLogger(typeof (WinServiceHost));
-        readonly IServiceCoordinator _coordinator;
+        readonly IOldServiceCoordinator _coordinator;
         readonly ServiceName _fullServiceName;
 
-        public WinServiceHost(IServiceCoordinator coordinator, ServiceName fullServiceName)
+        public WinServiceHost(IOldServiceCoordinator coordinator, ServiceName fullServiceName)
         {
             _coordinator = coordinator;
             _fullServiceName = fullServiceName;

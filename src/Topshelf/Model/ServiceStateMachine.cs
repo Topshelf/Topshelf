@@ -14,25 +14,19 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
-	using log4net;
 	using Magnum.Channels;
 	using Magnum.Reflection;
 	using Magnum.StateMachine;
 	using Messages;
 
 
-	[DebuggerDisplay("{ShelfName}: {CurrentState}")]
-	public abstract class ServiceStateMachine<TService, TCreate, TCreated> :
-		StateMachine<TService>,
+	[DebuggerDisplay("{ServiceStateMachine}: {CurrentState}")]
+	public class ServiceStateMachine :
+		StateMachine<ServiceStateMachine>,
 		IDisposable
-		where TCreate : ServiceCommand
-		where TCreated : ServiceEvent
-		where TService : ServiceStateMachine<TService, TCreate, TCreated>
 	{
-		static readonly ILog _log = LogManager.GetLogger(typeof(ServiceStateMachine<TService, TCreate, TCreated>));
-
 		UntypedChannel _coordinatorChannel;
-
+		bool _disposed;
 
 		static ServiceStateMachine()
 		{
@@ -106,8 +100,8 @@ namespace Topshelf.Model
 
 		public string Name { get; set; }
 
-		public static Event<TCreate> OnCreate { get; set; }
-		public static Event<TCreated> OnCreated { get; set; }
+		public static Event<CreateService> OnCreate { get; set; }
+		public static Event<ServiceCreated> OnCreated { get; set; }
 
 		public static Event<StartService> OnStart { get; set; }
 		public static Event<ReloadService> OnReload { get; set; }
@@ -130,15 +124,30 @@ namespace Topshelf.Model
 		public static State Completed { get; set; }
 		public static State Failed { get; set; }
 
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-		protected abstract void Create(TCreate message);
-		protected abstract void Create();
-		protected abstract void ServiceCreated(TCreated message);
 
+		void Create(CreateService message)
+		{
+		}
 
-		protected abstract void Start();
+		void Create()
+		{
+		}
 
-		protected virtual void Reload(ReloadService message)
+		void ServiceCreated(ServiceCreated message)
+		{
+		}
+
+		void Start()
+		{
+		}
+
+		void Reload(ReloadService message)
 		{
 			Stop(new StopService
 				{
@@ -148,9 +157,14 @@ namespace Topshelf.Model
 			// TODO likely need to set a timeout for this operation (mailbox would rock here)
 		}
 
-		protected abstract void Unload();
+		void Unload()
+		{
+		}
 
-		protected abstract void Stop(StopService message);
+		void Stop(StopService message)
+		{
+
+		}
 
 		void Publish<T>()
 			where T : ServiceEvent
@@ -165,14 +179,6 @@ namespace Topshelf.Model
 			_coordinatorChannel.Send(message);
 		}
 
-		bool _disposed;
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
 		~ServiceStateMachine()
 		{
 			Dispose(false);
@@ -183,9 +189,7 @@ namespace Topshelf.Model
 			if (_disposed)
 				return;
 			if (disposing)
-			{
 				_coordinatorChannel = null;
-			}
 
 			_disposed = true;
 		}

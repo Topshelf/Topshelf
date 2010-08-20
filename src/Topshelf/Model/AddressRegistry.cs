@@ -71,14 +71,14 @@ namespace Topshelf.Model
 			return "{0}/Shelf/{1}".FormatWith(GetPid(), serviceName);
 		}
 
-		public static OutboundChannel GetServiceCoordinatorProxy()
+		public static OutboundChannel GetOutboundCoordinatorChannel()
 		{
 			return new OutboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName);
 		}
 
 		public static InboundChannel GetServiceCoordinatorHost(Action<ConnectionConfigurator> cfg)
 		{
-			return new InboundChannel(ShelfServiceCoordinatorAddress, ShelfServiceCoordinatorPipeName, cfg);
+			return new InboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName, cfg);
 		}
 
 		public static OutboundChannel GetShelfServiceCoordinatorProxy()
@@ -86,7 +86,12 @@ namespace Topshelf.Model
 			return new OutboundChannel(ShelfServiceCoordinatorAddress, ShelfServiceCoordinatorPipeName);
 		}
 
-		public static InboundChannel CreateServiceChannel(string serviceName, Action<ConnectionConfigurator> cfg)
+		public static InboundChannel GetInboundServiceChannel(AppDomain appDomain, Action<ConnectionConfigurator> cfg)
+		{
+			return new InboundChannel(GetShelfServiceAddress(appDomain), GetShelfServicePipeName(appDomain), cfg);
+		}
+
+		public static InboundChannel GetInboundServiceChannel(string serviceName, Action<ConnectionConfigurator> cfg)
 		{
 			return new InboundChannel(GetServiceAddress(serviceName), GetServicePipeName(serviceName), cfg);
 		}

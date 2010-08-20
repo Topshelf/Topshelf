@@ -21,10 +21,10 @@ namespace Topshelf.Commands.WinService
         ServiceBase //TODO: Is this what you would InstallUtil?
     {
         private static readonly ILog _log = LogManager.GetLogger(typeof (ServiceHost));
-        private readonly IServiceCoordinator _coordinator;
+        private readonly IOldServiceCoordinator _coordinator;
 
 
-        public ServiceHost(IServiceCoordinator coordinator)
+        public ServiceHost(IOldServiceCoordinator coordinator)
         {
             _coordinator = coordinator;
         }

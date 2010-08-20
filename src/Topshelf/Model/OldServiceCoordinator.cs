@@ -27,13 +27,13 @@ namespace Topshelf.Model
 
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
-    public class ServiceCoordinator :
-        IServiceCoordinator
+    public class OldServiceCoordinator :
+        IOldServiceCoordinator
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
-        readonly Action<IServiceCoordinator> _beforeStartingServices;
-        readonly Action<IServiceCoordinator> _afterStartingServices;
-        readonly Action<IServiceCoordinator> _afterStoppingServices;
+        static readonly ILog _log = LogManager.GetLogger(typeof(OldServiceCoordinator));
+        readonly Action<IOldServiceCoordinator> _beforeStartingServices;
+        readonly Action<IOldServiceCoordinator> _afterStartingServices;
+        readonly Action<IOldServiceCoordinator> _afterStoppingServices;
 
         readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
@@ -44,9 +44,9 @@ namespace Topshelf.Model
         readonly IList<IService> _services = new List<IService>();
         readonly TimeSpan _timeout;
 
-    	public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
-                                  Action<IServiceCoordinator> afterStartingServices, 
-                                  Action<IServiceCoordinator> afterStoppingServices,
+    	public OldServiceCoordinator(Action<IOldServiceCoordinator> beforeStartingServices,
+                                  Action<IOldServiceCoordinator> afterStartingServices, 
+                                  Action<IOldServiceCoordinator> afterStoppingServices,
                                   TimeSpan waitTime)
         {
             ServiceStartedAction += msg => { };
@@ -187,7 +187,7 @@ namespace Topshelf.Model
             _disposed = true;
         }
 
-        ~ServiceCoordinator()
+        ~OldServiceCoordinator()
         {
             Dispose(false);
         }
@@ -291,7 +291,7 @@ namespace Topshelf.Model
                 handle.Invoke(faultMessage.Exception);
         }
 
-        Action<IServiceCoordinator> GetLogWrapper(string name, Action<IServiceCoordinator> action)
+        Action<IOldServiceCoordinator> GetLogWrapper(string name, Action<IOldServiceCoordinator> action)
         {
             return sc =>
             {

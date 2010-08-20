@@ -21,6 +21,23 @@ namespace Topshelf.Shelving
 	using Model;
 
 
+	public interface ServiceFactory
+	{
+		
+	}
+
+	public class ShelfServiceFactory :
+		ServiceFactory
+	{
+		
+	}
+
+	public class CurrentAppDomainServiceFactory :
+		ServiceFactory
+	{
+		
+	}
+
 	public class ShelfService :
 		ServiceStateMachine<ShelfService, CreateShelfService, ShelfCreated>
 	{

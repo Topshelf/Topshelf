@@ -22,10 +22,10 @@ namespace Topshelf.Commands
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof (RunCommand));
-        readonly IServiceCoordinator _coordinator;
+        readonly IOldServiceCoordinator _coordinator;
         readonly ServiceName _serviceName;
 
-        public RunCommand(IServiceCoordinator coordinator, ServiceName serviceName)
+        public RunCommand(IOldServiceCoordinator coordinator, ServiceName serviceName)
         {
             _coordinator = coordinator;
             _serviceName = serviceName;

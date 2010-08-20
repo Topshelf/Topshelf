@@ -36,7 +36,7 @@ namespace Topshelf.Shelving
 		readonly ILog _log;
 		readonly string _pipeName;
 		readonly string _serviceName;
-		readonly InboundChannel _shelfChannel;
+		readonly InboundChannel _channel;
 		IService _service;
 		InboundChannel _serviceChannel;
 
@@ -51,19 +51,13 @@ namespace Topshelf.Shelving
 
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-			_address = AddressRegistry.GetShelfServiceAddress(AppDomain.CurrentDomain);
-			_pipeName = AddressRegistry.GetShelfServicePipeName(AppDomain.CurrentDomain);
-			_shelfChannel = new InboundChannel(_address,
-			                                   _pipeName,
-			                                   x =>
+			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
+			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
 			                                   	{
 			                                   		x.AddConsumerOf<StartService>()
 			                                   			.UsingConsumer(msg => Start());
 			                                   	});
 
-
-			_coordinatorChannel = new OutboundChannel(AddressRegistry.ShelfServiceCoordinatorAddress,
-			                                          AddressRegistry.ShelfServiceCoordinatorPipeName);
 
 			_bootstrapperType = bootstrapperType;
 
@@ -75,15 +69,10 @@ namespace Topshelf.Shelving
 				});
 		}
 
-		public string ServiceName
-		{
-			get { return _serviceName; }
-		}
-
 		public void Dispose()
 		{
-			if (_shelfChannel != null)
-				_shelfChannel.Dispose();
+			if (_channel != null)
+				_channel.Dispose();
 		}
 
 		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -127,13 +116,13 @@ namespace Topshelf.Shelving
 		{
 			bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
-			Service<T> service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, _shelfChannel);
+			ServiceController<T> service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, _channel);
 
 			_serviceChannel = new InboundChannel(AddressRegistry.GetShelfServiceInstanceAddress(AppDomain.CurrentDomain),
 			                                     AddressRegistry.GetShelfServiceInstancePipeName(AppDomain.CurrentDomain),
 			                                     x =>
 			                                     	{
-			                                     		x.AddConsumersFor<Service<T>>()
+			                                     		x.AddConsumersFor<ServiceStateMachine>()
 			                                     			.UsingInstance(service);
 			                                     	});
 

@@ -32,16 +32,16 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service = new TestService();
 			_service2 = new TestService2();
 
-			_serviceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
+			_serviceCoordinator = new OldServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
 			IList<Func<IService>> services = new List<Func<IService>>
 				{
-					() => new Service<TestService>("test", AddressRegistry.GetServiceCoordinatorProxy(),
+					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
 					                               x => x.Stop(),
 					                               x => x.Pause(),
 					                               x => x.Continue(),
 					                               x => _service),
-					() => new Service<TestService>("test2", AddressRegistry.GetServiceCoordinatorProxy(),
+					() => new ServiceController<TestService>("test2", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
 					                               x => x.Stop(),
 					                               x => x.Pause(),
@@ -113,6 +113,6 @@ namespace Topshelf.Specs.ServiceCoordinator
 
 		TestService _service;
 		TestService2 _service2;
-		ServiceCoordinator _serviceCoordinator;
+		OldServiceCoordinator _serviceCoordinator;
 	}
 }

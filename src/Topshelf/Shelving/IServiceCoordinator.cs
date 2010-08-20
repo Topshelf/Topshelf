@@ -17,7 +17,7 @@ namespace Topshelf.Shelving
 	/// <summary>
 	/// Interface to the service controller
 	/// </summary>
-	public interface IShelfServiceController :
+	public interface IServiceCoordinator :
 		IDisposable
 	{
 		/// <summary>

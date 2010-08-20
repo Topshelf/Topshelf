@@ -17,6 +17,6 @@ namespace Topshelf.Configuration
     public class RunConfiguration
     {
         public WinServiceSettings WinServiceSettings { get; set; }
-        public IServiceCoordinator Coordinator { get; set; }
+        public IOldServiceCoordinator Coordinator { get; set; }
     }
 }

@@ -34,13 +34,13 @@ namespace Topshelf.Specs.ServiceCoordinator
 			ServiceCoordinator.ShelfFaulted += _future.Complete;
 			IList<Func<IService>> services = new List<Func<IService>>
 				{
-					() => new Service<TestService>("test", AddressRegistry.GetServiceCoordinatorProxy(),
+					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => { throw new Exception(); },
 					                               x => x.Stop(),
 					                               x => x.Pause(),
 					                               x => x.Continue(),
 					                               x => new TestService()),
-					() => new Service<TestService>("test2", AddressRegistry.GetServiceCoordinatorProxy(),
+					() => new ServiceController<TestService>("test2", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
 					                               x => x.Stop(),
 					                               x => x.Pause(),

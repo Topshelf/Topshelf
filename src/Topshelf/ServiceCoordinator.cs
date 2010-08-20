@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf
 {
 	using System;
 	using System.Linq;
@@ -22,43 +22,40 @@ namespace Topshelf.Shelving
 	using Magnum.Fibers;
 	using Messages;
 	using Model;
+	using Shelving;
 
 
-	public class ShelfServiceController :
-		IShelfServiceController
+	public class ServiceCoordinator :
+		IServiceCoordinator
 	{
-		readonly Cache<string, ShelfService> _serviceCache;
+		readonly Fiber _fiber;
+		readonly Cache<string, ServiceStateMachine> _serviceCache;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
-		UntypedChannel _controllerChannel;
-		ChannelConnection _controllerChannelConnection;
+
+		readonly Action<IServiceCoordinator> _beforeStartingServices;
+		readonly Action<IServiceCoordinator> _afterStartingServices;
+		readonly Action<IServiceCoordinator> _afterStoppingServices;
 
 		bool _disposed;
-		ThreadPoolFiber _fiber;
 		bool _stopping;
+		InboundChannel _channel;
 
-		public ShelfServiceController()
+		public ServiceCoordinator()
 		{
 			_fiber = new ThreadPoolFiber();
 
-			_controllerChannel = new ChannelAdapter();
+			_serviceCache = new Cache<string, ServiceStateMachine>(key => new ServiceStateMachine(key, _channel));
 
-			_serviceCache = new Cache<string, ShelfService>(key => new ShelfService(key, _controllerChannel));
-
-			_controllerChannelConnection = _controllerChannel.Connect(x =>
+			_channel = AddressRegistry.GetServiceCoordinatorHost(x =>
 				{
-					x.AddConsumersFor<ShelfService>()
-						.BindUsing<ShelfServiceBinding, string>()
+					x.AddConsumersFor<ServiceStateMachine>()
+						.BindUsing<ServiceStateMachineBinding, string>()
 						.ExecuteOnThreadPoolFiber()
-						.CreateNewInstanceBy(name => new ShelfService(name, _controllerChannel))
 						.PersistInMemoryUsing(_serviceCache);
-
 
 					x.AddConsumerOf<ServiceStopped>()
 						.UsingConsumer(OnServiceStopped)
 						.ExecuteOnFiber(_fiber);
-
-					x.ReceiveFromWcfChannel(AddressRegistry.ShelfServiceCoordinatorAddress,
-					                        AddressRegistry.ShelfServiceCoordinatorPipeName);
 				});
 		}
 
@@ -77,7 +74,7 @@ namespace Topshelf.Shelving
 					BootstrapperType = bootstrapperType,
 				};
 
-			_controllerChannel.Send(command);
+			_channel.Send(command);
 		}
 
 		public void CreateShelfService(string serviceName)
@@ -88,10 +85,10 @@ namespace Topshelf.Shelving
 					ShelfType = ShelfType.Folder,
 				};
 
-			_controllerChannel.Send(command);
+			_channel.Send(command);
 		}
 
-		~ShelfServiceController()
+		~ServiceCoordinator()
 		{
 			Dispose(false);
 		}
@@ -104,13 +101,11 @@ namespace Topshelf.Shelving
 			{
 				StopServices(10.Minutes());
 
-				if (_controllerChannelConnection != null)
+				if (_channel != null)
 				{
-					_controllerChannelConnection.Dispose();
-					_controllerChannelConnection = null;
+					_channel.Dispose();
+					_channel = null;
 				}
-
-				_controllerChannel = null;
 			}
 
 			_disposed = true;
@@ -120,7 +115,7 @@ namespace Topshelf.Shelving
 		{
 			if (_stopping)
 			{
-				_controllerChannel.Send(new UnloadService
+				_channel.Send(new UnloadService
 					{
 						ServiceName = message.ServiceName
 					});
@@ -160,7 +155,7 @@ namespace Topshelf.Shelving
 							ServiceName = name
 						};
 
-					_controllerChannel.Send(message);
+					_channel.Send(message);
 				});
 		}
 	}

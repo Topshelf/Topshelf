@@ -21,14 +21,14 @@ namespace Topshelf.Configuration.Dsl
 		IServiceConfigurator<TService>
 		where TService : class
 	{
-		public Service<TService> Create(UntypedChannel hostChannel)
+		public ServiceController<TService> Create(UntypedChannel hostChannel)
 		{
 			return Create(Name, hostChannel);
 		}
 
-		public Service<TService> Create(string serviceName, UntypedChannel coordinatorChannel)
+		public ServiceController<TService> Create(string serviceName, UntypedChannel coordinatorChannel)
 		{
-			var serviceController = new Service<TService>(serviceName, coordinatorChannel,
+			var serviceController = new ServiceController<TService>(serviceName, coordinatorChannel,
 			                                              StartAction,
 			                                              StopAction,
 			                                              PauseAction,

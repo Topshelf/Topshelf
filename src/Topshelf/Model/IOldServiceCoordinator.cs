@@ -15,7 +15,7 @@ namespace Topshelf.Model
     using System;
     using System.Collections.Generic;
 
-    public interface IServiceCoordinator :
+    public interface IOldServiceCoordinator :
         IDisposable
     {
         /// <summary>

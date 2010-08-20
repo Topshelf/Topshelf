@@ -30,10 +30,11 @@ namespace Topshelf.Shelving
 			_channel = new ChannelAdapter();
 			_connection = _channel.Connect(x =>
 				{
+					configurator(x);
+
 					x.ReceiveFromWcfChannel(address, endpoint)
 						.ExecuteOnThreadPoolFiber();
 
-					configurator(x);
 				});
 		}
 

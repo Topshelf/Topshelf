@@ -135,19 +135,19 @@ namespace Topshelf.Configuration.Dsl
         /// This is the best place to set up, for example, any IoC containers.
         /// </remarks>
         /// <param name="action">The action that will be performed before the services start.</param>
-        void BeforeStartingServices(Action<IServiceCoordinator> action);
+        void BeforeStartingServices(Action<IOldServiceCoordinator> action);
 
         /// <summary>
         /// Defines an action to perform after starting the services.
         /// </summary>
         /// <param name="action">The action that will be performed after the services start.</param>
-        void AfterStartingServices(Action<IServiceCoordinator> action);
+        void AfterStartingServices(Action<IOldServiceCoordinator> action);
 
         /// <summary>
         /// Defines an action to perform after stopping the services.
         /// </summary>
         /// <param name="action">The action that will be performed after services stop.</param>
-        void AfterStoppingServices(Action<IServiceCoordinator> action);
+        void AfterStoppingServices(Action<IOldServiceCoordinator> action);
 
         /// <summary>
         /// Sets the length of time the system will wait for events to complete, such as starting or stopping

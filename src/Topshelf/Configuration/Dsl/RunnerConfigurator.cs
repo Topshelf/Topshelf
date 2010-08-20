@@ -20,14 +20,14 @@ namespace Topshelf.Configuration.Dsl
     using Shelving;
 
 
-    public class RunnerConfigurator :
+	public class RunnerConfigurator :
         IRunnerConfigurator
     {
         readonly IList<Func<IService>> _serviceConfigurators;
         readonly WinServiceSettings _winServiceSettings;
-        Action<IServiceCoordinator> _beforeStartingServices = c => { };
-        Action<IServiceCoordinator> _afterStartingServices = c => { };
-        Action<IServiceCoordinator> _afterStoppingServices = c => { };
+        Action<IOldServiceCoordinator> _beforeStartingServices = c => { };
+        Action<IOldServiceCoordinator> _afterStartingServices = c => { };
+        Action<IOldServiceCoordinator> _afterStoppingServices = c => { };
         TimeSpan _timeout = 30.Seconds();
         Credentials _credentials;
         bool _disposed;
@@ -99,21 +99,21 @@ namespace Topshelf.Configuration.Dsl
             _serviceConfigurators.Add(() =>
                 {
                     action(configurator);
-                    return configurator.Create(AddressRegistry.GetServiceCoordinatorProxy());
+                    return configurator.Create(AddressRegistry.GetOutboundCoordinatorChannel());
                 });
         }
 
-        public void BeforeStartingServices(Action<IServiceCoordinator> action)
+        public void BeforeStartingServices(Action<IOldServiceCoordinator> action)
         {
             _beforeStartingServices = action;
         }
 
-        public void AfterStartingServices(Action<IServiceCoordinator> action)
+        public void AfterStartingServices(Action<IOldServiceCoordinator> action)
         {
             _afterStartingServices = action;
         }
 
-        public void AfterStoppingServices(Action<IServiceCoordinator> action)
+        public void AfterStoppingServices(Action<IOldServiceCoordinator> action)
         {
             _afterStoppingServices = action;
         }
@@ -159,7 +159,7 @@ namespace Topshelf.Configuration.Dsl
 
         RunConfiguration Create()
         {
-            var serviceCoordinator = new ServiceCoordinator(_beforeStartingServices, 
+            var serviceCoordinator = new OldServiceCoordinator(_beforeStartingServices, 
                                                             _afterStartingServices, 
                                                             _afterStoppingServices, 
                                                             _timeout);

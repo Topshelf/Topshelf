@@ -13,12 +13,13 @@
 namespace Topshelf.Shelving
 {
 	using Magnum.StateMachine;
+	using Model;
 
 
-	public class ShelfServiceBinding :
-		StateMachineBinding<ShelfService, string>
+	public class ServiceStateMachineBinding :
+		StateMachineBinding<ServiceStateMachine, string>
 	{
-		public ShelfServiceBinding()
+		public ServiceStateMachineBinding()
 		{
 			Id(x => x.Name);
 

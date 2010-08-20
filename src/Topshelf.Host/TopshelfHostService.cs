@@ -24,11 +24,11 @@ namespace Topshelf.Host
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
 
-		IShelfServiceController _controller;
+		IServiceCoordinator _coordinator;
 
 		public void Start()
 		{
-			_controller = new ShelfServiceController();
+			_coordinator = new ServiceCoordinator();
 
 			StartDirectoryMonitor();
 
@@ -37,7 +37,7 @@ namespace Topshelf.Host
 
 		void StartDirectoryMonitor()
 		{
-			_controller.CreateShelfService("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
+			_coordinator.CreateShelfService("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
 			//_shelfMaker = new ShelfMaker();
 			//_shelfMaker.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
 		}
@@ -58,7 +58,7 @@ namespace Topshelf.Host
 		{
 			try
 			{
-				_controller.CreateShelfService(directoryName);
+				_coordinator.CreateShelfService(directoryName);
 			}
 			catch (Exception ex)
 			{
@@ -68,7 +68,7 @@ namespace Topshelf.Host
 
 		public void Stop()
 		{
-			_controller.Dispose();
+			_coordinator.Dispose();
 		}
 	}
 }
