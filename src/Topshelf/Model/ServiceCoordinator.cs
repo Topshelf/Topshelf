@@ -36,7 +36,7 @@ namespace Topshelf.Model
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
 		readonly Fiber _fiber;
 		readonly Cache<string, ServiceStateMachine> _serviceCache;
-		readonly IList<Func<ServiceStateMachine>> _startupServices = new List<Func<ServiceStateMachine>>();
+		readonly IDictionary<string, Func<ServiceStateMachine>> _startupServices;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
 		InboundChannel _channel;
 
@@ -54,12 +54,15 @@ namespace Topshelf.Model
 			_afterStartingServices = afterStartingServices;
 			_beforeStartingServices = beforeStartingServices;
 
-			_serviceCache = new Cache<string, ServiceStateMachine>(key => new ServiceStateMachine(key, _channel));
+			_startupServices = new Dictionary<string, Func<ServiceStateMachine>>();
+
+			_serviceCache = new Cache<string, ServiceStateMachine>();
 
 			_channel = AddressRegistry.GetServiceCoordinatorHost(x =>
 				{
 					x.AddConsumersFor<ServiceStateMachine>()
 						.BindUsing<ServiceStateMachineBinding, string>()
+						.CreateNewInstanceBy(GetServiceInstance)
 						.ExecuteOnThreadPoolFiber()
 						.PersistInMemoryUsing(_serviceCache);
 
@@ -77,6 +80,7 @@ namespace Topshelf.Model
 		}
 
 		public ChannelAdapter EventChannel { get; private set; }
+
 
 		public void Dispose()
 		{
@@ -100,7 +104,7 @@ namespace Topshelf.Model
 
 			_startupServices.Each(serviceFactory =>
 				{
-					ServiceStateMachine service = serviceFactory();
+					ServiceStateMachine service = serviceFactory.Value();
 
 					_serviceCache.Add(service.Name, service);
 				});
@@ -115,10 +119,7 @@ namespace Topshelf.Model
 		/// <param name = "bootstrapperType">The type of the bootstrapper class for the service</param>
 		public void CreateShelfService(string serviceName, Type bootstrapperType)
 		{
-			_startupServices.Add(() =>
-				{
-					return new ShelfServiceController(serviceName, _channel);
-				});
+			_startupServices.Add(serviceName, () => { return new ShelfServiceController(serviceName, _channel); });
 			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Internal, bootstrapperType));
 		}
 
@@ -128,10 +129,7 @@ namespace Topshelf.Model
 		/// <param name = "serviceName">The name of the service to create (should match the folder)</param>
 		public void CreateShelfService(string serviceName)
 		{
-			_startupServices.Add(() =>
-			{
-				return new ShelfServiceController(serviceName, _channel);
-			});
+			_startupServices.Add(serviceName, () => { return new ShelfServiceController(serviceName, _channel); });
 			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Folder));
 		}
 
@@ -167,9 +165,20 @@ namespace Topshelf.Model
 			AfterStoppingServices();
 		}
 
-		public void CreateService(Func<ServiceStateMachine> serviceFactory)
+		public void CreateService(string serviceName, Func<ServiceStateMachine> serviceFactory)
 		{
-			_startupServices.Add(serviceFactory);
+			_startupServices.Add(serviceName, serviceFactory);
+		}
+
+		ServiceStateMachine GetServiceInstance(string key)
+		{
+			if(key == null)
+				return new ServiceStateMachine(null, _channel);
+
+			if (_startupServices.ContainsKey(key))
+				return _startupServices[key]();
+
+			return new ServiceStateMachine(key, _channel);
 		}
 
 		~ServiceCoordinator()

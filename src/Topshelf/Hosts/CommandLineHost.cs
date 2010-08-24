@@ -41,20 +41,31 @@ namespace Topshelf.Hosts
 		{
 			CheckToSeeIfWinServiceRunning();
 
-			_log.Debug("Starting up as a console application");
+			try
+			{
+				_log.Debug("Starting up as a console application");
 
-			_exit = new ManualResetEvent(false);
+				_exit = new ManualResetEvent(false);
 
-			Console.CancelKeyPress += HandleCancelKeyPress;
+				Console.CancelKeyPress += HandleCancelKeyPress;
 
-			_coordinator.Start(_timeout); //user code starts
+				_coordinator.Start(_timeout); //user code starts
 
-			_log.InfoFormat("Topshelf is running, press Control+C to exit.");
+				_log.InfoFormat("Topshelf is running, press Control+C to exit.");
 
-			_exit.WaitOne();
+				_exit.WaitOne();
 
-			ShutdownCoordinator();
+				ShutdownCoordinator();
+			}
+			catch (Exception ex)
+			{
+				_log.Error("An exception occurred", ex);
 
+			}
+			finally
+			{
+				ShutdownCoordinator();
+			}
 			_exit.Close();
 			_exit = null;
 		}
@@ -63,7 +74,13 @@ namespace Topshelf.Hosts
 		{
 			try
 			{
+				_log.Info("Stopping Topshelf");
+
 				_coordinator.Stop(_timeout);
+			}
+			catch (Exception ex)
+			{
+				_log.Error("The service did not shut down gracefully", ex);
 			}
 			finally
 			{
@@ -74,10 +91,16 @@ namespace Topshelf.Hosts
 
 		void HandleCancelKeyPress(object sender, ConsoleCancelEventArgs consoleCancelEventArgs)
 		{
-			_log.Info("Control+C detected, exiting.");
-			_log.Info("Stopping the Topshelf");
+			if (consoleCancelEventArgs.SpecialKey == ConsoleSpecialKey.ControlBreak)
+			{
+				_log.Error("Control+Break detected, terminating service (not cleanly, use Control+C to exit cleanly)");
+				return;
+			}
 
+			_log.Info("Control+C detected, exiting.");
 			_exit.Set();
+
+			consoleCancelEventArgs.Cancel = true;
 		}
 
 		void CheckToSeeIfWinServiceRunning()

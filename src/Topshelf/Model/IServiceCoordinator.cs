@@ -51,8 +51,9 @@ namespace Topshelf.Model
 		/// <summary>
 		/// Create the service using the factory method specified and add it to the coordinator
 		/// </summary>
+		/// <param name="serviceName"></param>
 		/// <param name="serviceFactory"></param>
-		void CreateService(Func<ServiceStateMachine> serviceFactory);
+		void CreateService(string serviceName, Func<ServiceStateMachine> serviceFactory);
 
 		/// <summary>
 		///   Creates a shelf service using the specified bootstrapper type

@@ -33,15 +33,20 @@ namespace Topshelf.Model
 			Define(() =>
 				{
 					Initially(
+					          When(OnCreate)
+					          	.Call(instance => instance.Create())
+					          	.TransitionTo(Creating));
+
+					During(Creating,
 					       When(OnCreated)
 					       	.Call((instance, message) => instance.ServiceCreated(message),
-								  HandleServiceCommandException)
+					       	      HandleServiceCommandException)
 					       	.TransitionTo(Created));
 
 					During(Created,
 					       When(OnStart)
 					       	.Call((instance, message) => instance.Start(),
-								  HandleServiceCommandException)
+					       	      HandleServiceCommandException)
 					       	.TransitionTo(Starting));
 
 					During(Starting,
@@ -51,7 +56,7 @@ namespace Topshelf.Model
 					During(Running,
 					       When(OnStop)
 					       	.Call((instance, message) => instance.Stop())
-							.TransitionTo(Stopping),
+					       	.TransitionTo(Stopping),
 					       When(OnRestart)
 					       	.Call((instance, message) => instance.Stop())
 					       	.TransitionTo(StoppingToRestart));
@@ -63,16 +68,16 @@ namespace Topshelf.Model
 					       	.TransitionTo(CreatingToRestart));
 
 					During(CreatingToRestart,
-						When(OnCreated)
-							.Call((instance,message) => instance.ServiceCreated(message),
-					          	      HandleServiceCommandException)
-							.Call(instance => instance.Start(),
-					          	      HandleServiceCommandException)
-									  .TransitionTo(Restarting));
+					       When(OnCreated)
+					       	.Call((instance, message) => instance.ServiceCreated(message),
+					       	      HandleServiceCommandException)
+					       	.Call(instance => instance.Start(),
+					       	      HandleServiceCommandException)
+					       	.TransitionTo(Restarting));
 
 					During(Restarting,
 					       When(OnRunning)
-						   .Call(instance => instance.Publish<ServiceRestarted>())
+					       	.Call(instance => instance.Publish<ServiceRestarted>())
 					       	.TransitionTo(Running));
 
 					Anytime(
@@ -92,10 +97,17 @@ namespace Topshelf.Model
 					        	.Call(instance => instance.Publish<ServiceStopping>()),
 					        When(Stopped.Enter)
 					        	.Call(instance => instance.Publish<ServiceStopped>()),
-							When(Restarting.Enter)
-							.Call(instance => instance.Publish<ServiceRestarting>())
+					        When(Restarting.Enter)
+					        	.Call(instance => instance.Publish<ServiceRestarting>())
 						);
 				});
+		}
+
+
+		public ServiceStateMachine(string name, UntypedChannel coordinatorChannel)
+		{
+			Name = name;
+			_coordinatorChannel = coordinatorChannel;
 		}
 
 		static ExceptionAction<ServiceStateMachine, Exception> HandleServiceCommandException
@@ -109,19 +121,11 @@ namespace Topshelf.Model
 		}
 
 
-		public ServiceStateMachine(string name, UntypedChannel coordinatorChannel)
-		{
-			Name = name;
-			_coordinatorChannel = coordinatorChannel;
-		}
-
-
-		public string Name { get; set; }
-
+		public static Event<CreateService> OnCreate { get; set; }
 		public static Event<ServiceCreated> OnCreated { get; set; }
 
 		public static Event<StartService> OnStart { get; set; }
-		public static Event<ServiceRunning> OnRunning{get;set;}
+		public static Event<ServiceRunning> OnRunning { get; set; }
 		public static Event<RestartService> OnRestart { get; set; }
 
 		public static Event<StopService> OnStop { get; set; }
@@ -129,6 +133,7 @@ namespace Topshelf.Model
 
 
 		public static State Initial { get; set; }
+		public static State Creating { get; set; }
 		public static State Created { get; set; }
 		public static State Starting { get; set; }
 		public static State Running { get; set; }
@@ -142,6 +147,7 @@ namespace Topshelf.Model
 		public static State Restarting { get; set; }
 		public static State Completed { get; set; }
 		public static State Failed { get; set; }
+		public string Name { get; set; }
 
 		public void Dispose()
 		{
@@ -181,7 +187,6 @@ namespace Topshelf.Model
 
 		protected virtual void Stop()
 		{
-
 		}
 
 		void Publish<T>()

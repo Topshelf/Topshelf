@@ -12,218 +12,215 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ServiceProcess;
-    using Magnum.Extensions;
-    using Magnum.Fibers;
-    using Model;
+	using System;
+	using System.Collections.Generic;
+	using System.ServiceProcess;
+	using Magnum.Extensions;
+	using Magnum.Fibers;
+	using Model;
 
 
 	public class RunnerConfigurator :
-        IRunnerConfigurator
-    {
-        readonly IList<Func<ServiceStateMachine>> _serviceConfigurators;
-        readonly WinServiceSettings _winServiceSettings;
-        Action<IServiceCoordinator> _beforeStartingServices = c => { };
-        Action<IServiceCoordinator> _afterStartingServices = c => { };
-        Action<IServiceCoordinator> _afterStoppingServices = c => { };
-        TimeSpan _timeout = 30.Seconds();
-        Credentials _credentials;
-        bool _disposed;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RunnerConfigurator"/> class.
-        /// </summary>
-        RunnerConfigurator()
-        {
-            _winServiceSettings = new WinServiceSettings();
-            _credentials = Credentials.LocalSystem;
-            _serviceConfigurators = new List<Func<ServiceStateMachine>>();
-        }
-
-		public void SetDisplayName(string displayName)
-        {
-            _winServiceSettings.DisplayName = displayName;
-        }
-
-        public void SetServiceName(string serviceName)
-        {
-            _winServiceSettings.ServiceName = new ServiceName(serviceName);
-        }
-
-        public void SetDescription(string description)
-        {
-            _winServiceSettings.Description = description;
-        }
-
-        public void DoNotStartAutomatically()
-        {
-            _winServiceSettings.StartMode = ServiceStartMode.Manual;
-        }
-
-        public void DependsOn(string serviceName)
-        {
-            _winServiceSettings.Dependencies.Add(serviceName);
-        }
-
-        public void DependencyOnMsmq()
-        {
-            DependsOn(KnownServiceNames.Msmq);
-        }
-
-        public void DependencyOnMsSql()
-        {
-            DependsOn(KnownServiceNames.SqlServer);
-        }
-
-        public void DependencyOnEventLog()
-        {
-            DependsOn(KnownServiceNames.EventLog);
-        }
-
-        public void DependencyOnIis()
-        {
-            DependsOn(KnownServiceNames.IIS);
-        }
-
-		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
-        {
-            var configurator = new ServiceConfigurator<TService>();
-            _serviceConfigurators.Add(() =>
-                {
-                    action(configurator);
-                    return configurator.Create(AddressRegistry.GetOutboundCoordinatorChannel());
-                });
-        }
-
-        public void BeforeStartingServices(Action<IServiceCoordinator> action)
-        {
-            _beforeStartingServices = action;
-        }
-
-        public void AfterStartingServices(Action<IServiceCoordinator> action)
-        {
-            _afterStartingServices = action;
-        }
-
-        public void AfterStoppingServices(Action<IServiceCoordinator> action)
-        {
-            _afterStoppingServices = action;
-        }
-
-        public void SetEventTimeout(TimeSpan timeout)
-        {
-            _timeout = timeout;
-        }
+		IRunnerConfigurator
+	{
+		readonly IList<Action<IServiceCoordinator>> _serviceConfigurators;
+		readonly WinServiceSettings _winServiceSettings;
+		Action<IServiceCoordinator> _afterStartingServices = c => { };
+		Action<IServiceCoordinator> _afterStoppingServices = c => { };
+		Action<IServiceCoordinator> _beforeStartingServices = c => { };
+		Credentials _credentials;
+		bool _disposed;
+		TimeSpan _timeout = 30.Seconds();
 
 		/// <summary>
-        /// Configures a service using the default configuration.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-        public void ConfigureService<TService>() 
-			where TService : class
-        {
-            ConfigureService<TService>(x => { });
-        }
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; 
-        /// <see langword="false"/> to release only unmanaged resources.</param>
-        void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-            if (disposing)
-                _serviceConfigurators.Clear();
-            _disposed = true;
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        RunConfiguration Create()
-        {
-            var serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(),
-				_beforeStartingServices, 
-                                                            _afterStartingServices, 
-                                                            _afterStoppingServices);
-
-            RegisterServices(serviceCoordinator);
-            
-            _winServiceSettings.Credentials = _credentials;
-            
-            var cfg = new RunConfiguration
-                {
-                    WinServiceSettings = _winServiceSettings,
-                    Coordinator = serviceCoordinator
-                };
-
-            return cfg;
-        }
-
-		void RegisterServices(IServiceCoordinator serviceCoordinator)
+		///   Initializes a new instance of the <see cref = "RunnerConfigurator" /> class.
+		/// </summary>
+		RunnerConfigurator()
 		{
-			_serviceConfigurators.Each(service =>
-				{
-					serviceCoordinator.CreateService(service);
-				});
+			_winServiceSettings = new WinServiceSettings();
+			_credentials = Credentials.LocalSystem;
+			_serviceConfigurators = new List<Action<IServiceCoordinator>>();
+		}
 
+		public void SetDisplayName(string displayName)
+		{
+			_winServiceSettings.DisplayName = displayName;
+		}
+
+		public void SetServiceName(string serviceName)
+		{
+			_winServiceSettings.ServiceName = new ServiceName(serviceName);
+		}
+
+		public void SetDescription(string description)
+		{
+			_winServiceSettings.Description = description;
+		}
+
+		public void DoNotStartAutomatically()
+		{
+			_winServiceSettings.StartMode = ServiceStartMode.Manual;
+		}
+
+		public void DependsOn(string serviceName)
+		{
+			_winServiceSettings.Dependencies.Add(serviceName);
+		}
+
+		public void DependencyOnMsmq()
+		{
+			DependsOn(KnownServiceNames.Msmq);
+		}
+
+		public void DependencyOnMsSql()
+		{
+			DependsOn(KnownServiceNames.SqlServer);
+		}
+
+		public void DependencyOnEventLog()
+		{
+			DependsOn(KnownServiceNames.EventLog);
+		}
+
+		public void DependencyOnIis()
+		{
+			DependsOn(KnownServiceNames.IIS);
+		}
+
+		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
+		{
+			var configurator = new ServiceConfigurator<TService>();
+			_serviceConfigurators.Add(coordinator =>
+				{
+					action(configurator);
+
+					coordinator.CreateService(configurator.Name, () => configurator.Create(AddressRegistry.GetOutboundCoordinatorChannel()));
+				});
+		}
+
+		public void BeforeStartingServices(Action<IServiceCoordinator> action)
+		{
+			_beforeStartingServices = action;
+		}
+
+		public void AfterStartingServices(Action<IServiceCoordinator> action)
+		{
+			_afterStartingServices = action;
+		}
+
+		public void AfterStoppingServices(Action<IServiceCoordinator> action)
+		{
+			_afterStoppingServices = action;
+		}
+
+		public void SetEventTimeout(TimeSpan timeout)
+		{
+			_timeout = timeout;
 		}
 
 		/// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="RunnerConfigurator"/> is reclaimed by garbage collection.
-        /// </summary>	
-        ~RunnerConfigurator()
-        {
-            Dispose(false);
-        }
+		///   Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        public static RunConfiguration New(Action<IRunnerConfigurator> action)
-        {
-            using (var configurator = new RunnerConfigurator())
-            {
-                action(configurator);
-                return configurator.Create();
-            }
-        }
+		/// <summary>
+		///   Configures a service using the default configuration.
+		/// </summary>
+		/// <typeparam name = "TService">The type of the service that will be configured.</typeparam>
+		public void ConfigureService<TService>()
+			where TService : class
+		{
+			ConfigureService<TService>(x => { });
+		}
 
-        #region Credentials
+		/// <summary>
+		///   Releases unmanaged and - optionally - managed resources
+		/// </summary>
+		/// <param name = "disposing"><see langword = "true" /> to release both managed and unmanaged resources; 
+		///   <see langword = "false" /> to release only unmanaged resources.</param>
+		void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+			if (disposing)
+				_serviceConfigurators.Clear();
+			_disposed = true;
+		}
 
-        public void RunAsLocalSystem()
-        {
-            _credentials = Credentials.LocalSystem;
-        }
+		RunConfiguration Create()
+		{
+			var serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(),
+			                                                _beforeStartingServices,
+			                                                _afterStartingServices,
+			                                                _afterStoppingServices);
 
-        public void RunAsFromInteractive()
-        {
-            _credentials = Credentials.Interactive;
-        }
+			RegisterServices(serviceCoordinator);
 
-        public void RunAsNetworkService()
-        {
-            _credentials = new Credentials(string.Empty, string.Empty, ServiceAccount.NetworkService);
-        }
+			_winServiceSettings.Credentials = _credentials;
 
-        public void RunAsFromCommandLine()
-        {
-            throw new NotImplementedException("soon though");
-        }
+			var cfg = new RunConfiguration
+				{
+					WinServiceSettings = _winServiceSettings,
+					Coordinator = serviceCoordinator
+				};
 
-        public void RunAs(string username, string password)
-        {
-            _credentials = Credentials.Custom(username, password);
-        }
+			return cfg;
+		}
 
-        #endregion
-    }
+		void RegisterServices(IServiceCoordinator serviceCoordinator)
+		{
+			_serviceConfigurators.Each(configurator => configurator(serviceCoordinator));
+		}
+
+		/// <summary>
+		///   Releases unmanaged resources and performs other cleanup operations before the
+		///   <see cref = "RunnerConfigurator" /> is reclaimed by garbage collection.
+		/// </summary>
+		~RunnerConfigurator()
+		{
+			Dispose(false);
+		}
+
+		public static RunConfiguration New(Action<IRunnerConfigurator> action)
+		{
+			using (var configurator = new RunnerConfigurator())
+			{
+				action(configurator);
+				return configurator.Create();
+			}
+		}
+
+		#region Credentials
+
+		public void RunAsLocalSystem()
+		{
+			_credentials = Credentials.LocalSystem;
+		}
+
+		public void RunAsFromInteractive()
+		{
+			_credentials = Credentials.Interactive;
+		}
+
+		public void RunAsNetworkService()
+		{
+			_credentials = new Credentials(string.Empty, string.Empty, ServiceAccount.NetworkService);
+		}
+
+		public void RunAsFromCommandLine()
+		{
+			throw new NotImplementedException("soon though");
+		}
+
+		public void RunAs(string username, string password)
+		{
+			_credentials = Credentials.Custom(username, password);
+		}
+
+		#endregion
+	}
 }
