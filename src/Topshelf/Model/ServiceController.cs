@@ -21,7 +21,7 @@ namespace Topshelf.Model
 
 	public class ServiceController<TService> :
 		ServiceStateMachine,
-		IService<TService>
+		IServiceController<TService>
 		where TService : class
 	{
 		ServiceFactory<TService> _serviceFactory;
@@ -83,17 +83,17 @@ namespace Topshelf.Model
 		{
 		}
 
-		protected override void Stop(StopService message)
+		protected override void Stop()
 		{
 			_stopAction(_instance);
 		}
 
-		public void Pause(PauseService message)
+		protected override void Pause()
 		{
 			_pauseAction(_instance);
 		}
 
-		public void Continue(ContinueService message)
+		protected override void Continue()
 		{
 			_continueAction(_instance);
 		}

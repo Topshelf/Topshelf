@@ -65,7 +65,7 @@ namespace Topshelf.Model
         /// </summary>
         /// <param name="s">name of the service</param>
         /// <returns>A service controller for the service in question</returns>
-        IService GetService(string s);
+        IServiceController GetService(string s);
         /// <summary>
         /// Provides a list of details about the hosted services
         /// </summary>

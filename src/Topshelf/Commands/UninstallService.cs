@@ -14,9 +14,10 @@ namespace Topshelf.Commands
 {
     using Configuration;
     using log4net;
-    using WinService.SubCommands;
+    using WindowsServiceCode;
 
-    public class UninstallService :
+
+	public class UninstallService :
         Command
     {
         static readonly ILog _log = LogManager.GetLogger(typeof (UninstallService));

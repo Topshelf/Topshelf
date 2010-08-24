@@ -39,9 +39,9 @@ namespace Topshelf.Model
             new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
 
         readonly InboundChannel _hostChannel;
-        readonly List<Func<IService>> _serviceConfigurators;
+        readonly List<Func<IServiceController>> _serviceConfigurators;
 
-        readonly IList<IService> _services = new List<IService>();
+        readonly IList<IServiceController> _services = new List<IServiceController>();
         readonly TimeSpan _timeout;
 
     	public OldServiceCoordinator(Action<IOldServiceCoordinator> beforeStartingServices,
@@ -57,7 +57,7 @@ namespace Topshelf.Model
             _afterStartingServices = GetLogWrapper("AfterStartingServices", afterStartingServices);
             _afterStoppingServices = GetLogWrapper("AfterStoppingServices", afterStoppingServices);
 
-            _serviceConfigurators = new List<Func<IService>>();
+            _serviceConfigurators = new List<Func<IServiceController>>();
 
 			_timeout = waitTime;
 			_hostChannel = AddressRegistry.GetServiceCoordinatorHost(s =>
@@ -69,7 +69,7 @@ namespace Topshelf.Model
                 });
         }
 
-        public IList<IService> Services
+        public IList<IServiceController> Services
         {
             get
             {
@@ -83,14 +83,14 @@ namespace Topshelf.Model
         {
             _beforeStartingServices(this);
 
-            ProcessEvent<StartService, ServiceRunning>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
+          //  ProcessEvent<StartService, ServiceRunning>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
 
             _afterStartingServices(this);
         }
 
         public void Stop()
         {
-            ProcessEvent<StopService, ServiceStopped>("Stop", "Stopping", ref ServiceStoppedAction, ServiceState.Stopped);
+          //  ProcessEvent<StopService, ServiceStopped>("Stop", "Stopping", ref ServiceStoppedAction, ServiceState.Stopped);
 
             _afterStoppingServices(this);
 
@@ -98,12 +98,12 @@ namespace Topshelf.Model
 
         public void Pause()
         {
-            ProcessEvent<PauseService, ServicePaused>("Pause", "Pausing", ref ServicePausedAction, ServiceState.Paused);
+         //   ProcessEvent<PauseService, ServicePaused>("Pause", "Pausing", ref ServicePausedAction, ServiceState.Paused);
         }
 
         public void Continue()
         {
-            ProcessEvent<ContinueService, ServiceRunning>("Continue", "Continuing", ref ServiceContinuedAction,ServiceState.Started);
+          //  ProcessEvent<ContinueService, ServiceRunning>("Continue", "Continuing", ref ServiceContinuedAction,ServiceState.Started);
         }
 
         public void StartService(string name)
@@ -111,7 +111,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Send(new StartService());
+         //   Services.Where(x => x.Name == name).First().Send(new StartService());
         }
 
         public void StopService(string name)
@@ -119,7 +119,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Send(new StopService());
+         //   Services.Where(x => x.Name == name).First().Send(new StopService());
         }
 
         public void PauseService(string name)
@@ -127,7 +127,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Send( new PauseService());
+         //   Services.Where(x => x.Name == name).First().Send( new PauseService());
         }
 
         public void ContinueService(string name)
@@ -135,7 +135,7 @@ namespace Topshelf.Model
             if (Services.Count == 0)
                 CreateServices();
 
-            Services.Where(x => x.Name == name).First().Send(new ContinueService());
+          //  Services.Where(x => x.Name == name).First().Send(new ContinueService());
         }
 
         public int HostedServiceCount
@@ -152,12 +152,12 @@ namespace Topshelf.Model
                 .ConvertAll(serviceController => new ServiceInformation
                     {
                         Name = serviceController.Name,
-                        State = serviceController.State,
-                        Type = serviceController.ServiceType.Name
+            //            State = serviceController.State,
+                     //   Type = serviceController.ServiceType.Name
                     });
         }
 
-        public IService GetService(string name)
+        public IServiceController GetService(string name)
         {
             return Services.Where(x => x.Name == name).FirstOrDefault();
         }
@@ -194,53 +194,53 @@ namespace Topshelf.Model
 
         #endregion
 
-        void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction,
-                                            ref Action<TRecieved> stateEvent, ServiceState targetState)
-            where TSent : ServiceCommand
-			where TRecieved : ServiceEvent
-		{
-            int servicesNotInTargetState = Services.Count(x => x.State != targetState);
-            bool completed;
-            long serviceReachedTargetState = 0;
-
-            using (var latch = new ManualResetEvent(false))
-            {
-                var countDown = new CountdownLatch(servicesNotInTargetState, () => latch.Set());
-
-                Action<TRecieved> action = msg =>
-                    {
-                        countDown.CountDown();
-                        Interlocked.Increment(ref serviceReachedTargetState);
-                    };
-
-                stateEvent += action;
-
-                _log.Debug("{0} is now {1} all '{2}' subordinate services".FormatWith(printableMethod, printableAction.ToLower(), Services.Count));
-                foreach (IService serviceController in Services)
-                {
-                    _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
-                    serviceController.Send(default(TSent));
-                }
-
-                completed = latch.WaitOne(_timeout);
-                stateEvent -= action;
-            }
-
-            if (!completed && (HostedServiceCount == 1 || serviceReachedTargetState == 0))
-            {
-                int qCount = _exceptions.ReadLock(q => q.Count);
-                Exception ex = null;
-
-                if (qCount > 0)
-                    ex = _exceptions.WriteLock(s => s.Dequeue());
-
-                throw new Exception(
-                    "One or more services failed to {0} in a timely manner.".FormatWith(printableMethod), ex);
-            }
-
-            if (!Services.Any(x => x.State == targetState))
-                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
-        }
+//        void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction,
+//                                            ref Action<TRecieved> stateEvent, ServiceState targetState)
+//            where TSent : ServiceCommand
+//			where TRecieved : ServiceEvent
+//		{
+//            int servicesNotInTargetState = Services.Count(x => x.State != targetState);
+//            bool completed;
+//            long serviceReachedTargetState = 0;
+//
+//            using (var latch = new ManualResetEvent(false))
+//            {
+//                var countDown = new CountdownLatch(servicesNotInTargetState, () => latch.Set());
+//
+//                Action<TRecieved> action = msg =>
+//                    {
+//                        countDown.CountDown();
+//                        Interlocked.Increment(ref serviceReachedTargetState);
+//                    };
+//
+//                stateEvent += action;
+//
+//                _log.Debug("{0} is now {1} all '{2}' subordinate services".FormatWith(printableMethod, printableAction.ToLower(), Services.Count));
+//                foreach (IService serviceController in Services)
+//                {
+//                    _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
+//                    serviceController.Send(default(TSent));
+//                }
+//
+//                completed = latch.WaitOne(_timeout);
+//                stateEvent -= action;
+//            }
+//
+//            if (!completed && (HostedServiceCount == 1 || serviceReachedTargetState == 0))
+//            {
+//                int qCount = _exceptions.ReadLock(q => q.Count);
+//                Exception ex = null;
+//
+//                if (qCount > 0)
+//                    ex = _exceptions.WriteLock(s => s.Dequeue());
+//
+//                throw new Exception(
+//                    "One or more services failed to {0} in a timely manner.".FormatWith(printableMethod), ex);
+//            }
+//
+//            if (!Services.Any(x => x.State == targetState))
+//                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
+//        }
 
         event Action<ServiceRunning> ServiceStartedAction;
         event Action<ServiceStopped> ServiceStoppedAction;
@@ -254,7 +254,7 @@ namespace Topshelf.Model
             {
                 foreach (var serviceConfigurator in _serviceConfigurators)
                 {
-                    IService serviceController = serviceConfigurator();
+                    IServiceController serviceController = serviceConfigurator();
                     _services.Add(serviceController);
                 }
 
@@ -262,13 +262,13 @@ namespace Topshelf.Model
             }
         }
 
-        public void AddNewService(IService controller)
+        public void AddNewService(IServiceController controller)
         {
             _services.Add(controller);
             //TODO: How to best call start here?
         }
 
-        public void RegisterServices(IList<Func<IService>> services)
+        public void RegisterServices(IList<Func<IServiceController>> services)
         {
             _serviceConfigurators.AddRange(services);
         }
@@ -277,7 +277,7 @@ namespace Topshelf.Model
         {
             foreach (var serviceConfigurator in _serviceConfigurators)
             {
-                IService serviceController = serviceConfigurator();
+                IServiceController serviceController = serviceConfigurator();
                 Services.Add(serviceController);
             }
         }

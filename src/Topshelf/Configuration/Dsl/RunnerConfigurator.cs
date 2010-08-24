@@ -16,18 +16,18 @@ namespace Topshelf.Configuration.Dsl
     using System.Collections.Generic;
     using System.ServiceProcess;
     using Magnum.Extensions;
+    using Magnum.Fibers;
     using Model;
-    using Shelving;
 
 
 	public class RunnerConfigurator :
         IRunnerConfigurator
     {
-        readonly IList<Func<IService>> _serviceConfigurators;
+        readonly IList<Func<ServiceStateMachine>> _serviceConfigurators;
         readonly WinServiceSettings _winServiceSettings;
-        Action<IOldServiceCoordinator> _beforeStartingServices = c => { };
-        Action<IOldServiceCoordinator> _afterStartingServices = c => { };
-        Action<IOldServiceCoordinator> _afterStoppingServices = c => { };
+        Action<IServiceCoordinator> _beforeStartingServices = c => { };
+        Action<IServiceCoordinator> _afterStartingServices = c => { };
+        Action<IServiceCoordinator> _afterStoppingServices = c => { };
         TimeSpan _timeout = 30.Seconds();
         Credentials _credentials;
         bool _disposed;
@@ -39,12 +39,10 @@ namespace Topshelf.Configuration.Dsl
         {
             _winServiceSettings = new WinServiceSettings();
             _credentials = Credentials.LocalSystem;
-            _serviceConfigurators = new List<Func<IService>>();
+            _serviceConfigurators = new List<Func<ServiceStateMachine>>();
         }
 
-        #region WinServiceSettings
-
-        public void SetDisplayName(string displayName)
+		public void SetDisplayName(string displayName)
         {
             _winServiceSettings.DisplayName = displayName;
         }
@@ -89,11 +87,7 @@ namespace Topshelf.Configuration.Dsl
             DependsOn(KnownServiceNames.IIS);
         }
 
-        #endregion
-
-        #region IRunnerConfigurator Members
-
-        public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
+		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
         {
             var configurator = new ServiceConfigurator<TService>();
             _serviceConfigurators.Add(() =>
@@ -103,17 +97,17 @@ namespace Topshelf.Configuration.Dsl
                 });
         }
 
-        public void BeforeStartingServices(Action<IOldServiceCoordinator> action)
+        public void BeforeStartingServices(Action<IServiceCoordinator> action)
         {
             _beforeStartingServices = action;
         }
 
-        public void AfterStartingServices(Action<IOldServiceCoordinator> action)
+        public void AfterStartingServices(Action<IServiceCoordinator> action)
         {
             _afterStartingServices = action;
         }
 
-        public void AfterStoppingServices(Action<IOldServiceCoordinator> action)
+        public void AfterStoppingServices(Action<IServiceCoordinator> action)
         {
             _afterStoppingServices = action;
         }
@@ -123,13 +117,12 @@ namespace Topshelf.Configuration.Dsl
             _timeout = timeout;
         }
 
-        #endregion
-
-        /// <summary>
+		/// <summary>
         /// Configures a service using the default configuration.
         /// </summary>
         /// <typeparam name="TService">The type of the service that will be configured.</typeparam>
-        public void ConfigureService<TService>() where TService : class
+        public void ConfigureService<TService>() 
+			where TService : class
         {
             ConfigureService<TService>(x => { });
         }
@@ -159,12 +152,12 @@ namespace Topshelf.Configuration.Dsl
 
         RunConfiguration Create()
         {
-            var serviceCoordinator = new OldServiceCoordinator(_beforeStartingServices, 
+            var serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(),
+				_beforeStartingServices, 
                                                             _afterStartingServices, 
-                                                            _afterStoppingServices, 
-                                                            _timeout);
+                                                            _afterStoppingServices);
 
-            serviceCoordinator.RegisterServices(_serviceConfigurators);
+            RegisterServices(serviceCoordinator);
             
             _winServiceSettings.Credentials = _credentials;
             
@@ -177,7 +170,16 @@ namespace Topshelf.Configuration.Dsl
             return cfg;
         }
 
-        /// <summary>
+		void RegisterServices(IServiceCoordinator serviceCoordinator)
+		{
+			_serviceConfigurators.Each(service =>
+				{
+					serviceCoordinator.CreateService(service);
+				});
+
+		}
+
+		/// <summary>
         /// Releases unmanaged resources and performs other cleanup operations before the
         /// <see cref="RunnerConfigurator"/> is reclaimed by garbage collection.
         /// </summary>	

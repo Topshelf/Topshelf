@@ -12,17 +12,25 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
+	using System;
+
+
 	public class ServiceCreated :
 		ServiceEvent
 	{
-		public ServiceCreated(string name)
+		public ServiceCreated(string name, Uri address, string pipeName)
 			: base(name)
 		{
+			Address = address;
+			PipeName = pipeName;
 			EventType = ServiceEventType.Created;
 		}
 
 		protected ServiceCreated()
 		{
 		}
+
+		public Uri Address { get; private set; }
+		public string PipeName { get; private set; }
 	}
 }

@@ -28,7 +28,7 @@ namespace Topshelf.Specs.ServiceCoordinator
         [When]
         public void A_registered_service_throws_on_continue()
         {
-            IList<Func<IService>> services = new List<Func<IService>>
+            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
 					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),

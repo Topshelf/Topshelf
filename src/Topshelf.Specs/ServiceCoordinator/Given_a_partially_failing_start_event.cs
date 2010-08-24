@@ -32,7 +32,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 		{
 			_future = new Future<Exception>();
 			ServiceCoordinator.ShelfFaulted += _future.Complete;
-			IList<Func<IService>> services = new List<Func<IService>>
+			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
 					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => { throw new Exception(); },

@@ -39,7 +39,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			                                             x => { _afterStoppingServicesInvoked = true; },
 			                                             10.Seconds());
 
-			IList<Func<IService>> services = new List<Func<IService>>
+			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
 					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
@@ -71,11 +71,11 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_serviceCoordinator.Pause();
 			_serviceCoordinator.Continue();
 
-			_service.WasRunning
+			_service.WasRunning.IsCompleted
 				.ShouldBeTrue();
-			_service.WasContinued
+			_service.WasContinued.IsCompleted
 				.ShouldBeTrue();
-			_service.Running
+			_service.Running.IsCompleted
 				.ShouldBeTrue();
 		}
 
@@ -85,38 +85,25 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_serviceCoordinator.Start();
 			_serviceCoordinator.Pause();
 
-			_service.WasRunning
+			_service.WasRunning.IsCompleted
 				.ShouldBeTrue();
-			_service.Paused
+			_service.Paused.IsCompleted
 				.ShouldBeTrue();
 		}
 
 		[Test]
 		public void Starting_the_coordinator_should_start_all_services()
 		{
-			bool beforeStartingServicesWasInvokedBeforeServiceStart = false;
-			bool afterStartingServicesWasInvokedBeforeServiceStart = false;
-
-			_service.StartAction = () =>
-				{
-					beforeStartingServicesWasInvokedBeforeServiceStart = _beforeStartingServicesInvoked;
-					afterStartingServicesWasInvokedBeforeServiceStart = _afterStartingServicesInvoked;
-				};
-
 			_serviceCoordinator.Start();
-			_service.WasRunning
+			_service.WasRunning.IsCompleted
 				.ShouldBeTrue();
-			_service2.WasRunning
+			_service2.WasRunning.IsCompleted
 				.ShouldBeTrue();
 
 			_beforeStartingServicesInvoked
 				.ShouldBeTrue();
 			_afterStartingServicesInvoked
 				.ShouldBeTrue();
-			beforeStartingServicesWasInvokedBeforeServiceStart
-				.ShouldBeTrue();
-			afterStartingServicesWasInvokedBeforeServiceStart
-				.ShouldBeFalse();
 		}
 
 		[Test]
@@ -125,14 +112,14 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_serviceCoordinator.Start();
 			_serviceCoordinator.Stop();
 
-			_service.WasRunning
+			_service.WasRunning.IsCompleted
 				.ShouldBeTrue();
-			_service.Stopped
+			_service.Stopped.IsCompleted
 				.ShouldBeTrue();
 
-			_service2.WasRunning
+			_service2.WasRunning.IsCompleted
 				.ShouldBeTrue();
-			_service2.Stopped
+			_service2.Stopped.IsCompleted
 				.ShouldBeTrue();
 
 			_afterStoppingServicesInvoked
@@ -142,7 +129,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 		[Test]
 		public void Unstarted_coordinator_should_not_start_services()
 		{
-			_service.WasRunning
+			_service.WasRunning.IsCompleted
 				.ShouldBeFalse();
 		}
 

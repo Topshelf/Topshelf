@@ -13,6 +13,8 @@
 namespace Topshelf.Model
 {
 	using System;
+	using System.Collections;
+	using System.Collections.Generic;
 	using System.Linq;
 	using System.Threading;
 	using log4net;
@@ -34,6 +36,7 @@ namespace Topshelf.Model
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
 		readonly Fiber _fiber;
 		readonly Cache<string, ServiceStateMachine> _serviceCache;
+		readonly IList<Func<ServiceStateMachine>> _startupServices = new List<Func<ServiceStateMachine>>();
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
 		InboundChannel _channel;
 
@@ -81,71 +84,68 @@ namespace Topshelf.Model
 			GC.SuppressFinalize(this);
 		}
 
+		public int ServiceCount
+		{
+			get { throw new NotImplementedException(); }
+		}
+
+		public IServiceController this[string serviceName]
+		{
+			get { throw new NotImplementedException(); }
+		}
+
 		public void Start(TimeSpan timeout)
 		{
 			BeforeStartingServices();
 
-			throw new NotImplementedException();
+			_startupServices.Each(serviceFactory =>
+				{
+					ServiceStateMachine service = serviceFactory();
+
+					_serviceCache.Add(service.Name, service);
+				});
 
 			AfterStartingServices();
 		}
 
 		/// <summary>
-		/// Creates a shelf service using the specified bootstrapper type
+		///   Creates a shelf service using the specified bootstrapper type
 		/// </summary>
-		/// <param name="serviceName">The name of the service to create</param>
-		/// <param name="bootstrapperType">The type of the bootstrapper class for the service</param>
+		/// <param name = "serviceName">The name of the service to create</param>
+		/// <param name = "bootstrapperType">The type of the bootstrapper class for the service</param>
 		public void CreateShelfService(string serviceName, Type bootstrapperType)
 		{
-			_channel.Send(new CreateShelfService(serviceName, ShelfType.Internal, bootstrapperType));
+			_startupServices.Add(() =>
+				{
+					return new ShelfServiceController(serviceName, _channel);
+				});
+			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Internal, bootstrapperType));
 		}
 
 		/// <summary>
-		/// Creates a shelf service by name, determining the bootstrapper type by reflection
+		///   Creates a shelf service by name, determining the bootstrapper type by reflection
 		/// </summary>
-		/// <param name="serviceName">The name of the service to create (should match the folder)</param>
+		/// <param name = "serviceName">The name of the service to create (should match the folder)</param>
 		public void CreateShelfService(string serviceName)
 		{
-			_channel.Send(new CreateShelfService(serviceName, ShelfType.Folder));
-		}
-
-		public void Send<T>(T message)
-		{
-			_channel.Send(message);
-		}
-
-		~ServiceCoordinator()
-		{
-			Dispose(false);
-		}
-
-		void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-			if (disposing)
+			_startupServices.Add(() =>
 			{
-				StopServices(10.Minutes());
-
-				if (_channel != null)
-				{
-					_channel.Dispose();
-					_channel = null;
-				}
-			}
-
-			_disposed = true;
+				return new ShelfServiceController(serviceName, _channel);
+			});
+			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Folder));
 		}
 
-		void OnServiceStopped(ServiceStopped message)
+		public IEnumerator<IServiceController> GetEnumerator()
 		{
-			if (_stopping)
-				_channel.Send(new UnloadService(message.ServiceName));
-
-			_updated.Set();
+			return _serviceCache.Cast<IServiceController>().GetEnumerator();
 		}
 
-		void StopServices(TimeSpan timeout)
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		public void Stop(TimeSpan timeout)
 		{
 			_stopping = true;
 
@@ -165,6 +165,42 @@ namespace Topshelf.Model
 				throw new InvalidOperationException("The services did not stop without the specified timeout");
 
 			AfterStoppingServices();
+		}
+
+		public void CreateService(Func<ServiceStateMachine> serviceFactory)
+		{
+			_startupServices.Add(serviceFactory);
+		}
+
+		~ServiceCoordinator()
+		{
+			Dispose(false);
+		}
+
+		void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+			if (disposing)
+			{
+				Stop(10.Minutes());
+
+				if (_channel != null)
+				{
+					_channel.Dispose();
+					_channel = null;
+				}
+			}
+
+			_disposed = true;
+		}
+
+		void OnServiceStopped(ServiceStopped message)
+		{
+			if (_stopping)
+				_channel.Send(new UnloadService(message.ServiceName));
+
+			_updated.Set();
 		}
 
 		bool AllServicesAreCompleted()

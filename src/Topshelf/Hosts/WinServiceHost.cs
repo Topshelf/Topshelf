@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,41 +12,41 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
-    using System.Reflection;
-    using Commands.WinService;
-    using Commands.WinService.SubCommands;
-    using Configuration;
-    using Exceptions;
-    using log4net;
-    using Model;
+	using System.Reflection;
+	using Configuration;
+	using Exceptions;
+	using log4net;
+	using Model;
+	using WindowsServiceCode;
 
-    public class WinServiceHost :
-        Host
-    {
-        readonly ILog _log = LogManager.GetLogger(typeof (WinServiceHost));
-        readonly IOldServiceCoordinator _coordinator;
-        readonly ServiceName _fullServiceName;
 
-        public WinServiceHost(IOldServiceCoordinator coordinator, ServiceName fullServiceName)
-        {
-            _coordinator = coordinator;
-            _fullServiceName = fullServiceName;
-        }
+	public class WinServiceHost :
+		Host
+	{
+		readonly IServiceCoordinator _coordinator;
+		readonly ServiceName _fullServiceName;
+		readonly ILog _log = LogManager.GetLogger(typeof(WinServiceHost));
 
-        public void Host()
-        {
-            _log.Info("Starting up as a winservice application");
+		public WinServiceHost(IServiceCoordinator coordinator, ServiceName fullServiceName)
+		{
+			_coordinator = coordinator;
+			_fullServiceName = fullServiceName;
+		}
 
-            if (!WinServiceHelper.IsInstalled(_fullServiceName.FullName))
-            {
-                string message =
-                    string.Format("The {0} service has not been installed yet. Please run {1} service install.",
-                                  _fullServiceName, Assembly.GetEntryAssembly().GetName());
-                _log.Fatal(message);
-                throw new ConfigurationException(message);
-            }
-            var inServiceHost = new ServiceHost(_coordinator);
-            inServiceHost.Run();
-        }
-    }
+		public void Host()
+		{
+			_log.Info("Starting up as a winservice application");
+
+			if (!WinServiceHelper.IsInstalled(_fullServiceName.FullName))
+			{
+				string message =
+					string.Format("The {0} service has not been installed yet. Please run {1} service install.",
+					              _fullServiceName, Assembly.GetEntryAssembly().GetName());
+				_log.Fatal(message);
+				throw new ConfigurationException(message);
+			}
+			var inServiceHost = new ServiceHost(_coordinator);
+			inServiceHost.Run();
+		}
+	}
 }

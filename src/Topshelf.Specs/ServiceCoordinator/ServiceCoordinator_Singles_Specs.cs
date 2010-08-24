@@ -14,7 +14,6 @@ namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Threading;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Model;
@@ -33,7 +32,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service2 = new TestService2();
 
 			_serviceCoordinator = new OldServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
-			IList<Func<IService>> services = new List<Func<IService>>
+			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
 					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),

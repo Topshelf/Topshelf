@@ -23,7 +23,5 @@ namespace Topshelf.Messages
 			EventType = ServiceEventType.ShelfCreated;
 		}
 
-		public Uri Address { get; set; }
-		public string PipeName { get; set; }
 	}
 }

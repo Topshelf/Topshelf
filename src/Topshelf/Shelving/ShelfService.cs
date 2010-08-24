@@ -21,23 +21,6 @@ namespace Topshelf.Shelving
 	using Model;
 
 
-	public interface ServiceFactory
-	{
-		
-	}
-
-	public class ShelfServiceFactory :
-		ServiceFactory
-	{
-		
-	}
-
-	public class CurrentAppDomainServiceFactory :
-		ServiceFactory
-	{
-		
-	}
-
 	public class ShelfServiceController :
 		ServiceStateMachine
 	{
@@ -92,7 +75,7 @@ namespace Topshelf.Shelving
 				_reference.Create();
 		}
 
-		protected override void ServiceCreated(ShelfCreated message)
+		protected override void ServiceCreated(ServiceCreated message)
 		{
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
@@ -103,9 +86,8 @@ namespace Topshelf.Shelving
 			Send(new StartService(Name));
 		}
 
-		protected override void Stop(StopService message)
+		protected override void Stop()
 		{
-			Send(message);
 		}
 
 		protected override void Unload()

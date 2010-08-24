@@ -87,12 +87,11 @@
     <Compile Include="Commands\InstallService.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
-    <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />
-    <Compile Include="Messages\ReloadService.cs" />
+    <Compile Include="Messages\RestartService.cs" />
     <Compile Include="Messages\ServiceFault.cs" />
     <Compile Include="Messages\ServiceFolderChanged.cs" />
     <Compile Include="Messages\PauseService.cs" />
@@ -105,6 +104,7 @@
     <Compile Include="Messages\ServicePausing.cs" />
     <Compile Include="Messages\ServiceCreated.cs" />
     <Compile Include="Messages\ServiceRestarted.cs" />
+    <Compile Include="Messages\ServiceRestarting.cs" />
     <Compile Include="Messages\ServiceRunning.cs" />
     <Compile Include="Messages\ServiceStopped.cs" />
     <Compile Include="Messages\ShelfEvent.cs" />
@@ -118,7 +118,7 @@
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Shelving\InboundChannel.cs" />
     <Compile Include="Shelving\OutboundChannel.cs" />
-    <Compile Include="Shelving\IServiceCoordinator.cs" />
+    <Compile Include="Model\IServiceCoordinator.cs" />
     <Compile Include="Model\ServiceStateMachine.cs" />
     <Compile Include="Model\ServiceStateMachineBinding.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
@@ -128,8 +128,6 @@
     <Compile Include="Shelving\ShelfType.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
-    <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
     <Compile Include="Exceptions\BuildServiceException.cs" />
     <Compile Include="Hosts\CommandLineHost.cs" />
     <Compile Include="Hosts\Host.cs" />
@@ -148,7 +146,7 @@
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Model\IOldServiceCoordinator.cs" />
     <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
-    <Compile Include="Model\IService.cs" />
+    <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Model\ServiceController.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />

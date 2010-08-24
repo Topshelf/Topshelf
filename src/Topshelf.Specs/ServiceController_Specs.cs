@@ -47,12 +47,12 @@ namespace Topshelf.Specs
 			_serviceChannel = new InboundChannel(AddressRegistry.GetServiceAddress(_serviceController.Name),
 			                                     AddressRegistry.GetServicePipeName(_serviceController.Name), x =>
 			                                     	{
-			                                     		x.AddConsumersFor<ServiceController<TestService>>()
+			                                     		x.AddConsumersFor<ServiceStateMachine>()
 			                                     			.UsingInstance(_serviceController)
 															.ExecuteOnProducerThread();
 			                                     	});
 
-			_serviceChannel.Send(new StartService());
+			_serviceChannel.Send(new StartService("test"));
 
 			_serviceStarted.WaitUntilCompleted(10.Seconds());
 
@@ -108,7 +108,7 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_stop()
 		{
-			_serviceChannel.Send(new StopService());
+			_serviceChannel.Send(new StopService("test"));
 
 			_serviceController.ShouldBeStopped();
 			_service.Stopped.IsCompleted.ShouldBeTrue();
@@ -159,7 +159,7 @@ namespace Topshelf.Specs
 			c.WhenStarted(s => s.Start());
 			c.WhenStopped(s => s.Stop());
 
-			using (IService service = c.Create(AddressRegistry.GetOutboundCoordinatorChannel()))
+			using (IServiceController service = c.Create(AddressRegistry.GetOutboundCoordinatorChannel()))
 			{
 //				service.Send(new StartService());
 

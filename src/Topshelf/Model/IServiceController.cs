@@ -16,17 +16,17 @@ namespace Topshelf.Model
 	using Magnum.StateMachine;
 
 
-	public interface IService :
+	public interface IServiceController :
 		IDisposable
 	{
-		Type ServiceType { get; }
 		string Name { get; }
 		State CurrentState { get; }
 	}
 
 
-	public interface IService<TService> :
-		IService
+	public interface IServiceController<TService> :
+		IServiceController
+		where TService : class
 	{
 	}
 }

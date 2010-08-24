@@ -10,17 +10,18 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Commands.WinService.SubCommands
+namespace Topshelf.WindowsServiceCode
 {
-    using System;
-    using System.Collections;
-    using System.Configuration.Install;
-    using System.Reflection;
-    using System.ServiceProcess;
-    using Configuration;
-    using log4net;
+	using System;
+	using System.Collections;
+	using System.Configuration.Install;
+	using System.Reflection;
+	using System.ServiceProcess;
+	using Configuration;
+	using log4net;
 
-    public static class WinServiceHelper
+
+	public static class WinServiceHelper
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(WinServiceHelper));
 

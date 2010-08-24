@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	public class ReloadService :
+	public class RestartService :
 		ServiceCommand
 	{
 	}

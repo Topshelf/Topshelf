@@ -23,7 +23,7 @@ namespace Topshelf.Model
 	[DebuggerDisplay("Service: {Name}, State: {CurrentState}")]
 	public class ServiceStateMachine :
 		StateMachine<ServiceStateMachine>,
-		IDisposable
+		IServiceController
 	{
 		UntypedChannel _coordinatorChannel;
 		bool _disposed;
@@ -44,20 +44,25 @@ namespace Topshelf.Model
 								  HandleServiceCommandException)
 					       	.TransitionTo(Starting));
 
+					During(Starting,
+					       When(OnRunning)
+					       	.TransitionTo(Running));
+
 					During(Running,
 					       When(OnStop)
-					       	.Call((instance, message) => instance.Stop(message)),
-					       When(OnReload)
-					       	.Call((instance, message) => instance.Reload(message))
-					       	.TransitionTo(Reloading));
+					       	.Call((instance, message) => instance.Stop())
+							.TransitionTo(Stopping),
+					       When(OnRestart)
+					       	.Call((instance, message) => instance.Stop())
+					       	.TransitionTo(StoppingToRestart));
 
-					During(Reloading,
+					During(StoppingToRestart,
 					       When(OnStopped)
 					       	.Call(instance => instance.Unload())
 					       	.Call(instance => instance.Create())
-					       	.TransitionTo(Recreating));
+					       	.TransitionTo(CreatingToRestart));
 
-					During(Recreating,
+					During(CreatingToRestart,
 						When(OnCreated)
 							.Call((instance,message) => instance.ServiceCreated(message),
 					          	      HandleServiceCommandException)
@@ -86,7 +91,9 @@ namespace Topshelf.Model
 					        When(Stopping.Enter)
 					        	.Call(instance => instance.Publish<ServiceStopping>()),
 					        When(Stopped.Enter)
-					        	.Call(instance => instance.Publish<ServiceStopped>())
+					        	.Call(instance => instance.Publish<ServiceStopped>()),
+							When(Restarting.Enter)
+							.Call(instance => instance.Publish<ServiceRestarting>())
 						);
 				});
 		}
@@ -108,13 +115,14 @@ namespace Topshelf.Model
 			_coordinatorChannel = coordinatorChannel;
 		}
 
+
 		public string Name { get; set; }
 
 		public static Event<ServiceCreated> OnCreated { get; set; }
 
 		public static Event<StartService> OnStart { get; set; }
 		public static Event<ServiceRunning> OnRunning{get;set;}
-		public static Event<ReloadService> OnReload { get; set; }
+		public static Event<RestartService> OnRestart { get; set; }
 
 		public static Event<StopService> OnStop { get; set; }
 		public static Event<ServiceStopped> OnStopped { get; set; }
@@ -129,8 +137,8 @@ namespace Topshelf.Model
 		public static State Continuing { get; set; }
 		public static State Stopping { get; set; }
 		public static State Stopped { get; set; }
-		public static State Reloading { get; set; }
-		public static State Recreating { get; set; }
+		public static State StoppingToRestart { get; set; }
+		public static State CreatingToRestart { get; set; }
 		public static State Restarting { get; set; }
 		public static State Completed { get; set; }
 		public static State Failed { get; set; }
@@ -153,7 +161,15 @@ namespace Topshelf.Model
 		{
 		}
 
-		void Reload(ReloadService message)
+		protected virtual void Pause()
+		{
+		}
+
+		protected virtual void Continue()
+		{
+		}
+
+		void Restart(RestartService message)
 		{
 			// TODO likely need to set a timeout for this operation (mailbox would rock here)
 			// TODO isn't this another transaction, with a timeout? )
@@ -163,7 +179,7 @@ namespace Topshelf.Model
 		{
 		}
 
-		protected virtual void Stop(StopService message)
+		protected virtual void Stop()
 		{
 
 		}

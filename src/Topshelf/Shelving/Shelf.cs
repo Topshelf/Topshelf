@@ -37,7 +37,7 @@ namespace Topshelf.Shelving
 		readonly string _pipeName;
 		readonly string _serviceName;
 		readonly InboundChannel _channel;
-		IService _service;
+		IServiceController _service;
 		InboundChannel _serviceChannel;
 
 
@@ -61,12 +61,7 @@ namespace Topshelf.Shelving
 
 			_bootstrapperType = bootstrapperType;
 
-			_coordinatorChannel.Send(new ShelfCreated
-				{
-					ServiceName = _serviceName,
-					Address = _address,
-					PipeName = _pipeName,
-				});
+			_coordinatorChannel.Send(new ServiceCreated(_serviceName, _address, _pipeName));
 		}
 
 		public void Dispose()
