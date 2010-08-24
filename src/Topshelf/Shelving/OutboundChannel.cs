@@ -13,6 +13,7 @@
 namespace Topshelf.Shelving
 {
 	using System;
+	using log4net;
 	using Magnum.Channels;
 
 
@@ -20,6 +21,8 @@ namespace Topshelf.Shelving
 		UntypedChannel,
 		IDisposable
 	{
+		static readonly ILog _log = LogManager.GetLogger(typeof(OutboundChannel));
+
 		ChannelAdapter _channel;
 		ChannelConnection _connection;
 
@@ -27,6 +30,8 @@ namespace Topshelf.Shelving
 
 		public OutboundChannel(Uri address, string endpoint)
 		{
+			_log.DebugFormat("Opening outbound channel at {0} ({1})", address, endpoint);
+
 			_channel = new ChannelAdapter();
 			_connection = _channel.Connect(cc =>
 				{

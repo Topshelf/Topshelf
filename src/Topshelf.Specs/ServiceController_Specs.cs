@@ -71,8 +71,8 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_continue()
 		{
-			_serviceChannel.Send(new PauseService());
-			_serviceChannel.Send(new ContinueService());
+			_serviceChannel.Send(new PauseService("test"));
+			_serviceChannel.Send(new ContinueService("test"));
 
 			_serviceController.ShouldBeRunning();
 			_service.WasContinued.IsCompleted.ShouldBeTrue();
@@ -90,7 +90,7 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_pause()
 		{
-			_serviceChannel.Send(new PauseService());
+			_serviceChannel.Send(new PauseService("test"));
 
 			_serviceController.ShouldBePaused();
 			_service.Paused.IsCompleted.ShouldBeTrue();

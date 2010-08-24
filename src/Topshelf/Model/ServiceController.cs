@@ -25,12 +25,12 @@ namespace Topshelf.Model
 		IServiceController<TService>
 		where TService : class
 	{
+		readonly IServiceCoordinator _coordinator;
 		readonly ILog _log;
 		Action<TService> _continueAction;
 		TService _instance;
 		Action<TService> _pauseAction;
 		InternalServiceFactory<TService> _serviceFactory;
-		readonly IServiceCoordinator _coordinator;
 		Action<TService> _startAction;
 		Action<TService> _stopAction;
 

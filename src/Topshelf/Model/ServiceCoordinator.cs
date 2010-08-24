@@ -74,6 +74,10 @@ namespace Topshelf.Model
 					x.AddConsumerOf<ServiceStopped>()
 						.UsingConsumer(OnServiceStopped)
 						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<CreateShelfService>()
+						.UsingConsumer(OnCreateShelfService)
+						.HandleOnFiber(_fiber);
 				});
 
 			EventChannel = new ChannelAdapter();
@@ -109,36 +113,22 @@ namespace Topshelf.Model
 			}
 		}
 
+		public void Send<T>(T message)
+		{
+			_channel.Send(message);
+		}
+
 		public void Start(TimeSpan timeout)
 		{
 			BeforeStartingServices();
 
-			_startupServices.Each(serviceFactory => _channel.Send(new CreateService(serviceFactory.Key)));
+			string[] servicesToStart = _startupServices.Select(x => x.Key).ToArray();
 
-			WaitUntilAllServicesAre(ServiceStateMachine.Running, timeout);
+			servicesToStart.Each(name => _channel.Send(new CreateService(name)));
+
+			WaitUntilServicesAre(servicesToStart, ServiceStateMachine.Running, timeout);
 
 			AfterStartingServices();
-		}
-
-		/// <summary>
-		///   Creates a shelf service using the specified bootstrapper type
-		/// </summary>
-		/// <param name = "serviceName">The name of the service to create</param>
-		/// <param name = "bootstrapperType">The type of the bootstrapper class for the service</param>
-		public void CreateShelfService(string serviceName, Type bootstrapperType)
-		{
-			_startupServices.Add(serviceName, x => { return new ShelfServiceController(serviceName, _channel); });
-			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Internal, bootstrapperType));
-		}
-
-		/// <summary>
-		///   Creates a shelf service by name, determining the bootstrapper type by reflection
-		/// </summary>
-		/// <param name = "serviceName">The name of the service to create (should match the folder)</param>
-		public void CreateShelfService(string serviceName)
-		{
-			_startupServices.Add(serviceName, x => { return new ShelfServiceController(serviceName, _channel); });
-			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Folder));
 		}
 
 		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
@@ -167,6 +157,15 @@ namespace Topshelf.Model
 			AfterStoppingServices();
 		}
 
+		void OnCreateShelfService(CreateShelfService message)
+		{
+			_startupServices.Add(message.ServiceName,
+			                     x => new ShelfServiceController(message.ServiceName, _channel, message.ShelfType,
+			                                                     message.BootstrapperType, message.AssemblyNames));
+
+			_channel.Send(new CreateService(message.ServiceName));
+		}
+
 		void WaitUntilAllServicesAre(State state, TimeSpan timeout)
 		{
 			DateTime stopTime = SystemUtil.Now + timeout;
@@ -183,9 +182,28 @@ namespace Topshelf.Model
 				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
 		}
 
+		void WaitUntilServicesAre(IEnumerable<string> services, State state, TimeSpan timeout)
+		{
+			DateTime stopTime = SystemUtil.Now + timeout;
+
+			while (SystemUtil.Now < stopTime)
+			{
+				_updated.WaitOne(1.Seconds());
+
+				bool success = services
+				               	.Where(key => _serviceCache.Has(key))
+				               	.Select(key => _serviceCache[key])
+				               	.Count(x => x.CurrentState == state) == services.Count();
+				if (success)
+					return;
+			}
+
+			throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
+		}
+
 		ServiceStateMachine GetServiceInstance(string key)
 		{
-			if(key == null)
+			if (key == null)
 				return new ServiceStateMachine(null, _channel);
 
 			if (_startupServices.ContainsKey(key))
