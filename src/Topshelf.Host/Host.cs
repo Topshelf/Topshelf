@@ -22,7 +22,9 @@ namespace Topshelf
 
 	public class Host
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+		public const string DefaultServiceName = "Topshelf.Host";
+
+		static readonly ILog _log = LogManager.GetLogger(DefaultServiceName);
 		readonly IServiceCoordinator _coordinator;
 
 		public Host(IServiceCoordinator coordinator)
@@ -55,7 +57,7 @@ namespace Topshelf
 			}
 			else
 			{
-				_log.WarnFormat("The services folder does not exist");
+				_log.WarnFormat("[{0}] The services folder does not exist", DefaultServiceName);
 			}
 		}
 
@@ -67,13 +69,12 @@ namespace Topshelf
 			}
 			catch (Exception ex)
 			{
-				_log.Error("The service {0} could not be created".FormatWith(directoryName), ex);
+				_log.Error("[{0}] Failed to create service".FormatWith(directoryName), ex);
 			}
 		}
 
 		public void Stop()
 		{
-			_log.DebugFormat("Stop called on Host");
 		}
 	}
 }

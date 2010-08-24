@@ -22,7 +22,7 @@ namespace Topshelf
 
 	public class Program
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+		static readonly ILog _log = LogManager.GetLogger(Host.DefaultServiceName);
 
 		static void Main(string[] args)
 		{
@@ -32,12 +32,12 @@ namespace Topshelf
 				{
 					x.AfterStoppingServices(h =>
 						{
-							Console.WriteLine("All services have been stopped.");
+							Console.WriteLine("[Topshelf] All services have been stopped");
 						});
 
 					x.ConfigureService<Host>(s =>
 						{
-							s.Named("Topshelf.Host");
+							s.Named(Host.DefaultServiceName);
 							s.ConstructUsing((name,coordinator) => new Host(coordinator));
 							s.WhenStarted(tc => tc.Start());
 							s.WhenStopped(tc => tc.Stop());
@@ -46,8 +46,8 @@ namespace Topshelf
 					x.RunAsLocalSystem();
 
 					x.SetDescription("Topshelf Hosting Service");
-					x.SetDisplayName("Topshelf.Host");
-					x.SetServiceName("Topshelf.Host");
+					x.SetDisplayName(Host.DefaultServiceName);
+					x.SetServiceName(Host.DefaultServiceName);
 				});
 
 			Runner.Host(cfg, args);

@@ -12,21 +12,17 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	public enum ServiceEventType
+	public class ServiceCompleted :
+		ServiceEvent
 	{
-		Created,
-		Starting,
-		Running,
-		Pausing,
-		Paused,
-		Continuing,
-		Stopping,
-		Stopped,
-		FolderChanged,
-		Fault,
-		ShelfCreated,
-		Restarted,
-		Completed,
-		Unloaded
+		public ServiceCompleted(string name)
+			: base(name)
+		{
+			EventType = ServiceEventType.Completed;
+		}
+
+		protected ServiceCompleted()
+		{
+		}
 	}
 }

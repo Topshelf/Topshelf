@@ -23,6 +23,7 @@ namespace Topshelf.Model
 	using Magnum.Collections;
 	using Magnum.Extensions;
 	using Magnum.Fibers;
+	using Magnum.StateMachine;
 	using Messages;
 	using Shelving;
 
@@ -67,7 +68,7 @@ namespace Topshelf.Model
 						.PersistInMemoryUsing(_serviceCache);
 
 					x.AddConsumerOf<ServiceEvent>()
-						.UsingConsumer(LogServiceEvent)
+						.UsingConsumer(OnServiceEvent)
 						.ExecuteOnFiber(_fiber);
 
 					x.AddConsumerOf<ServiceStopped>()
@@ -76,11 +77,6 @@ namespace Topshelf.Model
 				});
 
 			EventChannel = new ChannelAdapter();
-		}
-
-		void LogServiceEvent(ServiceEvent message)
-		{
-			_log.InfoFormat("[{0}] {1}", message.ServiceName, message.EventType);
 		}
 
 		public ServiceCoordinator()
@@ -117,13 +113,9 @@ namespace Topshelf.Model
 		{
 			BeforeStartingServices();
 
-			_startupServices.Each(serviceFactory =>
-				{
-					_channel.Send(new CreateService(serviceFactory.Key));
-//					ServiceStateMachine service = serviceFactory.Value();
+			_startupServices.Each(serviceFactory => _channel.Send(new CreateService(serviceFactory.Key)));
 
-	//				_serviceCache.Add(service.Name, service);
-				});
+			WaitUntilAllServicesAre(ServiceStateMachine.Running, timeout);
 
 			AfterStartingServices();
 		}
@@ -170,20 +162,25 @@ namespace Topshelf.Model
 
 			SendStopCommandToServices();
 
+			WaitUntilAllServicesAre(ServiceStateMachine.Completed, timeout);
+
+			AfterStoppingServices();
+		}
+
+		void WaitUntilAllServicesAre(State state, TimeSpan timeout)
+		{
 			DateTime stopTime = SystemUtil.Now + timeout;
 
 			while (SystemUtil.Now < stopTime)
 			{
 				_updated.WaitOne(1.Seconds());
 
-				if (AllServicesAreCompleted())
+				if (AllServiceInState(state))
 					break;
 			}
 
-			if (!AllServicesAreCompleted())
-				throw new InvalidOperationException("The services did not stop without the specified timeout");
-
-			AfterStoppingServices();
+			if (!AllServiceInState(state))
+				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)
@@ -202,16 +199,27 @@ namespace Topshelf.Model
 			Dispose(false);
 		}
 
+		void OnServiceEvent(ServiceEvent message)
+		{
+			_log.InfoFormat("[{0}] {1}", message.ServiceName, message.EventType);
+			_updated.Set();
+		}
+
+		void OnServiceStopped(ServiceStopped message)
+		{
+			if (_stopping)
+				_channel.Send(new UnloadService(message.ServiceName));
+		}
+
 		void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;
 			if (disposing)
 			{
-				Stop(10.Minutes());
-
 				if (_channel != null)
 				{
+					_log.DebugFormat("[Topshelf] Closing coordinator channel");
 					_channel.Dispose();
 					_channel = null;
 				}
@@ -220,17 +228,9 @@ namespace Topshelf.Model
 			_disposed = true;
 		}
 
-		void OnServiceStopped(ServiceStopped message)
+		bool AllServiceInState(State expected)
 		{
-			if (_stopping)
-				_channel.Send(new UnloadService(message.ServiceName));
-
-			_updated.Set();
-		}
-
-		bool AllServicesAreCompleted()
-		{
-			return !_serviceCache.Any(x => x.CurrentState != ServiceStateMachine.Completed);
+			return _serviceCache.Count() > 0 && _serviceCache.All(x => x.CurrentState == expected);
 		}
 
 		void SendStopCommandToServices()
@@ -246,27 +246,27 @@ namespace Topshelf.Model
 
 		void BeforeStartingServices()
 		{
-			CallAction("before starting services", _beforeStartingServices);
+			CallAction("Before starting services", _beforeStartingServices);
 		}
 
 		void AfterStartingServices()
 		{
-			CallAction("after starting services", _afterStartingServices);
+			CallAction("After starting services", _afterStartingServices);
 		}
 
 		void AfterStoppingServices()
 		{
-			CallAction("after stopping services", _afterStoppingServices);
+			CallAction("After stopping services", _afterStoppingServices);
 		}
 
 		void CallAction(string name, Action<IServiceCoordinator> action)
 		{
-			_log.DebugFormat("Calling {0} action", name);
+			_log.DebugFormat("[Topshelf] {0}", name);
 
 			if (action != null)
 				action(this);
 
-			_log.InfoFormat("Call to {0} complete", name);
+			_log.InfoFormat("[Topshelf] {0} complete", name);
 		}
 	}
 }

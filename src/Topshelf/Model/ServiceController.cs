@@ -61,7 +61,7 @@ namespace Topshelf.Model
 		{
 			try
 			{
-				_log.DebugFormat("Calling service factory for {0}", Name);
+				_log.DebugFormat("[{0}] Creating service", Name);
 
 				_instance = _serviceFactory(Name, _coordinator);
 
@@ -85,7 +85,7 @@ namespace Topshelf.Model
 
 		protected override void Start()
 		{
-			CallAction("start", _startAction);
+			CallAction("Start", _startAction);
 
 			Publish<ServiceRunning>();
 		}
@@ -100,25 +100,27 @@ namespace Topshelf.Model
 			}
 
 			_instance = null;
+
+			Publish<ServiceUnloaded>();
 		}
 
 		protected override void Stop()
 		{
-			CallAction("stop", _stopAction);
+			CallAction("Stop", _stopAction);
 
 			Publish<ServiceStopped>();
 		}
 
 		protected override void Pause()
 		{
-			CallAction("pause", _pauseAction);
+			CallAction("Pause", _pauseAction);
 
 			Publish<ServicePaused>();
 		}
 
 		protected override void Continue()
 		{
-			CallAction("continue", _continueAction);
+			CallAction("Continue", _continueAction);
 
 			Publish<ServiceRunning>();
 		}
@@ -128,11 +130,11 @@ namespace Topshelf.Model
 			if (callback == null)
 				return;
 
-			_log.DebugFormat("[{0}] Calling {1} action", Name, text);
+			_log.DebugFormat("[{0}] {1}", Name, text);
 
 			callback(_instance);
 
-			_log.InfoFormat("[{0}] Call to {1} complete", Name, text);
+			_log.InfoFormat("[{0}] {1} complete", Name, text);
 		}
 
 		protected override void Dispose(bool disposing)

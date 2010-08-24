@@ -51,7 +51,7 @@ namespace Topshelf.Hosts
 
 				_coordinator.Start(_timeout); //user code starts
 
-				_log.InfoFormat("Topshelf is running, press Control+C to exit.");
+				_log.InfoFormat("[Topshelf] Running, press Control+C to exit.");
 
 				_exit.WaitOne();
 			}
@@ -72,7 +72,7 @@ namespace Topshelf.Hosts
 		{
 			try
 			{
-				_log.Info("Stopping Topshelf");
+				_log.Info("[Topshelf] Stopping");
 
 				_coordinator.Stop(_timeout);
 			}
@@ -84,6 +84,8 @@ namespace Topshelf.Hosts
 			{
 				_coordinator.Dispose();
 				_coordinator = null;
+
+				_log.Info("[Topshelf] Stopped");
 			}
 		}
 
