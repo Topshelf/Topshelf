@@ -31,18 +31,19 @@ namespace Topshelf.Configuration.Dsl
 			StopAction = DoNothing;
 			ContinueAction = DoNothing;
 
-			BuildAction = name => FastActivator<TService>.Create();
+			BuildAction = (name, coordinator) => FastActivator<TService>.Create();
 
 			Name = "{0}/{1}".FormatWith(typeof(TService).Name, Guid.NewGuid());
 		}
 
-		public string Name { get; protected set; }
-		public Action<TService> ContinueAction { get; private set; }
-		public Action<TService> PauseAction { get; private set; }
-		public Action<TService> StartAction { get; private set; }
-		public Action<TService> StopAction { get; private set; }
+		public string Name { get; private set; }
 
-		public ServiceFactory<TService> BuildAction { get; private set; }
+		Action<TService> ContinueAction { get; set; }
+		Action<TService> PauseAction { get; set; }
+		Action<TService> StartAction { get; set; }
+		Action<TService> StopAction { get; set; }
+
+		InternalServiceFactory<TService> BuildAction { get; set; }
 
 		public void Dispose()
 		{
@@ -77,22 +78,27 @@ namespace Topshelf.Configuration.Dsl
 
 		public void HowToBuildService(ServiceFactory<TService> factory)
 		{
-			BuildAction = factory;
+			BuildAction = (name, coordinator) => factory(name);
 		}
 
 		public void ConstructUsing(ServiceFactory<TService> factory)
 		{
-			BuildAction = factory;
+			BuildAction = (name,coordinator) => factory(name);
 		}
 
-		public ServiceController<TService> Create(UntypedChannel hostChannel)
+		public void ConstructUsing(InternalServiceFactory<TService> serviceFactory)
 		{
-			return Create(Name, hostChannel);
+			BuildAction = serviceFactory;
 		}
 
-		public ServiceController<TService> Create(string serviceName, UntypedChannel coordinatorChannel)
+		public ServiceController<TService> Create(IServiceCoordinator coordinator, UntypedChannel coordinatorChannel)
 		{
-			var serviceController = new ServiceController<TService>(serviceName, coordinatorChannel,
+			return Create(Name, coordinator, coordinatorChannel);
+		}
+
+		public ServiceController<TService> Create(string serviceName, IServiceCoordinator coordinator, UntypedChannel coordinatorChannel)
+		{
+			var serviceController = new ServiceController<TService>(serviceName, coordinator, coordinatorChannel,
 			                                                        StartAction,
 			                                                        StopAction,
 			                                                        PauseAction,

@@ -18,19 +18,20 @@ namespace Topshelf
 	using FileSystem;
 	using log4net;
 	using Model;
-	using Shelving;
 
 
 	public class Host
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+		readonly IServiceCoordinator _coordinator;
 
-		IServiceCoordinator _coordinator;
+		public Host(IServiceCoordinator coordinator)
+		{
+			_coordinator = coordinator;
+		}
 
 		public void Start()
 		{
-			_coordinator = new ServiceCoordinator();
-
 			CreateDirectoryMonitor();
 
 			CreateExistingServices();
@@ -43,12 +44,19 @@ namespace Topshelf
 
 		void CreateExistingServices()
 		{
-			string serviceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
+			var serviceDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services"));
 
-			Directory.GetDirectories(serviceDir)
-				.ToList()
-				.ConvertAll(Path.GetFileName)
-				.ForEach(CreateShelfService);
+			if (serviceDirectory.Exists)
+			{
+				Directory.GetDirectories(serviceDirectory.FullName)
+					.ToList()
+					.ConvertAll(Path.GetFileName)
+					.ForEach(CreateShelfService);
+			}
+			else
+			{
+				_log.WarnFormat("The services folder does not exist");
+			}
 		}
 
 		void CreateShelfService(string directoryName)
@@ -65,7 +73,7 @@ namespace Topshelf
 
 		public void Stop()
 		{
-			_coordinator.Dispose();
+			_log.DebugFormat("Stop called on Host");
 		}
 	}
 }

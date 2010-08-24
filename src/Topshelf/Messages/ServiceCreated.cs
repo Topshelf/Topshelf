@@ -26,6 +26,11 @@ namespace Topshelf.Messages
 			EventType = ServiceEventType.Created;
 		}
 
+		public ServiceCreated(string serviceName)
+			: this(serviceName, null, null)
+		{
+		}
+
 		protected ServiceCreated()
 		{
 		}

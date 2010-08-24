@@ -41,7 +41,7 @@ namespace Topshelf.Specs
 				c.WhenContinued(s => { _wasContinued = true; });
 				c.HowToBuildService(name => _service);
 
-				_serviceController = c.Create(AddressRegistry.GetOutboundCoordinatorChannel());
+				_serviceController = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel());
 			}
 
 			_serviceChannel = new InboundChannel(AddressRegistry.GetServiceAddress(_serviceController.Name),
@@ -159,7 +159,7 @@ namespace Topshelf.Specs
 			c.WhenStarted(s => s.Start());
 			c.WhenStopped(s => s.Stop());
 
-			using (IServiceController service = c.Create(AddressRegistry.GetOutboundCoordinatorChannel()))
+			using (IServiceController service = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel()))
 			{
 //				service.Send(new StartService());
 

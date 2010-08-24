@@ -41,18 +41,18 @@ namespace Topshelf.Specs.ServiceCoordinator
 
 			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
-					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
+					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
 					                               x => x.Stop(),
 					                               x => x.Pause(),
 					                               x => x.Continue(),
-					                               x => _service),
-					() => new ServiceController<TestService>("test2", AddressRegistry.GetOutboundCoordinatorChannel(),
+					                               (x,c) => _service),
+					() => new ServiceController<TestService>("test2", null, AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
 					                               x => x.Stop(),
 					                               x => x.Pause(),
 					                               x => x.Continue(),
-					                               x => _service2)
+					                               (x,c) => _service2)
 				};
 
 			_serviceCoordinator.RegisterServices(services);

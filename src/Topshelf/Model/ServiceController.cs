@@ -14,6 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using Exceptions;
+	using log4net;
 	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Messages;
@@ -24,26 +25,31 @@ namespace Topshelf.Model
 		IServiceController<TService>
 		where TService : class
 	{
-		ServiceFactory<TService> _serviceFactory;
+		readonly ILog _log;
 		Action<TService> _continueAction;
 		TService _instance;
 		Action<TService> _pauseAction;
+		InternalServiceFactory<TService> _serviceFactory;
+		readonly IServiceCoordinator _coordinator;
 		Action<TService> _startAction;
 		Action<TService> _stopAction;
 
-		public ServiceController(string name, UntypedChannel eventChannel,
+		public ServiceController(string name, IServiceCoordinator coordinator, UntypedChannel eventChannel,
 		                         Action<TService> startAction,
 		                         Action<TService> stopAction,
 		                         Action<TService> pauseAction,
 		                         Action<TService> continueAction,
-		                         ServiceFactory<TService> serviceFactory)
+		                         InternalServiceFactory<TService> serviceFactory)
 			: base(name, eventChannel)
 		{
+			_coordinator = coordinator;
 			_startAction = startAction;
 			_continueAction = continueAction;
 			_serviceFactory = serviceFactory;
 			_pauseAction = pauseAction;
 			_stopAction = stopAction;
+
+			_log = LogManager.GetLogger("Topshelf.Host.Service." + name);
 		}
 
 		public Type ServiceType
@@ -51,22 +57,21 @@ namespace Topshelf.Model
 			get { return typeof(TService); }
 		}
 
-		public void Create(CreateService message)
-		{
-			Create();
-		}
-
-		protected void Create()
+		protected override void Create()
 		{
 			try
 			{
-				_instance = _serviceFactory(Name);
+				_log.DebugFormat("Calling service factory for {0}", Name);
+
+				_instance = _serviceFactory(Name, _coordinator);
 
 				if (_instance == null)
 				{
 					throw new NullReferenceException("The service instance returned was null for service type "
 					                                 + typeof(TService).ToShortTypeName());
 				}
+
+				Publish<ServiceCreated>();
 			}
 			catch (Exception ex)
 			{
@@ -74,32 +79,60 @@ namespace Topshelf.Model
 			}
 		}
 
+		protected override void ServiceCreated(ServiceCreated message)
+		{
+		}
+
 		protected override void Start()
 		{
-			_startAction(_instance);
+			CallAction("start", _startAction);
+
+			Publish<ServiceRunning>();
 		}
 
 		protected override void Unload()
 		{
+			var disposableInstance = _instance as IDisposable;
+			if (disposableInstance != null)
+			{
+				using (disposableInstance)
+					_log.DebugFormat("[{0}] Disposing of instance", Name);
+			}
+
+			_instance = null;
 		}
 
 		protected override void Stop()
 		{
-			_stopAction(_instance);
+			CallAction("stop", _stopAction);
+
+			Publish<ServiceStopped>();
 		}
 
 		protected override void Pause()
 		{
-			_pauseAction(_instance);
+			CallAction("pause", _pauseAction);
+
+			Publish<ServicePaused>();
 		}
 
 		protected override void Continue()
 		{
-			_continueAction(_instance);
+			CallAction("continue", _continueAction);
+
+			Publish<ServiceRunning>();
 		}
 
-		protected override void ServiceCreated(ServiceCreated message)
+		void CallAction(string text, Action<TService> callback)
 		{
+			if (callback == null)
+				return;
+
+			_log.DebugFormat("[{0}] Calling {1} action", Name, text);
+
+			callback(_instance);
+
+			_log.InfoFormat("[{0}] Call to {1} complete", Name, text);
 		}
 
 		protected override void Dispose(bool disposing)
@@ -116,92 +149,4 @@ namespace Topshelf.Model
 			}
 		}
 	}
-
-
-//	[DebuggerDisplay("Service({Name}) is {State}")]
-//	public class ServiceControllexxxxr<TService> :
-//		StateMachine<ServiceController<TService>>,
-//		IServiceController
-//		where TService : class
-//	{
-//		readonly OutboundChannel _coordinatorChannel;
-//		InboundChannel _channel;
-//		bool _created;
-//		bool _disposed;
-//		Fiber _fiber;
-//
-//
-//
-//		public ServiceController(string serviceName, OutboundChannel coordinatorChannel)
-//		{
-//			Name = serviceName;
-//
-//			_fiber = new ThreadPoolFiber();
-//			_coordinatorChannel = coordinatorChannel;
-//
-//			_channel = WellknownAddresses.CreateServiceChannel(serviceName, s =>
-//				{
-//					s.AddConsumersFor<ServiceController<TService>>()
-//						.UsingInstance(this)
-//						.ExecuteOnFiber(_fiber);
-//				});
-//		}
-//
-//	
-//
-//		public void Dispose()
-//		{
-//			Dispose(true);
-//			GC.SuppressFinalize(this);
-//		}
-//
-//		public void Send<T>(T message)
-//		{
-//			_channel.Send(message);
-//		}
-//
-//		public string Name { get; private set; }
-//
-//		public Type ServiceType
-//		{
-//			get { return typeof(TService); }
-//		}
-//
-//		public ServiceState State
-//		{
-//			get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
-//		}
-//
-//		protected void Dispose(bool disposing)
-//		{
-//			if (!disposing)
-//				return;
-//			if (_disposed)
-//				return;
-//
-//			if (_channel != null)
-//			{
-//				_channel.Dispose();
-//				_channel = null;
-//			}
-//
-//			_instance = default(TService);
-//
-//			_fiber.Shutdown(30.Seconds());
-//
-//			StartAction = null;
-//			StopAction = null;
-//			PauseAction = null;
-//			ContinueAction = null;
-//			BuildService = null;
-//			_disposed = true;
-//		}
-//
-//		~ServiceController()
-//		{
-//			Dispose(false);
-//		}
-//
-//
-//	}
 }

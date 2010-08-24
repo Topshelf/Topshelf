@@ -36,7 +36,7 @@ namespace Topshelf.Model
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
 		readonly Fiber _fiber;
 		readonly Cache<string, ServiceStateMachine> _serviceCache;
-		readonly IDictionary<string, Func<ServiceStateMachine>> _startupServices;
+		readonly IDictionary<string, Func<IServiceCoordinator, ServiceStateMachine>> _startupServices;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
 		InboundChannel _channel;
 
@@ -54,7 +54,7 @@ namespace Topshelf.Model
 			_afterStartingServices = afterStartingServices;
 			_beforeStartingServices = beforeStartingServices;
 
-			_startupServices = new Dictionary<string, Func<ServiceStateMachine>>();
+			_startupServices = new Dictionary<string, Func<IServiceCoordinator, ServiceStateMachine>>();
 
 			_serviceCache = new Cache<string, ServiceStateMachine>();
 
@@ -66,12 +66,21 @@ namespace Topshelf.Model
 						.ExecuteOnThreadPoolFiber()
 						.PersistInMemoryUsing(_serviceCache);
 
+					x.AddConsumerOf<ServiceEvent>()
+						.UsingConsumer(LogServiceEvent)
+						.ExecuteOnFiber(_fiber);
+
 					x.AddConsumerOf<ServiceStopped>()
 						.UsingConsumer(OnServiceStopped)
 						.ExecuteOnFiber(_fiber);
 				});
 
 			EventChannel = new ChannelAdapter();
+		}
+
+		void LogServiceEvent(ServiceEvent message)
+		{
+			_log.InfoFormat("[{0}] {1}", message.ServiceName, message.EventType);
 		}
 
 		public ServiceCoordinator()
@@ -90,12 +99,18 @@ namespace Topshelf.Model
 
 		public int ServiceCount
 		{
-			get { throw new NotImplementedException(); }
+			get { return _serviceCache.Count(); }
 		}
 
 		public IServiceController this[string serviceName]
 		{
-			get { throw new NotImplementedException(); }
+			get
+			{
+				if (_serviceCache.Has(serviceName))
+					return _serviceCache[serviceName];
+
+				return null;
+			}
 		}
 
 		public void Start(TimeSpan timeout)
@@ -104,9 +119,10 @@ namespace Topshelf.Model
 
 			_startupServices.Each(serviceFactory =>
 				{
-					ServiceStateMachine service = serviceFactory.Value();
+					_channel.Send(new CreateService(serviceFactory.Key));
+//					ServiceStateMachine service = serviceFactory.Value();
 
-					_serviceCache.Add(service.Name, service);
+	//				_serviceCache.Add(service.Name, service);
 				});
 
 			AfterStartingServices();
@@ -119,7 +135,7 @@ namespace Topshelf.Model
 		/// <param name = "bootstrapperType">The type of the bootstrapper class for the service</param>
 		public void CreateShelfService(string serviceName, Type bootstrapperType)
 		{
-			_startupServices.Add(serviceName, () => { return new ShelfServiceController(serviceName, _channel); });
+			_startupServices.Add(serviceName, x => { return new ShelfServiceController(serviceName, _channel); });
 			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Internal, bootstrapperType));
 		}
 
@@ -129,8 +145,13 @@ namespace Topshelf.Model
 		/// <param name = "serviceName">The name of the service to create (should match the folder)</param>
 		public void CreateShelfService(string serviceName)
 		{
-			_startupServices.Add(serviceName, () => { return new ShelfServiceController(serviceName, _channel); });
+			_startupServices.Add(serviceName, x => { return new ShelfServiceController(serviceName, _channel); });
 			//_channel.Send(new CreateShelfService(serviceName, ShelfType.Folder));
+		}
+
+		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
+		{
+			_startupServices.Add(serviceName, serviceFactory);
 		}
 
 		public IEnumerator<IServiceController> GetEnumerator()
@@ -165,18 +186,13 @@ namespace Topshelf.Model
 			AfterStoppingServices();
 		}
 
-		public void CreateService(string serviceName, Func<ServiceStateMachine> serviceFactory)
-		{
-			_startupServices.Add(serviceName, serviceFactory);
-		}
-
 		ServiceStateMachine GetServiceInstance(string key)
 		{
 			if(key == null)
 				return new ServiceStateMachine(null, _channel);
 
 			if (_startupServices.ContainsKey(key))
-				return _startupServices[key]();
+				return _startupServices[key](this);
 
 			return new ServiceStateMachine(key, _channel);
 		}

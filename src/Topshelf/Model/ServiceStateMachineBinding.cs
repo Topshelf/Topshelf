@@ -25,7 +25,7 @@ namespace Topshelf.Model
 			Bind(ServiceStateMachine.OnCreate, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnCreated, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnRunning, x => x.ServiceName);
-			Bind(ServiceStateMachine.OnStart, x => x.ServiceName);
+//			Bind(ServiceStateMachine.OnStart, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnStop, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnRestart, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnCreated, x => x.ServiceName);

@@ -111,7 +111,7 @@ namespace Topshelf.Shelving
 		{
 			bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
-			ServiceController<T> service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, _channel);
+			ServiceController<T> service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
 
 			_serviceChannel = new InboundChannel(AddressRegistry.GetShelfServiceInstanceAddress(AppDomain.CurrentDomain),
 			                                     AddressRegistry.GetShelfServiceInstancePipeName(AppDomain.CurrentDomain),

@@ -41,13 +41,16 @@ namespace Topshelf.Model
 					       When(OnCreated)
 					       	.Call((instance, message) => instance.ServiceCreated(message),
 					       	      HandleServiceCommandException)
-					       	.TransitionTo(Created));
-
-					During(Created,
-					       When(OnStart)
+					       	.TransitionTo(Created)
 					       	.Call((instance, message) => instance.Start(),
 					       	      HandleServiceCommandException)
 					       	.TransitionTo(Starting));
+
+//					During(Created,
+//					       When(OnStart)
+//					       	.Call((instance, message) => instance.Start(),
+//					       	      HandleServiceCommandException)
+//					       	.TransitionTo(Starting));
 
 					During(Starting,
 					       When(OnRunning)
@@ -60,6 +63,10 @@ namespace Topshelf.Model
 					       When(OnRestart)
 					       	.Call((instance, message) => instance.Stop())
 					       	.TransitionTo(StoppingToRestart));
+
+					During(Stopping,
+					       When(OnStopped)
+					       	.TransitionTo(Completed));
 
 					During(StoppingToRestart,
 					       When(OnStopped)
@@ -81,8 +88,6 @@ namespace Topshelf.Model
 					       	.TransitionTo(Running));
 
 					Anytime(
-					        When(Created.Enter)
-					        	.Call(instance => instance.Publish<ServiceCreated>()),
 					        When(Starting.Enter)
 					        	.Call(instance => instance.Publish<ServiceStarting>()),
 					        When(Running.Enter)
@@ -189,7 +194,7 @@ namespace Topshelf.Model
 		{
 		}
 
-		void Publish<T>()
+		protected void Publish<T>()
 			where T : ServiceEvent
 		{
 			T message = FastActivator<T>.Create(Name);
@@ -197,7 +202,7 @@ namespace Topshelf.Model
 			_coordinatorChannel.Send(message);
 		}
 
-		void Publish<T>(T message)
+		protected void Publish<T>(T message)
 		{
 			_coordinatorChannel.Send(message);
 		}

@@ -14,4 +14,8 @@ namespace Topshelf.Model
 {
 	public delegate TService ServiceFactory<TService>(string name)
 		where TService : class;
+
+
+	public delegate TService InternalServiceFactory<TService>(string name, IServiceCoordinator coordinator)
+		where TService : class;
 }

@@ -38,7 +38,7 @@ namespace Topshelf
 					x.ConfigureService<Host>(s =>
 						{
 							s.Named("Topshelf.Host");
-							s.HowToBuildService(name => new Host());
+							s.ConstructUsing((name,coordinator) => new Host(coordinator));
 							s.WhenStarted(tc => tc.Start());
 							s.WhenStopped(tc => tc.Stop());
 						});

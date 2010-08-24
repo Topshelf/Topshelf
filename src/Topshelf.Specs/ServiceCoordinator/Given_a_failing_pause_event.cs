@@ -29,12 +29,12 @@ namespace Topshelf.Specs.ServiceCoordinator
 		{
 			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
-					() => new ServiceController<TestService>("test", AddressRegistry.GetOutboundCoordinatorChannel(),
+					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
 					                               x => x.Start(),
 					                               x => x.Stop(),
 					                               x => { throw new Exception(); },
 					                               x => x.Continue(),
-					                               x => new TestService())
+					                               (x,c) => new TestService())
 				};
 
 			ServiceCoordinator.RegisterServices(services);

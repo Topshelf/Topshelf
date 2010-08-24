@@ -54,8 +54,6 @@ namespace Topshelf.Hosts
 				_log.InfoFormat("Topshelf is running, press Control+C to exit.");
 
 				_exit.WaitOne();
-
-				ShutdownCoordinator();
 			}
 			catch (Exception ex)
 			{

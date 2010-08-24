@@ -29,5 +29,6 @@ namespace Topshelf.Configuration.Dsl
 
 		void HowToBuildService(ServiceFactory<TService> serviceFactory);
 		void ConstructUsing(ServiceFactory<TService> serviceFactory);
+		void ConstructUsing(InternalServiceFactory<TService> serviceFactory);
 	}
 }

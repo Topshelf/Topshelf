@@ -53,7 +53,7 @@ namespace Topshelf.Model
 		/// </summary>
 		/// <param name="serviceName"></param>
 		/// <param name="serviceFactory"></param>
-		void CreateService(string serviceName, Func<ServiceStateMachine> serviceFactory);
+		void CreateService(string serviceName, Func<IServiceCoordinator,ServiceStateMachine> serviceFactory);
 
 		/// <summary>
 		///   Creates a shelf service using the specified bootstrapper type

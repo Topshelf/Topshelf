@@ -94,7 +94,8 @@ namespace Topshelf.Configuration.Dsl
 				{
 					action(configurator);
 
-					coordinator.CreateService(configurator.Name, () => configurator.Create(AddressRegistry.GetOutboundCoordinatorChannel()));
+					coordinator.CreateService(configurator.Name, 
+						x => configurator.Create(coordinator, AddressRegistry.GetOutboundCoordinatorChannel()));
 				});
 		}
 
