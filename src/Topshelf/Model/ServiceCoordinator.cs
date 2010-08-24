@@ -64,16 +64,16 @@ namespace Topshelf.Model
 					x.AddConsumersFor<ServiceStateMachine>()
 						.BindUsing<ServiceStateMachineBinding, string>()
 						.CreateNewInstanceBy(GetServiceInstance)
-						.ExecuteOnThreadPoolFiber()
+						.HandleOnInstanceFiber()
 						.PersistInMemoryUsing(_serviceCache);
 
 					x.AddConsumerOf<ServiceEvent>()
 						.UsingConsumer(OnServiceEvent)
-						.ExecuteOnFiber(_fiber);
+						.HandleOnFiber(_fiber);
 
 					x.AddConsumerOf<ServiceStopped>()
 						.UsingConsumer(OnServiceStopped)
-						.ExecuteOnFiber(_fiber);
+						.HandleOnFiber(_fiber);
 				});
 
 			EventChannel = new ChannelAdapter();

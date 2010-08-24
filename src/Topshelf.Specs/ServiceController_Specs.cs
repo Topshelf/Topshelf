@@ -49,7 +49,7 @@ namespace Topshelf.Specs
 			                                     	{
 			                                     		x.AddConsumersFor<ServiceStateMachine>()
 			                                     			.UsingInstance(_serviceController)
-															.ExecuteOnProducerThread();
+															.HandleOnCallingThread();
 			                                     	});
 
 			_serviceChannel.Send(new StartService("test"));

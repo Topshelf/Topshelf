@@ -33,8 +33,7 @@ namespace Topshelf.Shelving
 					configurator(x);
 
 					x.ReceiveFromWcfChannel(address, endpoint)
-						.ExecuteOnThreadPoolFiber();
-
+						.HandleOnFiber();
 				});
 		}
 

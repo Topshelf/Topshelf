@@ -90,20 +90,6 @@ namespace Topshelf.Model
 			Publish<ServiceRunning>();
 		}
 
-		protected override void Unload()
-		{
-			var disposableInstance = _instance as IDisposable;
-			if (disposableInstance != null)
-			{
-				using (disposableInstance)
-					_log.DebugFormat("[{0}] Disposing of instance", Name);
-			}
-
-			_instance = null;
-
-			Publish<ServiceUnloaded>();
-		}
-
 		protected override void Stop()
 		{
 			CallAction("Stop", _stopAction);
@@ -123,6 +109,24 @@ namespace Topshelf.Model
 			CallAction("Continue", _continueAction);
 
 			Publish<ServiceRunning>();
+		}
+
+		protected override void Unload()
+		{
+			_log.DebugFormat("[{0}] {1}", Name, "Unload");
+
+			var disposableInstance = _instance as IDisposable;
+			if (disposableInstance != null)
+			{
+				using (disposableInstance)
+					_log.DebugFormat("[{0}] Dispose", Name);
+			}
+
+			_instance = null;
+
+			_log.InfoFormat("[{0}] {1} complete", Name, "Unload");
+
+			Publish<ServiceUnloaded>();
 		}
 
 		void CallAction(string text, Action<TService> callback)

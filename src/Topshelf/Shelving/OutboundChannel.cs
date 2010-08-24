@@ -31,7 +31,7 @@ namespace Topshelf.Shelving
 			_connection = _channel.Connect(cc =>
 				{
 					cc.SendToWcfChannel(address, endpoint)
-						.ExecuteOnThreadPoolFiber();
+						.HandleOnFiber();
 				});
 		}
 
