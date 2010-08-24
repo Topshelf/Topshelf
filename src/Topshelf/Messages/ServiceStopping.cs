@@ -12,8 +12,17 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    public class ServiceStopping :
-        ServiceMessage
-    {
-    }
+	public class ServiceStopping :
+		ServiceEvent
+	{
+		public ServiceStopping(string name)
+			: base(name)
+		{
+			EventType = ServiceEventType.Stopping;
+		}
+
+		protected ServiceStopping()
+		{
+		}
+	}
 }

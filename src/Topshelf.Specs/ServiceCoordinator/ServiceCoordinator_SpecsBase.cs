@@ -20,12 +20,12 @@ namespace Topshelf.Specs.ServiceCoordinator
     [Scenario]
     public class ServiceCoordinator_SpecsBase
     {
-        public ServiceCoordinator ServiceCoordinator { get; set; }
+        public OldServiceCoordinator ServiceCoordinator { get; set; }
 
         [Given]
         public void A_service_coordinator()
         {
-            ServiceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
+            ServiceCoordinator = new OldServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
         }
 
         [After]

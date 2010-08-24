@@ -21,13 +21,14 @@ namespace Topshelf.FileSystem
     using Magnum.FileSystem;
     using Magnum.FileSystem.Events;
     using Messages;
+    using Model;
     using Shelving;
 
     public class DirectoryMonitor :
         IDisposable
     {
         readonly string _baseDir;
-        readonly HostProxy _hostChannel;
+        readonly OutboundChannel _hostChannel;
         ChannelAdapter _channel;
         Scheduler _scheduler;
         PollingFileSystemEventProducer _producer;
@@ -35,7 +36,7 @@ namespace Topshelf.FileSystem
         public DirectoryMonitor(string directory)
         {
             _baseDir = directory;
-            _hostChannel = WellknownAddresses.GetShelfMakerProxy();
+            _hostChannel = AddressRegistry.GetShelfServiceCoordinatorProxy();
         }
 
         public void Start()
@@ -59,10 +60,7 @@ namespace Topshelf.FileSystem
                                                    if (key == _baseDir)
                                                        return;
                                                    
-                                                   _hostChannel.Send(new FileSystemChange
-                                                       {
-                                                           ShelfName = key
-                                                       });
+                                                   _hostChannel.Send(new ServiceFolderChanged(key));
                                                })));
         }
 

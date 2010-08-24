@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,8 +12,30 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    public class ServiceReady :
-        ServiceMessage
-    {
-    }
+	using System;
+
+
+	public class ServiceCreated :
+		ServiceEvent
+	{
+		public ServiceCreated(string name, Uri address, string pipeName)
+			: base(name)
+		{
+			Address = address;
+			PipeName = pipeName;
+			EventType = ServiceEventType.Created;
+		}
+
+		public ServiceCreated(string serviceName)
+			: this(serviceName, null, null)
+		{
+		}
+
+		protected ServiceCreated()
+		{
+		}
+
+		public Uri Address { get; private set; }
+		public string PipeName { get; private set; }
+	}
 }

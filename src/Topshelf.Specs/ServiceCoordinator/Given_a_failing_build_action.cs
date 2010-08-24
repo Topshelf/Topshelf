@@ -17,7 +17,6 @@ namespace Topshelf.Specs.ServiceCoordinator
 	using Magnum.TestFramework;
 	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using TestObject;
 
 
@@ -30,14 +29,12 @@ namespace Topshelf.Specs.ServiceCoordinator
 		{
 			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{
-					() => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-						{
-							BuildService = s => { throw new Exception(); },
-							StartAction = x => x.Start(),
-							StopAction = x => x.Stop(),
-							ContinueAction = x => x.Continue(),
-							PauseAction = x => x.Continue()
-						}
+					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
+					                               x => x.Start(),
+					                               x => x.Stop(),
+					                               x => x.Pause(),
+					                               x => x.Continue(),
+					                               (x,c) => { throw new Exception(); })
 				};
 
 			ServiceCoordinator.RegisterServices(services);

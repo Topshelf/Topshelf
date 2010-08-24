@@ -12,20 +12,23 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    using System;
+	using System;
 
-    public class ShelfFault :
-        ServiceMessage
-    {
-        public Exception Exception { get; set; }
 
-        public ShelfFault()
-        {
-        }
+	public class ShelfFault :
+		ShelfEvent
+	{
+		public ShelfFault(Exception ex)
+			: this()
+		{
+			Exception = ex;
+		}
 
-        public ShelfFault(Exception ex)
-        {
-            Exception = ex;
-        }
-    }
+		protected ShelfFault()
+		{
+			EventType = ServiceEventType.Fault;
+		}
+
+		public Exception Exception { get; protected set; }
+	}
 }
