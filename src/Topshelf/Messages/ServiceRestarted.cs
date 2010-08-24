@@ -10,25 +10,19 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf.Messages
 {
-	using Magnum.StateMachine;
-	using Model;
-
-
-	public class ServiceStateMachineBinding :
-		StateMachineBinding<ServiceStateMachine, string>
+	public class ServiceRestarted :
+		ServiceEvent
 	{
-		public ServiceStateMachineBinding()
+		public ServiceRestarted(string name)
+			: base(name)
 		{
-			Id(x => x.Name);
+			EventType = ServiceEventType.Restarted;
+		}
 
-			Bind(ShelfService.OnCreate, x => x.ServiceName);
-			Bind(ShelfService.OnStart, x => x.ServiceName);
-			Bind(ShelfService.OnStop, x => x.ServiceName);
-			Bind(ShelfService.OnReload, x => x.ServiceName);
-			Bind(ShelfService.OnCreated, x => x.ServiceName);
-			Bind(ShelfService.OnStopped, x => x.ServiceName);
+		protected ServiceRestarted()
+		{
 		}
 	}
 }

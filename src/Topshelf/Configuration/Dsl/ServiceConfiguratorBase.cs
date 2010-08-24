@@ -27,7 +27,7 @@ namespace Topshelf.Configuration.Dsl
         public Action<TService> StartAction { get; private set; }
         public Action<TService> StopAction { get; private set; }
 
-        public ServiceBuilder BuildAction { get; private set; }
+        public ServiceFactory<TService> BuildAction { get; private set; }
 
         public ServiceConfiguratorBase()
         {
@@ -80,9 +80,9 @@ namespace Topshelf.Configuration.Dsl
             ContinueAction = continueAction;
         }
 
-        public void HowToBuildService(ServiceBuilder builder)
+        public void HowToBuildService(ServiceFactory<TService> factory)
         {
-            BuildAction = builder;
+            BuildAction = factory;
         }
 
         protected virtual void Dispose(bool disposing)

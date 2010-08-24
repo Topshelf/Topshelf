@@ -8,7 +8,7 @@
     <ProjectGuid>{5E6657AD-E81C-4C76-AA45-7D0032AA5C31}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Topshelf.Host</RootNamespace>
+    <RootNamespace>Topshelf</RootNamespace>
     <AssemblyName>Topshelf.Host</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -51,7 +51,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TopshelfHostService.cs" />
+    <Compile Include="Host.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">

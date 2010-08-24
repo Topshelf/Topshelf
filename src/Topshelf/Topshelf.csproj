@@ -104,6 +104,7 @@
     <Compile Include="Messages\ServicePaused.cs" />
     <Compile Include="Messages\ServicePausing.cs" />
     <Compile Include="Messages\ServiceCreated.cs" />
+    <Compile Include="Messages\ServiceRestarted.cs" />
     <Compile Include="Messages\ServiceRunning.cs" />
     <Compile Include="Messages\ServiceStopped.cs" />
     <Compile Include="Messages\ShelfEvent.cs" />
@@ -114,7 +115,7 @@
     <Compile Include="Messages\StartService.cs" />
     <Compile Include="Messages\StopService.cs" />
     <Compile Include="Messages\UnloadService.cs" />
-    <Compile Include="ServiceCoordinator.cs" />
+    <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Shelving\InboundChannel.cs" />
     <Compile Include="Shelving\OutboundChannel.cs" />
     <Compile Include="Shelving\IServiceCoordinator.cs" />
@@ -123,7 +124,6 @@
     <Compile Include="Shelving\ShelfConfiguration.cs" />
     <Compile Include="Shelving\ShelfReference.cs" />
     <Compile Include="Shelving\ShelfService.cs" />
-    <Compile Include="Shelving\ServiceStateMachineBinding.cs" />
     <Compile Include="Shelving\ShelfState.cs" />
     <Compile Include="Shelving\ShelfType.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
@@ -135,7 +135,7 @@
     <Compile Include="Hosts\Host.cs" />
     <Compile Include="Hosts\WinServiceHost.cs" />
     <Compile Include="WindowsServiceCode\Kernel32.cs" />
-    <Compile Include="Model\ServiceBuilder.cs" />
+    <Compile Include="Model\ServiceFactory.cs" />
     <Compile Include="ProcessExtensions.cs" />
     <Compile Include="Configuration\ServiceActionNames.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />

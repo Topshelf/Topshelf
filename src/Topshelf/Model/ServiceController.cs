@@ -24,20 +24,24 @@ namespace Topshelf.Model
 		IService<TService>
 		where TService : class
 	{
-		ServiceBuilder _buildAction;
+		ServiceFactory<TService> _serviceFactory;
 		Action<TService> _continueAction;
 		TService _instance;
 		Action<TService> _pauseAction;
 		Action<TService> _startAction;
 		Action<TService> _stopAction;
 
-		public ServiceController(string name, UntypedChannel eventChannel, Action<TService> startAction, Action<TService> stopAction,
-		               Action<TService> pauseAction, Action<TService> continueAction, ServiceBuilder buildAction)
+		public ServiceController(string name, UntypedChannel eventChannel,
+		                         Action<TService> startAction,
+		                         Action<TService> stopAction,
+		                         Action<TService> pauseAction,
+		                         Action<TService> continueAction,
+		                         ServiceFactory<TService> serviceFactory)
 			: base(name, eventChannel)
 		{
 			_startAction = startAction;
 			_continueAction = continueAction;
-			_buildAction = buildAction;
+			_serviceFactory = serviceFactory;
 			_pauseAction = pauseAction;
 			_stopAction = stopAction;
 		}
@@ -47,16 +51,16 @@ namespace Topshelf.Model
 			get { return typeof(TService); }
 		}
 
-		protected override void Create(CreateService message)
+		public void Create(CreateService message)
 		{
 			Create();
 		}
 
-		protected override void Create()
+		protected void Create()
 		{
 			try
 			{
-				_instance = (TService)_buildAction(Name);
+				_instance = _serviceFactory(Name);
 
 				if (_instance == null)
 				{
@@ -108,7 +112,7 @@ namespace Topshelf.Model
 				_stopAction = null;
 				_pauseAction = null;
 				_continueAction = null;
-				_buildAction = null;
+				_serviceFactory = null;
 			}
 		}
 	}

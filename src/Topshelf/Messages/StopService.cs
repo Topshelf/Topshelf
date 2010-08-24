@@ -15,6 +15,9 @@ namespace Topshelf.Messages
 	public class StopService :
 		ServiceCommand
 	{
-		public string ServiceName { get; set; }
+		public StopService(string serviceName)
+			: base(serviceName)
+		{
+		}
 	}
 }

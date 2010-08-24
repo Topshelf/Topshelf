@@ -14,6 +14,15 @@ namespace Topshelf.Messages
 {
 	public abstract class ServiceCommand
 	{
-		public string ServiceName { get; set; }
+		protected ServiceCommand(string serviceName)
+		{
+			ServiceName = serviceName;
+		}
+
+		protected ServiceCommand()
+		{
+		}
+
+		public string ServiceName { get; private set; }
 	}
 }

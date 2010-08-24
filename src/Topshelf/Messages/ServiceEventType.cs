@@ -24,6 +24,7 @@ namespace Topshelf.Messages
 		Stopped,
 		FolderChanged,
 		Fault,
-		ShelfCreated
+		ShelfCreated,
+		Restarted
 	}
 }

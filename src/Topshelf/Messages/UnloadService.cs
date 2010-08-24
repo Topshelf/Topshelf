@@ -15,5 +15,9 @@ namespace Topshelf.Messages
 	public class UnloadService :
 		ServiceCommand
 	{
+		public UnloadService(string serviceName)
+			: base(serviceName)
+		{
+		}
 	}
 }

@@ -14,12 +14,20 @@ namespace Topshelf.Shelving
 {
 	using System;
 
+
 	/// <summary>
 	/// Interface to the service controller
 	/// </summary>
 	public interface IServiceCoordinator :
 		IDisposable
 	{
+		/// <summary>
+		/// Start the services hosted by the coordinator and wait until they have completed starting
+		/// before returning to the caller
+		/// </summary>
+		/// <param name="timeout"></param>
+		void Start(TimeSpan timeout);
+
 		/// <summary>
 		/// Creates a shelf service using the specified bootstrapper type
 		/// </summary>

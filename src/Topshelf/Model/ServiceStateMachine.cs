@@ -20,7 +20,7 @@ namespace Topshelf.Model
 	using Messages;
 
 
-	[DebuggerDisplay("{ServiceStateMachine}: {CurrentState}")]
+	[DebuggerDisplay("Service: {Name}, State: {CurrentState}")]
 	public class ServiceStateMachine :
 		StateMachine<ServiceStateMachine>,
 		IDisposable
@@ -33,27 +33,15 @@ namespace Topshelf.Model
 			Define(() =>
 				{
 					Initially(
-					          When(OnCreate)
-					          	.Call((instance, message) => instance.Create(message),
-					          	      InCaseOf<Exception>()
-					          	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
-					          	      	.TransitionTo(Failed))
-					          	.TransitionTo(Creating));
-
-					During(Creating,
 					       When(OnCreated)
 					       	.Call((instance, message) => instance.ServiceCreated(message),
-					       	      InCaseOf<Exception>()
-					       	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
-					       	      	.TransitionTo(Failed))
+								  HandleServiceCommandException)
 					       	.TransitionTo(Created));
 
 					During(Created,
 					       When(OnStart)
 					       	.Call((instance, message) => instance.Start(),
-					       	      InCaseOf<Exception>()
-					       	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
-					       	      	.TransitionTo(Failed))
+								  HandleServiceCommandException)
 					       	.TransitionTo(Starting));
 
 					During(Running,
@@ -67,12 +55,24 @@ namespace Topshelf.Model
 					       When(OnStopped)
 					       	.Call(instance => instance.Unload())
 					       	.Call(instance => instance.Create())
-					       	.TransitionTo(Creating));
+					       	.TransitionTo(Recreating));
+
+					During(Recreating,
+						When(OnCreated)
+							.Call((instance,message) => instance.ServiceCreated(message),
+					          	      HandleServiceCommandException)
+							.Call(instance => instance.Start(),
+					          	      HandleServiceCommandException)
+									  .TransitionTo(Restarting));
+
+					During(Restarting,
+					       When(OnRunning)
+						   .Call(instance => instance.Publish<ServiceRestarted>())
+					       	.TransitionTo(Running));
 
 					Anytime(
 					        When(Created.Enter)
-					        	.Call(instance => instance.Publish<ServiceCreated>())
-					        	.Call(instance => instance.Start()),
+					        	.Call(instance => instance.Publish<ServiceCreated>()),
 					        When(Starting.Enter)
 					        	.Call(instance => instance.Publish<ServiceStarting>()),
 					        When(Running.Enter)
@@ -91,6 +91,16 @@ namespace Topshelf.Model
 				});
 		}
 
+		static ExceptionAction<ServiceStateMachine, Exception> HandleServiceCommandException
+		{
+			get
+			{
+				return InCaseOf<Exception>()
+					.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
+					.TransitionTo(Failed);
+			}
+		}
+
 
 		public ServiceStateMachine(string name, UntypedChannel coordinatorChannel)
 		{
@@ -100,10 +110,10 @@ namespace Topshelf.Model
 
 		public string Name { get; set; }
 
-		public static Event<CreateService> OnCreate { get; set; }
 		public static Event<ServiceCreated> OnCreated { get; set; }
 
 		public static Event<StartService> OnStart { get; set; }
+		public static Event<ServiceRunning> OnRunning{get;set;}
 		public static Event<ReloadService> OnReload { get; set; }
 
 		public static Event<StopService> OnStop { get; set; }
@@ -111,7 +121,6 @@ namespace Topshelf.Model
 
 
 		public static State Initial { get; set; }
-		public static State Creating { get; set; }
 		public static State Created { get; set; }
 		public static State Starting { get; set; }
 		public static State Running { get; set; }
@@ -121,6 +130,8 @@ namespace Topshelf.Model
 		public static State Stopping { get; set; }
 		public static State Stopped { get; set; }
 		public static State Reloading { get; set; }
+		public static State Recreating { get; set; }
+		public static State Restarting { get; set; }
 		public static State Completed { get; set; }
 		public static State Failed { get; set; }
 
@@ -130,38 +141,29 @@ namespace Topshelf.Model
 			GC.SuppressFinalize(this);
 		}
 
-
-		void Create(CreateService message)
+		protected virtual void Create()
 		{
 		}
 
-		void Create()
+		protected virtual void ServiceCreated(ServiceCreated message)
 		{
 		}
 
-		void ServiceCreated(ServiceCreated message)
-		{
-		}
-
-		void Start()
+		protected virtual void Start()
 		{
 		}
 
 		void Reload(ReloadService message)
 		{
-			Stop(new StopService
-				{
-					ServiceName = message.ServiceName
-				});
-
 			// TODO likely need to set a timeout for this operation (mailbox would rock here)
+			// TODO isn't this another transaction, with a timeout? )
 		}
 
-		void Unload()
+		protected virtual void Unload()
 		{
 		}
 
-		void Stop(StopService message)
+		protected virtual void Stop(StopService message)
 		{
 
 		}

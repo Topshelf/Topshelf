@@ -55,7 +55,7 @@ namespace Topshelf.Specs
 		{
 			_log.Debug("Starting up the controller");
 
-			using (var controller = new Topshelf.ServiceCoordinator())
+			using (var controller = new Model.ServiceCoordinator())
 			{
 				controller.CreateShelfService("bob", typeof(TestAppDomainBootsrapper));
 
@@ -66,7 +66,7 @@ namespace Topshelf.Specs
 		[Test]
 		public void Should_stop_the_shelf_in_the_separate_app_domain()
 		{
-			using (var controller = new Topshelf.ServiceCoordinator())
+			using (var controller = new Model.ServiceCoordinator())
 			{
 				controller.CreateShelfService("bob", typeof(TestAppDomainBootsrapper));
 

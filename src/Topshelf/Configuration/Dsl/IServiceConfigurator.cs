@@ -26,6 +26,6 @@ namespace Topshelf.Configuration.Dsl
         void WhenPaused(Action<TService> pauseAction);
         void WhenContinued(Action<TService> continueAction);
 
-        void HowToBuildService(ServiceBuilder serviceBuilder);
+        void HowToBuildService(ServiceFactory<TService> serviceFactory);
     }
 }

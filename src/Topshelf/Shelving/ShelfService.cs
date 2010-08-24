@@ -38,17 +38,17 @@ namespace Topshelf.Shelving
 		
 	}
 
-	public class ShelfService :
-		ServiceStateMachine<ShelfService, CreateShelfService, ShelfCreated>
+	public class ShelfServiceController :
+		ServiceStateMachine
 	{
-		static readonly ILog _log = LogManager.GetLogger(typeof(ShelfService));
+		static readonly ILog _log = LogManager.GetLogger(typeof(ShelfServiceController));
 
 		AssemblyName[] _assemblyNames;
 		Type _bootstrapperType;
 		ShelfReference _reference;
 		ShelfType _shelfType;
 
-		public ShelfService(string name, UntypedChannel eventChannel)
+		public ShelfServiceController(string name, UntypedChannel eventChannel)
 			: base(name, eventChannel)
 		{
 		}
@@ -66,7 +66,7 @@ namespace Topshelf.Shelving
 			_reference.ShelfChannel.Send(message);
 		}
 
-		protected override void Create(CreateShelfService message)
+		protected void Create(CreateShelfService message)
 		{
 			_log.Debug("Creating shelf service: " + message.ServiceName);
 
@@ -100,10 +100,7 @@ namespace Topshelf.Shelving
 		protected override void Start()
 		{
 			_log.Debug("Starting service: " + Name);
-			Send(new StartService
-				{
-					ServiceName = Name,
-				});
+			Send(new StartService(Name));
 		}
 
 		protected override void Stop(StopService message)

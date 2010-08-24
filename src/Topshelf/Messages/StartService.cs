@@ -15,5 +15,9 @@ namespace Topshelf.Messages
 	public class StartService :
 		ServiceCommand
 	{
+		public StartService(string serviceName)
+			: base(serviceName)
+		{
+		}
 	}
 }

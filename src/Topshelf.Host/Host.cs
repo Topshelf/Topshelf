@@ -10,17 +10,18 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Host
+namespace Topshelf
 {
 	using System;
 	using System.IO;
 	using System.Linq;
 	using FileSystem;
 	using log4net;
+	using Model;
 	using Shelving;
 
 
-	public class TopshelfHostService
+	public class Host
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
 
@@ -30,31 +31,27 @@ namespace Topshelf.Host
 		{
 			_coordinator = new ServiceCoordinator();
 
-			StartDirectoryMonitor();
+			CreateDirectoryMonitor();
 
-			StartExistingServices();
+			CreateExistingServices();
 		}
 
-		void StartDirectoryMonitor()
+		void CreateDirectoryMonitor()
 		{
-			_coordinator.CreateShelfService("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
-			//_shelfMaker = new ShelfMaker();
-			//_shelfMaker.MakeShelf("TopShelf.DirectoryWatcher", typeof(DirectoryMonitorBootstrapper));
+			_coordinator.CreateShelfService("TopShelf.DirectoryMonitor", typeof(DirectoryMonitorBootstrapper));
 		}
 
-		void StartExistingServices()
+		void CreateExistingServices()
 		{
 			string serviceDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
 
 			Directory.GetDirectories(serviceDir)
 				.ToList()
 				.ConvertAll(Path.GetFileName)
-				.ForEach(StartShelfService);
-
-			//.ForEach(dir => _shelfMaker.MakeShelf(dir));
+				.ForEach(CreateShelfService);
 		}
 
-		void StartShelfService(string directoryName)
+		void CreateShelfService(string directoryName)
 		{
 			try
 			{

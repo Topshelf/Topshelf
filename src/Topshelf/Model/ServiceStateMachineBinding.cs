@@ -13,24 +13,21 @@
 namespace Topshelf.Model
 {
 	using Magnum.StateMachine;
-	using Shelving;
-	using Messages;
 
 
-	public class ServiceBinding<TService> :
-		StateMachineBinding<TService, string>
-		where TService : ServiceStateMachine<TService, CreateService, ServiceCreated>
+	public class ServiceStateMachineBinding :
+		StateMachineBinding<ServiceStateMachine, string>
 	{
-		public ServiceBinding()
+		public ServiceStateMachineBinding()
 		{
 			Id(x => x.Name);
 
-			Bind(ShelfService.OnCreate, x => x.ServiceName);
-			Bind(ShelfService.OnStart, x => x.ServiceName);
-			Bind(ShelfService.OnStop, x => x.ServiceName);
-			Bind(ShelfService.OnReload, x => x.ServiceName);
-			Bind(ShelfService.OnCreated, x => x.ServiceName);
-			Bind(ShelfService.OnStopped, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnCreated, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnStart, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnStop, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnReload, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnCreated, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnStopped, x => x.ServiceName);
 		}
 	}
 }
