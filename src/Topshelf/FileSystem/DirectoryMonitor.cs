@@ -98,13 +98,16 @@ namespace Topshelf.FileSystem
 						.BufferFor(3.Seconds())
 						.UseScheduler(_scheduler)
 						.Distinct(fsEvent => GetChangedDirectory(fsEvent.Path))
-						.UsingConsumer(fsEvents => fsEvents.Keys.Distinct().Each(key =>
+						.UsingConsumer(fsEvents =>
 							{
-								if (key == _baseDirectory)
-									return;
+								fsEvents.Keys.Distinct().Each(key =>
+									{
+										if (key == _baseDirectory)
+											return;
 
-								_coordinatorChannel.Send(new ServiceFolderChanged(key));
-							}))
+										_coordinatorChannel.Send(new ServiceFolderChanged(key));
+									});
+							})
 						.HandleOnFiber(_fiber);
 				});
 		}

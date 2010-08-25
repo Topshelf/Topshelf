@@ -38,7 +38,7 @@ namespace Topshelf
 		{
 			CreateDirectoryMonitor();
 
-			CreateExistingServices();
+			// TODO MONITOR DOES THIS I GUESS CreateExistingServices();
 		}
 
 		void CreateDirectoryMonitor()

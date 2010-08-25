@@ -16,6 +16,7 @@ namespace Topshelf.Model
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Reflection;
 	using System.Threading;
 	using log4net;
 	using Magnum;
@@ -77,6 +78,10 @@ namespace Topshelf.Model
 
 					x.AddConsumerOf<CreateShelfService>()
 						.UsingConsumer(OnCreateShelfService)
+						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<ServiceFolderChanged>()
+						.UsingConsumer(OnServiceFolderChanged)
 						.HandleOnFiber(_fiber);
 				});
 
@@ -160,13 +165,31 @@ namespace Topshelf.Model
 		void OnCreateShelfService(CreateShelfService message)
 		{
 			_log.InfoFormat("[Topshelf] Received shelf request for {0}{1}", message.ServiceName,
-				message.BootstrapperType == null ? "" : " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()) );
+			                message.BootstrapperType == null
+			                	? ""
+			                	: " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()));
 
 			_startupServices.Add(message.ServiceName,
 			                     x => new ShelfServiceController(message.ServiceName, _channel, message.ShelfType,
 			                                                     message.BootstrapperType, message.AssemblyNames));
 
 			_channel.Send(new CreateService(message.ServiceName));
+		}
+
+		void OnServiceFolderChanged(ServiceFolderChanged message)
+		{
+			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
+
+			if (_serviceCache.Has(message.ServiceName))
+				_channel.Send(new RestartService(message.ServiceName));
+			else
+			{
+				_startupServices.Add(message.ServiceName,
+				                     x => new ShelfServiceController(message.ServiceName, _channel, ShelfType.Folder,
+				                                                     null, new AssemblyName[] {}));
+
+				_channel.Send(new CreateService(message.ServiceName));
+			}
 		}
 
 		void WaitUntilAllServicesAre(State state, TimeSpan timeout)
