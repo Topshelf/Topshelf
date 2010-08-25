@@ -142,7 +142,6 @@
     <Compile Include="Configuration\ServiceActionNames.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Shelving\Shelf.cs" />
-    <Compile Include="Shelving\ShelfMaker.cs" />
     <Compile Include="Model\AddressRegistry.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />

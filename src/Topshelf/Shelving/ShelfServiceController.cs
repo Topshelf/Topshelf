@@ -116,11 +116,15 @@ namespace Topshelf.Shelving
 
 		protected override void Unload()
 		{
+			_log.DebugFormat("[{0}] {1}", Name, "Unload");
+
 			if (_reference != null)
 			{
 				_reference.Dispose();
 				_reference = null;
 			}
+
+			Publish<ServiceUnloaded>();
 		}
 	}
 }

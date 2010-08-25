@@ -23,6 +23,7 @@ namespace Topshelf.Shelving
 	using Magnum.Channels;
 	using Magnum.Collections;
 	using Magnum.Extensions;
+	using Magnum.Fibers;
 	using Magnum.Reflection;
 	using Messages;
 	using Model;
@@ -39,6 +40,8 @@ namespace Topshelf.Shelving
 		InboundChannel _channel;
 		bool _disposed;
 		ServiceStateMachine _service;
+		ThreadPoolFiber _fiber;
+		Cache<string, ServiceStateMachine> _serviceCache;
 
 		public Shelf(Type bootstrapperType)
 		{
@@ -131,38 +134,43 @@ namespace Topshelf.Shelving
 
 			_log.DebugFormat("[{0}] Creating service type: {1}", _serviceName, typeof(T).ToShortTypeName());
 
+			_fiber = new ThreadPoolFiber();
 
 			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
 				{
 					x.AddConsumerOf<ServiceCreated>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServiceRunning>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServicePausing>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServicePaused>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServiceContinuing>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServiceStopping>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServiceStopped>()
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
 					x.AddConsumerOf<ServiceUnloaded>() // TODO might want to make this unload the entire app domain
 						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnCallingThread();
+						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<StopService>()
+						.UsingConsumer(m => _log.InfoFormat("[{0}] Received Stop", m.ServiceName))
+						.HandleOnFiber(_fiber);
 				});
 
 			_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
 
-			var serviceCache = new Cache<string, ServiceStateMachine>();
+			_serviceCache = new Cache<string, ServiceStateMachine>();
 
 			_channel.Connect(x =>
 				{
@@ -170,7 +178,7 @@ namespace Topshelf.Shelving
 						.BindUsing<ServiceStateMachineBinding, string>()
 						.CreateNewInstanceBy(GetServiceInstance)
 						.HandleOnInstanceFiber()
-						.PersistInMemoryUsing(serviceCache);
+						.PersistInMemoryUsing(_serviceCache);
 				});
 
 			_channel.Send(new CreateService(_serviceName, _channel.Address, _channel.PipeName));
