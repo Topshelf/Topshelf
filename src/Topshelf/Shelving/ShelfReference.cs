@@ -82,7 +82,7 @@ namespace Topshelf.Shelving
 			Type shelfType = typeof(Shelf);
 
 			_handle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                                 args,
+			                                 args ?? new object[]{null},
 			                                 null, null, null);
 		}
 

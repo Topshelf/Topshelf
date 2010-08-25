@@ -58,9 +58,6 @@ namespace Topshelf.Shelving
 			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
 
 			Create();
-
-
-//			_coordinatorChannel.Send(new ServiceCreated(_serviceName, _channel.Address, _channel.PipeName));
 		}
 
 		public void Dispose()
