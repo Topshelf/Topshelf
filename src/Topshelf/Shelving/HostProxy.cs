@@ -32,7 +32,7 @@ namespace Topshelf.Shelving
             _connection = _proxyChannel.Connect(cc =>
                 {
                     cc.SendToWcfChannel(address, endpoint)
-                        .ExecuteOnFiber(_fiber);
+                        .HandleOnFiber(_fiber);
                 });
         }
 

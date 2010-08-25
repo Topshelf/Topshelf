@@ -29,7 +29,7 @@ namespace Topshelf.Shelving
             _inputConnection = _input.Connect(x =>
                 {
                     x.ReceiveFromWcfChannel(address, endpoint)
-                        .ExecuteOnProducerThread();
+                        .HandleOnCallingThread();
                 });
         }
 
