@@ -17,7 +17,9 @@ namespace Topshelf
 	using System.Linq;
 	using FileSystem;
 	using log4net;
+	using Messages;
 	using Model;
+	using Shelving;
 
 
 	public class Host
@@ -36,12 +38,13 @@ namespace Topshelf
 		{
 			CreateDirectoryMonitor();
 
-			CreateExistingServices();
+			// TODO MONITOR DOES THIS I GUESS CreateExistingServices();
 		}
 
 		void CreateDirectoryMonitor()
 		{
-			_coordinator.CreateShelfService("TopShelf.DirectoryMonitor", typeof(DirectoryMonitorBootstrapper));
+			_coordinator.Send(new CreateShelfService("TopShelf.DirectoryMonitor", ShelfType.Internal,
+			                                         typeof(DirectoryMonitorBootstrapper)));
 		}
 
 		void CreateExistingServices()
@@ -56,16 +59,14 @@ namespace Topshelf
 					.ForEach(CreateShelfService);
 			}
 			else
-			{
 				_log.WarnFormat("[{0}] The services folder does not exist", DefaultServiceName);
-			}
 		}
 
 		void CreateShelfService(string directoryName)
 		{
 			try
 			{
-				_coordinator.CreateShelfService(directoryName);
+				_coordinator.Send(new CreateShelfService(directoryName, ShelfType.Folder));
 			}
 			catch (Exception ex)
 			{

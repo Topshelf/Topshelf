@@ -17,8 +17,7 @@ namespace Topshelf.Messages
 	using Shelving;
 
 
-	public class CreateShelfService :
-		CreateService
+	public class CreateShelfService
 	{
 		public CreateShelfService(string serviceName, ShelfType shelfType)
 			: this(serviceName, shelfType, null)
@@ -31,8 +30,8 @@ namespace Topshelf.Messages
 		}
 
 		public CreateShelfService(string serviceName, ShelfType shelfType, Type bootstrapperType, AssemblyName[] assemblyNames)
-			: base(serviceName)
 		{
+			ServiceName = serviceName;
 			ShelfType = shelfType;
 			BootstrapperType = bootstrapperType;
 			AssemblyNames = assemblyNames;
@@ -41,6 +40,8 @@ namespace Topshelf.Messages
 		protected CreateShelfService()
 		{
 		}
+
+		public string ServiceName { get; private set; }
 
 		public ShelfType ShelfType { get; private set; }
 		public Type BootstrapperType { get; private set; }

@@ -19,5 +19,9 @@ namespace Topshelf.Messages
 			: base(serviceName)
 		{
 		}
+
+		protected StartService()
+		{
+		}
 	}
 }

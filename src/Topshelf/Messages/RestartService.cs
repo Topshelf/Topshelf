@@ -15,5 +15,13 @@ namespace Topshelf.Messages
 	public class RestartService :
 		ServiceCommand
 	{
+		public RestartService(string serviceName)
+			: base(serviceName)
+		{
+		}
+
+		protected RestartService()
+		{
+		}
 	}
 }

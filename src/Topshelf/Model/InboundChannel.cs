@@ -10,25 +10,35 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Messages
+namespace Topshelf.Model
 {
 	using System;
+	using log4net;
+	using Magnum.Channels;
+	using Magnum.Channels.Configuration;
+	using Shelving;
 
 
-	public class ShelfFault :
-		ShelfEvent
+	public class InboundChannel : 
+		ServiceChannelBase
 	{
-		public ShelfFault(Exception ex)
-			: this()
+		static readonly ILog _log = LogManager.GetLogger(typeof(InboundChannel));
+
+		public InboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
+			: base(address, pipeName, x =>
+				{
+					configurator(x);
+
+					x.ReceiveFromWcfChannel(address, pipeName)
+						.HandleOnFiber();
+				})
 		{
-			Exception = ex;
+			_log.DebugFormat("Opening inbound channel at {0} ({1})", address, pipeName);
 		}
 
-		protected ShelfFault()
+		public InboundChannel(Uri address, string pipeName)
+			: this(address, pipeName, x => { })
 		{
-			EventType = ServiceEventType.Fault;
 		}
-
-		public Exception Exception { get; protected set; }
 	}
 }

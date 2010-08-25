@@ -21,6 +21,9 @@ namespace Topshelf.Shelving
 	using log4net;
 	using log4net.Config;
 	using Magnum.Channels;
+	using Magnum.Collections;
+	using Magnum.Extensions;
+	using Magnum.Fibers;
 	using Magnum.Reflection;
 	using Messages;
 	using Model;
@@ -30,70 +33,85 @@ namespace Topshelf.Shelving
 	public class Shelf :
 		IDisposable
 	{
-		readonly Uri _address;
 		readonly Type _bootstrapperType;
-		readonly OutboundChannel _coordinatorChannel;
+		OutboundChannel _coordinatorChannel;
 		readonly ILog _log;
-		readonly string _pipeName;
 		readonly string _serviceName;
-		readonly InboundChannel _channel;
-		IServiceController _service;
-		InboundChannel _serviceChannel;
-
+		InboundChannel _channel;
+		bool _disposed;
+		ServiceStateMachine _service;
+		ThreadPoolFiber _fiber;
+		Cache<string, ServiceStateMachine> _serviceCache;
 
 		public Shelf(Type bootstrapperType)
 		{
+			_bootstrapperType = bootstrapperType;
+
 			BootstrapLogger();
 
 			_log = LogManager.GetLogger(typeof(Shelf));
 
 			_serviceName = AppDomain.CurrentDomain.FriendlyName;
 
-			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
 			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
-			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
-			                                   	{
-			                                   		x.AddConsumerOf<StartService>()
-			                                   			.UsingConsumer(msg => Start());
-			                                   	});
 
-
-			_bootstrapperType = bootstrapperType;
-
-			_coordinatorChannel.Send(new ServiceCreated(_serviceName, _address, _pipeName));
+			Create();
 		}
 
 		public void Dispose()
 		{
-			if (_channel != null)
-				_channel.Dispose();
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
-		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		~Shelf()
 		{
-			_log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "",
-			                                                                      AppDomain.CurrentDomain.FriendlyName,
-			                                                                      e.ExceptionObject));
-
-			if (e.IsTerminating && _coordinatorChannel != null)
-			{
-				_coordinatorChannel.Send(new ShelfFault(e.ExceptionObject as Exception)
-					{
-						ServiceName = _serviceName
-					});
-			}
+			Dispose(false);
 		}
 
-		void Start()
+		void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+			if (disposing)
+			{
+				if (_channel != null)
+				{
+					_channel.Dispose();
+					_channel = null;
+				}
+
+				if (_coordinatorChannel != null)
+				{
+					_coordinatorChannel.Dispose();
+					_coordinatorChannel = null;
+				}
+			}
+
+			_disposed = true;
+		}
+
+		void Create()
 		{
 			try
 			{
-				Type t = FindBootstrapperImplementationType(_bootstrapperType);
-				object bootstrapper = Activator.CreateInstance(t);
+				Type type = FindBootstrapperImplementationType(_bootstrapperType);
 
-				Type serviceType = bootstrapper.GetType().GetInterfaces()[0].GetGenericArguments()[0];
-				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>).MakeGenericType(serviceType));
+				_log.DebugFormat("[{0}] Creating bootstrapper: {1}", _serviceName, type.ToShortTypeName());
+
+				object bootstrapper = FastActivator.Create(type);
+
+				Type serviceType = bootstrapper.GetType()
+					.GetInterfaces()
+					.First()
+					.GetGenericArguments()
+					.First();
+
+				_log.DebugFormat("[{0}] Creating configurator for service type: {1}", _serviceName, serviceType.ToShortTypeName());
+
+				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] {serviceType});
 
 				this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
 			}
@@ -111,20 +129,67 @@ namespace Topshelf.Shelving
 		{
 			bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
-			ServiceController<T> service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
+			_log.DebugFormat("[{0}] Creating service type: {1}", _serviceName, typeof(T).ToShortTypeName());
 
-			_serviceChannel = new InboundChannel(AddressRegistry.GetShelfServiceInstanceAddress(AppDomain.CurrentDomain),
-			                                     AddressRegistry.GetShelfServiceInstancePipeName(AppDomain.CurrentDomain),
-			                                     x =>
-			                                     	{
-			                                     		x.AddConsumersFor<ServiceStateMachine>()
-			                                     			.UsingInstance(service);
-			                                     	});
+			_fiber = new ThreadPoolFiber();
 
+			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
+				{
+					x.AddConsumerOf<ServiceCreated>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServiceRunning>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServicePausing>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServicePaused>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServiceContinuing>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServiceStopping>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServiceStopped>()
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
+					x.AddConsumerOf<ServiceUnloaded>() // TODO might want to make this unload the entire app domain
+						.UsingConsumer(m => _coordinatorChannel.Send(m))
+						.HandleOnFiber(_fiber);
 
-			_serviceChannel.Send(new CreateService());
+					x.AddConsumerOf<StopService>()
+						.UsingConsumer(m => _log.InfoFormat("[{0}] Received Stop", m.ServiceName))
+						.HandleOnFiber(_fiber);
+				});
 
-			_service = service;
+			_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
+
+			_serviceCache = new Cache<string, ServiceStateMachine>();
+
+			_channel.Connect(x =>
+				{
+					x.AddConsumersFor<ServiceStateMachine>()
+						.BindUsing<ServiceStateMachineBinding, string>()
+						.CreateNewInstanceBy(GetServiceInstance)
+						.HandleOnInstanceFiber()
+						.PersistInMemoryUsing(_serviceCache);
+				});
+
+			_channel.Send(new CreateService(_serviceName, _channel.Address, _channel.PipeName));
+		}
+			
+		ServiceStateMachine GetServiceInstance(string key)
+		{
+			if (key == null)
+				return new ServiceStateMachine(null, _channel);
+
+			if (key == _serviceName)
+				return _service;
+
+			throw new InvalidOperationException("An unknown service was requested: " + key);
 		}
 
 		public static Type FindBootstrapperImplementationType(Type bootstrapper)
@@ -135,8 +200,7 @@ namespace Topshelf.Shelving
 					return bootstrapper;
 
 				throw new InvalidOperationException(
-					"Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().
-					                                                                          	Name));
+					"Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
 			}
 
 			// check configuration first
@@ -165,15 +229,27 @@ namespace Topshelf.Shelving
 			return false;
 		}
 
+		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			_log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "",
+			                                                                      AppDomain.CurrentDomain.FriendlyName,
+			                                                                      e.ExceptionObject));
+
+			if (e.IsTerminating && _coordinatorChannel != null)
+			{
+				_coordinatorChannel.Send(new ServiceFault(_serviceName, e.ExceptionObject as Exception));
+			}
+		}
+
 		void SendFault(Exception exception)
 		{
 			try
 			{
-				_coordinatorChannel.Send(new ShelfFault(exception));
+				_coordinatorChannel.Send(new ServiceFault(_serviceName, exception));
 			}
 			catch (Exception)
 			{
-				// eat the exception for now
+				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), exception);
 			}
 		}
 

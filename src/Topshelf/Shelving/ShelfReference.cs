@@ -19,6 +19,7 @@ namespace Topshelf.Shelving
 	using log4net;
 	using Magnum.Channels;
 	using Magnum.Extensions;
+	using Model;
 
 
 	public class ShelfReference :
@@ -42,15 +43,6 @@ namespace Topshelf.Shelving
 			ConfigureAppDomainSettings();
 
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
-
-//			new ShelfService
-//				{
-//					AppDomain = ad,
-//					ObjectHandle = shelfHandle, //TODO: if this is never used do we need to keep a reference?
-//					ShelfChannelBuilder = appDomain => WellknownAddresses.GetShelfChannelProxy(appDomain),
-//					ServiceChannelBuilder = appDomain => WellknownAddresses.GetServiceChannelProxy(appDomain, ad.FriendlyName),
-//					ShelfName = name
-//				}
 		}
 
 		public UntypedChannel ShelfChannel
@@ -76,9 +68,9 @@ namespace Topshelf.Shelving
 
 		public void Create(Type bootstrapperType)
 		{
-			_log.DebugFormat("Shelf[{0}].BootstrapperType = {1}", _serviceName, bootstrapperType.ToShortTypeName());
-			_log.DebugFormat("Shelf[{0}].BootstrapperAssembly = {1}", _serviceName, bootstrapperType.Assembly.GetName().Name);
-			_log.DebugFormat("Shelf[{0}].BootstrapperVersion = {1}", _serviceName, bootstrapperType.Assembly.GetName().Version);
+			_log.DebugFormat("[{0}].BootstrapperType = {1}", _serviceName, bootstrapperType.ToShortTypeName());
+			_log.DebugFormat("[{0}].BootstrapperAssembly = {1}", _serviceName, bootstrapperType.Assembly.GetName().Name);
+			_log.DebugFormat("[{0}].BootstrapperVersion = {1}", _serviceName, bootstrapperType.Assembly.GetName().Version);
 
 			CreateShelfInstance(bootstrapperType);
 		}
@@ -90,7 +82,7 @@ namespace Topshelf.Shelving
 			Type shelfType = typeof(Shelf);
 
 			_handle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                                 args,
+			                                 args ?? new object[]{null},
 			                                 null, null, null);
 		}
 
@@ -105,15 +97,15 @@ namespace Topshelf.Shelving
 			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
 			_domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine("Services", _serviceName));
-			_log.DebugFormat("Shelf[{0}].ApplicationBase = {1}", _serviceName, _domainSettings.ApplicationBase);
+			_log.DebugFormat("[{0}].ApplicationBase = {1}", _serviceName, _domainSettings.ApplicationBase);
 
 			_domainSettings.ConfigurationFile = Path.Combine(_domainSettings.ApplicationBase, _serviceName + ".config");
-			_log.DebugFormat("Shelf[{0}].ConfigurationFile = {1}", _serviceName, _domainSettings.ConfigurationFile);
+			_log.DebugFormat("[{0}].ConfigurationFile = {1}", _serviceName, _domainSettings.ConfigurationFile);
 		}
 
 		public void CreateShelfChannel(Uri uri, string pipeName)
 		{
-			_log.DebugFormat("Creating channel proxy to shelf: {0}, {1} - {2}", _serviceName, uri, pipeName);
+			_log.DebugFormat("[{0}] Creating shelf proxy: {1} ({2})", _serviceName, uri, pipeName);
 
 			_channel = new OutboundChannel(uri, pipeName);
 		}

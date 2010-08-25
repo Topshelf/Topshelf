@@ -35,6 +35,8 @@ namespace Topshelf.Model
 		/// <returns></returns>
 		IServiceController this[string serviceName] { get; }
 
+		void Send<T>(T message);
+
 		/// <summary>
 		///   Start the services hosted by the coordinator and wait until they have completed starting
 		///   before returning to the caller
@@ -53,19 +55,6 @@ namespace Topshelf.Model
 		/// </summary>
 		/// <param name="serviceName"></param>
 		/// <param name="serviceFactory"></param>
-		void CreateService(string serviceName, Func<IServiceCoordinator,ServiceStateMachine> serviceFactory);
-
-		/// <summary>
-		///   Creates a shelf service using the specified bootstrapper type
-		/// </summary>
-		/// <param name = "serviceName">The name of the service to create</param>
-		/// <param name = "bootstrapperType">The type of the bootstrapper class for the service</param>
-		void CreateShelfService(string serviceName, Type bootstrapperType);
-
-		/// <summary>
-		///   Creates a shelf service by name, determining the bootstrapper type by reflection
-		/// </summary>
-		/// <param name = "serviceName">The name of the service to create (should match the folder)</param>
-		void CreateShelfService(string serviceName);
+		void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory);
 	}
 }

@@ -18,6 +18,7 @@ namespace Topshelf.Specs
 	using log4net;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
+	using Messages;
 	using NUnit.Framework;
 	using Shelving;
 	using Topshelf.Configuration.Dsl;
@@ -55,9 +56,9 @@ namespace Topshelf.Specs
 		{
 			_log.Debug("Starting up the controller");
 
-			using (var controller = new Model.ServiceCoordinator())
+			using (var coordinator = new Model.ServiceCoordinator())
 			{
-				controller.CreateShelfService("bob", typeof(TestAppDomainBootsrapper));
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal,typeof(TestAppDomainBootsrapper)));
 
 				TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
 			}
@@ -66,9 +67,9 @@ namespace Topshelf.Specs
 		[Test]
 		public void Should_stop_the_shelf_in_the_separate_app_domain()
 		{
-			using (var controller = new Model.ServiceCoordinator())
+			using (var coordinator = new Model.ServiceCoordinator())
 			{
-				controller.CreateShelfService("bob", typeof(TestAppDomainBootsrapper));
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
 
 				TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
 			}

@@ -18,8 +18,8 @@ namespace Topshelf.Messages
 	public class ServiceCreated :
 		ServiceEvent
 	{
-		public ServiceCreated(string name, Uri address, string pipeName)
-			: base(name)
+		public ServiceCreated(string serviceName, Uri address, string pipeName)
+			: base(serviceName)
 		{
 			Address = address;
 			PipeName = pipeName;

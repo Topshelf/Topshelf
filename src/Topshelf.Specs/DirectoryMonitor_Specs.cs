@@ -96,22 +96,21 @@ namespace Topshelf.Specs
 			using (var dm = new DirectoryMonitor("."))
 			{
 				var myChannel = new ChannelAdapter();
-				using (new InboundChannel(AddressRegistry.ShelfServiceCoordinatorAddress, 
-					AddressRegistry.ShelfServiceCoordinatorPipeName))
+				using (AddressRegistry.GetInboundServiceCoordinatorChannel(x => { }))
 				{
 					dm.Start();
 
 					myChannel.Connect(sc => sc.AddConsumerOf<ServiceFolderChanged>()
-					                        	.UsingConsumer(fsc =>
-					                        		{
-                                                        if (fsc.ServiceName.Equals("bottle", StringComparison.OrdinalIgnoreCase))
-                                                            return; // gotta skip the bottle directory
+												.UsingConsumer(fsc =>
+													{
+														if (fsc.ServiceName.Equals("bottle", StringComparison.OrdinalIgnoreCase))
+															return; // gotta skip the bottle directory
 
-					                        			long localCount = Interlocked.Increment(ref count);
-					                        			//Console.WriteLine(fsc.ShelfName);
-					                        			if (localCount%2 == 0)
-					                        				manualResetEvent.Set();
-					                        		}));
+														long localCount = Interlocked.Increment(ref count);
+														//Console.WriteLine(fsc.ShelfName);
+														if (localCount % 2 == 0)
+															manualResetEvent.Set();
+													}));
 
 					//Console.WriteLine(baseDir);
 					//Console.WriteLine("-- Directories");
@@ -125,9 +124,9 @@ namespace Topshelf.Specs
 
 					//Console.WriteLine("-- Files");
 
-                    File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test.out")), "Testing stuff");
+					File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test.out")), "Testing stuff");
 					File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service2", "test.out")), "Testing stuff");
-                    File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test2.out")), "Testing stuff");
+					File.AppendAllText(Path.Combine(baseDir, Path.Combine("Service1", "test2.out")), "Testing stuff");
 
 					manualResetEvent.WaitOne(10.Seconds());
 

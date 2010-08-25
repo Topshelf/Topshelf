@@ -17,19 +17,19 @@ namespace Topshelf.Messages
 	/// </summary>
 	public abstract class ServiceEvent
 	{
-		protected ServiceEvent()
-		{
-		}
-
 		protected ServiceEvent(string serviceName)
 		{
 			ServiceName = serviceName;
 		}
 
+		protected ServiceEvent()
+		{
+		}
+
 		/// <summary>
 		/// The name of the service that sourced this event
 		/// </summary>
-		public string ServiceName { get; set; }
+		public string ServiceName { get; protected set; }
 
 		/// <summary>
 		/// The event type that was published

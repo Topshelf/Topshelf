@@ -15,7 +15,6 @@ namespace Topshelf.Shelving
 	using System;
 	using System.Reflection;
 	using log4net;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Messages;
 	using Model;
@@ -26,14 +25,19 @@ namespace Topshelf.Shelving
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(ShelfServiceController));
 
-		AssemblyName[] _assemblyNames;
-		Type _bootstrapperType;
-		ShelfReference _reference;
-		ShelfType _shelfType;
+		readonly AssemblyName[] _assemblyNames;
+		readonly Type _bootstrapperType;
+		readonly ShelfType _shelfType;
 
-		public ShelfServiceController(string name, UntypedChannel eventChannel)
+		ShelfReference _reference;
+
+		public ShelfServiceController(string name, ServiceChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
+		                              AssemblyName[] assemblyNames)
 			: base(name, eventChannel)
 		{
+			_shelfType = shelfType;
+			_bootstrapperType = bootstrapperType;
+			_assemblyNames = assemblyNames;
 		}
 
 
@@ -49,21 +53,16 @@ namespace Topshelf.Shelving
 			_reference.ShelfChannel.Send(message);
 		}
 
-		protected void Create(CreateShelfService message)
+
+		protected override void Create(CreateService message)
 		{
-			_log.Debug("Creating shelf service: " + message.ServiceName);
-
-			Name = message.ServiceName;
-
-			_shelfType = message.ShelfType;
-			_bootstrapperType = message.BootstrapperType;
-			_assemblyNames = message.AssemblyNames;
-
 			Create();
 		}
 
 		protected override void Create()
 		{
+			_log.DebugFormat("[{0}] Creating shelf service", Name);
+
 			_reference = new ShelfReference(Name, _shelfType);
 
 			if (_assemblyNames != null)
@@ -77,26 +76,55 @@ namespace Topshelf.Shelving
 
 		protected override void ServiceCreated(ServiceCreated message)
 		{
+			_log.DebugFormat("[{0}] Shelf created at {1} ({2})", Name, message.Address, message.PipeName);
+
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
+		}
+
+		protected override void ServiceFaulted(ServiceFault message)
+		{
+			_log.Error("[{0}] Shelf Service Faulted".FormatWith(Name), message.Exception);
 		}
 
 		protected override void Start()
 		{
-			_log.Debug("Starting service: " + Name);
+			_log.DebugFormat("[{0}] Start", Name);
+
 			Send(new StartService(Name));
 		}
 
 		protected override void Stop()
 		{
+			_log.DebugFormat("[{0}] Stop", Name);
+
+			Send(new StopService(Name));
+		}
+
+		protected override void Pause()
+		{
+			_log.DebugFormat("[{0}] Pause", Name);
+
+			Send(new PauseService(Name));
+		}
+
+		protected override void Continue()
+		{
+			_log.DebugFormat("[{0}] Continue", Name);
+
+			Send(new ContinueService(Name));
 		}
 
 		protected override void Unload()
 		{
+			_log.DebugFormat("[{0}] {1}", Name, "Unload");
+
 			if (_reference != null)
 			{
 				_reference.Dispose();
 				_reference = null;
 			}
+
+			Publish<ServiceUnloaded>();
 		}
 	}
 }

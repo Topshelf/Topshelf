@@ -14,7 +14,6 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
-	using Magnum.Channels;
 	using Magnum.Reflection;
 	using Magnum.StateMachine;
 	using Messages;
@@ -25,7 +24,6 @@ namespace Topshelf.Model
 		StateMachine<ServiceStateMachine>,
 		IServiceController
 	{
-		UntypedChannel _coordinatorChannel;
 		bool _disposed;
 
 		static ServiceStateMachine()
@@ -34,7 +32,7 @@ namespace Topshelf.Model
 				{
 					Initially(
 					          When(OnCreate)
-					          	.Call(instance => instance.Create())
+					          	.Call((instance,message) => instance.Create(message))
 					          	.TransitionTo(Creating)
 						);
 
@@ -45,7 +43,10 @@ namespace Topshelf.Model
 					       	.TransitionTo(Created)
 					       	.Call((instance, message) => instance.Start(),
 					       	      HandleServiceCommandException)
-					       	.TransitionTo(Starting)
+					       	.TransitionTo(Starting),
+					       When(OnFault)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Failed)
 						);
 
 					During(Created,
@@ -74,9 +75,9 @@ namespace Topshelf.Model
 					       	.TransitionTo(Stopped));
 
 					During(Stopped,
-						   When(OnUnload)
-							.Call(instance => instance.Unload())
-							.TransitionTo(Unloading));
+					       When(OnUnload)
+					       	.Call(instance => instance.Unload())
+					       	.TransitionTo(Unloading));
 
 					During(Unloading,
 					       When(OnUnloaded)
@@ -119,11 +120,13 @@ namespace Topshelf.Model
 		}
 
 
-		public ServiceStateMachine(string name, UntypedChannel coordinatorChannel)
+		public ServiceStateMachine(string name, ServiceChannel coordinatorChannel)
 		{
 			Name = name;
-			_coordinatorChannel = coordinatorChannel;
+			CoordinatorChannel = coordinatorChannel;
 		}
+
+		protected ServiceChannel CoordinatorChannel { get; private set; }
 
 		static ExceptionAction<ServiceStateMachine, Exception> HandleServiceCommandException
 		{
@@ -147,6 +150,8 @@ namespace Topshelf.Model
 		public static Event<ServiceStopped> OnStopped { get; set; }
 		public static Event<UnloadService> OnUnload { get; set; }
 		public static Event<ServiceUnloaded> OnUnloaded { get; set; }
+
+		public static Event<ServiceFault> OnFault { get; set; }
 
 
 		public static State Initial { get; set; }
@@ -174,11 +179,19 @@ namespace Topshelf.Model
 			GC.SuppressFinalize(this);
 		}
 
+		protected virtual void Create(CreateService message)
+		{
+		}
+
 		protected virtual void Create()
 		{
 		}
 
 		protected virtual void ServiceCreated(ServiceCreated message)
+		{
+		}
+
+		protected virtual void ServiceFaulted(ServiceFault message)
 		{
 		}
 
@@ -213,12 +226,12 @@ namespace Topshelf.Model
 		{
 			T message = FastActivator<T>.Create(Name);
 
-			_coordinatorChannel.Send(message);
+			CoordinatorChannel.Send(message);
 		}
 
 		protected void Publish<T>(T message)
 		{
-			_coordinatorChannel.Send(message);
+			CoordinatorChannel.Send(message);
 		}
 
 		~ServiceStateMachine()
@@ -231,7 +244,7 @@ namespace Topshelf.Model
 			if (_disposed)
 				return;
 			if (disposing)
-				_coordinatorChannel = null;
+				CoordinatorChannel = null;
 
 			_disposed = true;
 		}

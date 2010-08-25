@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -10,37 +10,42 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf.Model
 {
 	using System;
+	using System.Collections.Generic;
 	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
+	using Magnum.Extensions;
 
 
-	public class InboundChannel :
-		UntypedChannel,
+	public abstract class ServiceChannelBase :
+		ServiceChannel,
 		IDisposable
 	{
 		UntypedChannel _channel;
-		ChannelConnection _connection;
+		IList<ChannelConnection> _connections;
 		bool _disposed;
 
-		public InboundChannel(Uri address, string endpoint, Action<ConnectionConfigurator> configurator)
+		protected ServiceChannelBase(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
 		{
+			Address = address;
+			PipeName = pipeName;
+
 			_channel = new ChannelAdapter();
-			_connection = _channel.Connect(x =>
-				{
-					configurator(x);
-
-					x.ReceiveFromWcfChannel(address, endpoint)
-						.HandleOnFiber();
-				});
+			_connections = new List<ChannelConnection>();
+			_connections.Add(_channel.Connect(configurator));
 		}
 
-		public InboundChannel(Uri address, string endpoint)
-			: this(address, endpoint, x => { })
+		public Uri Address { get; private set; }
+
+		public void Connect(Action<ConnectionConfigurator> configurator)
 		{
+			_connections.Add(_channel.Connect(configurator));
 		}
+
+		public string PipeName { get; private set; }
+
 
 		public void Dispose()
 		{
@@ -48,14 +53,14 @@ namespace Topshelf.Shelving
 			GC.SuppressFinalize(this);
 		}
 
-		~InboundChannel()
-		{
-			Dispose(false);
-		}
-
 		public void Send<T>(T message)
 		{
 			_channel.Send(message);
+		}
+
+		~ServiceChannelBase()
+		{
+			Dispose(false);
 		}
 
 		void Dispose(bool disposing)
@@ -64,11 +69,7 @@ namespace Topshelf.Shelving
 				return;
 			if (disposing)
 			{
-				if (_connection != null)
-				{
-					_connection.Dispose();
-					_connection = null;
-				}
+				_connections.Each(x => x.Dispose());
 
 				_channel = null;
 			}

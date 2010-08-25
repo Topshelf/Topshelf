@@ -12,26 +12,26 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.ServiceCoordinator
 {
-    using Magnum.Extensions;
-    using Magnum.TestFramework;
-    using Model;
+	using Magnum.Fibers;
+	using Magnum.TestFramework;
+	using Model;
 
 
-    [Scenario]
-    public class ServiceCoordinator_SpecsBase
-    {
-        public OldServiceCoordinator ServiceCoordinator { get; set; }
+	[Scenario]
+	public class ServiceCoordinator_SpecsBase
+	{
+		public ServiceCoordinator ServiceCoordinator { get; set; }
 
-        [Given]
-        public void A_service_coordinator()
-        {
-            ServiceCoordinator = new OldServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
-        }
+		[Given]
+		public void A_service_coordinator()
+		{
+			ServiceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { }, x => { }, x => { });
+		}
 
-        [After]
-        public void CleanUp()
-        {
-            ServiceCoordinator.Dispose();
-        }
-    }
+		[After]
+		public void CleanUp()
+		{
+			ServiceCoordinator.Dispose();
+		}
+	}
 }

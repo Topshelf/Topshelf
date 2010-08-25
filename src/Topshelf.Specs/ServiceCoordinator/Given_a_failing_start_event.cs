@@ -27,24 +27,24 @@ namespace Topshelf.Specs.ServiceCoordinator
 		[When]
 		public void A_registered_service_throws_on_start()
 		{
-			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-				{
-					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
-					                               x => { throw new Exception(); },
-					                               x => x.Stop(),
-					                               x => x.Pause(),
-					                               x => x.Continue(),
-					                               (x,c) => new TestService())
-				};
-
-			ServiceCoordinator.RegisterServices(services);
+//			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
+//				{
+//					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
+//					                               x => { throw new Exception(); },
+//					                               x => x.Stop(),
+//					                               x => x.Pause(),
+//					                               x => x.Continue(),
+//					                               (x,c) => new TestService())
+//				};
+//
+//			ServiceCoordinator.RegisterServices(services);
 		}
 
 		[Then]
 		[Slow]
 		public void An_exception_is_thrown_when_service_is_started()
 		{
-			Assert.That(() => ServiceCoordinator.Start(), Throws.InstanceOf<Exception>());
+//			Assert.That(() => ServiceCoordinator.Start(), Throws.InstanceOf<Exception>());
 		}
 	}
 }

@@ -18,7 +18,6 @@ namespace Topshelf.Specs
 	using Messages;
 	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using TestObject;
 	using Topshelf.Configuration.Dsl;
 
@@ -31,7 +30,7 @@ namespace Topshelf.Specs
 		{
 			_serviceStarted = new FutureChannel<ServiceRunning>();
 			_service = new TestService();
-			_hostChannel = AddressRegistry.GetServiceCoordinatorHost(x => { x.AddChannel(_serviceStarted); });
+			_hostChannel = AddressRegistry.GetInboundServiceCoordinatorChannel(x => { x.AddChannel(_serviceStarted); });
 
 			using (var c = new ServiceConfigurator<TestService>())
 			{
@@ -71,8 +70,8 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_continue()
 		{
-			_serviceChannel.Send(new PauseService());
-			_serviceChannel.Send(new ContinueService());
+			_serviceChannel.Send(new PauseService("test"));
+			_serviceChannel.Send(new ContinueService("test"));
 
 			_serviceController.ShouldBeRunning();
 			_service.WasContinued.IsCompleted.ShouldBeTrue();
@@ -90,7 +89,7 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_pause()
 		{
-			_serviceChannel.Send(new PauseService());
+			_serviceChannel.Send(new PauseService("test"));
 
 			_serviceController.ShouldBePaused();
 			_service.Paused.IsCompleted.ShouldBeTrue();

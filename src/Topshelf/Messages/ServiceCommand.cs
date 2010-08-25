@@ -23,6 +23,6 @@ namespace Topshelf.Messages
 		{
 		}
 
-		public string ServiceName { get; private set; }
+		public string ServiceName { get; protected set; }
 	}
 }

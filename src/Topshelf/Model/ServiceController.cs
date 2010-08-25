@@ -15,7 +15,6 @@ namespace Topshelf.Model
 	using System;
 	using Exceptions;
 	using log4net;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Messages;
 
@@ -25,22 +24,24 @@ namespace Topshelf.Model
 		IServiceController<TService>
 		where TService : class
 	{
+		readonly IServiceCoordinator _coordinator;
 		readonly ILog _log;
 		Action<TService> _continueAction;
 		TService _instance;
 		Action<TService> _pauseAction;
 		InternalServiceFactory<TService> _serviceFactory;
-		readonly IServiceCoordinator _coordinator;
 		Action<TService> _startAction;
 		Action<TService> _stopAction;
+		Uri _address;
+		string _pipeName;
 
-		public ServiceController(string name, IServiceCoordinator coordinator, UntypedChannel eventChannel,
+		public ServiceController(string name, IServiceCoordinator coordinator, ServiceChannel coordinatorChannel,
 		                         Action<TService> startAction,
 		                         Action<TService> stopAction,
 		                         Action<TService> pauseAction,
 		                         Action<TService> continueAction,
 		                         InternalServiceFactory<TService> serviceFactory)
-			: base(name, eventChannel)
+			: base(name, coordinatorChannel)
 		{
 			_coordinator = coordinator;
 			_startAction = startAction;
@@ -57,6 +58,14 @@ namespace Topshelf.Model
 			get { return typeof(TService); }
 		}
 
+		protected override void Create(CreateService message)
+		{
+			_address = message.Address;
+			_pipeName = message.PipeName;
+
+			Create();
+		}
+
 		protected override void Create()
 		{
 			try
@@ -71,7 +80,7 @@ namespace Topshelf.Model
 					                                 + typeof(TService).ToShortTypeName());
 				}
 
-				Publish<ServiceCreated>();
+				Publish(new ServiceCreated(Name, _address, _pipeName));
 			}
 			catch (Exception ex)
 			{
