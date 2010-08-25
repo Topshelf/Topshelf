@@ -14,28 +14,17 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
-	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
 	using Magnum.Extensions;
-	using Shelving;
 
 
 	public static class AddressRegistry
 	{
-		public static Uri ShelfServiceCoordinatorAddress
-		{
-			get { return GetServiceUri().AppendPath("ShelfCoordinator"); }
-		}
-
 		public static Uri ServiceCoordinatorAddress
 		{
 			get { return GetServiceUri().AppendPath("Coordinator"); }
 		}
 
-		public static string ShelfServiceCoordinatorPipeName
-		{
-			get { return "{0}/ShelfServiceCoordinator".FormatWith(GetPid()); }
-		}
 
 		public static string ServiceCoordinatorPipeName
 		{
@@ -77,14 +66,9 @@ namespace Topshelf.Model
 			return new OutboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName);
 		}
 
-		public static InboundChannel GetServiceCoordinatorHost(Action<ConnectionConfigurator> cfg)
+		public static InboundChannel GetInboundServiceCoordinatorChannel(Action<ConnectionConfigurator> cfg)
 		{
 			return new InboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName, cfg);
-		}
-
-		public static OutboundChannel GetShelfServiceCoordinatorProxy()
-		{
-			return new OutboundChannel(ShelfServiceCoordinatorAddress, ShelfServiceCoordinatorPipeName);
 		}
 
 		public static InboundChannel GetInboundServiceChannel(AppDomain appDomain, Action<ConnectionConfigurator> cfg)
@@ -95,16 +79,6 @@ namespace Topshelf.Model
 		public static InboundChannel GetInboundServiceChannel(string serviceName, Action<ConnectionConfigurator> cfg)
 		{
 			return new InboundChannel(GetServiceAddress(serviceName), GetServicePipeName(serviceName), cfg);
-		}
-
-		public static Uri GetShelfServiceInstanceAddress(AppDomain appDomain)
-		{
-			return GetServiceUri().AppendPath("ShelfService").AppendPath(appDomain.FriendlyName);
-		}
-
-		public static string GetShelfServiceInstancePipeName(AppDomain appDomain)
-		{
-			return "{0}/ShelfService/{1}".FormatWith(GetPid(), appDomain.FriendlyName);
 		}
 	}
 }

@@ -19,6 +19,7 @@ namespace Topshelf.Shelving
 	using log4net;
 	using Magnum.Channels;
 	using Magnum.Extensions;
+	using Model;
 
 
 	public class ShelfReference :

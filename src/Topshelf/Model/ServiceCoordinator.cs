@@ -59,7 +59,7 @@ namespace Topshelf.Model
 
 			_serviceCache = new Cache<string, ServiceStateMachine>();
 
-			_channel = AddressRegistry.GetServiceCoordinatorHost(x =>
+			_channel = AddressRegistry.GetInboundServiceCoordinatorChannel(x =>
 				{
 					x.AddConsumersFor<ServiceStateMachine>()
 						.BindUsing<ServiceStateMachineBinding, string>()

@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,88 +12,135 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.FileSystem
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using Magnum.Channels;
-    using Magnum.Extensions;
-    using Magnum.Fibers;
-    using Magnum.FileSystem;
-    using Magnum.FileSystem.Events;
-    using Messages;
-    using Model;
-    using Shelving;
+	using System;
+	using System.IO;
+	using System.Linq;
+	using Magnum.Channels;
+	using Magnum.Extensions;
+	using Magnum.Fibers;
+	using Magnum.FileSystem;
+	using Magnum.FileSystem.Events;
+	using Messages;
+	using Model;
+	using Directory = System.IO.Directory;
 
-    public class DirectoryMonitor :
-        IDisposable
-    {
-        readonly string _baseDir;
-        readonly OutboundChannel _hostChannel;
-        ChannelAdapter _channel;
-        Scheduler _scheduler;
-        PollingFileSystemEventProducer _producer;
 
-        public DirectoryMonitor(string directory)
-        {
-            _baseDir = directory;
-            _hostChannel = AddressRegistry.GetShelfServiceCoordinatorProxy();
-        }
+	public class DirectoryMonitor :
+		IDisposable
+	{
+		readonly string _baseDirectory;
+		ChannelAdapter _channel;
+		ChannelConnection _connection;
+		OutboundChannel _coordinatorChannel;
+		bool _disposed;
+		ThreadPoolFiber _fiber;
+		PollingFileSystemEventProducer _producer;
+		Scheduler _scheduler;
 
-        public void Start()
-        {
-            // file system watcher will fail if directory isn't there, ensure it is
-            if (!System.IO.Directory.Exists(_baseDir))
-                System.IO.Directory.CreateDirectory(_baseDir);
+		public DirectoryMonitor(string directory)
+		{
+			_baseDirectory = directory;
+			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
+			_fiber = new ThreadPoolFiber();
+		}
 
-            _channel = new ChannelAdapter();
-            FiberFactory fiberFactory = () => new SynchronousFiber();
-            _scheduler = new TimerScheduler(fiberFactory());
-            _producer = new PollingFileSystemEventProducer(_baseDir, _channel, _scheduler, fiberFactory(),
-                                                           2.Minutes());
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-            _channel.Connect(config => config
-                                           .AddConsumerOf<FileSystemEvent>()
-                                           .BufferFor(3.Seconds())
-                                           .Distinct(fsEvent => GetChangedDirectory(fsEvent.Path))
-                                           .UsingConsumer(fsEvents => fsEvents.Keys.ToList().ForEach(key =>
-                                               {
-                                                   if (key == _baseDir)
-                                                       return;
-                                                   
-                                                   _hostChannel.Send(new ServiceFolderChanged(key));
-                                               })));
-        }
+		~DirectoryMonitor()
+		{
+			Dispose(false);
+		}
 
-        public void Stop()
-        {
-            if (_producer != null)
-            {
-                _producer.Dispose();
-                _producer = null;
-            }
+		void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+			if (disposing)
+			{
+				if (_scheduler != null)
+					_scheduler.Stop();
 
-            if (_scheduler != null)
-            {
-                _scheduler.Stop();
-                _scheduler = null;
-            }
-        }
+				_fiber.Shutdown(30.Seconds());
 
-        /// <summary>
-        ///   Normalize the source of the event; we only care about the directory in question
-        /// </summary>
-        string GetChangedDirectory(string eventItem)
-        {
-            return eventItem.Substring(_baseDir.Length).Split(Path.DirectorySeparatorChar).Where(x => x.Length > 0).FirstOrDefault();
-        }
+				if (_producer != null)
+					_producer.Dispose();
 
-        public void Dispose()
-        {
-            if (_scheduler != null)
-                _scheduler.Stop();
+				if (_coordinatorChannel != null)
+				{
+					_coordinatorChannel.Dispose();
+					_coordinatorChannel = null;
+				}
+			}
 
-            if (_producer != null)
-                _producer.Dispose();
-        }
-    }
+			_disposed = true;
+		}
+
+		public void Start()
+		{
+			// file system watcher will fail if directory isn't there, ensure it is
+			if (!Directory.Exists(_baseDirectory))
+				Directory.CreateDirectory(_baseDirectory);
+
+			_scheduler = new TimerScheduler(new ThreadPoolFiber());
+			_channel = new ChannelAdapter();
+
+			_producer = new PollingFileSystemEventProducer(_baseDirectory, _channel, _scheduler, new ThreadPoolFiber(),
+			                                               2.Minutes());
+
+			_connection = _channel.Connect(config =>
+				{
+					config
+						.AddConsumerOf<FileSystemEvent>()
+						.BufferFor(3.Seconds())
+						.UseScheduler(_scheduler)
+						.Distinct(fsEvent => GetChangedDirectory(fsEvent.Path))
+						.UsingConsumer(fsEvents => fsEvents.Keys.Distinct().Each(key =>
+							{
+								if (key == _baseDirectory)
+									return;
+
+								_coordinatorChannel.Send(new ServiceFolderChanged(key));
+							}))
+						.HandleOnFiber(_fiber);
+				});
+		}
+
+		public void Stop()
+		{
+			if (_producer != null)
+			{
+				_producer.Dispose();
+				_producer = null;
+			}
+
+			if (_scheduler != null)
+			{
+				_scheduler.Stop();
+				_scheduler = null;
+			}
+
+			if (_connection != null)
+			{
+				_connection.Dispose();
+				_connection = null;
+			}
+
+			_channel = null;
+		}
+
+		/// <summary>
+		///   Normalize the source of the event; we only care about the directory in question
+		/// </summary>
+		string GetChangedDirectory(string eventItem)
+		{
+			return eventItem.Substring(_baseDirectory.Length)
+				.Split(Path.DirectorySeparatorChar)
+				.Where(x => x.Length > 0)
+				.FirstOrDefault();
+		}
+	}
 }

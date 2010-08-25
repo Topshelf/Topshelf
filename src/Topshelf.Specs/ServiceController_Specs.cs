@@ -18,7 +18,6 @@ namespace Topshelf.Specs
 	using Messages;
 	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using TestObject;
 	using Topshelf.Configuration.Dsl;
 
@@ -31,7 +30,7 @@ namespace Topshelf.Specs
 		{
 			_serviceStarted = new FutureChannel<ServiceRunning>();
 			_service = new TestService();
-			_hostChannel = AddressRegistry.GetServiceCoordinatorHost(x => { x.AddChannel(_serviceStarted); });
+			_hostChannel = AddressRegistry.GetInboundServiceCoordinatorChannel(x => { x.AddChannel(_serviceStarted); });
 
 			using (var c = new ServiceConfigurator<TestService>())
 			{
