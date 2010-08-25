@@ -16,7 +16,8 @@ namespace Topshelf.Specs.Configuration
 	using System.ServiceProcess;
     using System.Threading;
     using Magnum.Extensions;
-    using Model;
+	using Magnum.Monads;
+	using Model;
     using NUnit.Framework;
     using TestObject;
     using Topshelf.Configuration;
@@ -158,6 +159,8 @@ namespace Topshelf.Specs.Configuration
                 x.ConfigureService<TestService>(c => c.Named(serviceName));
             });
 
+            _runner.Coordinator.Start(5.Seconds());
+
         	var serviceInfo = _runner.Coordinator[serviceName];
 
             serviceInfo.Name.ShouldEqual(serviceName);
@@ -167,6 +170,8 @@ namespace Topshelf.Specs.Configuration
         public void when_not_specified_service_names_are_assigned()
         {
             _runner = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
+
+            _runner.Coordinator.Start(5.Seconds());
 
         	var serviceInfo = _runner.Coordinator.First();
 
@@ -178,9 +183,11 @@ namespace Topshelf.Specs.Configuration
         {
             _runner = RunnerConfigurator.New(x =>
             {
-                x.ConfigureService<TestService>(c => { });
-                x.ConfigureService<TestService>(c => { });
+                x.ConfigureService<TestService>(c => c.HowToBuildService(s => new TestService()));
+                x.ConfigureService<TestService>(c =>  c.HowToBuildService(s => new TestService()));
             });
+
+            _runner.Coordinator.Start(5.Seconds());
 
         	var first = _runner.Coordinator.First();
         	var second = _runner.Coordinator.Skip(1).First();
