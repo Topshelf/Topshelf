@@ -15,63 +15,29 @@ namespace Topshelf.Shelving
 	using System;
 	using log4net;
 	using Magnum.Channels;
+	using Magnum.Channels.Configuration;
 
 
-	public class OutboundChannel :
-		UntypedChannel,
-		IDisposable
+	public class OutboundChannel : 
+		ChannelBase
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(OutboundChannel));
 
-		ChannelAdapter _channel;
-		ChannelConnection _connection;
-
-		bool _disposed;
-
-		public OutboundChannel(Uri address, string endpoint)
-		{
-			_log.DebugFormat("Opening outbound channel at {0} ({1})", address, endpoint);
-
-			_channel = new ChannelAdapter();
-			_connection = _channel.Connect(cc =>
+		public OutboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
+			: base(address, pipeName, x =>
 				{
-					cc.SendToWcfChannel(address, endpoint)
+					configurator(x);
+
+					x.SendToWcfChannel(address, pipeName)
 						.HandleOnFiber();
-				});
+				})
+		{
+			_log.DebugFormat("Opening outbound channel at {0} ({1})", address, pipeName);
 		}
 
-		public void Dispose()
+		public OutboundChannel(Uri address, string pipeName)
+			: this(address, pipeName, x => { })
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		public void Send<T>(T message)
-		{
-			if (!_disposed)
-				_channel.Send(message);
-		}
-
-		~OutboundChannel()
-		{
-			Dispose(false);
-		}
-
-		void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-			if (disposing)
-			{
-				if (_connection != null)
-				{
-					_connection.Dispose();
-					_connection = null;
-				}
-				_channel = null;
-			}
-
-			_disposed = true;
 		}
 	}
 }

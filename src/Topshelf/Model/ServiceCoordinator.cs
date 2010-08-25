@@ -37,7 +37,7 @@ namespace Topshelf.Model
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
 		readonly Fiber _fiber;
 		readonly Cache<string, ServiceStateMachine> _serviceCache;
-		readonly IDictionary<string, Func<IServiceCoordinator, ServiceStateMachine>> _startupServices;
+		readonly Cache<string, Func<IServiceCoordinator, ServiceStateMachine>> _startupServices;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
 		InboundChannel _channel;
 
@@ -55,7 +55,7 @@ namespace Topshelf.Model
 			_afterStartingServices = afterStartingServices;
 			_beforeStartingServices = beforeStartingServices;
 
-			_startupServices = new Dictionary<string, Func<IServiceCoordinator, ServiceStateMachine>>();
+			_startupServices = new Cache<string, Func<IServiceCoordinator, ServiceStateMachine>>();
 
 			_serviceCache = new Cache<string, ServiceStateMachine>();
 
@@ -122,7 +122,7 @@ namespace Topshelf.Model
 		{
 			BeforeStartingServices();
 
-			string[] servicesToStart = _startupServices.Select(x => x.Key).ToArray();
+			string[] servicesToStart = _startupServices.GetAllKeys();
 
 			servicesToStart.Each(name => _channel.Send(new CreateService(name)));
 
@@ -159,6 +159,9 @@ namespace Topshelf.Model
 
 		void OnCreateShelfService(CreateShelfService message)
 		{
+			_log.InfoFormat("[Topshelf] Received shelf request for {0}{1}", message.ServiceName,
+				message.BootstrapperType == null ? "" : " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()) );
+
 			_startupServices.Add(message.ServiceName,
 			                     x => new ShelfServiceController(message.ServiceName, _channel, message.ShelfType,
 			                                                     message.BootstrapperType, message.AssemblyNames));
@@ -206,9 +209,10 @@ namespace Topshelf.Model
 			if (key == null)
 				return new ServiceStateMachine(null, _channel);
 
-			if (_startupServices.ContainsKey(key))
+			if (_startupServices.Has(key))
 				return _startupServices[key](this);
 
+			_log.WarnFormat("[Topshelf] No factory for service {0}", key);
 			return new ServiceStateMachine(key, _channel);
 		}
 

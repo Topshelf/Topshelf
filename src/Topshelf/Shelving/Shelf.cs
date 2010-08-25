@@ -30,11 +30,9 @@ namespace Topshelf.Shelving
 	public class Shelf :
 		IDisposable
 	{
-		readonly Uri _address;
 		readonly Type _bootstrapperType;
 		readonly OutboundChannel _coordinatorChannel;
 		readonly ILog _log;
-		readonly string _pipeName;
 		readonly string _serviceName;
 		readonly InboundChannel _channel;
 		IServiceController _service;
@@ -49,7 +47,7 @@ namespace Topshelf.Shelving
 
 			_serviceName = AppDomain.CurrentDomain.FriendlyName;
 
-			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
 			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
 			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
@@ -61,7 +59,7 @@ namespace Topshelf.Shelving
 
 			_bootstrapperType = bootstrapperType;
 
-			_coordinatorChannel.Send(new ServiceCreated(_serviceName, _address, _pipeName));
+			_coordinatorChannel.Send(new ServiceCreated(_serviceName, _channel.Address, _channel.PipeName));
 		}
 
 		public void Dispose()
@@ -70,7 +68,7 @@ namespace Topshelf.Shelving
 				_channel.Dispose();
 		}
 
-		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			_log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "",
 			                                                                      AppDomain.CurrentDomain.FriendlyName,

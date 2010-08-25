@@ -18,67 +18,26 @@ namespace Topshelf.Shelving
 	using Magnum.Channels.Configuration;
 
 
-	public class InboundChannel :
-		UntypedChannel,
-		IDisposable
+	public class InboundChannel : 
+		ChannelBase
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(InboundChannel));
 
-		UntypedChannel _channel;
-		ChannelConnection _connection;
-		bool _disposed;
-
-		public InboundChannel(Uri address, string endpoint, Action<ConnectionConfigurator> configurator)
-		{
-			_log.DebugFormat("Opening inbound channel at {0} ({1})", address, endpoint);
-
-			_channel = new ChannelAdapter();
-			_connection = _channel.Connect(x =>
+		public InboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
+			: base(address, pipeName, x =>
 				{
 					configurator(x);
 
-					x.ReceiveFromWcfChannel(address, endpoint)
+					x.ReceiveFromWcfChannel(address, pipeName)
 						.HandleOnFiber();
-				});
+				})
+		{
+			_log.DebugFormat("Opening inbound channel at {0} ({1})", address, pipeName);
 		}
 
-		public InboundChannel(Uri address, string endpoint)
-			: this(address, endpoint, x => { })
+		public InboundChannel(Uri address, string pipeName)
+			: this(address, pipeName, x => { })
 		{
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		~InboundChannel()
-		{
-			Dispose(false);
-		}
-
-		public void Send<T>(T message)
-		{
-			_channel.Send(message);
-		}
-
-		void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-			if (disposing)
-			{
-				if (_connection != null)
-				{
-					_connection.Dispose();
-					_connection = null;
-				}
-
-				_channel = null;
-			}
-
-			_disposed = true;
 		}
 	}
 }
