@@ -84,17 +84,12 @@ namespace Topshelf.Model
 						.UsingConsumer(OnServiceFolderChanged)
 						.HandleOnFiber(_fiber);
 				});
-
-			EventChannel = new ChannelAdapter();
 		}
 
 		public ServiceCoordinator()
 			: this(new ThreadPoolFiber(), null, null, null)
 		{
 		}
-
-		public ChannelAdapter EventChannel { get; private set; }
-
 
 		public void Dispose()
 		{
