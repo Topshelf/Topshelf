@@ -10,15 +10,32 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Exceptions
 {
-	public class Monitor
+	using System;
+	using System.Runtime.Serialization;
+
+
+	[Serializable]
+	public class TopshelfException :
+		Exception
 	{
-		public void Start()
+		public TopshelfException()
 		{
 		}
 
-		public void Stop()
+		public TopshelfException(string message)
+			: base(message)
+		{
+		}
+
+		public TopshelfException(string message, Exception innerException)
+			: base(message, innerException)
+		{
+		}
+
+		protected TopshelfException(SerializationInfo info, StreamingContext context)
+			: base(info, context)
 		{
 		}
 	}

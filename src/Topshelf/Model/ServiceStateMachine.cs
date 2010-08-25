@@ -14,6 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
+	using Exceptions;
 	using Magnum.Reflection;
 	using Magnum.StateMachine;
 	using Messages;
@@ -32,7 +33,11 @@ namespace Topshelf.Model
 				{
 					Initially(
 					          When(OnCreate)
-					          	.Call((instance,message) => instance.Create(message))
+					          	.Call((instance, message) => instance.Create(message),
+					          	      InCaseOf<BuildServiceException>()
+					          	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
+					          	      	.TransitionTo(Failed),
+					          	      HandleServiceCommandException)
 					          	.TransitionTo(Creating)
 						);
 

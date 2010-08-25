@@ -43,14 +43,6 @@ namespace Topshelf
 							s.WhenStopped(tc => tc.Stop());
 						});
 
-					x.ConfigureService<Monitor>(s =>
-						{
-							s.Named("Topshelf.Monitor");
-							s.ConstructUsing(name => new Monitor());
-							s.WhenStarted(m => m.Start());
-							s.WhenStopped(m => m.Stop());
-						});
-
 					x.RunAsLocalSystem();
 
 					x.SetDescription("Topshelf Hosting Service");

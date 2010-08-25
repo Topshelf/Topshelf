@@ -55,20 +55,22 @@ namespace Topshelf.Specs
         {
             _log.Debug("Starting up the controller");
 
-            using (var coordinator = new Model.ServiceCoordinator())
-            {
-                coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
+			using (var coordinator = new Model.ServiceCoordinator())
+			{
+                coordinator.Start();
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
 
                 TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
             }
         }
 
-        [Test]
-        public void Should_stop_the_shelf_in_the_separate_app_domain()
-        {
-            using (var coordinator = new Model.ServiceCoordinator())
-            {
-                coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
+		[Test]
+		public void Should_stop_the_shelf_in_the_separate_app_domain()
+		{
+			using (var coordinator = new Model.ServiceCoordinator())
+			{
+                coordinator.Start();
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
 
                 TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
             }

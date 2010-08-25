@@ -14,6 +14,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
 	using System.Collections.Generic;
+	using Magnum.Extensions;
 	using Magnum.Fibers;
 	using Model;
 	using NUnit.Framework;
@@ -36,7 +37,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 
 			_serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { _beforeStartingServicesInvoked = true; },
 			                                             x => { _afterStartingServicesInvoked = true; },
-			                                             x => { _afterStoppingServicesInvoked = true; });
+			                                             x => { _afterStoppingServicesInvoked = true; }, 1.Minutes());
 
 			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
 				{

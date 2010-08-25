@@ -83,7 +83,7 @@ namespace Topshelf.Shelving
 
 		protected override void ServiceFaulted(ServiceFault message)
 		{
-			_log.Error("[{0}] Shelf Service Faulted".FormatWith(Name), message.Exception);
+			_log.ErrorFormat("[{0}] Shelf Service Faulted: {1}", Name, message.ExceptionMessage);
 		}
 
 		protected override void Start()

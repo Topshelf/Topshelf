@@ -31,7 +31,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service = new TestService();
 			_service2 = new TestService2();
 
-			_serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { }, x => { }, x => { });
+			_serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { }, x => { }, x => { }, 1.Minutes());
 			_serviceCoordinator.CreateService("test",
 			                                  n =>
 			                                  new ServiceController<TestService>("test", null,
@@ -52,7 +52,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			                                                                     x.Continue(),
 			                                                                     (x, c) =>
 			                                                                     _service2));
-			_serviceCoordinator.Start(10.Seconds());
+			_serviceCoordinator.Start();
 
 			_service.Running.WaitUntilCompleted(10.Seconds());
 			_service2.Running.WaitUntilCompleted(10.Seconds());

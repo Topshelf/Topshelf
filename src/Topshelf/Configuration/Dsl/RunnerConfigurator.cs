@@ -30,7 +30,7 @@ namespace Topshelf.Configuration.Dsl
 		Action<IServiceCoordinator> _beforeStartingServices = c => { };
 		Credentials _credentials;
 		bool _disposed;
-		TimeSpan _timeout = 30.Seconds();
+		TimeSpan _timeout = 1.Minutes();
 
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "RunnerConfigurator" /> class.
@@ -157,7 +157,8 @@ namespace Topshelf.Configuration.Dsl
 			var serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(),
 			                                                _beforeStartingServices,
 			                                                _afterStartingServices,
-			                                                _afterStoppingServices);
+			                                                _afterStoppingServices,
+			                                                _timeout);
 
 			RegisterServices(serviceCoordinator);
 

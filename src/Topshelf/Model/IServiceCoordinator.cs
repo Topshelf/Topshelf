@@ -31,30 +31,33 @@ namespace Topshelf.Model
 		/// <summary>
 		///   Returns the service by name
 		/// </summary>
-		/// <param name = "serviceName"></param>
+		/// <param name = "serviceName">The name of the service to retrieve</param>
 		/// <returns></returns>
 		IServiceController this[string serviceName] { get; }
 
+		/// <summary>
+		/// Sends a message to the coordinator
+		/// </summary>
+		/// <typeparam name="T">The message type</typeparam>
+		/// <param name="message">The message</param>
 		void Send<T>(T message);
 
 		/// <summary>
 		///   Start the services hosted by the coordinator and wait until they have completed starting
 		///   before returning to the caller
 		/// </summary>
-		/// <param name = "timeout"></param>
-		void Start(TimeSpan timeout);
+		void Start();
 
 		/// <summary>
 		///   Stops the service coordinator and waits for the specified timeout until the services have stopped
 		/// </summary>
-		/// <param name = "timeout"></param>
-		void Stop(TimeSpan timeout);
+		void Stop();
 
 		/// <summary>
 		/// Create the service using the factory method specified and add it to the coordinator
 		/// </summary>
-		/// <param name="serviceName"></param>
-		/// <param name="serviceFactory"></param>
+		/// <param name="serviceName">The name of the service to be created</param>
+		/// <param name="serviceFactory">The factory method to use when the service is created</param>
 		void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory);
 	}
 }
