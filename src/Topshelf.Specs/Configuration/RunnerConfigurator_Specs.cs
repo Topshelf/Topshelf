@@ -12,180 +12,97 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.Configuration
 {
-	using System.Linq;
 	using System.ServiceProcess;
-    using System.Threading;
-    using Magnum.Extensions;
-    using Model;
-    using NUnit.Framework;
-    using TestObject;
-    using Topshelf.Configuration;
-    using Topshelf.Configuration.Dsl;
+	using Magnum.TestFramework;
+	using TestObject;
+	using Topshelf.Configuration;
+	using Topshelf.Configuration.Dsl;
 
-    [TestFixture, Explicit]
-    public class RunnerConfigurator_Specs
-    {
-        private RunConfiguration _runConfiguration;
 
-        [SetUp]
-        public void EstablishContext()
-        {
-            _runConfiguration = RunnerConfigurator.New(x =>
-                {
-                    x.SetDisplayName("chris");
-                    x.SetServiceName("chris");
-                    x.SetDescription("chris's pants");
+	[Scenario]
+	public class Configuring_a_service_using_the_runner
+	{
+		RunConfiguration _runConfiguration;
 
-                    x.ConfigureService<TestService>(c =>
-                        {
-                            c.WhenStarted(s => s.Start());
-                            c.WhenStopped(s => s.Stop());
-                            c.WhenPaused(s => { });
-                            c.WhenContinued(s => { });
-                            c.Named("my_service");
-                        });
+		[Given]
+		public void A_service_configuration()
+		{
+			_runConfiguration = RunnerConfigurator.New(x =>
+				{
+					x.SetDisplayName("chris");
+					x.SetServiceName("chris");
+					x.SetDescription("chris's pants");
 
-                    x.DoNotStartAutomatically();
+					x.ConfigureService<TestService>(c =>
+						{
+							c.WhenStarted(s => s.Start());
+							c.WhenStopped(s => s.Stop());
+							c.WhenPaused(s => { });
+							c.WhenContinued(s => { });
+							c.Named("my_service");
+						});
 
-                    x.RunAs("dru", "pass");
+					x.DoNotStartAutomatically();
 
-                    x.DependsOn("ServiceName");
-                    x.DependencyOnMsmq();
-                    x.DependencyOnMsSql();
-                });
-        }
+					x.RunAs("dru", "pass");
 
-        [TearDown]
-        public void CleanUp()
-        {
-            _runConfiguration.Coordinator.Dispose();
-        }
+					x.DependsOn("ServiceName");
+					x.DependencyOnMsmq();
+					x.DependencyOnMsSql();
+				});
+		}
 
-        [Test, Ignore("This test does nothing.")]
-        public void A_pretend_void_main()
-        {
-            string[] args = new string[0];
-            RunConfiguration cfg = RunnerConfigurator.New(x => { });
-            //some thing parses the args
-            //Dispatch(args, serviceCoordinator);
-        }
+		[Finally]
+		public void Finally()
+		{
+			_runConfiguration.Coordinator.Dispose();
+			_runConfiguration = null;
+		}
 
-        [Test]
-        public void Should_depend_on_Msmq_MsSql_and_Custom()
-        {
-            _runConfiguration.WinServiceSettings.Dependencies
-                .ShouldContain(KnownServiceNames.Msmq);
+		[Then]
+		public void Should_depend_on_Msmq_MsSql_and_Custom()
+		{
+			_runConfiguration.WinServiceSettings.Dependencies
+				.ShouldContain(KnownServiceNames.Msmq);
 
-            _runConfiguration.WinServiceSettings.Dependencies
-                .ShouldContain(KnownServiceNames.SqlServer);
+			_runConfiguration.WinServiceSettings.Dependencies
+				.ShouldContain(KnownServiceNames.SqlServer);
 
-            _runConfiguration.WinServiceSettings.Dependencies
-                .ShouldContain("ServiceName");
-        }
+			_runConfiguration.WinServiceSettings.Dependencies
+				.ShouldContain("ServiceName");
+		}
 
-        [Test]
-        public void Names_should_be_correct()
-        {
-            _runConfiguration.WinServiceSettings.FullDisplayName
-                .ShouldEqual("chris");
+		[Then]
+		public void Names_should_be_correct()
+		{
+			_runConfiguration.WinServiceSettings.FullDisplayName
+				.ShouldEqual("chris");
 
-            _runConfiguration.WinServiceSettings.ServiceName.FullName
-                .ShouldEqual("chris");
+			_runConfiguration.WinServiceSettings.ServiceName.FullName
+				.ShouldEqual("chris");
 
-            _runConfiguration.WinServiceSettings.Description
-                .ShouldEqual("chris's pants");
-        }
+			_runConfiguration.WinServiceSettings.Description
+				.ShouldEqual("chris's pants");
+		}
 
-        [Test]
-        public void Should_not_be_set_to_start_automatically()
-        {
-            _runConfiguration.WinServiceSettings.StartMode
-                .ShouldEqual(ServiceStartMode.Manual);
-        }
+		[Then]
+		public void Should_not_be_set_to_start_automatically()
+		{
+			_runConfiguration.WinServiceSettings.StartMode
+				.ShouldEqual(ServiceStartMode.Manual);
+		}
 
-        [Test]
-        public void Credentials()
-        {
-            _runConfiguration.WinServiceSettings.Credentials.Username
-                .ShouldEqual("dru");
+		[Then]
+		public void Should_use_the_correct_credentials()
+		{
+			_runConfiguration.WinServiceSettings.Credentials.Username
+				.ShouldEqual("dru");
 
-            _runConfiguration.WinServiceSettings.Credentials.Password
-                .ShouldEqual("pass");
+			_runConfiguration.WinServiceSettings.Credentials.Password
+				.ShouldEqual("pass");
 
-            _runConfiguration.WinServiceSettings.Credentials.AccountType
-                .ShouldEqual(ServiceAccount.User);
-        }
-
-        [Test]
-        public void Hosted_service_configuration()
-        {
-            _runConfiguration.Coordinator.Start(10.Seconds());
-            _runConfiguration.Coordinator.ServiceCount
-                .ShouldEqual(1);
-
-            Thread.Sleep(1.Seconds());
-
-            IServiceController serviceController = _runConfiguration.Coordinator["my_service"];
-
-            serviceController.Name
-                .ShouldEqual("my_service");
-            serviceController.CurrentState.Name.ShouldEqual("Running");
-        }
-    }
-
-    [TestFixture]
-    public class RunnerConfigurator_without_pre_generated_runner_specs 
-    {
-        RunConfiguration _runner;
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (_runner != null)
-            {
-                _runner.Coordinator.Dispose();
-                _runner = null;
-            }
-        }
-
-        [Test]
-        public void when_specified_service_names_are_used_in_the_service_configuration()
-        {
-            const string serviceName = "service name";
-
-            _runner = RunnerConfigurator.New(x =>
-            {
-                x.ConfigureService<TestService>(c => c.Named(serviceName));
-            });
-
-        	var serviceInfo = _runner.Coordinator[serviceName];
-
-            serviceInfo.Name.ShouldEqual(serviceName);
-        }
-
-        [Test]
-        public void when_not_specified_service_names_are_assigned()
-        {
-            _runner = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
-
-        	var serviceInfo = _runner.Coordinator.First();
-
-            serviceInfo.Name.ShouldNotBeNull();
-        }
-
-        [Test]
-        public void when_not_specified_automatic_service_names_should_be_unique_for_services_of_the_same_type()
-        {
-            _runner = RunnerConfigurator.New(x =>
-            {
-                x.ConfigureService<TestService>(c => { });
-                x.ConfigureService<TestService>(c => { });
-            });
-
-        	var first = _runner.Coordinator.First();
-        	var second = _runner.Coordinator.Skip(1).First();
-
-            first.Name.ShouldNotEqual(second.Name);
-        }
-    }
+			_runConfiguration.WinServiceSettings.Credentials.AccountType
+				.ShouldEqual(ServiceAccount.User);
+		}
+	}
 }

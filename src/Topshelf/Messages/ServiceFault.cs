@@ -22,13 +22,14 @@ namespace Topshelf.Messages
 			: base(serviceName)
 		{
 			EventType = ServiceEventType.Fault;
-			Exception = ex;
+			if(ex != null)
+				ExceptionMessage = ex.Message;
 		}
 
 		protected ServiceFault()
 		{
 		}
 
-		public Exception Exception { get; private set; }
+		public string ExceptionMessage { get; protected set; }
 	}
 }

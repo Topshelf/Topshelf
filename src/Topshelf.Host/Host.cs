@@ -12,11 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-	using System;
-	using System.IO;
-	using System.Linq;
 	using FileSystem;
-	using log4net;
 	using Messages;
 	using Model;
 	using Shelving;
@@ -26,7 +22,6 @@ namespace Topshelf
 	{
 		public const string DefaultServiceName = "Topshelf.Host";
 
-		static readonly ILog _log = LogManager.GetLogger(DefaultServiceName);
 		readonly IServiceCoordinator _coordinator;
 
 		public Host(IServiceCoordinator coordinator)
@@ -37,41 +32,13 @@ namespace Topshelf
 		public void Start()
 		{
 			CreateDirectoryMonitor();
-
-			// TODO MONITOR DOES THIS I GUESS CreateExistingServices();
 		}
 
 		void CreateDirectoryMonitor()
 		{
-			_coordinator.Send(new CreateShelfService("TopShelf.DirectoryMonitor", ShelfType.Internal,
+			_coordinator.Send(new CreateShelfService("TopShelf.DirectoryMonitor",
+			                                         ShelfType.Internal,
 			                                         typeof(DirectoryMonitorBootstrapper)));
-		}
-
-		void CreateExistingServices()
-		{
-			var serviceDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services"));
-
-			if (serviceDirectory.Exists)
-			{
-				Directory.GetDirectories(serviceDirectory.FullName)
-					.ToList()
-					.ConvertAll(Path.GetFileName)
-					.ForEach(CreateShelfService);
-			}
-			else
-				_log.WarnFormat("[{0}] The services folder does not exist", DefaultServiceName);
-		}
-
-		void CreateShelfService(string directoryName)
-		{
-			try
-			{
-				_coordinator.Send(new CreateShelfService(directoryName, ShelfType.Folder));
-			}
-			catch (Exception ex)
-			{
-				_log.Error("[{0}] Failed to create service".FormatWith(directoryName), ex);
-			}
 		}
 
 		public void Stop()

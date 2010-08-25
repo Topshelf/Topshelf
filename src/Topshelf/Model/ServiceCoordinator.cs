@@ -18,6 +18,7 @@ namespace Topshelf.Model
 	using System.Linq;
 	using System.Reflection;
 	using System.Threading;
+	using Exceptions;
 	using log4net;
 	using Magnum;
 	using Magnum.Channels;
@@ -39,6 +40,7 @@ namespace Topshelf.Model
 		readonly Fiber _fiber;
 		readonly Cache<string, ServiceStateMachine> _serviceCache;
 		readonly Cache<string, Func<IServiceCoordinator, ServiceStateMachine>> _startupServices;
+		readonly TimeSpan _timeout;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
 		InboundChannel _channel;
 
@@ -46,50 +48,26 @@ namespace Topshelf.Model
 
 		bool _stopping;
 
-		public ServiceCoordinator(Fiber fiber,
-		                          Action<IServiceCoordinator> beforeStartingServices,
+		public ServiceCoordinator(Fiber fiber, 
+			Action<IServiceCoordinator> beforeStartingServices,
 		                          Action<IServiceCoordinator> afterStartingServices,
-		                          Action<IServiceCoordinator> afterStoppingServices)
+		                          Action<IServiceCoordinator> afterStoppingServices, 
+			TimeSpan timeout)
 		{
 			_fiber = fiber;
 			_afterStoppingServices = afterStoppingServices;
 			_afterStartingServices = afterStartingServices;
 			_beforeStartingServices = beforeStartingServices;
+			_timeout = timeout;
 
 			_startupServices = new Cache<string, Func<IServiceCoordinator, ServiceStateMachine>>();
-
 			_serviceCache = new Cache<string, ServiceStateMachine>();
-
-			_channel = AddressRegistry.GetInboundServiceCoordinatorChannel(x =>
-				{
-					x.AddConsumersFor<ServiceStateMachine>()
-						.BindUsing<ServiceStateMachineBinding, string>()
-						.CreateNewInstanceBy(GetServiceInstance)
-						.HandleOnInstanceFiber()
-						.PersistInMemoryUsing(_serviceCache);
-
-					x.AddConsumerOf<ServiceEvent>()
-						.UsingConsumer(OnServiceEvent)
-						.HandleOnFiber(_fiber);
-
-					x.AddConsumerOf<ServiceStopped>()
-						.UsingConsumer(OnServiceStopped)
-						.HandleOnFiber(_fiber);
-
-					x.AddConsumerOf<CreateShelfService>()
-						.UsingConsumer(OnCreateShelfService)
-						.HandleOnFiber(_fiber);
-
-					x.AddConsumerOf<ServiceFolderChanged>()
-						.UsingConsumer(OnServiceFolderChanged)
-						.HandleOnFiber(_fiber);
-				});
 
 			EventChannel = new ChannelAdapter();
 		}
 
 		public ServiceCoordinator()
-			: this(new ThreadPoolFiber(), null, null, null)
+			: this(new ThreadPoolFiber(), null, null, null, 1.Minutes())
 		{
 		}
 
@@ -120,21 +98,89 @@ namespace Topshelf.Model
 
 		public void Send<T>(T message)
 		{
+			if (_channel == null)
+				throw new InvalidOperationException("The service coordinator must be started before sending it any messages");
+
 			_channel.Send(message);
 		}
 
-		public void Start(TimeSpan timeout)
+		public void Start()
 		{
+			CreateCoordinatorChannel();
+
 			BeforeStartingServices();
 
 			string[] servicesToStart = _startupServices.GetAllKeys();
 
 			servicesToStart.Each(name => _channel.Send(new CreateService(name, _channel.Address, _channel.PipeName)));
 
-			WaitUntilServicesAre(servicesToStart, ServiceStateMachine.Running, timeout);
+			WaitUntilServicesAreRunning(servicesToStart, _timeout);
 
 			AfterStartingServices();
 		}
+
+		void CreateCoordinatorChannel()
+		{
+			if (_channel != null)
+				return;
+
+			_channel = AddressRegistry.GetInboundServiceCoordinatorChannel(x =>
+				{
+					x.AddConsumersFor<ServiceStateMachine>()
+						.BindUsing<ServiceStateMachineBinding, string>()
+						.CreateNewInstanceBy(GetServiceInstance)
+						.HandleOnInstanceFiber()
+						.PersistInMemoryUsing(_serviceCache);
+
+					x.AddConsumerOf<ServiceEvent>()
+						.UsingConsumer(OnServiceEvent)
+						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<ServiceFault>()
+						.UsingConsumer(OnServiceFault)
+						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<ServiceStopped>()
+						.UsingConsumer(OnServiceStopped)
+						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<CreateShelfService>()
+						.UsingConsumer(OnCreateShelfService)
+						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<ServiceFolderChanged>()
+						.UsingConsumer(OnServiceFolderChanged)
+						.HandleOnFiber(_fiber);
+				});
+		}
+
+		void WaitUntilServicesAreRunning(IEnumerable<string> services, TimeSpan timeout)
+		{
+			DateTime stopTime = SystemUtil.Now + timeout;
+
+			while (SystemUtil.Now < stopTime)
+			{
+				_updated.WaitOne(1.Seconds());
+
+				bool success = services
+				               	.Where(key => _serviceCache.Has(key))
+				               	.Select(key => _serviceCache[key])
+				               	.Count(x => x.CurrentState == ServiceStateMachine.Running) == services.Count();
+				if (success)
+					return;
+
+				bool anyFailed = services
+					.Where(key => _serviceCache.Has(key))
+					.Select(key => _serviceCache[key])
+					.Any(service => service.CurrentState == ServiceStateMachine.Failed);
+
+				if (anyFailed)
+					throw new TopshelfException("At least one configured service failed to start");
+			}
+
+			throw new TopshelfException("All services were not started within the specified timeout");
+		}
+
 
 		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
 		{
@@ -151,13 +197,13 @@ namespace Topshelf.Model
 			return GetEnumerator();
 		}
 
-		public void Stop(TimeSpan timeout)
+		public void Stop()
 		{
 			_stopping = true;
 
 			SendStopCommandToServices();
 
-			WaitUntilAllServicesAre(ServiceStateMachine.Completed, timeout);
+			WaitUntilAllServicesAre(ServiceStateMachine.Completed, _timeout);
 
 			AfterStoppingServices();
 		}
@@ -192,6 +238,11 @@ namespace Topshelf.Model
 			}
 		}
 
+		void OnServiceFault(ServiceFault message)
+		{
+			// TODO need to do something about this, maybe capture/log the exception
+		}
+
 		void WaitUntilAllServicesAre(State state, TimeSpan timeout)
 		{
 			DateTime stopTime = SystemUtil.Now + timeout;
@@ -206,25 +257,6 @@ namespace Topshelf.Model
 
 			if (!AllServiceInState(state))
 				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
-		}
-
-		void WaitUntilServicesAre(IEnumerable<string> services, State state, TimeSpan timeout)
-		{
-			DateTime stopTime = SystemUtil.Now + timeout;
-
-			while (SystemUtil.Now < stopTime)
-			{
-				_updated.WaitOne(1.Seconds());
-
-				bool success = services
-				               	.Where(key => _serviceCache.Has(key))
-				               	.Select(key => _serviceCache[key])
-				               	.Count(x => x.CurrentState == state) == services.Count();
-				if (success)
-					return;
-			}
-
-			throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)

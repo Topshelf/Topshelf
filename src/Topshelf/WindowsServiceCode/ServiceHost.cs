@@ -47,7 +47,7 @@ namespace Topshelf.WindowsServiceCode
 				_log.Info("Received service start notification");
 				_log.DebugFormat("Arguments: {0}", string.Join(",", args));
 
-				_coordinator.Start(_timeout);
+				_coordinator.Start();
 			}
 			catch (Exception ex)
 			{
@@ -62,7 +62,7 @@ namespace Topshelf.WindowsServiceCode
 			{
 				_log.Info("Received service stop notification");
 
-				_coordinator.Stop(_timeout);
+				_coordinator.Stop();
 				_coordinator.Dispose();
 			}
 			catch (Exception ex)
