@@ -12,106 +12,110 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using System.IO;
-    using System.Threading;
-    using Magnum.Extensions;
-    using Magnum.TestFramework;
-    using NUnit.Framework;
-    using Shelving;
-    using Topshelf.Configuration.Dsl;
+	using System;
+	using System.IO;
+	using System.Threading;
+	using log4net;
+	using Magnum.Extensions;
+	using Magnum.TestFramework;
+	using Messages;
+	using NUnit.Framework;
+	using Shelving;
+	using Topshelf.Configuration.Dsl;
 
 
-    [TestFixture, Slow]
-    public class AppDomain_Specs
-    {
-        [SetUp]
-        public void Setup()
-        {         
-            if (Directory.Exists("Services"))
-                Directory.Delete("Services", true);
-            
-            Directory.CreateDirectory("Services");
-            var bobPath = Path.Combine("Services", "bob");
-            Directory.CreateDirectory(bobPath);
+	[TestFixture]
+	[Slow]
+	public class Using_the_shelf_service_controller_to_start_a_service
+	{
+		static readonly ILog _log = LogManager.GetLogger(typeof(Using_the_shelf_service_controller_to_start_a_service));
+		[SetUp]
+		public void Setup()
+		{
+			if (Directory.Exists("Services"))
+				Directory.Delete("Services", true);
 
-            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", bobPath);
-            DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", bobPath);
-            DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
-            DirectoryMonitor_Specs.CopyFileToDir("log4net.dll", bobPath);
-        }
+			Directory.CreateDirectory("Services");
+			string bobPath = Path.Combine("Services", "bob");
+			Directory.CreateDirectory(bobPath);
 
-        [TearDown]
-        public void CleanUp()
-        {
-            Directory.Delete("Services", true);
-        }
+			DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("log4net.dll", bobPath);
+		}
 
-        [Test]
-        public void Init_and_ready_service_in_seperate_app_domain()
-        {
-            using (var sm = new ShelfMaker())
-            {
-                using (var manualResetEvent = new ManualResetEvent(false))
-                {
-                    sm.OnShelfStateChanged += (sender, args) =>
-                        {
-                            if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
-                                manualResetEvent.Set();
-                        };
+		[TearDown]
+		public void CleanUp()
+		{
+			Directory.Delete("Services", true);
+		}
 
-                    sm.MakeShelf("bob", typeof (AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+		[Test]
+		public void Should_start_the_shelf_in_the_separate_app_domain()
+		{
+			_log.Debug("Starting up the controller");
 
-                    manualResetEvent.WaitOne(20.Seconds());
+			using (var coordinator = new Model.ServiceCoordinator())
+			{
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal,typeof(TestAppDomainBootsrapper)));
 
-                    sm.GetState("bob").ShouldEqual(ShelfState.Ready);
-                }
-            }
-        }
+				TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
+			}
+		}
 
-        [Test, Slow]
-        public void Stop_a_shelf()
-        {
-            using (var sm = new ShelfMaker())
-            {
-                var readyEvent = new ManualResetEvent(false);
-                var stopEvent = new ManualResetEvent(false);
+		[Test]
+		public void Should_stop_the_shelf_in_the_separate_app_domain()
+		{
+			using (var coordinator = new Model.ServiceCoordinator())
+			{
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
 
-                sm.OnShelfStateChanged += (sender, args) =>
-                {
-                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Started)
-                        readyEvent.Set();
+				TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
+			}
 
-                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Stopped)
-                        stopEvent.Set();
-                };
+			TestAppDomainBootsrapper.Stopped.WaitOne(20.Seconds()).ShouldBeTrue();
+		}
+	}
 
-                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
 
-                readyEvent.WaitOne(60.Seconds());
+	public class TestAppDomainBootsrapper :
+		Bootstrapper<object>
+	{
+		[ThreadStatic]
+		static Semaphore _started;
 
-                sm.GetState("bob").ShouldEqual(ShelfState.Started);
+		[ThreadStatic]
+		static Semaphore _stopped;
 
-                sm.StopShelf("bob");
+		public static Semaphore Started
+		{
+			get
+			{
+				if (_started == null)
+					_started = new Semaphore(0, 100, "TestAppDomainBootstrapperSemaphore");
 
-                stopEvent.WaitOne(60.Seconds());
+				return _started;
+			}
+		}
 
-                sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
-                
-                //readyEvent.Dispose();
-                //stopEvent.Dispose();
-            }
-        }
-    }
+		public static Semaphore Stopped
+		{
+			get
+			{
+				if (_stopped == null)
+					_stopped = new Semaphore(0, 100, "TestAppDomainBootstrapperSemaphore");
 
-    public class AppDomain_Specs_Bootstrapper :
-        Bootstrapper<object>
-    {
-        public void InitializeHostedService(IServiceConfigurator<object> cfg)
-        {
-            cfg.HowToBuildService(serviceBuilder => new object());
+				return _stopped;
+			}
+		}
 
-            cfg.WhenStarted(a => { });
-            cfg.WhenStopped(a => { });
-        }
-    }
+		public void InitializeHostedService(IServiceConfigurator<object> cfg)
+		{
+			cfg.HowToBuildService(serviceBuilder => new object());
+
+			cfg.WhenStarted(a => { Started.Release(); });
+			cfg.WhenStopped(a => { Stopped.Release(); });
+		}
+	}
 }

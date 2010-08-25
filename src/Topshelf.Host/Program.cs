@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2008 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Host
+namespace Topshelf
 {
 	using System;
 	using System.IO;
@@ -22,7 +22,7 @@ namespace Topshelf.Host
 
 	public class Program
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+		static readonly ILog _log = LogManager.GetLogger(Host.DefaultServiceName);
 
 		static void Main(string[] args)
 		{
@@ -30,21 +30,32 @@ namespace Topshelf.Host
 
 			RunConfiguration cfg = RunnerConfigurator.New(x =>
 				{
-					x.AfterStoppingServices(h => { Console.WriteLine("AfterStop called invoked, services are stopping"); });
-
-					x.ConfigureService<TopshelfHostService>(s =>
+					x.AfterStoppingServices(h =>
 						{
-							s.Named("Topshelf.Host");
-							s.HowToBuildService(name => new TopshelfHostService());
+							Console.WriteLine("[Topshelf] All services have been stopped");
+						});
+
+					x.ConfigureService<Host>(s =>
+						{
+							s.Named(Host.DefaultServiceName);
+							s.ConstructUsing((name,coordinator) => new Host(coordinator));
 							s.WhenStarted(tc => tc.Start());
 							s.WhenStopped(tc => tc.Stop());
+						});
+
+					x.ConfigureService<Monitor>(s =>
+						{
+							s.Named("Topshelf.Monitor");
+							s.ConstructUsing(name => new Monitor());
+							s.WhenStarted(m => m.Start());
+							s.WhenStopped(m => m.Stop());
 						});
 
 					x.RunAsLocalSystem();
 
 					x.SetDescription("Topshelf Hosting Service");
-					x.SetDisplayName("Topshelf.Host");
-					x.SetServiceName("Topshelf.Host");
+					x.SetDisplayName(Host.DefaultServiceName);
+					x.SetServiceName(Host.DefaultServiceName);
 				});
 
 			Runner.Host(cfg, args);

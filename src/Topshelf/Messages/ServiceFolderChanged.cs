@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,20 +12,17 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    using System;
-
-    public class ShelfFault :
-        ServiceMessage
+    public class ServiceFolderChanged :
+        ServiceEvent
     {
-        public Exception Exception { get; set; }
+		public ServiceFolderChanged(string name)
+			: base(name)
+		{
+			EventType = ServiceEventType.FolderChanged;
+		}
 
-        public ShelfFault()
-        {
-        }
-
-        public ShelfFault(Exception ex)
-        {
-            Exception = ex;
-        }
+		protected ServiceFolderChanged()
+		{
+		}
     }
 }

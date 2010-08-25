@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,64 +12,49 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-    using System;
-    using System.Collections.Generic;
+	using System;
+	using System.Collections.Generic;
 
-    public interface IServiceCoordinator :
-        IDisposable
-    {
-        /// <summary>
-        /// Starts all registered services, blocking the thread while they start
-        /// </summary>
-        void Start();
-        /// <summary>
-        /// Stops all registered services, blocking the thread while they stop
-        /// </summary>
-        void Stop();
-        /// <summary>
-        /// Pause all started services, blocking the thread while they stop
-        /// </summary>
-        void Pause();
-        /// <summary>
-        /// Continue all paused services, blocking the thread while they continue
-        /// </summary>
-        void Continue();
 
-        /// <summary>
-        /// Starts a given service, without blocking the current thread
-        /// </summary>
-        /// <param name="name">name of the service</param>
-        void StartService(string name);
-        /// <summary>
-        /// Stops a given service, without blocking the current thread
-        /// </summary>
-        /// <param name="name">name of the service</param>
-        void StopService(string name);
-        /// <summary>
-        /// Pauses a given service, without blocking the current thread
-        /// </summary>
-        /// <param name="name">name of the service</param>
-        void PauseService(string name);
-        /// <summary>
-        /// Continues a given service, without blocking the current thread
-        /// </summary>
-        /// <param name="name">name of the service</param>
-        void ContinueService(string name);
+	/// <summary>
+	///   Interface to the service controller
+	/// </summary>
+	public interface IServiceCoordinator :
+		IEnumerable<IServiceController>,
+		IDisposable
+	{
+		/// <summary>
+		///   The number of services managed by the coordinator
+		/// </summary>
+		int ServiceCount { get; }
 
-        /// <summary>
-        /// The number of services currently hosted, mostly used for testing
-        /// </summary>
-        int HostedServiceCount { get; }
-        /// <summary>
-        /// Get the service controller for a given service, mostly used for testing
-        /// </summary>
-        /// <param name="s">name of the service</param>
-        /// <returns>A service controller for the service in question</returns>
-        IServiceController GetService(string s);
-        /// <summary>
-        /// Provides a list of details about the hosted services
-        /// </summary>
-        /// <returns>List of ServiceInformation, describing the hosted services</returns>
-        IList<ServiceInformation> GetServiceInfo();
-    }
+		/// <summary>
+		///   Returns the service by name
+		/// </summary>
+		/// <param name = "serviceName"></param>
+		/// <returns></returns>
+		IServiceController this[string serviceName] { get; }
+
+		void Send<T>(T message);
+
+		/// <summary>
+		///   Start the services hosted by the coordinator and wait until they have completed starting
+		///   before returning to the caller
+		/// </summary>
+		/// <param name = "timeout"></param>
+		void Start(TimeSpan timeout);
+
+		/// <summary>
+		///   Stops the service coordinator and waits for the specified timeout until the services have stopped
+		/// </summary>
+		/// <param name = "timeout"></param>
+		void Stop(TimeSpan timeout);
+
+		/// <summary>
+		/// Create the service using the factory method specified and add it to the coordinator
+		/// </summary>
+		/// <param name="serviceName"></param>
+		/// <param name="serviceFactory"></param>
+		void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory);
+	}
 }

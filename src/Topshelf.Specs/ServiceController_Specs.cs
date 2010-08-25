@@ -12,14 +12,12 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-	using System.Threading;
 	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Messages;
 	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using TestObject;
 	using Topshelf.Configuration.Dsl;
 
@@ -30,105 +28,123 @@ namespace Topshelf.Specs
 		[SetUp]
 		public void EstablishContext()
 		{
-			using (var startEvent = new ManualResetEvent(false))
+			_serviceStarted = new FutureChannel<ServiceRunning>();
+			_service = new TestService();
+			_hostChannel = AddressRegistry.GetInboundServiceCoordinatorChannel(x => { x.AddChannel(_serviceStarted); });
+
+			using (var c = new ServiceConfigurator<TestService>())
 			{
-				_srv = new TestService();
+				c.WhenStarted(s => s.Start());
+				c.WhenStopped(s => s.Stop());
+				c.WhenPaused(s => { _wasPaused = true; });
+				c.WhenContinued(s => { _wasContinued = true; });
+				c.HowToBuildService(name => _service);
 
-				_channelAdaptor = new ChannelAdapter();
-				_hostChannel = WellknownAddresses.GetServiceCoordinatorHost(_channelAdaptor);
-
-                using (_channelAdaptor.Connect(config => config.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => startEvent.Set())))
-                {
-
-                    ServiceConfigurator<TestService> c = new ServiceConfigurator<TestService>();
-                    c.WhenStarted(s => s.Start());
-                    c.WhenStopped(s => s.Stop());
-                    c.WhenPaused(s => { _wasPaused = true; });
-                    c.WhenContinued(s => { _wasContinued = true; });
-                    c.HowToBuildService(name => _srv);
-
-                    _serviceController = c.Create(WellknownAddresses.GetServiceCoordinatorProxy());
-                    _serviceController.Start();
-
-                    startEvent.WaitOne(5.Seconds());
-
-                    _serviceController.State.ShouldEqual(ServiceState.Started);
-                }
+				_serviceController = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel());
 			}
+
+			_serviceChannel = new InboundChannel(AddressRegistry.GetServiceAddress(_serviceController.Name),
+			                                     AddressRegistry.GetServicePipeName(_serviceController.Name), x =>
+			                                     	{
+			                                     		x.AddConsumersFor<ServiceStateMachine>()
+			                                     			.UsingInstance(_serviceController)
+															.HandleOnCallingThread();
+			                                     	});
+
+			_serviceChannel.Send(new StartService("test"));
+
+			_serviceStarted.WaitUntilCompleted(10.Seconds());
+
+			_serviceController.ShouldBeRunning();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-            _hostChannel.Dispose();
-            Thread.Sleep(1.Seconds());
 			_serviceController.Dispose();
+			_serviceChannel.Dispose();
+			_hostChannel.Dispose();
 		}
 
-		[Test, Slow]
+		[Test]
+		[Slow]
 		public void Should_continue()
 		{
-			_serviceController.Pause();
+			_serviceChannel.Send(new PauseService("test"));
+			_serviceChannel.Send(new ContinueService("test"));
 
-			_serviceController.Continue();
-
-			_serviceController.State
-				.ShouldEqual(ServiceState.Started);
-			_wasContinued
-				.ShouldBeTrue();
+			_serviceController.ShouldBeRunning();
+			_service.WasContinued.IsCompleted.ShouldBeTrue();
 		}
 
-        [Test, Slow]
+		[Test]
+		[Slow]
 		public void Should_expose_contained_type()
 		{
 			_serviceController.ServiceType
 				.ShouldEqual(typeof(TestService));
 		}
 
-        [Test, Slow]
+		[Test]
+		[Slow]
 		public void Should_pause()
 		{
-			_serviceController.Pause();
+			_serviceChannel.Send(new PauseService("test"));
 
-			_serviceController.State
-				.ShouldEqual(ServiceState.Paused);
-
-			_wasPaused
-				.ShouldBeTrue();
+			_serviceController.ShouldBePaused();
+			_service.Paused.IsCompleted.ShouldBeTrue();
 		}
 
-        [Test, Slow]
+		[Test]
+		[Slow]
 		public void Should_start()
 		{
-			_serviceController.State
-				.ShouldEqual(ServiceState.Started);
-
-			_srv.Stopped
-				.ShouldBeFalse();
-			_srv.Started
-				.ShouldBeTrue();
+			_serviceController.ShouldBeRunning();
+			_service.Running.IsCompleted.ShouldBeTrue();
 		}
 
-        [Test, Slow]
+		[Test]
+		[Slow]
 		public void Should_stop()
 		{
-			_serviceController.Stop();
+			_serviceChannel.Send(new StopService("test"));
 
-			_serviceController.State
-				.ShouldEqual(ServiceState.Stopped);
-
-			_srv.Stopped
-				.ShouldBeTrue();
+			_serviceController.ShouldBeStopped();
+			_service.Stopped.IsCompleted.ShouldBeTrue();
 		}
 
-		IServiceController _serviceController;
-		TestService _srv;
+		FutureChannel<ServiceRunning> _serviceStarted;
+
+		ServiceController<TestService> _serviceController;
+		TestService _service;
 		bool _wasPaused;
 		bool _wasContinued;
-		ChannelAdapter _channelAdaptor;
-		HostHost _hostChannel;
+		InboundChannel _hostChannel;
+		InboundChannel _serviceChannel;
 
 		//TODO: state transition tests
+	}
+
+
+	public static class ServiceAssertions
+	{
+		public static void ShouldBeRunning<TService>(this ServiceController<TService> service) 
+			where TService : class
+		{
+			service.CurrentState.ShouldEqual(ServiceController<TService>.Running);
+		}
+	
+		public static void ShouldBeStopped<TService>(this ServiceController<TService> service) 
+			where TService : class
+		{
+			service.CurrentState.ShouldEqual(ServiceController<TService>.Stopped);
+		}
+
+		public static void ShouldBePaused<TService>(this ServiceController<TService> service) 
+			where TService : class
+		{
+			service.CurrentState.ShouldEqual(ServiceController<TService>.Paused);
+		}
 	}
 
 
@@ -142,13 +158,13 @@ namespace Topshelf.Specs
 			c.WhenStarted(s => s.Start());
 			c.WhenStopped(s => s.Stop());
 
-            using (IServiceController service = c.Create(WellknownAddresses.GetServiceCoordinatorProxy()))
-            {
-                service.Start();
+			using (IServiceController service = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel()))
+			{
+//				service.Send(new StartService());
 
-                service.State
-                    .ShouldEqual(ServiceState.Started);
-            }
+	//			service.State
+		//			.ShouldEqual(ServiceState.Started);
+			}
 		}
 	}
 }

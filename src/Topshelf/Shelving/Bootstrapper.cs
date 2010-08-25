@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,10 +12,12 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
-    using Configuration.Dsl;
+	using Configuration.Dsl;
 
-    public interface Bootstrapper<T>
-    {
-        void InitializeHostedService(IServiceConfigurator<T> cfg);
-    }
+
+	public interface Bootstrapper<T>
+		where T : class
+	{
+		void InitializeHostedService(IServiceConfigurator<T> cfg);
+	}
 }

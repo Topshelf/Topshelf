@@ -25,7 +25,7 @@ namespace Topshelf.Specs
             var config = ShelfConfiguration.GetConfig();
 
             Assert.That(config, Is.Not.Null);
-            config.BootstrapperType.ShouldEqual(typeof(AppDomain_Specs_Bootstrapper));
+			config.BootstrapperType.ShouldEqual(typeof(TestAppDomainBootsrapper));
         }
     }
 }

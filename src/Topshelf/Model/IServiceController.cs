@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,23 +12,21 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-    using System;
-    using Magnum.Channels;
+	using System;
+	using Magnum.StateMachine;
 
-    public interface IServiceController :
-        IDisposable
-    {
-        Type ServiceType { get; }
-        string Name { get; }
-        ServiceState State { get; }
-        ServiceBuilder BuildService { get; }
 
-        UntypedChannel ControllerChannel { get; }
+	public interface IServiceController :
+		IDisposable
+	{
+		string Name { get; }
+		State CurrentState { get; }
+	}
 
-        void Initialize();
-        void Start();
-        void Stop();
-        void Pause();
-        void Continue();
-    }
+
+	public interface IServiceController<TService> :
+		IServiceController
+		where TService : class
+	{
+	}
 }

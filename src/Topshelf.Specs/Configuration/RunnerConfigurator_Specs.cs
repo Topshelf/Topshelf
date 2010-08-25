@@ -12,7 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.Configuration
 {
-    using System.ServiceProcess;
+	using System.Linq;
+	using System.ServiceProcess;
     using System.Threading;
     using Magnum.Extensions;
     using Model;
@@ -118,18 +119,17 @@ namespace Topshelf.Specs.Configuration
         [Test]
         public void Hosted_service_configuration()
         {
-            _runConfiguration.Coordinator.Start();
-            _runConfiguration.Coordinator.HostedServiceCount
+            _runConfiguration.Coordinator.Start(10.Seconds());
+            _runConfiguration.Coordinator.ServiceCount
                 .ShouldEqual(1);
 
             Thread.Sleep(1.Seconds());
 
-            IServiceController serviceController = _runConfiguration.Coordinator.GetService("my_service");
+            IServiceController serviceController = _runConfiguration.Coordinator["my_service"];
 
             serviceController.Name
                 .ShouldEqual("my_service");
-            serviceController.State
-                .ShouldEqual(ServiceState.Started);
+            serviceController.CurrentState.Name.ShouldEqual("Running");
         }
     }
 
@@ -158,9 +158,9 @@ namespace Topshelf.Specs.Configuration
                 x.ConfigureService<TestService>(c => c.Named(serviceName));
             });
 
-            var serviceInfo = _runner.Coordinator.GetServiceInfo();
+        	var serviceInfo = _runner.Coordinator[serviceName];
 
-            serviceInfo[0].Name.ShouldEqual(serviceName);
+            serviceInfo.Name.ShouldEqual(serviceName);
         }
 
         [Test]
@@ -168,9 +168,9 @@ namespace Topshelf.Specs.Configuration
         {
             _runner = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
 
-            var serviceInfo = _runner.Coordinator.GetServiceInfo();
+        	var serviceInfo = _runner.Coordinator.First();
 
-            serviceInfo[0].Name.ShouldNotBeNull();
+            serviceInfo.Name.ShouldNotBeNull();
         }
 
         [Test]
@@ -182,9 +182,10 @@ namespace Topshelf.Specs.Configuration
                 x.ConfigureService<TestService>(c => { });
             });
 
-            var serviceInfo = _runner.Coordinator.GetServiceInfo();
+        	var first = _runner.Coordinator.First();
+        	var second = _runner.Coordinator.Skip(1).First();
 
-            serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
+            first.Name.ShouldNotEqual(second.Name);
         }
     }
 }
