@@ -124,7 +124,7 @@ namespace Topshelf.Model
 
 			string[] servicesToStart = _startupServices.GetAllKeys();
 
-			servicesToStart.Each(name => _channel.Send(new CreateService(name)));
+			servicesToStart.Each(name => _channel.Send(new CreateService(name, _channel.Address, _channel.PipeName)));
 
 			WaitUntilServicesAre(servicesToStart, ServiceStateMachine.Running, timeout);
 

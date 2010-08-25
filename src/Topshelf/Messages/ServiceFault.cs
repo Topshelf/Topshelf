@@ -18,19 +18,17 @@ namespace Topshelf.Messages
 	public class ServiceFault :
 		ServiceEvent
 	{
-		public ServiceFault(string name, Exception ex)
-			: this()
+		public ServiceFault(string serviceName, Exception ex)
+			: base(serviceName)
 		{
-			Name = name;
+			EventType = ServiceEventType.Fault;
 			Exception = ex;
 		}
 
 		protected ServiceFault()
 		{
-			EventType = ServiceEventType.Fault;
 		}
 
-		public string Name { get; set; }
-		public Exception Exception { get; protected set; }
+		public Exception Exception { get; private set; }
 	}
 }

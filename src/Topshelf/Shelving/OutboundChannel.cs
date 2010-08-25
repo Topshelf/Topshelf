@@ -19,7 +19,7 @@ namespace Topshelf.Shelving
 
 
 	public class OutboundChannel : 
-		ChannelBase
+		ServiceChannelBase
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(OutboundChannel));
 

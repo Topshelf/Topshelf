@@ -117,8 +117,9 @@
     <Compile Include="Messages\StartService.cs" />
     <Compile Include="Messages\StopService.cs" />
     <Compile Include="Messages\UnloadService.cs" />
+    <Compile Include="Model\ServiceChannel.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
-    <Compile Include="Shelving\ChannelBase.cs" />
+    <Compile Include="Shelving\ServiceChannelBase.cs" />
     <Compile Include="Shelving\InboundChannel.cs" />
     <Compile Include="Shelving\OutboundChannel.cs" />
     <Compile Include="Model\IServiceCoordinator.cs" />

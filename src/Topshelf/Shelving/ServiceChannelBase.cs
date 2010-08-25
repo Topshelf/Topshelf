@@ -13,28 +13,38 @@
 namespace Topshelf.Shelving
 {
 	using System;
+	using System.Collections.Generic;
 	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
+	using Magnum.Extensions;
+	using Model;
 
 
-	public class ChannelBase :
-		UntypedChannel,
+	public abstract class ServiceChannelBase :
+		ServiceChannel,
 		IDisposable
 	{
 		UntypedChannel _channel;
-		ChannelConnection _connection;
+		IList<ChannelConnection> _connections;
 		bool _disposed;
 
-		protected ChannelBase(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
+		protected ServiceChannelBase(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
 		{
 			Address = address;
 			PipeName = pipeName;
 
 			_channel = new ChannelAdapter();
-			_connection = _channel.Connect(configurator);
+			_connections = new List<ChannelConnection>();
+			_connections.Add(_channel.Connect(configurator));
 		}
 
 		public Uri Address { get; private set; }
+
+		public void Connect(Action<ConnectionConfigurator> configurator)
+		{
+			_connections.Add(_channel.Connect(configurator));
+		}
+
 		public string PipeName { get; private set; }
 
 
@@ -49,7 +59,7 @@ namespace Topshelf.Shelving
 			_channel.Send(message);
 		}
 
-		~ChannelBase()
+		~ServiceChannelBase()
 		{
 			Dispose(false);
 		}
@@ -60,11 +70,7 @@ namespace Topshelf.Shelving
 				return;
 			if (disposing)
 			{
-				if (_connection != null)
-				{
-					_connection.Dispose();
-					_connection = null;
-				}
+				_connections.Each(x => x.Dispose());
 
 				_channel = null;
 			}

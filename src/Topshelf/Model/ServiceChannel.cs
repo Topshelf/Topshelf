@@ -10,18 +10,19 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Messages
+namespace Topshelf.Model
 {
-	public class StartService :
-		ServiceCommand
-	{
-		public StartService(string serviceName)
-			: base(serviceName)
-		{
-		}
+	using System;
+	using Magnum.Channels;
+	using Magnum.Channels.Configuration;
 
-		protected StartService()
-		{
-		}
+
+	public interface ServiceChannel :
+		UntypedChannel
+	{
+		string PipeName { get; }
+		Uri Address { get; }
+
+		void Connect(Action<ConnectionConfigurator> configurator);
 	}
 }

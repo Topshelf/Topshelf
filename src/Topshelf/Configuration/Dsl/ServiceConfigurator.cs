@@ -91,12 +91,12 @@ namespace Topshelf.Configuration.Dsl
 			BuildAction = serviceFactory;
 		}
 
-		public ServiceController<TService> Create(IServiceCoordinator coordinator, UntypedChannel coordinatorChannel)
+		public ServiceController<TService> Create(IServiceCoordinator coordinator, ServiceChannel coordinatorChannel)
 		{
 			return Create(Name, coordinator, coordinatorChannel);
 		}
 
-		public ServiceController<TService> Create(string serviceName, IServiceCoordinator coordinator, UntypedChannel coordinatorChannel)
+		public ServiceController<TService> Create(string serviceName, IServiceCoordinator coordinator, ServiceChannel coordinatorChannel)
 		{
 			var serviceController = new ServiceController<TService>(serviceName, coordinator, coordinatorChannel,
 			                                                        StartAction,

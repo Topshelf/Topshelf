@@ -16,12 +16,12 @@ namespace Topshelf.Messages
 
 
 	public class ShelfFault :
-		ShelfEvent
+		ServiceEvent
 	{
-		public ShelfFault(Exception ex)
-			: this()
+		public ShelfFault(string serviceName, Exception exception)
+			: base(serviceName)
 		{
-			Exception = ex;
+			Exception = exception;
 		}
 
 		protected ShelfFault()

@@ -14,6 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
+	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
 	using Magnum.Extensions;
 	using Shelving;

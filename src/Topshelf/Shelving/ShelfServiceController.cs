@@ -15,7 +15,6 @@ namespace Topshelf.Shelving
 	using System;
 	using System.Reflection;
 	using log4net;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Messages;
 	using Model;
@@ -32,7 +31,7 @@ namespace Topshelf.Shelving
 
 		ShelfReference _reference;
 
-		public ShelfServiceController(string name, UntypedChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
+		public ShelfServiceController(string name, ServiceChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
 		                              AssemblyName[] assemblyNames)
 			: base(name, eventChannel)
 		{
@@ -52,6 +51,12 @@ namespace Topshelf.Shelving
 			}
 
 			_reference.ShelfChannel.Send(message);
+		}
+
+
+		protected override void Create(CreateService message)
+		{
+			Create();
 		}
 
 		protected override void Create()
@@ -76,6 +81,11 @@ namespace Topshelf.Shelving
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
 
+		protected override void ServiceFaulted(ServiceFault message)
+		{
+			_log.Error("[{0}] Shelf Service Faulted".FormatWith(Name), message.Exception);
+		}
+
 		protected override void Start()
 		{
 			_log.DebugFormat("[{0}] Start", Name);
@@ -85,6 +95,23 @@ namespace Topshelf.Shelving
 
 		protected override void Stop()
 		{
+			_log.DebugFormat("[{0}] Stop", Name);
+
+			Send(new StopService(Name));
+		}
+
+		protected override void Pause()
+		{
+			_log.DebugFormat("[{0}] Pause", Name);
+
+			Send(new PauseService(Name));
+		}
+
+		protected override void Continue()
+		{
+			_log.DebugFormat("[{0}] Continue", Name);
+
+			Send(new ContinueService(Name));
 		}
 
 		protected override void Unload()

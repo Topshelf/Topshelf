@@ -12,6 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
+	using System;
+
+
 	public class CreateService :
 		ServiceCommand
 	{
@@ -20,8 +23,18 @@ namespace Topshelf.Messages
 		{
 		}
 
-		public CreateService()
+		public CreateService(string serviceName, Uri address, string pipeName)
+			: base(serviceName)
+		{
+			Address = address;
+			PipeName = pipeName;
+		}
+
+		protected CreateService()
 		{
 		}
+
+		public Uri Address { get; private set; }
+		public string PipeName { get; private set; }
 	}
 }
