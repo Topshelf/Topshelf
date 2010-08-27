@@ -1,5 +1,5 @@
 ﻿// Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,24 +12,12 @@
 // specific language governing permissions and limitations under the License.
 namespace StuffOnAShelf
 {
-    using System;
-    using System.IO;
-    using log4net.Config;
-    using Topshelf.Configuration.Dsl;
-    using Topshelf.Shelving;
-
-    public class AShelvedClock :
-        Bootstrapper<TheClock>
-    {
-        public void InitializeHostedService(IServiceConfigurator<TheClock> cfg)
-        {
-            cfg.HowToBuildService(n => new TheClock());
-            cfg.WhenStarted(s =>
-            {
-                XmlConfigurator.Configure(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clock.log4net.config")));
-                s.Start();
-            });
-            cfg.WhenStopped(s => s.Stop());
-        }
-    }
+	public enum ClockFailureMode
+	{
+		None,
+		FailToCreate,
+		FailToStart,
+		FailToStop,
+		CrashAfterStart
+	}
 }

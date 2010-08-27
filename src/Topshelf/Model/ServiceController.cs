@@ -84,7 +84,7 @@ namespace Topshelf.Model
 			}
 			catch (Exception ex)
 			{
-				throw new BuildServiceException(Name, typeof(TService), ex);
+				Publish(new ServiceFault(Name, new BuildServiceException(Name, typeof(TService), ex)));
 			}
 		}
 
@@ -101,30 +101,22 @@ namespace Topshelf.Model
 
 		protected override void Start()
 		{
-			CallAction("Start", _startAction);
-
-			Publish<ServiceRunning>();
+			CallAction<ServiceRunning>("Start", _startAction);
 		}
 
 		protected override void Stop()
 		{
-			CallAction("Stop", _stopAction);
-
-			Publish<ServiceStopped>();
+			CallAction<ServiceStopped>("Stop", _stopAction);
 		}
 
 		protected override void Pause()
 		{
-			CallAction("Pause", _pauseAction);
-
-			Publish<ServicePaused>();
+			CallAction<ServicePaused>("Pause", _pauseAction);
 		}
 
 		protected override void Continue()
 		{
-			CallAction("Continue", _continueAction);
-
-			Publish<ServiceRunning>();
+			CallAction<ServiceRunning>("Continue", _continueAction);
 		}
 
 		protected override void Unload()
@@ -145,16 +137,26 @@ namespace Topshelf.Model
 			Publish<ServiceUnloaded>();
 		}
 
-		void CallAction(string text, Action<TService> callback)
+		void CallAction<TEvent>(string text, Action<TService> callback)
+			where TEvent : ServiceEvent
 		{
 			if (callback == null)
 				return;
 
-			_log.DebugFormat("[{0}] {1}", Name, text);
+			try
+			{
+				_log.DebugFormat("[{0}] {1}", Name, text);
 
-			callback(_instance);
+				callback(_instance);
 
-			_log.InfoFormat("[{0}] {1} complete", Name, text);
+				_log.InfoFormat("[{0}] {1} complete", Name, text);
+
+				Publish<TEvent>();
+			}
+			catch (Exception ex)
+			{
+				Publish(new ServiceFault(Name, ex));
+			}
 		}
 
 		protected override void Dispose(bool disposing)

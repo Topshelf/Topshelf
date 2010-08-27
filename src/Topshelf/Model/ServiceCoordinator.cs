@@ -251,7 +251,11 @@ namespace Topshelf.Model
 			}
 
 			if (!AllServiceInState(state))
+			{
+				_serviceCache.Where(x => x.CurrentState != state).Each(x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
+
 				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
+			}
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)

@@ -16,10 +16,9 @@ namespace Topshelf.Model
 	using log4net;
 	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
-	using Shelving;
 
 
-	public class OutboundChannel : 
+	public class OutboundChannel :
 		ServiceChannelBase
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(OutboundChannel));
