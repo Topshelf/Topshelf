@@ -29,7 +29,7 @@ namespace Topshelf.Model
 					configurator(x);
 
 					x.SendToWcfChannel(address, pipeName)
-						.HandleOnFiber();
+						.HandleOnCallingThread();
 				})
 		{
 			_log.DebugFormat("Opening outbound channel at {0} ({1})", address, pipeName);

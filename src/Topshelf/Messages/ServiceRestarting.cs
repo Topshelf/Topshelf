@@ -25,4 +25,18 @@ namespace Topshelf.Messages
 		{
 		}
 	}
+
+	public class ServiceUnloading :
+		ServiceEvent
+	{
+		public ServiceUnloading(string name)
+			: base(name)
+		{
+			EventType = ServiceEventType.Unloading;
+		}
+
+		protected ServiceUnloading()
+		{
+		}
+	}
 }

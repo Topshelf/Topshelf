@@ -35,13 +35,13 @@ namespace Topshelf.Shelving
 		IDisposable
 	{
 		readonly Type _bootstrapperType;
-		OutboundChannel _coordinatorChannel;
 		readonly ILog _log;
 		readonly string _serviceName;
 		InboundChannel _channel;
+		OutboundChannel _coordinatorChannel;
 		bool _disposed;
-		ServiceStateMachine _service;
 		ThreadPoolFiber _fiber;
+		ServiceStateMachine _service;
 		Cache<string, ServiceStateMachine> _serviceCache;
 
 		public Shelf(Type bootstrapperType)
@@ -134,14 +134,7 @@ namespace Topshelf.Shelving
 
 			_fiber = new ThreadPoolFiber();
 
-			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
-				{
-					AddEventForwarders(x);
-
-					x.AddConsumerOf<StopService>()
-						.UsingConsumer(m => _log.InfoFormat("[{0}] Received Stop", m.ServiceName))
-						.HandleOnFiber(_fiber);
-				});
+			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, AddEventForwarders);
 
 			_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
 
@@ -177,22 +170,13 @@ namespace Topshelf.Shelving
 			x.AddConsumerOf<ServiceRunning>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServicePausing>()
+			x.AddConsumerOf<ServiceStopped>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServicePaused>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceContinuing>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceStopping>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceStopped>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceUnloaded>() // TODO might want to make this unload the entire app domain
+			x.AddConsumerOf<ServiceUnloaded>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
 		}
@@ -252,16 +236,14 @@ namespace Topshelf.Shelving
 			                                                                      e.ExceptionObject));
 
 			if (e.IsTerminating && _coordinatorChannel != null)
-			{
 				SendFault(e.ExceptionObject as Exception);
-			}
 		}
 
 		void SendFault(Exception exception)
 		{
 			try
 			{
-				_coordinatorChannel.Send(new ServiceFault(_serviceName, exception));
+				_channel.Send(new ServiceFault(_serviceName, exception));
 			}
 			catch (Exception)
 			{

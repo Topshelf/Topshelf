@@ -44,9 +44,9 @@ namespace Topshelf.Model
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
 		InboundChannel _channel;
 
-		bool _disposed;
+		volatile bool _disposed;
 
-		bool _stopping;
+		volatile bool _stopping;
 
 		public ServiceCoordinator(Fiber fiber, 
 			Action<IServiceCoordinator> beforeStartingServices,
@@ -167,7 +167,7 @@ namespace Topshelf.Model
 				bool anyFailed = services
 					.Where(key => _serviceCache.Has(key))
 					.Select(key => _serviceCache[key])
-					.Any(service => service.CurrentState == ServiceStateMachine.Failed);
+					.Any(service => service.CurrentState == ServiceStateMachine.Faulted);
 
 				if (anyFailed)
 					throw new TopshelfException("At least one configured service failed to start");

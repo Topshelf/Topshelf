@@ -101,44 +101,42 @@ namespace Topshelf.Model
 
 		protected override void Start()
 		{
-			CallAction<ServiceRunning>("Start", _startAction);
+			CallAction<ServiceStarting, ServiceRunning>("Start", _startAction);
 		}
 
 		protected override void Stop()
 		{
-			CallAction<ServiceStopped>("Stop", _stopAction);
+			CallAction<ServiceStopping, ServiceStopped>("Stop", _stopAction);
 		}
 
 		protected override void Pause()
 		{
-			CallAction<ServicePaused>("Pause", _pauseAction);
+			CallAction<ServicePausing, ServicePaused>("Pause", _pauseAction);
 		}
 
 		protected override void Continue()
 		{
-			CallAction<ServiceRunning>("Continue", _continueAction);
+			CallAction<ServiceContinuing,ServiceRunning>("Continue", _continueAction);
 		}
 
 		protected override void Unload()
 		{
-			_log.DebugFormat("[{0}] {1}", Name, "Unload");
-
-			var disposableInstance = _instance as IDisposable;
-			if (disposableInstance != null)
-			{
-				using (disposableInstance)
-					_log.DebugFormat("[{0}] Dispose", Name);
-			}
+			CallAction<ServiceUnloading, ServiceUnloaded>("Unload", instance =>
+				{
+					var disposable = instance as IDisposable;
+					if (disposable != null)
+					{
+						using (disposable)
+							_log.DebugFormat("[{0}] Dispose", Name);
+					}
+				});
 
 			_instance = null;
-
-			_log.InfoFormat("[{0}] {1} complete", Name, "Unload");
-
-			Publish<ServiceUnloaded>();
 		}
 
-		void CallAction<TEvent>(string text, Action<TService> callback)
-			where TEvent : ServiceEvent
+		void CallAction<TBefore, TComplete>(string text, Action<TService> callback)
+			where TComplete : ServiceEvent
+			where TBefore : ServiceEvent
 		{
 			if (callback == null)
 				return;
@@ -147,11 +145,13 @@ namespace Topshelf.Model
 			{
 				_log.DebugFormat("[{0}] {1}", Name, text);
 
+				Publish<TBefore>();
+
 				callback(_instance);
 
 				_log.InfoFormat("[{0}] {1} complete", Name, text);
 
-				Publish<TEvent>();
+				Publish<TComplete>();
 			}
 			catch (Exception ex)
 			{
