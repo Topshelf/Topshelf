@@ -31,7 +31,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service = new TestService();
 			_service2 = new TestService2();
 
-			_serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { }, x => { }, x => { });
+			_serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { }, x => { }, x => { }, 1.Minutes());
 			_serviceCoordinator.CreateService("test",
 			                                  n =>
 			                                  new ServiceController<TestService>("test", null,
@@ -52,7 +52,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			                                                                     x.Continue(),
 			                                                                     (x, c) =>
 			                                                                     _service2));
-			_serviceCoordinator.Start(10.Seconds());
+			_serviceCoordinator.Start();
 
 			_service.Running.WaitUntilCompleted(10.Seconds());
 			_service2.Running.WaitUntilCompleted(10.Seconds());
@@ -64,23 +64,21 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_serviceCoordinator.Dispose();
 		}
 
-		[Test]
-		public void D_Continue_individual_service()
+		[Test, Explicit("Not Yet Implemented")]
+		public void Continue_individual_service()
 		{
-			_serviceCoordinator.EventChannel.Send(new PauseService("test"));
-			_serviceCoordinator.EventChannel.Send(new ContinueService("test"));
+            _serviceCoordinator.Send(new PauseService("test"));
+            _service.Paused.WaitUntilCompleted(2.Seconds()).ShouldBeTrue();
+            _serviceCoordinator.Send(new ContinueService("test"));
+            _service.WasContinued.WaitUntilCompleted(2.Seconds()).ShouldBeTrue();
 
-			_service.Running.IsCompleted.ShouldBeTrue();
-			_service.Paused.IsCompleted.ShouldBeTrue();
-			_service.WasContinued.IsCompleted.ShouldBeTrue();
-
-			_service2.Running.IsCompleted.ShouldBeTrue();
+            _service2.Running.IsCompleted.ShouldBeTrue();
 		}
 
-		[Test]
+        [Test, Explicit("Not Yet Implemented")]
 		public void Pause_individual_service()
 		{
-			_serviceCoordinator.EventChannel.Send(new PauseService("test"));
+			_serviceCoordinator.Send(new PauseService("test"));
 
 			_service.Running.IsCompleted.ShouldBeTrue();
 			_service.Paused.IsCompleted.ShouldBeTrue();
@@ -88,12 +86,12 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service2.Running.IsCompleted.ShouldBeTrue();
 		}
 
-		[Test]
+        [Test, Explicit("Not Yet Implemented")]
 		public void Pause_should_pause_all_services_and_continue_only_the_named_service()
 		{
-			_serviceCoordinator.EventChannel.Send(new PauseService("test"));
-			_serviceCoordinator.EventChannel.Send(new PauseService("test2"));
-			_serviceCoordinator.EventChannel.Send(new ContinueService("test"));
+			_serviceCoordinator.Send(new PauseService("test"));
+			_serviceCoordinator.Send(new PauseService("test2"));
+			_serviceCoordinator.Send(new ContinueService("test"));
 
 			_service.Running.IsCompleted.ShouldBeTrue();
 			_service.Paused.IsCompleted.ShouldBeTrue();
@@ -106,13 +104,13 @@ namespace Topshelf.Specs.ServiceCoordinator
 		[Test]
 		public void Stop_individual_service()
 		{
-			_serviceCoordinator.EventChannel.Send(new StopService("test"));
+			_serviceCoordinator.Send(new StopService("test"));
 
 			_service.Running.IsCompleted.ShouldBeTrue();
-			_service.Stopped.IsCompleted.ShouldBeTrue();
+			_service.Stopped.WaitUntilCompleted(5.Seconds()).ShouldBeTrue();
 
 			_service2.Running.IsCompleted.ShouldBeTrue();
-			_service2.Stopped.IsCompleted.ShouldBeTrue();
+			_service2.Stopped.IsCompleted.ShouldBeFalse();
 		}
 
 		TestService _service;

@@ -20,7 +20,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 	using TestObject;
 
 
-	[Scenario]
+    [Scenario, Explicit("Need new scenarios for faults")]
 	public class Given_a_failing_start_event :
 		ServiceCoordinator_SpecsBase
 	{

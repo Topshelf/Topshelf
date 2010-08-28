@@ -84,7 +84,7 @@ namespace Topshelf.Model
 			}
 			catch (Exception ex)
 			{
-				throw new BuildServiceException(Name, typeof(TService), ex);
+				Publish(new ServiceFault(Name, new BuildServiceException(Name, typeof(TService), ex)));
 			}
 		}
 
@@ -92,62 +92,71 @@ namespace Topshelf.Model
 		{
 		}
 
+		protected override void ServiceFaulted(ServiceFault message)
+		{
+			_log.ErrorFormat("[{0}] Faulted: {1}", Name, message.ExceptionMessage);
+
+			// TODO some type of retry needed here
+		}
+
 		protected override void Start()
 		{
-			CallAction("Start", _startAction);
-
-			Publish<ServiceRunning>();
+			CallAction<ServiceStarting, ServiceRunning>("Start", _startAction);
 		}
 
 		protected override void Stop()
 		{
-			CallAction("Stop", _stopAction);
-
-			Publish<ServiceStopped>();
+			CallAction<ServiceStopping, ServiceStopped>("Stop", _stopAction);
 		}
 
 		protected override void Pause()
 		{
-			CallAction("Pause", _pauseAction);
-
-			Publish<ServicePaused>();
+			CallAction<ServicePausing, ServicePaused>("Pause", _pauseAction);
 		}
 
 		protected override void Continue()
 		{
-			CallAction("Continue", _continueAction);
-
-			Publish<ServiceRunning>();
+			CallAction<ServiceContinuing,ServiceRunning>("Continue", _continueAction);
 		}
 
 		protected override void Unload()
 		{
-			_log.DebugFormat("[{0}] {1}", Name, "Unload");
-
-			var disposableInstance = _instance as IDisposable;
-			if (disposableInstance != null)
-			{
-				using (disposableInstance)
-					_log.DebugFormat("[{0}] Dispose", Name);
-			}
+			CallAction<ServiceUnloading, ServiceUnloaded>("Unload", instance =>
+				{
+					var disposable = instance as IDisposable;
+					if (disposable != null)
+					{
+						using (disposable)
+							_log.DebugFormat("[{0}] Dispose", Name);
+					}
+				});
 
 			_instance = null;
-
-			_log.InfoFormat("[{0}] {1} complete", Name, "Unload");
-
-			Publish<ServiceUnloaded>();
 		}
 
-		void CallAction(string text, Action<TService> callback)
+		void CallAction<TBefore, TComplete>(string text, Action<TService> callback)
+			where TComplete : ServiceEvent
+			where TBefore : ServiceEvent
 		{
 			if (callback == null)
 				return;
 
-			_log.DebugFormat("[{0}] {1}", Name, text);
+			try
+			{
+				_log.DebugFormat("[{0}] {1}", Name, text);
 
-			callback(_instance);
+				Publish<TBefore>();
 
-			_log.InfoFormat("[{0}] {1} complete", Name, text);
+				callback(_instance);
+
+				_log.InfoFormat("[{0}] {1} complete", Name, text);
+
+				Publish<TComplete>();
+			}
+			catch (Exception ex)
+			{
+				Publish(new ServiceFault(Name, ex));
+			}
 		}
 
 		protected override void Dispose(bool disposing)

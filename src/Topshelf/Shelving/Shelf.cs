@@ -21,6 +21,7 @@ namespace Topshelf.Shelving
 	using log4net;
 	using log4net.Config;
 	using Magnum.Channels;
+	using Magnum.Channels.Configuration;
 	using Magnum.Collections;
 	using Magnum.Extensions;
 	using Magnum.Fibers;
@@ -34,13 +35,13 @@ namespace Topshelf.Shelving
 		IDisposable
 	{
 		readonly Type _bootstrapperType;
-		OutboundChannel _coordinatorChannel;
 		readonly ILog _log;
 		readonly string _serviceName;
 		InboundChannel _channel;
+		OutboundChannel _coordinatorChannel;
 		bool _disposed;
-		ServiceStateMachine _service;
 		ThreadPoolFiber _fiber;
+		ServiceStateMachine _service;
 		Cache<string, ServiceStateMachine> _serviceCache;
 
 		public Shelf(Type bootstrapperType)
@@ -133,37 +134,7 @@ namespace Topshelf.Shelving
 
 			_fiber = new ThreadPoolFiber();
 
-			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, x =>
-				{
-					x.AddConsumerOf<ServiceCreated>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServiceRunning>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServicePausing>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServicePaused>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServiceContinuing>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServiceStopping>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServiceStopped>()
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-					x.AddConsumerOf<ServiceUnloaded>() // TODO might want to make this unload the entire app domain
-						.UsingConsumer(m => _coordinatorChannel.Send(m))
-						.HandleOnFiber(_fiber);
-
-					x.AddConsumerOf<StopService>()
-						.UsingConsumer(m => _log.InfoFormat("[{0}] Received Stop", m.ServiceName))
-						.HandleOnFiber(_fiber);
-				});
+			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, AddEventForwarders);
 
 			_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
 
@@ -171,6 +142,9 @@ namespace Topshelf.Shelving
 
 			_channel.Connect(x =>
 				{
+					// right now, we are handling one service per shelf, but this could easily be
+					// extended to allowing multiple by taking on some of the same service handling
+					// that the coordinator does for service creation
 					x.AddConsumersFor<ServiceStateMachine>()
 						.BindUsing<ServiceStateMachineBinding, string>()
 						.CreateNewInstanceBy(GetServiceInstance)
@@ -178,9 +152,35 @@ namespace Topshelf.Shelving
 						.PersistInMemoryUsing(_serviceCache);
 				});
 
+			// this creates the state machine instance in the shelf and tells the servicecontroller
+			// to create the service
 			_channel.Send(new CreateService(_serviceName, _channel.Address, _channel.PipeName));
 		}
-			
+
+		void AddEventForwarders(ConnectionConfigurator x)
+		{
+			// These are needed to ensure that events are updated in the shelf state machine
+			// as well as the service coordinator state machine. To handle this, the servicecontroller
+			// is given the shelf channel as the reporting channel for events, and the shelf forwards
+			// the events to the service coordinator
+
+			x.AddConsumerOf<ServiceCreated>()
+				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServiceRunning>()
+				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServiceStopped>()
+				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServicePaused>()
+				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServiceUnloaded>()
+				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.HandleOnFiber(_fiber);
+		}
+
 		ServiceStateMachine GetServiceInstance(string key)
 		{
 			if (key == null)
@@ -236,16 +236,14 @@ namespace Topshelf.Shelving
 			                                                                      e.ExceptionObject));
 
 			if (e.IsTerminating && _coordinatorChannel != null)
-			{
-				_coordinatorChannel.Send(new ServiceFault(_serviceName, e.ExceptionObject as Exception));
-			}
+				SendFault(e.ExceptionObject as Exception);
 		}
 
 		void SendFault(Exception exception)
 		{
 			try
 			{
-				_coordinatorChannel.Send(new ServiceFault(_serviceName, exception));
+				_channel.Send(new ServiceFault(_serviceName, exception));
 			}
 			catch (Exception)
 			{

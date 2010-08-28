@@ -16,10 +16,9 @@ namespace Topshelf.Model
 	using log4net;
 	using Magnum.Channels;
 	using Magnum.Channels.Configuration;
-	using Shelving;
 
 
-	public class OutboundChannel : 
+	public class OutboundChannel :
 		ServiceChannelBase
 	{
 		static readonly ILog _log = LogManager.GetLogger(typeof(OutboundChannel));
@@ -30,7 +29,7 @@ namespace Topshelf.Model
 					configurator(x);
 
 					x.SendToWcfChannel(address, pipeName)
-						.HandleOnFiber();
+						.HandleOnCallingThread();
 				})
 		{
 			_log.DebugFormat("Opening outbound channel at {0} ({1})", address, pipeName);

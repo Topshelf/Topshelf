@@ -18,10 +18,11 @@ namespace Topshelf.Specs.ServiceCoordinator
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Model;
+	using NUnit.Framework;
 	using TestObject;
 
 
-	[Scenario]
+	[Scenario, Explicit("Need new scenarios for faults")]
 	public class Given_a_partially_failing_start_event :
 		ServiceCoordinator_SpecsBase
 	{

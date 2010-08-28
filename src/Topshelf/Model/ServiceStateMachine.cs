@@ -14,6 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
+	using Exceptions;
 	using Magnum.Reflection;
 	using Magnum.StateMachine;
 	using Messages;
@@ -32,7 +33,11 @@ namespace Topshelf.Model
 				{
 					Initially(
 					          When(OnCreate)
-					          	.Call((instance,message) => instance.Create(message))
+					          	.Call((instance, message) => instance.Create(message),
+					          	      InCaseOf<BuildServiceException>()
+					          	      	.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
+					          	      	.TransitionTo(Faulted),
+					          	      HandleServiceCommandException)
 					          	.TransitionTo(Creating)
 						);
 
@@ -41,47 +46,69 @@ namespace Topshelf.Model
 					       	.Call((instance, message) => instance.ServiceCreated(message),
 					       	      HandleServiceCommandException)
 					       	.TransitionTo(Created)
-					       	.Call((instance, message) => instance.Start(),
+					       	.Call(instance => instance.Start(),
 					       	      HandleServiceCommandException)
 					       	.TransitionTo(Starting),
-					       When(OnFault)
+					       When(OnFaulted)
 					       	.Call((instance, message) => instance.ServiceFaulted(message))
-					       	.TransitionTo(Failed)
+					       	.TransitionTo(Faulted)
 						);
 
 					During(Created,
-					       When(OnStart)
-					       	.Call((instance, message) => instance.Start(),
-					       	      HandleServiceCommandException)
-					       	.TransitionTo(Starting),
-					       When(OnRunning)
-					       	.TransitionTo(Running));
+						   When(OnStart)
+							.TransitionTo(Starting)
+					       	.Call(instance => instance.Start(),
+					       	      HandleServiceCommandException),
+						   When(OnRunning)
+							.TransitionTo(Running)
+							.Call(instance => instance.ServiceRunning()));
 
 					During(Starting,
-					       When(OnRunning)
-					       	.TransitionTo(Running));
+						   When(OnRunning)
+							.TransitionTo(Running)
+					       	.Call(instance => instance.ServiceRunning()));
 
 					During(Running,
-					       When(OnStop)
-					       	.Call((instance, message) => instance.Stop())
-					       	.TransitionTo(Stopping),
-					       When(OnRestart)
-					       	.Call((instance, message) => instance.Stop())
-					       	.TransitionTo(StoppingToRestart));
-
+						   When(OnStop)
+							.TransitionTo(Stopping)
+					       	.Call((instance, message) => instance.Stop()),
+						   When(OnPause)
+							.TransitionTo(Pausing)
+					       	.Call((instance, message) => instance.Pause()),
+						   When(OnRestart)
+							.TransitionTo(StoppingToRestart)
+					       	.Call((instance, message) => instance.Stop()));
 
 					During(Stopping,
-					       When(OnStopped)
-					       	.TransitionTo(Stopped));
+						   When(OnStopped)
+							.TransitionTo(Stopped)
+					       	.Call(instance => instance.ServiceStopped()));
+
+					During(Pausing,
+						   When(OnPaused)
+							.TransitionTo(Paused)
+					       	.Call(instance => instance.ServicePaused()));
+
+					During(Paused,
+						   When(OnContinue)
+							.TransitionTo(Continuing)
+					       	.Call(instance => instance.Continue()));
+
+					During(Continuing,
+						   When(OnRunning)
+							.TransitionTo(Running)
+					       	.Call(instance => instance.ServiceRunning()));
 
 					During(Stopped,
-					       When(OnUnload)
-					       	.Call(instance => instance.Unload())
-					       	.TransitionTo(Unloading));
+						   When(OnUnload)
+							.TransitionTo(Unloading)
+					       	.Call(instance => instance.Unload()));
 
 					During(Unloading,
 					       When(OnUnloaded)
-					       	.TransitionTo(Completed));
+					       	.TransitionTo(Completed)
+					       	.Call(instance => instance.ServiceUnloaded())
+					       	.Call(instance => instance.Publish<ServiceCompleted>()));
 
 					During(StoppingToRestart,
 					       When(OnStopped)
@@ -101,21 +128,6 @@ namespace Topshelf.Model
 					       When(OnRunning)
 					       	.Call(instance => instance.Publish<ServiceRestarted>())
 					       	.TransitionTo(Running));
-
-					Anytime(
-					        When(Starting.Enter)
-					        	.Call(instance => instance.Publish<ServiceStarting>()),
-					        When(Pausing.Enter)
-					        	.Call(instance => instance.Publish<ServicePausing>()),
-					        When(Continuing.Enter)
-					        	.Call(instance => instance.Publish<ServiceContinuing>()),
-					        When(Stopping.Enter)
-					        	.Call(instance => instance.Publish<ServiceStopping>()),
-					        When(Restarting.Enter)
-					        	.Call(instance => instance.Publish<ServiceRestarting>()),
-					        When(Completed.Enter)
-					        	.Call(instance => instance.Publish<ServiceCompleted>())
-						);
 				});
 		}
 
@@ -134,7 +146,7 @@ namespace Topshelf.Model
 			{
 				return InCaseOf<Exception>()
 					.Then((i, ex) => i.Publish(new ServiceFault(i.Name, ex)))
-					.TransitionTo(Failed);
+					.TransitionTo(Faulted);
 			}
 		}
 
@@ -144,14 +156,21 @@ namespace Topshelf.Model
 
 		public static Event<StartService> OnStart { get; set; }
 		public static Event<ServiceRunning> OnRunning { get; set; }
-		public static Event<RestartService> OnRestart { get; set; }
 
 		public static Event<StopService> OnStop { get; set; }
 		public static Event<ServiceStopped> OnStopped { get; set; }
+
+		public static Event<PauseService> OnPause { get; set; }
+		public static Event<ServicePaused> OnPaused { get; set; }
+
+		public static Event<ContinueService> OnContinue { get; set; }
+
 		public static Event<UnloadService> OnUnload { get; set; }
 		public static Event<ServiceUnloaded> OnUnloaded { get; set; }
 
-		public static Event<ServiceFault> OnFault { get; set; }
+		public static Event<RestartService> OnRestart { get; set; }
+
+		public static Event<ServiceFault> OnFaulted { get; set; }
 
 
 		public static State Initial { get; set; }
@@ -169,7 +188,7 @@ namespace Topshelf.Model
 		public static State Restarting { get; set; }
 		public static State Unloading { get; set; }
 		public static State Completed { get; set; }
-		public static State Failed { get; set; }
+		public static State Faulted { get; set; }
 
 		public string Name { get; set; }
 
@@ -188,6 +207,22 @@ namespace Topshelf.Model
 		}
 
 		protected virtual void ServiceCreated(ServiceCreated message)
+		{
+		}
+
+		protected virtual void ServiceRunning()
+		{
+		}
+
+		protected virtual void ServiceStopped()
+		{
+		}
+
+		protected virtual void ServicePaused()
+		{
+		}
+
+		protected virtual void ServiceUnloaded()
 		{
 		}
 

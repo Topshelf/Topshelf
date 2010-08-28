@@ -30,9 +30,12 @@ namespace Topshelf.Model
 			Bind(ServiceStateMachine.OnRestart, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnCreated, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnStopped, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnPause, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnPaused, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnContinue, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnUnload, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnUnloaded, x => x.ServiceName);
-			Bind(ServiceStateMachine.OnFault, x => x.ServiceName);
+			Bind(ServiceStateMachine.OnFaulted, x => x.ServiceName);
 		}
 	}
 }

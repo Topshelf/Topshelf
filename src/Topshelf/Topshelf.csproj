@@ -87,6 +87,7 @@
     <Compile Include="Commands\InstallService.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
+    <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
     <Compile Include="Messages\ContinueService.cs" />

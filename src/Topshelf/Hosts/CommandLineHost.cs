@@ -49,7 +49,7 @@ namespace Topshelf.Hosts
 
 				Console.CancelKeyPress += HandleCancelKeyPress;
 
-				_coordinator.Start(_timeout); //user code starts
+				_coordinator.Start(); //user code starts
 
 				_log.InfoFormat("[Topshelf] Running, press Control+C to exit.");
 
@@ -74,7 +74,7 @@ namespace Topshelf.Hosts
 			{
 				_log.Info("[Topshelf] Stopping");
 
-				_coordinator.Stop(_timeout);
+				_coordinator.Stop();
 			}
 			catch (Exception ex)
 			{

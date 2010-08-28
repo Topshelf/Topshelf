@@ -36,8 +36,8 @@ namespace Topshelf.Specs
 			{
 				c.WhenStarted(s => s.Start());
 				c.WhenStopped(s => s.Stop());
-				c.WhenPaused(s => { _wasPaused = true; });
-				c.WhenContinued(s => { _wasContinued = true; });
+				c.WhenPaused(s => { });
+				c.WhenContinued(s => { });
 				c.HowToBuildService(name => _service);
 
 				_serviceController = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel());
@@ -68,6 +68,7 @@ namespace Topshelf.Specs
 
 		[Test]
 		[Slow]
+        [Explicit("Not Yet Implemented")]
 		public void Should_continue()
 		{
 			_serviceChannel.Send(new PauseService("test"));
@@ -87,6 +88,7 @@ namespace Topshelf.Specs
 
 		[Test]
 		[Slow]
+        [Explicit("Not Yet Implemented")]
 		public void Should_pause()
 		{
 			_serviceChannel.Send(new PauseService("test"));
@@ -117,9 +119,7 @@ namespace Topshelf.Specs
 
 		ServiceController<TestService> _serviceController;
 		TestService _service;
-		bool _wasPaused;
-		bool _wasContinued;
-		InboundChannel _hostChannel;
+	    InboundChannel _hostChannel;
 		InboundChannel _serviceChannel;
 
 		//TODO: state transition tests
