@@ -179,6 +179,9 @@ namespace Topshelf.Shelving
 			x.AddConsumerOf<ServiceUnloaded>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
+		    x.AddConsumerOf<ServiceFault>()
+		        .UsingConsumer(m => _coordinatorChannel.Send(m))
+		        .HandleOnFiber(_fiber);
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)

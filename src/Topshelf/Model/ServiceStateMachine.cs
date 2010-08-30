@@ -66,7 +66,10 @@ namespace Topshelf.Model
 					During(Starting,
 						   When(OnRunning)
 							.TransitionTo(Running)
-					       	.Call(instance => instance.ServiceRunning()));
+                            .Call(instance => instance.ServiceRunning()),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Running,
 						   When(OnStop)
@@ -77,27 +80,42 @@ namespace Topshelf.Model
 					       	.Call((instance, message) => instance.Pause()),
 						   When(OnRestart)
 							.TransitionTo(StoppingToRestart)
-					       	.Call((instance, message) => instance.Stop()));
+                            .Call((instance, message) => instance.Stop()),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Stopping,
 						   When(OnStopped)
 							.TransitionTo(Stopped)
-					       	.Call(instance => instance.ServiceStopped()));
+                            .Call(instance => instance.ServiceStopped()),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Pausing,
 						   When(OnPaused)
 							.TransitionTo(Paused)
-					       	.Call(instance => instance.ServicePaused()));
+                            .Call(instance => instance.ServicePaused()),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Paused,
 						   When(OnContinue)
 							.TransitionTo(Continuing)
-					       	.Call(instance => instance.Continue()));
+                            .Call(instance => instance.Continue()),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Continuing,
 						   When(OnRunning)
 							.TransitionTo(Running)
-					       	.Call(instance => instance.ServiceRunning()));
+                            .Call(instance => instance.ServiceRunning()),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Stopped,
 						   When(OnUnload)
@@ -114,7 +132,10 @@ namespace Topshelf.Model
 					       When(OnStopped)
 					       	.Call(instance => instance.Unload())
 					       	.Call(instance => instance.Create())
-					       	.TransitionTo(CreatingToRestart));
+                            .TransitionTo(CreatingToRestart),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(CreatingToRestart,
 					       When(OnCreated)
@@ -122,12 +143,18 @@ namespace Topshelf.Model
 					       	      HandleServiceCommandException)
 					       	.Call(instance => instance.Start(),
 					       	      HandleServiceCommandException)
-					       	.TransitionTo(Restarting));
+                            .TransitionTo(Restarting),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 
 					During(Restarting,
 					       When(OnRunning)
 					       	.Call(instance => instance.Publish<ServiceRestarted>())
-					       	.TransitionTo(Running));
+                            .TransitionTo(Running),
+                           When(OnFaulted)
+                            .Call((instance, message) => instance.ServiceFaulted(message))
+                            .TransitionTo(Faulted));
 				});
 		}
 

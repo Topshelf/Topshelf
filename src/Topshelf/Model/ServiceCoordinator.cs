@@ -48,7 +48,9 @@ namespace Topshelf.Model
 
 		volatile bool _stopping;
 
-		public ServiceCoordinator(Fiber fiber, 
+	    public event Action<string, string> ServiceFault;
+        
+        public ServiceCoordinator(Fiber fiber, 
 			Action<IServiceCoordinator> beforeStartingServices,
 		                          Action<IServiceCoordinator> afterStartingServices,
 		                          Action<IServiceCoordinator> afterStoppingServices, 
@@ -235,7 +237,13 @@ namespace Topshelf.Model
 
 		void OnServiceFault(ServiceFault message)
 		{
-			// TODO need to do something about this, maybe capture/log the exception
+			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ExceptionMessage);
+
+		    var handler = ServiceFault;
+            if (handler != null)
+            {
+                handler.Invoke(message.ServiceName, message.ExceptionMessage);
+            }
 		}
 
 		void WaitUntilAllServicesAre(State state, TimeSpan timeout)

@@ -13,38 +13,40 @@
 namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
-	using System.Collections.Generic;
+	using System.Linq;
+	using Magnum;
+	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Model;
 	using NUnit.Framework;
 	using TestObject;
 
 
-    [Scenario, Explicit("Need new scenarios for faults")]
+    [Scenario]
 	public class Given_a_failing_start_event :
 		ServiceCoordinator_SpecsBase
 	{
+        Future<string> _faultHappened = new Future<string>();
+
 		[When]
 		public void A_registered_service_throws_on_start()
 		{
-//			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-//				{
-//					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
-//					                               x => { throw new Exception(); },
-//					                               x => x.Stop(),
-//					                               x => x.Pause(),
-//					                               x => x.Continue(),
-//					                               (x,c) => new TestService())
-//				};
-//
-//			ServiceCoordinator.RegisterServices(services);
+		    Coordinator.ServiceFault += (msg, ex) => _faultHappened.Complete(msg);
+
+            CreateService<TestService>("test",
+                                       x => { throw new Exception(); },
+                                       x => x.Stop(),
+                                       x => x.Pause(),
+                                       x => x.Continue(),
+                                       (x, c) => new TestService());
 		}
 
 		[Then]
-		[Slow]
 		public void An_exception_is_thrown_when_service_is_started()
 		{
-//			Assert.That(() => ServiceCoordinator.Start(), Throws.InstanceOf<Exception>());
+            Assert.That(() => Coordinator.Start(), Throws.InstanceOf<Exception>());
+		    _faultHappened.WaitUntilCompleted(10.Seconds()).ShouldBeTrue();
+		    Coordinator.Where(x => x.Name == "test").FirstOrDefault().CurrentState.ShouldEqual(ServiceStateMachine.Faulted);
 		}
 	}
 }

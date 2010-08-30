@@ -96,7 +96,7 @@ namespace Topshelf.Model
 		{
 			_log.ErrorFormat("[{0}] Faulted: {1}", Name, message.ExceptionMessage);
 
-			// TODO some type of retry needed here
+            Publish(message);
 		}
 
 		protected override void Start()
