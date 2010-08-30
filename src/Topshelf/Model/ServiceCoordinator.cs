@@ -48,13 +48,11 @@ namespace Topshelf.Model
 
 		volatile bool _stopping;
 
-	    public event Action<string, string> ServiceFault;
-        
-        public ServiceCoordinator(Fiber fiber, 
-			Action<IServiceCoordinator> beforeStartingServices,
+		public ServiceCoordinator(Fiber fiber,
+		                          Action<IServiceCoordinator> beforeStartingServices,
 		                          Action<IServiceCoordinator> afterStartingServices,
-		                          Action<IServiceCoordinator> afterStoppingServices, 
-			TimeSpan timeout)
+		                          Action<IServiceCoordinator> afterStoppingServices,
+		                          TimeSpan timeout)
 		{
 			_fiber = fiber;
 			_afterStoppingServices = afterStoppingServices;
@@ -64,12 +62,16 @@ namespace Topshelf.Model
 
 			_startupServices = new Cache<string, Func<IServiceCoordinator, ServiceStateMachine>>();
 			_serviceCache = new Cache<string, ServiceStateMachine>();
+
+			EventChannel = new ChannelAdapter();
 		}
 
 		public ServiceCoordinator()
 			: this(new ThreadPoolFiber(), null, null, null, 1.Minutes())
 		{
 		}
+
+		public UntypedChannel EventChannel { get; private set; }
 
 		public void Dispose()
 		{
@@ -114,6 +116,33 @@ namespace Topshelf.Model
 			WaitUntilServicesAreRunning(servicesToStart, _timeout);
 
 			AfterStartingServices();
+		}
+
+
+		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
+		{
+			_startupServices.Add(serviceName, serviceFactory);
+		}
+
+		public IEnumerator<IServiceController> GetEnumerator()
+		{
+			return _serviceCache.Cast<IServiceController>().GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		public void Stop()
+		{
+			_stopping = true;
+
+			SendStopCommandToServices();
+
+			WaitUntilAllServicesAre(ServiceStateMachine.Completed, _timeout);
+
+			AfterStoppingServices();
 		}
 
 		void CreateCoordinatorChannel()
@@ -178,33 +207,6 @@ namespace Topshelf.Model
 			throw new TopshelfException("All services were not started within the specified timeout");
 		}
 
-
-		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
-		{
-			_startupServices.Add(serviceName, serviceFactory);
-		}
-
-		public IEnumerator<IServiceController> GetEnumerator()
-		{
-			return _serviceCache.Cast<IServiceController>().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		public void Stop()
-		{
-			_stopping = true;
-
-			SendStopCommandToServices();
-
-			WaitUntilAllServicesAre(ServiceStateMachine.Completed, _timeout);
-
-			AfterStoppingServices();
-		}
-
 		void OnCreateShelfService(CreateShelfService message)
 		{
 			_log.InfoFormat("[Topshelf] Received shelf request for {0}{1}", message.ServiceName,
@@ -239,11 +241,7 @@ namespace Topshelf.Model
 		{
 			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ExceptionMessage);
 
-		    var handler = ServiceFault;
-            if (handler != null)
-            {
-                handler.Invoke(message.ServiceName, message.ExceptionMessage);
-            }
+			EventChannel.Send(message);
 		}
 
 		void WaitUntilAllServicesAre(State state, TimeSpan timeout)
@@ -293,6 +291,8 @@ namespace Topshelf.Model
 		{
 			if (_stopping)
 				_channel.Send(new UnloadService(message.ServiceName));
+
+			EventChannel.Send(message);
 		}
 
 		void Dispose(bool disposing)
