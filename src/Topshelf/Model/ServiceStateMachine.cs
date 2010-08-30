@@ -55,71 +55,74 @@ namespace Topshelf.Model
 						);
 
 					During(Created,
-						   When(OnStart)
-							.TransitionTo(Starting)
+					       When(OnStart)
+					       	.TransitionTo(Starting)
 					       	.Call(instance => instance.Start(),
 					       	      HandleServiceCommandException),
-						   When(OnRunning)
-							.TransitionTo(Running)
-							.Call(instance => instance.ServiceRunning()));
+					       When(OnRunning)
+					       	.TransitionTo(Running)
+					       	.Call(instance => instance.ServiceRunning()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Starting,
-						   When(OnRunning)
-							.TransitionTo(Running)
-                            .Call(instance => instance.ServiceRunning()),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       When(OnRunning)
+					       	.TransitionTo(Running)
+					       	.Call(instance => instance.ServiceRunning()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Running,
-						   When(OnStop)
-							.TransitionTo(Stopping)
+					       When(OnStop)
+					       	.TransitionTo(Stopping)
 					       	.Call((instance, message) => instance.Stop()),
-						   When(OnPause)
-							.TransitionTo(Pausing)
+					       When(OnPause)
+					       	.TransitionTo(Pausing)
 					       	.Call((instance, message) => instance.Pause()),
-						   When(OnRestart)
-							.TransitionTo(StoppingToRestart)
-                            .Call((instance, message) => instance.Stop()),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       When(OnRestart)
+					       	.TransitionTo(StoppingToRestart)
+					       	.Call((instance, message) => instance.Stop()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Stopping,
-						   When(OnStopped)
-							.TransitionTo(Stopped)
-                            .Call(instance => instance.ServiceStopped()),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       When(OnStopped)
+					       	.TransitionTo(Stopped)
+					       	.Call(instance => instance.ServiceStopped()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Pausing,
-						   When(OnPaused)
-							.TransitionTo(Paused)
-                            .Call(instance => instance.ServicePaused()),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       When(OnPaused)
+					       	.TransitionTo(Paused)
+					       	.Call(instance => instance.ServicePaused()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Paused,
-						   When(OnContinue)
-							.TransitionTo(Continuing)
-                            .Call(instance => instance.Continue()),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       When(OnContinue)
+					       	.TransitionTo(Continuing)
+					       	.Call(instance => instance.Continue()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Continuing,
-						   When(OnRunning)
-							.TransitionTo(Running)
-                            .Call(instance => instance.ServiceRunning()),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       When(OnRunning)
+					       	.TransitionTo(Running)
+					       	.Call(instance => instance.ServiceRunning()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Stopped,
-						   When(OnUnload)
-							.TransitionTo(Unloading)
+					       When(OnUnload)
+					       	.TransitionTo(Unloading)
 					       	.Call(instance => instance.Unload()));
 
 					During(Unloading,
@@ -132,10 +135,10 @@ namespace Topshelf.Model
 					       When(OnStopped)
 					       	.Call(instance => instance.Unload())
 					       	.Call(instance => instance.Create())
-                            .TransitionTo(CreatingToRestart),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       	.TransitionTo(CreatingToRestart),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(CreatingToRestart,
 					       When(OnCreated)
@@ -143,18 +146,22 @@ namespace Topshelf.Model
 					       	      HandleServiceCommandException)
 					       	.Call(instance => instance.Start(),
 					       	      HandleServiceCommandException)
-                            .TransitionTo(Restarting),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       	.TransitionTo(Restarting),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
 
 					During(Restarting,
 					       When(OnRunning)
 					       	.Call(instance => instance.Publish<ServiceRestarted>())
-                            .TransitionTo(Running),
-                           When(OnFaulted)
-                            .Call((instance, message) => instance.ServiceFaulted(message))
-                            .TransitionTo(Faulted));
+					       	.TransitionTo(Running),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted));
+
+					During(Faulted,
+					       When(OnStop)
+					       	.TransitionTo(Completed));
 				});
 		}
 
