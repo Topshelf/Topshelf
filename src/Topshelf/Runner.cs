@@ -22,11 +22,12 @@ namespace Topshelf
     /// </summary>
     public static class Runner
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof (Runner));
+        static readonly ILog _log = LogManager.GetLogger("Topshelf.Runner");
 
         static Runner()
         {
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+			
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
 

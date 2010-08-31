@@ -25,7 +25,7 @@ namespace Topshelf.Hosts
 	{
 		readonly IServiceCoordinator _coordinator;
 		readonly ServiceName _fullServiceName;
-		readonly ILog _log = LogManager.GetLogger(typeof(WinServiceHost));
+		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.WinServiceHost");
 
 		public WinServiceHost(IServiceCoordinator coordinator, ServiceName fullServiceName)
 		{

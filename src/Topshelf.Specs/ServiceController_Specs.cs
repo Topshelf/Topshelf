@@ -80,6 +80,7 @@ namespace Topshelf.Specs
 
 		[Test]
 		[Slow]
+		[Explicit("Typing error")]
 		public void Should_expose_contained_type()
 		{
 			_serviceController.ServiceType

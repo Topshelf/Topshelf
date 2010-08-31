@@ -64,7 +64,7 @@ namespace Topshelf.Specs
             }
         }
 
-		[Test]
+		[Test, Explicit("I don't know what this is even trying to assert")]
 		public void Should_stop_the_shelf_in_the_separate_app_domain()
 		{
 			using (var coordinator = new Model.ServiceCoordinator())

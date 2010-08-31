@@ -56,6 +56,7 @@
   <ItemGroup>
     <Content Include="clock.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,7 @@ namespace Topshelf.Commands
 	public class RunCommand :
 		Command
 	{
-		static readonly ILog _log = LogManager.GetLogger(typeof(RunCommand));
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.RunCommand");
 		readonly IServiceCoordinator _coordinator;
 		readonly ServiceName _serviceName;
 

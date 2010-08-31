@@ -20,7 +20,7 @@ namespace Topshelf.Commands
 	public class UninstallService :
         Command
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof (UninstallService));
+        static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.UninstallService");
         readonly WinServiceSettings _settings;
 
 

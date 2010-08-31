@@ -25,7 +25,7 @@ namespace Topshelf.Specs
 	using Shelving;
 
 
-    [TestFixture, Slow]
+    [TestFixture, Slow, Explicit("Not meaningful any more")]
 	public class DirectoryMonitor_Specs
 	{
 		[TearDown]

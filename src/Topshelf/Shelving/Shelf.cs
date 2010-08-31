@@ -17,6 +17,7 @@ namespace Topshelf.Shelving
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
+	using System.Threading;
 	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
@@ -49,10 +50,10 @@ namespace Topshelf.Shelving
 			_bootstrapperType = bootstrapperType;
 
 			BootstrapLogger();
-
-			_log = LogManager.GetLogger(typeof(Shelf));
-
+			
 			_serviceName = AppDomain.CurrentDomain.FriendlyName;
+
+			_log = LogManager.GetLogger("Topshelf.Shelf." + _serviceName);
 
 			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
@@ -237,6 +238,9 @@ namespace Topshelf.Shelving
 
 			if (e.IsTerminating && _coordinatorChannel != null)
 				SendFault(e.ExceptionObject as Exception);
+
+			// try to wait for the message to be sent
+			Thread.Sleep(1.Seconds());
 		}
 
 		void SendFault(Exception exception)
