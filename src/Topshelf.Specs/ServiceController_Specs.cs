@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
+	using System;
 	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
@@ -25,54 +26,60 @@ namespace Topshelf.Specs
 	[TestFixture]
 	public class ServiceController_Specs
 	{
-		[SetUp]
+		[TearDown]
+		public void TearDown()
+		{
+			_serviceController.Dispose();
+			_hostChannel.Dispose();
+		}
+
+		[Test]
 		public void EstablishContext()
 		{
 			_serviceStarted = new FutureChannel<ServiceRunning>();
 			_service = new TestService();
-			_hostChannel = AddressRegistry.GetInboundServiceCoordinatorChannel(x => { x.AddChannel(_serviceStarted); });
+			_hostChannel = new TestChannel();
+
 
 			using (var c = new ServiceConfigurator<TestService>())
 			{
+				c.Named("test");
 				c.WhenStarted(s => s.Start());
 				c.WhenStopped(s => s.Stop());
 				c.WhenPaused(s => { });
 				c.WhenContinued(s => { });
 				c.HowToBuildService(name => _service);
 
-				_serviceController = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel());
+				_serviceController = c.Create(null, _hostChannel);
 			}
 
-			_serviceChannel = new InboundChannel(AddressRegistry.GetServiceAddress(_serviceController.Name),
-			                                     AddressRegistry.GetServicePipeName(_serviceController.Name), x =>
-			                                     	{
-			                                     		x.AddConsumersFor<ServiceStateMachine>()
-			                                     			.UsingInstance(_serviceController)
-															.HandleOnCallingThread();
-			                                     	});
+			_hostChannel.Connect(x =>
+				{
+					x.AddConsumersFor<ServiceStateMachine>()
+						.BindUsing<ServiceStateMachineBinding, string>()
+						.CreateNewInstanceBy(GetServiceInstance)
+						.HandleOnInstanceFiber()
+						.PersistInMemory();
 
-			_serviceChannel.Send(new StartService("test"));
+					x.AddChannel(_serviceStarted);
+				});
 
-			_serviceStarted.WaitUntilCompleted(10.Seconds());
+			_hostChannel.Send(new CreateService("test"));
+			//_serviceChannel.Send(new StartService("test"));
+
+			_serviceStarted.WaitUntilCompleted(5.Seconds());
 
 			_serviceController.ShouldBeRunning();
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			_serviceController.Dispose();
-			_serviceChannel.Dispose();
-			_hostChannel.Dispose();
+			_service.Running.IsCompleted.ShouldBeTrue();
 		}
 
 		[Test]
 		[Slow]
-        [Explicit("Not Yet Implemented")]
+		[Explicit("Not Yet Implemented")]
 		public void Should_continue()
 		{
-			_serviceChannel.Send(new PauseService("test"));
-			_serviceChannel.Send(new ContinueService("test"));
+			_hostChannel.Send(new PauseService("test"));
+			_hostChannel.Send(new ContinueService("test"));
 
 			_serviceController.ShouldBeRunning();
 			_service.WasContinued.IsCompleted.ShouldBeTrue();
@@ -89,10 +96,10 @@ namespace Topshelf.Specs
 
 		[Test]
 		[Slow]
-        [Explicit("Not Yet Implemented")]
+		[Explicit("Not Yet Implemented")]
 		public void Should_pause()
 		{
-			_serviceChannel.Send(new PauseService("test"));
+			_hostChannel.Send(new PauseService("test"));
 
 			_serviceController.ShouldBePaused();
 			_service.Paused.IsCompleted.ShouldBeTrue();
@@ -110,41 +117,50 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_stop()
 		{
-			_serviceChannel.Send(new StopService("test"));
+			_hostChannel.Send(new StopService("test"));
 
 			_serviceController.ShouldBeStopped();
 			_service.Stopped.IsCompleted.ShouldBeTrue();
+		}
+
+		ServiceStateMachine GetServiceInstance(string key)
+		{
+			// this is needed for refrection
+			if (key == null)
+				return new ServiceStateMachine(null, _hostChannel);
+
+			if (key == _serviceController.Name)
+				return _serviceController;
+
+			throw new InvalidOperationException("An unknown service was requested: " + key);
 		}
 
 		FutureChannel<ServiceRunning> _serviceStarted;
 
 		ServiceController<TestService> _serviceController;
 		TestService _service;
-	    InboundChannel _hostChannel;
-		InboundChannel _serviceChannel;
-
-		//TODO: state transition tests
+		TestChannel _hostChannel;
 	}
 
 
 	public static class ServiceAssertions
 	{
-		public static void ShouldBeRunning<TService>(this ServiceController<TService> service) 
+		public static void ShouldBeRunning<TService>(this ServiceController<TService> service)
 			where TService : class
 		{
-			service.CurrentState.ShouldEqual(ServiceController<TService>.Running);
-		}
-	
-		public static void ShouldBeStopped<TService>(this ServiceController<TService> service) 
-			where TService : class
-		{
-			service.CurrentState.ShouldEqual(ServiceController<TService>.Stopped);
+			service.CurrentState.ShouldEqual(ServiceStateMachine.Running);
 		}
 
-		public static void ShouldBePaused<TService>(this ServiceController<TService> service) 
+		public static void ShouldBeStopped<TService>(this ServiceController<TService> service)
 			where TService : class
 		{
-			service.CurrentState.ShouldEqual(ServiceController<TService>.Paused);
+			service.CurrentState.ShouldEqual(ServiceStateMachine.Stopped);
+		}
+
+		public static void ShouldBePaused<TService>(this ServiceController<TService> service)
+			where TService : class
+		{
+			service.CurrentState.ShouldEqual(ServiceStateMachine.Paused);
 		}
 	}
 
@@ -163,8 +179,8 @@ namespace Topshelf.Specs
 			{
 //				service.Send(new StartService());
 
-	//			service.State
-		//			.ShouldEqual(ServiceState.Started);
+				//			service.State
+				//			.ShouldEqual(ServiceState.Started);
 			}
 		}
 	}
