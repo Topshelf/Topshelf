@@ -46,7 +46,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 		[Given]
 		public void A_service_coordinator()
 		{
-			Coordinator = new ServiceCoordinator(new ThreadPoolFiber(), Ignored, Ignored, Ignored, 60.Seconds());
+			Coordinator = new ServiceCoordinator(new ThreadPoolFiber(), Ignored, Ignored, Ignored, 10.Seconds());
 		}
 
 		[After]

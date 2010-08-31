@@ -13,38 +13,54 @@
 namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
-	using System.Collections.Generic;
+	using System.Linq;
+	using Magnum.Channels;
+	using Magnum.Extensions;
 	using Magnum.TestFramework;
+	using Messages;
 	using Model;
 	using NUnit.Framework;
 	using TestObject;
 
 
-    [Scenario, Explicit("Need new scenarios for faults")]
+	[Scenario]
 	public class Given_a_failing_start_event :
 		ServiceCoordinator_SpecsBase
 	{
+		FutureChannel<ServiceFault> _faultHappened = new FutureChannel<ServiceFault>();
+		ChannelConnection _connection;
+
 		[When]
 		public void A_registered_service_throws_on_start()
 		{
-//			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-//				{
-//					() => new ServiceController<TestService>("test", null, AddressRegistry.GetOutboundCoordinatorChannel(),
-//					                               x => { throw new Exception(); },
-//					                               x => x.Stop(),
-//					                               x => x.Pause(),
-//					                               x => x.Continue(),
-//					                               (x,c) => new TestService())
-//				};
-//
-//			ServiceCoordinator.RegisterServices(services);
+			_connection = Coordinator.EventChannel.Connect(x => x.AddChannel(_faultHappened));
+
+			CreateService("test",
+			              x => { throw new Exception(); },
+			              x => x.Stop(),
+			              x => x.Pause(),
+			              x => x.Continue(),
+			              (x, c) => new TestService());
+		}
+
+		[After]
+		public void After()
+		{
+			_connection.Dispose();
+			_connection = null;
 		}
 
 		[Then]
-		[Slow]
 		public void An_exception_is_thrown_when_service_is_started()
 		{
-//			Assert.That(() => ServiceCoordinator.Start(), Throws.InstanceOf<Exception>());
+			Assert.That(() => Coordinator.Start(), Throws.InstanceOf<Exception>());
+			_faultHappened.WaitUntilCompleted(10.Seconds()).ShouldBeTrue();
+			_faultHappened.Value.ServiceName.ShouldEqual("test");
+			
+			IServiceController service = Coordinator.Where(x => x.Name == "test").FirstOrDefault();
+			service.ShouldNotBeNull();
+
+			service.CurrentState.ShouldEqual(ServiceStateMachine.Faulted);
 		}
 	}
 }

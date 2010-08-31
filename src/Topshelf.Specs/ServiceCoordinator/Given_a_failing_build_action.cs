@@ -19,7 +19,6 @@ namespace Topshelf.Specs.ServiceCoordinator
 
 
     [Scenario, Explicit("Need new scenarios for faults")]
-	[Slow]
 	public class Given_a_failing_build_action :
 		ServiceCoordinator_SpecsBase
 	{
