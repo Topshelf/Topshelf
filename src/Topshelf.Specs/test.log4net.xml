@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <configSections>
+    <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler,log4net" />
+  </configSections>
+  <log4net>
+    <root>
+      <level value="ALL" />
+      <appender-ref ref="console" />
+    </root>
+
+		<appender name="console" type="log4net.Appender.ConsoleAppender, log4net">
+      <layout type="log4net.Layout.PatternLayout,log4net">
+        <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n" />
+      </layout>
+    </appender>
+  </log4net>
+</configuration>

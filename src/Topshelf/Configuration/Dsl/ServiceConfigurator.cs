@@ -12,33 +12,125 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-    using Magnum.Channels;
-    using Model;
-    using Shelving;
+	using System;
+	using Magnum.Channels;
+	using Magnum.Reflection;
+	using Model;
 
 
-    public class ServiceConfigurator<TService> :
-        ServiceConfiguratorBase<TService>,
-        IServiceConfigurator<TService>
-        where TService : class
-    {
-        public IServiceController Create(HostProxy hostChannel)
-        {
-            return Create(Name, hostChannel);
-        }
+	public class ServiceConfigurator<TService> :
+		IServiceConfigurator<TService>
+		where TService : class
+	{
+		bool _disposed;
 
-        public IServiceController Create(string serviceName, HostProxy hostChannel)
-        {
-            IServiceController serviceController = new ServiceController<TService>(serviceName, hostChannel)
-                {
-                    StartAction = StartAction,
-                    StopAction = StopAction,
-                    PauseAction = PauseAction,
-                    ContinueAction = ContinueAction,
-                    BuildService = BuildAction,
-                };
+		public ServiceConfigurator()
+		{
+			PauseAction = DoNothing;
+			StartAction = DoNothing;
+			StopAction = DoNothing;
+			ContinueAction = DoNothing;
 
-            return serviceController;
-        }
-    }
+			BuildAction = (name, coordinator) => FastActivator<TService>.Create();
+
+			Name = "{0}/{1}".FormatWith(typeof(TService).Name, Guid.NewGuid());
+		}
+
+		public string Name { get; private set; }
+
+		Action<TService> ContinueAction { get; set; }
+		Action<TService> PauseAction { get; set; }
+		Action<TService> StartAction { get; set; }
+		Action<TService> StopAction { get; set; }
+
+		InternalServiceFactory<TService> BuildAction { get; set; }
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		public void Named(string name)
+		{
+			Name = name;
+		}
+
+		public void WhenStarted(Action<TService> startAction)
+		{
+			StartAction = startAction;
+		}
+
+		public void WhenStopped(Action<TService> stopAction)
+		{
+			StopAction = stopAction;
+		}
+
+		public void WhenPaused(Action<TService> pauseAction)
+		{
+			PauseAction = pauseAction;
+		}
+
+		public void WhenContinued(Action<TService> continueAction)
+		{
+			ContinueAction = continueAction;
+		}
+
+		public void HowToBuildService(ServiceFactory<TService> factory)
+		{
+			BuildAction = (name, coordinator) => factory(name);
+		}
+
+		public void ConstructUsing(ServiceFactory<TService> factory)
+		{
+			BuildAction = (name,coordinator) => factory(name);
+		}
+
+		public void ConstructUsing(InternalServiceFactory<TService> serviceFactory)
+		{
+			BuildAction = serviceFactory;
+		}
+
+		public ServiceController<TService> Create(IServiceCoordinator coordinator, ServiceChannel coordinatorChannel)
+		{
+			return Create(Name, coordinator, coordinatorChannel);
+		}
+
+		public ServiceController<TService> Create(string serviceName, IServiceCoordinator coordinator, ServiceChannel coordinatorChannel)
+		{
+			var serviceController = new ServiceController<TService>(serviceName, coordinator, coordinatorChannel,
+			                                                        StartAction,
+			                                                        StopAction,
+			                                                        PauseAction,
+			                                                        ContinueAction,
+			                                                        BuildAction);
+
+			return serviceController;
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+			if (_disposed)
+				return;
+
+			StartAction = null;
+			StopAction = null;
+			PauseAction = null;
+			ContinueAction = null;
+			BuildAction = null;
+
+			_disposed = true;
+		}
+
+		~ServiceConfigurator()
+		{
+			Dispose(false);
+		}
+
+		static void DoNothing(TService instance)
+		{
+		}
+	}
 }

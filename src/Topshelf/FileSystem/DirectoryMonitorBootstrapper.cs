@@ -12,22 +12,37 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.FileSystem
 {
-    using System;
-    using System.Configuration;
-    using System.IO;
-    using Configuration.Dsl;
-    using Shelving;
+	using System;
+	using System.Configuration;
+	using System.IO;
+	using Configuration.Dsl;
+	using Shelving;
 
-    public class DirectoryMonitorBootstrapper :
-        Bootstrapper<DirectoryMonitor>
-    {
-        public void InitializeHostedService(IServiceConfigurator<DirectoryMonitor> cfg)
-        {
-            string baseDir = ConfigurationManager.AppSettings["MonitorDirectory"] ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
-            cfg.HowToBuildService(serviceBuilder => new DirectoryMonitor(baseDir));
 
-            cfg.WhenStarted(dm => dm.Start());
-            cfg.WhenStopped(dm => dm.Stop());
-        }
-    }
+	public class DirectoryMonitorBootstrapper :
+		Bootstrapper<DirectoryMonitor>
+	{
+		public void InitializeHostedService(IServiceConfigurator<DirectoryMonitor> cfg)
+		{
+			cfg.HowToBuildService(CreateDirectoryMonitor);
+
+			cfg.WhenStarted(dm => dm.Start());
+			cfg.WhenStopped(dm => dm.Stop());
+		}
+
+		static DirectoryMonitor CreateDirectoryMonitor(string serviceName)
+		{
+			return new DirectoryMonitor(GetServicesDirectory());
+		}
+
+		static string GetServicesDirectory()
+		{
+			return ConfigurationManager.AppSettings["MonitorDirectory"] ?? GetDefaultServicesDirectory();
+		}
+
+		static string GetDefaultServicesDirectory()
+		{
+			return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Services");
+		}
+	}
 }

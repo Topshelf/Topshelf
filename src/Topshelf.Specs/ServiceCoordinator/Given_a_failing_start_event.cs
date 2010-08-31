@@ -12,42 +12,55 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.ServiceCoordinator
 {
-    using System;
-    using System.Collections.Generic;
-    using Magnum.TestFramework;
-    using Model;
-    using NUnit.Framework;
-    using Shelving;
-    using TestObject;
+	using System;
+	using System.Linq;
+	using Magnum.Channels;
+	using Magnum.Extensions;
+	using Magnum.TestFramework;
+	using Messages;
+	using Model;
+	using NUnit.Framework;
+	using TestObject;
 
 
-    [Scenario]
-    public class Given_a_failing_start_event :
-        ServiceCoordinator_SpecsBase
-    {
-        [When]
-        public void A_registered_service_throws_on_start()
-        {
-            IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-                {
-                    () => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-                        {
-                            BuildService = s => new TestService(),
-                            StartAction = x => { throw new Exception(); },
-                            StopAction = x => x.Stop(),
-                            ContinueAction = x => x.Continue(),
-                            PauseAction = x => x.Pause()
-                        }
-                };
+	[Scenario]
+	public class Given_a_failing_start_event :
+		ServiceCoordinator_SpecsBase
+	{
+		FutureChannel<ServiceFault> _faultHappened = new FutureChannel<ServiceFault>();
+		ChannelConnection _connection;
 
-            ServiceCoordinator.RegisterServices(services);
-        }
+		[When]
+		public void A_registered_service_throws_on_start()
+		{
+			_connection = Coordinator.EventChannel.Connect(x => x.AddChannel(_faultHappened));
 
-        [Then]
-        [Slow]
-        public void An_exception_is_thrown_when_service_is_started()
-        {
-            Assert.That(() => ServiceCoordinator.Start(), Throws.InstanceOf<Exception>());
-        }
-    }
+			CreateService("test",
+			              x => { throw new Exception(); },
+			              x => x.Stop(),
+			              x => x.Pause(),
+			              x => x.Continue(),
+			              (x, c) => new TestService());
+		}
+
+		[After]
+		public void After()
+		{
+			_connection.Dispose();
+			_connection = null;
+		}
+
+		[Then]
+		public void An_exception_is_thrown_when_service_is_started()
+		{
+			Assert.That(() => Coordinator.Start(), Throws.InstanceOf<Exception>());
+			_faultHappened.WaitUntilCompleted(10.Seconds()).ShouldBeTrue();
+			_faultHappened.Value.ServiceName.ShouldEqual("test");
+			
+			IServiceController service = Coordinator.Where(x => x.Name == "test").FirstOrDefault();
+			service.ShouldNotBeNull();
+
+			service.CurrentState.ShouldEqual(ServiceStateMachine.Faulted);
+		}
+	}
 }

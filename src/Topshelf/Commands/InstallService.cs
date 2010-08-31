@@ -14,12 +14,13 @@ namespace Topshelf.Commands
 {
     using Configuration;
     using log4net;
-    using WinService.SubCommands;
+    using WindowsServiceCode;
 
-    public class InstallService :
+
+	public class InstallService :
         Command
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof (InstallService));
+        static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.InstallService");
 
         readonly WinServiceSettings _settings;
 

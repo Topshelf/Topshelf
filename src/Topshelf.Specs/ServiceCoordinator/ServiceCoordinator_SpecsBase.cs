@@ -12,26 +12,48 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs.ServiceCoordinator
 {
-    using Magnum.Extensions;
-    using Magnum.TestFramework;
-    using Model;
+	using System;
+	using Magnum.Extensions;
+	using Magnum.Fibers;
+	using Magnum.TestFramework;
+	using Model;
 
 
-    [Scenario]
-    public class ServiceCoordinator_SpecsBase
-    {
-        public ServiceCoordinator ServiceCoordinator { get; set; }
+	[Scenario]
+	public class ServiceCoordinator_SpecsBase
+	{
+		public ServiceCoordinator Coordinator { get; set; }
 
-        [Given]
-        public void A_service_coordinator()
-        {
-            ServiceCoordinator = new ServiceCoordinator(x => { }, x => { }, x => { }, 10.Seconds());
-        }
+		void Ignored(IServiceCoordinator coordinator)
+		{
+		}
 
-        [After]
-        public void CleanUp()
-        {
-            ServiceCoordinator.Dispose();
-        }
-    }
+		protected void CreateService<T>(string serviceName, Action<T> startAction, Action<T> stopAction, Action<T> pauseAction,
+		                                Action<T> continueAction, InternalServiceFactory<T> serviceFactory)
+			where T : class
+		{
+			Coordinator.CreateService(serviceName,
+			                          n =>
+			                          new ServiceController<T>(serviceName, null,
+			                                                   AddressRegistry.GetOutboundCoordinatorChannel(),
+			                                                   startAction,
+			                                                   stopAction,
+			                                                   pauseAction,
+			                                                   continueAction,
+			                                                   serviceFactory));
+		}
+
+		[Given]
+		public void A_service_coordinator()
+		{
+			Coordinator = new ServiceCoordinator(new ThreadPoolFiber(), Ignored, Ignored, Ignored, 10.Seconds());
+		}
+
+		[After]
+		public void CleanUp()
+		{
+			Coordinator.Dispose();
+			Coordinator = null;
+		}
+	}
 }

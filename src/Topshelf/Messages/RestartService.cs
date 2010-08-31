@@ -12,20 +12,16 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    using System;
+	public class RestartService :
+		ServiceCommand
+	{
+		public RestartService(string serviceName)
+			: base(serviceName)
+		{
+		}
 
-    public class ShelfFault :
-        ServiceMessage
-    {
-        public Exception Exception { get; set; }
-
-        public ShelfFault()
-        {
-        }
-
-        public ShelfFault(Exception ex)
-        {
-            Exception = ex;
-        }
-    }
+		protected RestartService()
+		{
+		}
+	}
 }

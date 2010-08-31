@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\bin\Services\clock\</OutputPath>
+    <OutputPath>..\..\..\bin\Services\clock\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -43,7 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AShelvedClock.cs" />
+    <Compile Include="ClockFailureMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TheClock.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Topshelf\Topshelf.csproj">
@@ -54,6 +56,7 @@
   <ItemGroup>
     <Content Include="clock.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>

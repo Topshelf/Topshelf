@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2010 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,307 +12,345 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading;
-    using log4net;
-    using Magnum.Channels;
-    using Magnum.Concurrency;
-    using Magnum.Extensions;
-    using Magnum.Threading;
-    using Messages;
-    using Shelving;
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Reflection;
+	using System.Threading;
+	using Exceptions;
+	using log4net;
+	using Magnum;
+	using Magnum.Channels;
+	using Magnum.Collections;
+	using Magnum.Extensions;
+	using Magnum.Fibers;
+	using Magnum.StateMachine;
+	using Messages;
+	using Shelving;
 
 
-    [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
-    public class ServiceCoordinator :
-        IServiceCoordinator
-    {
-        static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
-        readonly Action<IServiceCoordinator> _beforeStartingServices;
-        readonly Action<IServiceCoordinator> _afterStartingServices;
-        readonly Action<IServiceCoordinator> _afterStoppingServices;
+	public class ServiceCoordinator :
+		IServiceCoordinator
+	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceCoordinator");
+		readonly Action<IServiceCoordinator> _afterStartingServices;
+		readonly Action<IServiceCoordinator> _afterStoppingServices;
+		readonly Action<IServiceCoordinator> _beforeStartingServices;
+		readonly Fiber _fiber;
+		readonly Cache<string, ServiceStateMachine> _serviceCache;
+		readonly Cache<string, Func<IServiceCoordinator, ServiceStateMachine>> _startupServices;
+		readonly TimeSpan _timeout;
+		readonly AutoResetEvent _updated = new AutoResetEvent(true);
+		InboundChannel _channel;
 
-        readonly ReaderWriterLockedObject<Queue<Exception>> _exceptions =
-            new ReaderWriterLockedObject<Queue<Exception>>(new Queue<Exception>());
+		volatile bool _disposed;
 
-        readonly HostHost _hostChannel;
-        readonly ChannelAdapter _myChannel;
-        readonly List<Func<IServiceController>> _serviceConfigurators;
+		volatile bool _stopping;
 
-        readonly IList<IServiceController> _services = new List<IServiceController>();
-        readonly TimeSpan _timeout;
+		public ServiceCoordinator(Fiber fiber,
+		                          Action<IServiceCoordinator> beforeStartingServices,
+		                          Action<IServiceCoordinator> afterStartingServices,
+		                          Action<IServiceCoordinator> afterStoppingServices,
+		                          TimeSpan timeout)
+		{
+			_fiber = fiber;
+			_afterStoppingServices = afterStoppingServices;
+			_afterStartingServices = afterStartingServices;
+			_beforeStartingServices = beforeStartingServices;
+			_timeout = timeout;
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingHost,
-                                  Action<IServiceCoordinator> afterStartingHost, 
-                                  Action<IServiceCoordinator> afterStoppingHost)
-            : this(beforeStartingHost, afterStartingHost, afterStoppingHost, 30.Seconds())
-        {
-        }
+			_startupServices = new Cache<string, Func<IServiceCoordinator, ServiceStateMachine>>();
+			_serviceCache = new Cache<string, ServiceStateMachine>();
+
+			EventChannel = new ChannelAdapter();
+		}
+
+		public ServiceCoordinator()
+			: this(new ThreadPoolFiber(), null, null, null, 1.Minutes())
+		{
+		}
+
+		public UntypedChannel EventChannel { get; private set; }
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		public int ServiceCount
+		{
+			get { return _serviceCache.Count(); }
+		}
+
+		public IServiceController this[string serviceName]
+		{
+			get
+			{
+				if (_serviceCache.Has(serviceName))
+					return _serviceCache[serviceName];
+
+				return null;
+			}
+		}
+
+		public void Send<T>(T message)
+		{
+			if (_channel == null)
+				throw new InvalidOperationException("The service coordinator must be started before sending it any messages");
+
+			_channel.Send(message);
+		}
+
+		public void Start()
+		{
+			CreateCoordinatorChannel();
+
+			BeforeStartingServices();
+
+			string[] servicesToStart = _startupServices.GetAllKeys();
+
+			servicesToStart.Each(name => _channel.Send(new CreateService(name, _channel.Address, _channel.PipeName)));
+
+			WaitUntilServicesAreRunning(servicesToStart, _timeout);
+
+			AfterStartingServices();
+		}
 
 
-        public ServiceCoordinator(Action<IServiceCoordinator> beforeStartingServices,
-                                  Action<IServiceCoordinator> afterStartingServices, 
-                                  Action<IServiceCoordinator> afterStoppingServices,
-                                  TimeSpan waitTime)
-        {
-            ServiceStartedAction += msg => { };
-            ServiceStoppedAction += msg => { };
-            ServiceContinuedAction += msg => { };
-            ServicePausedAction += msg => { };
+		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
+		{
+			_startupServices.Add(serviceName, serviceFactory);
+		}
 
-            _beforeStartingServices = GetLogWrapper("BeforeStartingServices", beforeStartingServices);
-            _afterStartingServices = GetLogWrapper("AfterStartingServices", afterStartingServices);
-            _afterStoppingServices = GetLogWrapper("AfterStoppingServices", afterStoppingServices);
+		public IEnumerator<IServiceController> GetEnumerator()
+		{
+			return _serviceCache.Cast<IServiceController>().GetEnumerator();
+		}
 
-            _serviceConfigurators = new List<Func<IServiceController>>();
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-            _myChannel = new ChannelAdapter();
-            _hostChannel = WellknownAddresses.GetServiceCoordinatorHost(_myChannel);
-            _timeout = waitTime;
+		public void Stop()
+		{
+			_stopping = true;
 
-            _myChannel.Connect(s =>
-                {
-                    s.AddConsumerOf<ShelfFault>().UsingConsumer(HandleServiceFault);
-                    s.AddConsumerOf<ServiceStarted>().UsingConsumer(msg => ServiceStartedAction.Invoke(msg));
-                    s.AddConsumerOf<ServiceStopped>().UsingConsumer(msg => ServiceStoppedAction.Invoke(msg));
-                    s.AddConsumerOf<ServiceContinued>().UsingConsumer(msg => ServiceContinuedAction.Invoke(msg));
-                    s.AddConsumerOf<ServicePaused>().UsingConsumer(msg => ServicePausedAction.Invoke(msg));
-                });
-        }
+			SendStopCommandToServices();
 
-        public IList<IServiceController> Services
-        {
-            get
-            {
-                LoadNewServiceConfigurations();
+			WaitUntilAllServicesAre(ServiceStateMachine.Completed, _timeout);
 
-                return _services;
-            }
-        }
+			AfterStoppingServices();
+		}
 
-        public void Start()
-        {
-            _beforeStartingServices(this);
+		void CreateCoordinatorChannel()
+		{
+			if (_channel != null)
+				return;
 
-            ProcessEvent<StartService, ServiceStarted>("Start", "Starting", ref ServiceStartedAction, ServiceState.Started);
+			_channel = AddressRegistry.GetInboundServiceCoordinatorChannel(x =>
+				{
+					x.AddConsumersFor<ServiceStateMachine>()
+						.BindUsing<ServiceStateMachineBinding, string>()
+						.CreateNewInstanceBy(GetServiceInstance)
+						.HandleOnInstanceFiber()
+						.PersistInMemoryUsing(_serviceCache);
 
-            _afterStartingServices(this);
-        }
+					x.AddConsumerOf<ServiceEvent>()
+						.UsingConsumer(OnServiceEvent)
+						.HandleOnFiber(_fiber);
 
-        public void Stop()
-        {
-            ProcessEvent<StopService, ServiceStopped>("Stop", "Stopping", ref ServiceStoppedAction, ServiceState.Stopped);
+					x.AddConsumerOf<ServiceFault>()
+						.UsingConsumer(OnServiceFault)
+						.HandleOnFiber(_fiber);
 
-            _afterStoppingServices(this);
+					x.AddConsumerOf<ServiceStopped>()
+						.UsingConsumer(OnServiceStopped)
+						.HandleOnFiber(_fiber);
 
-        }
+					x.AddConsumerOf<CreateShelfService>()
+						.UsingConsumer(OnCreateShelfService)
+						.HandleOnFiber(_fiber);
 
-        public void Pause()
-        {
-            ProcessEvent<PauseService, ServicePaused>("Pause", "Pausing", ref ServicePausedAction, ServiceState.Paused);
-        }
+					x.AddConsumerOf<ServiceFolderChanged>()
+						.UsingConsumer(OnServiceFolderChanged)
+						.HandleOnFiber(_fiber);
+				});
+		}
 
-        public void Continue()
-        {
-            ProcessEvent<ContinueService, ServiceContinued>("Continue", "Continuing", ref ServiceContinuedAction,ServiceState.Started);
-        }
+		void WaitUntilServicesAreRunning(IEnumerable<string> services, TimeSpan timeout)
+		{
+			DateTime stopTime = SystemUtil.Now + timeout;
 
-        public void StartService(string name)
-        {
-            if (Services.Count == 0)
-                CreateServices();
+			while (SystemUtil.Now < stopTime)
+			{
+				_updated.WaitOne(1.Seconds());
 
-            Services.Where(x => x.Name == name).First().ControllerChannel.Send(new StartService());
-        }
+				bool success = services
+				               	.Where(key => _serviceCache.Has(key))
+				               	.Select(key => _serviceCache[key])
+				               	.Count(x => x.CurrentState == ServiceStateMachine.Running) == services.Count();
+				if (success)
+					return;
 
-        public void StopService(string name)
-        {
-            if (Services.Count == 0)
-                CreateServices();
+				bool anyFailed = services
+					.Where(key => _serviceCache.Has(key))
+					.Select(key => _serviceCache[key])
+					.Any(service => service.CurrentState == ServiceStateMachine.Faulted);
 
-            Services.Where(x => x.Name == name).First().Stop();
-        }
+				if (anyFailed)
+					throw new TopshelfException("At least one configured service failed to start");
+			}
 
-        public void PauseService(string name)
-        {
-            if (Services.Count == 0)
-                CreateServices();
+			throw new TopshelfException("All services were not started within the specified timeout");
+		}
 
-            Services.Where(x => x.Name == name).First().Pause();
-        }
+		void OnCreateShelfService(CreateShelfService message)
+		{
+			_log.InfoFormat("[Topshelf] Received shelf request for {0}{1}", message.ServiceName,
+			                message.BootstrapperType == null
+			                	? ""
+			                	: " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()));
 
-        public void ContinueService(string name)
-        {
-            if (Services.Count == 0)
-                CreateServices();
+			_startupServices.Add(message.ServiceName,
+			                     x => new ShelfServiceController(message.ServiceName, _channel, message.ShelfType,
+			                                                     message.BootstrapperType, message.AssemblyNames));
 
-            Services.Where(x => x.Name == name).First().Continue();
-        }
+			_channel.Send(new CreateService(message.ServiceName));
+		}
 
-        public int HostedServiceCount
-        {
-            get { return Services.Count; }
-        }
+		void OnServiceFolderChanged(ServiceFolderChanged message)
+		{
+			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
-        public IList<ServiceInformation> GetServiceInfo()
-        {
-            LoadNewServiceConfigurations();
+			if (_serviceCache.Has(message.ServiceName))
+				_channel.Send(new RestartService(message.ServiceName));
+			else
+			{
+				_startupServices.Add(message.ServiceName,
+				                     x => new ShelfServiceController(message.ServiceName, _channel, ShelfType.Folder,
+				                                                     null, new AssemblyName[] {}));
 
-            return Services
-                .ToList()
-                .ConvertAll(serviceController => new ServiceInformation
-                    {
-                        Name = serviceController.Name,
-                        State = serviceController.State,
-                        Type = serviceController.ServiceType.Name
-                    });
-        }
+				_channel.Send(new CreateService(message.ServiceName));
+			}
+		}
 
-        public IServiceController GetService(string name)
-        {
-            return Services.Where(x => x.Name == name).FirstOrDefault();
-        }
+		void OnServiceFault(ServiceFault message)
+		{
+			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ExceptionMessage);
 
-        #region Dispose
+			EventChannel.Send(message);
+		}
 
-        bool _disposed;
+		void WaitUntilAllServicesAre(State state, TimeSpan timeout)
+		{
+			DateTime stopTime = SystemUtil.Now + timeout;
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+			while (SystemUtil.Now < stopTime)
+			{
+				_updated.WaitOne(1.Seconds());
 
-        void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-            if (disposing)
-            {
-                Services.Each(s => s.Dispose());
-                Services.Clear();
+				if (AllServiceInState(state))
+					break;
+			}
 
-                if (_hostChannel != null)
-                    _hostChannel.Dispose();
-            }
-            _disposed = true;
-        }
+			if (!AllServiceInState(state))
+			{
+				_serviceCache.Where(x => x.CurrentState != state).Each(x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
 
-        ~ServiceCoordinator()
-        {
-            Dispose(false);
-        }
+				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
+			}
+		}
 
-        #endregion
+		ServiceStateMachine GetServiceInstance(string key)
+		{
+			if (key == null)
+				return new ServiceStateMachine(null, _channel);
 
-        void ProcessEvent<TSent, TRecieved>(string printableMethod, string printableAction,
-                                            ref Action<TRecieved> stateEvent, ServiceState targetState)
-            where TRecieved : ServiceMessage
-            where TSent : ServiceMessage
-        {
-            int servicesNotInTargetState = Services.Count(x => x.State != targetState);
-            bool completed;
-            long serviceReachedTargetState = 0;
+			if (_startupServices.Has(key))
+				return _startupServices[key](this);
 
-            using (var latch = new ManualResetEvent(false))
-            {
-                var countDown = new CountdownLatch(servicesNotInTargetState, () => latch.Set());
+			_log.WarnFormat("[Topshelf] No factory for service {0}", key);
+			return new ServiceStateMachine(key, _channel);
+		}
 
-                Action<TRecieved> action = msg =>
-                    {
-                        countDown.CountDown();
-                        Interlocked.Increment(ref serviceReachedTargetState);
-                    };
+		~ServiceCoordinator()
+		{
+			Dispose(false);
+		}
 
-                stateEvent += action;
+		void OnServiceEvent(ServiceEvent message)
+		{
+			_log.InfoFormat("[{0}] {1}", message.ServiceName, message.EventType);
+			_updated.Set();
+		}
 
-                _log.Debug("{0} is now {1} all '{2}' subordinate services".FormatWith(printableMethod, printableAction.ToLower(), Services.Count));
-                foreach (IServiceController serviceController in Services)
-                {
-                    _log.InfoFormat("{1} subordinate service '{0}'", serviceController.Name, printableAction);
-                    serviceController.ControllerChannel.Send(default(TSent));
-                }
+		void OnServiceStopped(ServiceStopped message)
+		{
+			if (_stopping)
+				_channel.Send(new UnloadService(message.ServiceName));
 
-                completed = latch.WaitOne(_timeout);
-                stateEvent -= action;
-            }
+			EventChannel.Send(message);
+		}
 
-            if (!completed && (HostedServiceCount == 1 || serviceReachedTargetState == 0))
-            {
-                int qCount = _exceptions.ReadLock(q => q.Count);
-                Exception ex = null;
+		void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+			if (disposing)
+			{
+				if (_channel != null)
+				{
+					_log.DebugFormat("[Topshelf] Closing coordinator channel");
+					_channel.Dispose();
+					_channel = null;
+				}
+			}
 
-                if (qCount > 0)
-                    ex = _exceptions.WriteLock(s => s.Dequeue());
+			_disposed = true;
+		}
 
-                throw new Exception(
-                    "One or more services failed to {0} in a timely manner.".FormatWith(printableMethod), ex);
-            }
+		bool AllServiceInState(State expected)
+		{
+			return _serviceCache.Count() > 0 && _serviceCache.All(x => x.CurrentState == expected);
+		}
 
-            if (!Services.Any(x => x.State == targetState))
-                throw new Exception("All services have errored out.", _exceptions.ReadLock(q => q.Dequeue()));
-        }
+		void SendStopCommandToServices()
+		{
+			_serviceCache.Each((name, service) =>
+				{
+					var message = new StopService(name);
 
-        event Action<ServiceStarted> ServiceStartedAction;
-        event Action<ServiceStopped> ServiceStoppedAction;
-        event Action<ServicePaused> ServicePausedAction;
-        event Action<ServiceContinued> ServiceContinuedAction;
-        public event Action<Exception> ShelfFaulted;
+					_channel.Send(message);
+				});
+		}
 
-        void LoadNewServiceConfigurations()
-        {
-            if (_serviceConfigurators.Any())
-            {
-                foreach (var serviceConfigurator in _serviceConfigurators)
-                {
-                    IServiceController serviceController = serviceConfigurator();
-                    _services.Add(serviceController);
-                }
 
-                _serviceConfigurators.Clear();
-            }
-        }
+		void BeforeStartingServices()
+		{
+			CallAction("Before starting services", _beforeStartingServices);
+		}
 
-        public void AddNewService(IServiceController controller)
-        {
-            _services.Add(controller);
-            //TODO: How to best call start here?
-        }
+		void AfterStartingServices()
+		{
+			CallAction("After starting services", _afterStartingServices);
+		}
 
-        public void RegisterServices(IList<Func<IServiceController>> services)
-        {
-            _serviceConfigurators.AddRange(services);
-        }
+		void AfterStoppingServices()
+		{
+			CallAction("After stopping services", _afterStoppingServices);
+		}
 
-        void CreateServices()
-        {
-            foreach (var serviceConfigurator in _serviceConfigurators)
-            {
-                IServiceController serviceController = serviceConfigurator();
-                Services.Add(serviceController);
-            }
-        }
+		void CallAction(string name, Action<IServiceCoordinator> action)
+		{
+			_log.DebugFormat("[Topshelf] {0}", name);
 
-        void HandleServiceFault(ShelfFault faultMessage)
-        {
-            _exceptions.WriteLock(s => s.Enqueue(faultMessage.Exception));
+			if (action != null)
+				action(this);
 
-            Action<Exception> handle = ShelfFaulted;
-            if (handle != null)
-                handle.Invoke(faultMessage.Exception);
-        }
-
-        Action<IServiceCoordinator> GetLogWrapper(string name, Action<IServiceCoordinator> action)
-        {
-            return sc =>
-            {
-                _log.DebugFormat("Calling {0}", name);
-                action(sc);
-                _log.InfoFormat("{0} complete", name);
-            };
-        }
-    }
+			_log.InfoFormat("[Topshelf] {0} complete", name);
+		}
+	}
 }

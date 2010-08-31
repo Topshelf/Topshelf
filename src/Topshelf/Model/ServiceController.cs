@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-// 
+// Copyright 2007-2010 The Apache Software Foundation.
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,262 +12,163 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-    using System;
-    using System.Diagnostics;
-    using Exceptions;
-    using log4net;
-    using Magnum.Channels;
-    using Magnum.StateMachine;
-    using Messages;
-    using Shelving;
+	using System;
+	using Exceptions;
+	using log4net;
+	using Magnum.Extensions;
+	using Messages;
 
 
-    [DebuggerDisplay("Service({Name}) is {State}")]
-    public class ServiceController<TService> :
-        StateMachine<ServiceController<TService>>,
-        IServiceController
-        where TService : class
-    {
-        ILog _log = LogManager.GetLogger(typeof(ServiceController<TService>));
+	public class ServiceController<TService> :
+		ServiceStateMachine,
+		IServiceController<TService>
+		where TService : class
+	{
+		readonly IServiceCoordinator _coordinator;
+		readonly ILog _log;
+		Action<TService> _continueAction;
+		TService _instance;
+		Action<TService> _pauseAction;
+		InternalServiceFactory<TService> _serviceFactory;
+		Action<TService> _startAction;
+		Action<TService> _stopAction;
+		Uri _address;
+		string _pipeName;
 
-        #region StateMachine
+		public ServiceController(string name, IServiceCoordinator coordinator, ServiceChannel coordinatorChannel,
+		                         Action<TService> startAction,
+		                         Action<TService> stopAction,
+		                         Action<TService> pauseAction,
+		                         Action<TService> continueAction,
+		                         InternalServiceFactory<TService> serviceFactory)
+			: base(name, coordinatorChannel)
+		{
+			_coordinator = coordinator;
+			_startAction = startAction;
+			_continueAction = continueAction;
+			_serviceFactory = serviceFactory;
+			_pauseAction = pauseAction;
+			_stopAction = stopAction;
 
-        static ServiceController()
-        {
-            Define(() =>
-                {
-                    Initially(
-                              When(OnStart)
-                                  .Then(sc => sc.Initialize())
-                                  .Then(sc => sc.StartAction(sc._instance))
-                                  .TransitionTo(Started)
-                        );
+			_log = LogManager.GetLogger("Topshelf.Host.Service." + name);
+		}
 
-                    During(Started,
-                           When(OnPause)
-                               .Then(sc => sc.PauseAction(sc._instance))
-                               .TransitionTo(Paused));
+		public Type ServiceType
+		{
+			get { return typeof(TService); }
+		}
 
-                    During(Paused,
-                           When(OnContinue)
-                               .Then(sc => sc.ContinueAction(sc._instance))
-                               .TransitionTo(Started));
+		protected override void Create(CreateService message)
+		{
+			_address = message.Address;
+			_pipeName = message.PipeName;
 
+			Create();
+		}
 
-                    Anytime(When(OnStop)
-                                .Then(sc => sc.StopAction(sc._instance))
-                                .TransitionTo(Stopped)
-                        );
-                });
-        }
-
-        public static Event OnStart { get; set; }
-        public static Event OnStop { get; set; }
-        public static Event OnPause { get; set; }
-        public static Event OnContinue { get; set; }
-
-        public static State Initial { get; set; }
-        public static State Started { get; set; }
-        public static State Stopped { get; set; }
-        public static State Paused { get; set; }
-        public static State Completed { get; set; }
-
-        #endregion
-
-        #region Messaging Start
-
-        readonly HostProxy _hostChannel;
-        readonly HostHost _myChannelHost;
-        readonly ChannelAdapter _myChannel;
-        readonly ChannelConnection _connection;
-
-        public UntypedChannel ControllerChannel
-        {
-            get { return _myChannel; }
-        }
-
-        #endregion
-
-        public ServiceController(string serviceName, HostProxy hostChannel)
-        {
-            Name = serviceName;
-
-            _hostChannel = hostChannel;
-            _myChannel = new ChannelAdapter();
-
-            _myChannelHost = WellknownAddresses.GetCurrentServiceHost(_myChannel, serviceName);
-
-            //build subscriptions
-            _connection = _myChannel.Connect(s =>
-                {
-                    s.AddConsumerOf<ReadyService>().UsingConsumer(m => Initialize());
-                    s.AddConsumerOf<StopService>().UsingConsumer(m => Stop());
-                    s.AddConsumerOf<StartService>().UsingConsumer(m => Start());
-                    s.AddConsumerOf<PauseService>().UsingConsumer(m => Pause());
-                    s.AddConsumerOf<ContinueService>().UsingConsumer(m => Continue());
-                });
-        }
-
-        TService _instance;
-        public Action<TService> StartAction { get; set; }
-        public Action<TService> StopAction { get; set; }
-        public Action<TService> PauseAction { get; set; }
-        public Action<TService> ContinueAction { get; set; }
-        public ServiceBuilder BuildService { get; set; }
-
-        #region Dispose Stuff
-
-        bool _disposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
-        {
-            if (!disposing)
-                return;
-            if (_disposed)
-                return;
-
-            if (_connection != null)
-                _connection.Dispose();
-
-            if (_myChannelHost != null)
-                _myChannelHost.Dispose();
-
-            _instance = default(TService);
-            StartAction = null;
-            StopAction = null;
-            PauseAction = null;
-            ContinueAction = null;
-            BuildService = null;
-            _disposed = true;
-        }
-
-        ~ServiceController()
-        {
-            Dispose(false);
-        }
-
-        #endregion
-
-        #region IServiceController Members
-
-        bool _hasInitialized;
-
-        public void Initialize()
-        {
-            if (_hasInitialized)
-                return;
-
-        	bool hasFaulted = false;
-
-        	try
-        	{
-				_instance = (TService)BuildService(Name);
-        	}
-        	catch (Exception ex)
-        	{
-				_hostChannel.Send(new ShelfFault(new CouldntBuildServiceException(Name, typeof(TService), ex)));
-        		hasFaulted = true;
-        	}
-            
-            if (_instance == null)
+		protected override void Create()
+		{
+			try
 			{
-				_hostChannel.Send(new ShelfFault(new CouldntBuildServiceException(Name, typeof(TService))));
-				hasFaulted = true;
+				_log.DebugFormat("[{0}] Creating service", Name);
+
+				_instance = _serviceFactory(Name, _coordinator);
+
+				if (_instance == null)
+				{
+					throw new NullReferenceException("The service instance returned was null for service type "
+					                                 + typeof(TService).ToShortTypeName());
+				}
+
+				Publish(new ServiceCreated(Name, _address, _pipeName));
 			}
+			catch (Exception ex)
+			{
+				Publish(new ServiceFault(Name, new BuildServiceException(Name, typeof(TService), ex)));
+			}
+		}
 
-			if (!hasFaulted)
-				_hostChannel.Send(new ServiceReady());
+		protected override void ServiceCreated(ServiceCreated message)
+		{
+		}
 
-            _hasInitialized = true;
-        }
+		protected override void ServiceFaulted(ServiceFault message)
+		{
+			_log.ErrorFormat("[{0}] Faulted: {1}", Name, message.ExceptionMessage);
+		}
 
-        public void Start()
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceStarting());
-                RaiseEvent(OnStart);
-                _hostChannel.Send(new ServiceStarted());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+		protected override void Start()
+		{
+			CallAction<ServiceStarting, ServiceRunning>("Start", _startAction);
+		}
 
-        public void Stop()
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceStopping());
-                RaiseEvent(OnStop);
-                _hostChannel.Send(new ServiceStopped());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+		protected override void Stop()
+		{
+			CallAction<ServiceStopping, ServiceStopped>("Stop", _stopAction);
+		}
 
-        public void Pause()
-        {
-            try
-            {
-                _hostChannel.Send(new ServicePausing());
-                RaiseEvent(OnPause);
-                _hostChannel.Send(new ServicePaused());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+		protected override void Pause()
+		{
+			CallAction<ServicePausing, ServicePaused>("Pause", _pauseAction);
+		}
 
-        public void Continue()
-        {
-            try
-            {
-                _hostChannel.Send(new ServiceContinuing());
-                RaiseEvent(OnContinue);
-                _hostChannel.Send(new ServiceContinued());
-            }
-            catch (Exception ex)
-            {
-                SendFault(ex);
-            }
-        }
+		protected override void Continue()
+		{
+			CallAction<ServiceContinuing,ServiceRunning>("Continue", _continueAction);
+		}
 
-        void SendFault(Exception exception)
-        {
-            try
-            {
-                _hostChannel.Send(new ShelfFault(exception));
-            }
-            catch (Exception)
-            {
-                _log.Error("Shelf '{0}' is having a bad day.", exception);
-                // eat the exception for now
-            }
-        }
+		protected override void Unload()
+		{
+			CallAction<ServiceUnloading, ServiceUnloaded>("Unload", instance =>
+				{
+					var disposable = instance as IDisposable;
+					if (disposable != null)
+					{
+						using (disposable)
+							_log.DebugFormat("[{0}] Dispose", Name);
+					}
+				});
 
-        public string Name { get; private set; }
+			_instance = null;
+		}
 
-        public Type ServiceType
-        {
-            get { return typeof(TService); }
-        }
+		void CallAction<TBefore, TComplete>(string text, Action<TService> callback)
+			where TComplete : ServiceEvent
+			where TBefore : ServiceEvent
+		{
+			if (callback == null)
+				return;
 
-        public ServiceState State
-        {
-            get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
-        }
+			try
+			{
+				_log.DebugFormat("[{0}] {1}", Name, text);
 
-        #endregion
-    }
+				Publish<TBefore>();
+
+				callback(_instance);
+
+				_log.InfoFormat("[{0}] {1} complete", Name, text);
+
+				Publish<TComplete>();
+			}
+			catch (Exception ex)
+			{
+				Publish(new ServiceFault(Name, ex));
+			}
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
+			if (disposing)
+			{
+				_startAction = null;
+				_stopAction = null;
+				_pauseAction = null;
+				_continueAction = null;
+				_serviceFactory = null;
+			}
+		}
+	}
 }

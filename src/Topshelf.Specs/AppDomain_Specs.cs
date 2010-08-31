@@ -12,26 +12,30 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
+    using System;
     using System.IO;
     using System.Threading;
+    using log4net;
     using Magnum.Extensions;
     using Magnum.TestFramework;
+    using Messages;
     using NUnit.Framework;
     using Shelving;
     using Topshelf.Configuration.Dsl;
 
 
-    [TestFixture, Slow]
-    public class AppDomain_Specs
+    [TestFixture]
+    [Slow]
+    public class Using_the_shelf_service_controller_to_start_a_service
     {
         [SetUp]
         public void Setup()
-        {         
+        {
             if (Directory.Exists("Services"))
                 Directory.Delete("Services", true);
-            
+
             Directory.CreateDirectory("Services");
-            var bobPath = Path.Combine("Services", "bob");
+            string bobPath = Path.Combine("Services", "bob");
             Directory.CreateDirectory(bobPath);
 
             DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", bobPath);
@@ -47,71 +51,74 @@ namespace Topshelf.Specs
         }
 
         [Test]
-        public void Init_and_ready_service_in_seperate_app_domain()
+        public void Should_start_the_shelf_in_the_separate_app_domain()
         {
-            using (var sm = new ShelfMaker())
-            {
-                using (var manualResetEvent = new ManualResetEvent(false))
-                {
-                    sm.OnShelfStateChanged += (sender, args) =>
-                        {
-                            if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Ready)
-                                manualResetEvent.Set();
-                        };
+            _log.Debug("Starting up the controller");
 
-                    sm.MakeShelf("bob", typeof (AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
+			using (var coordinator = new Model.ServiceCoordinator())
+			{
+                coordinator.Start();
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
 
-                    manualResetEvent.WaitOne(20.Seconds());
-
-                    sm.GetState("bob").ShouldEqual(ShelfState.Ready);
-                }
+                TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
             }
         }
 
-        [Test, Slow]
-        public void Stop_a_shelf()
-        {
-            using (var sm = new ShelfMaker())
-            {
-                var readyEvent = new ManualResetEvent(false);
-                var stopEvent = new ManualResetEvent(false);
+		[Test, Explicit("I don't know what this is even trying to assert")]
+		public void Should_stop_the_shelf_in_the_separate_app_domain()
+		{
+			using (var coordinator = new Model.ServiceCoordinator())
+			{
+                coordinator.Start();
+				coordinator.Send(new CreateShelfService("bob", ShelfType.Internal, typeof(TestAppDomainBootsrapper)));
 
-                sm.OnShelfStateChanged += (sender, args) =>
-                {
-                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Started)
-                        readyEvent.Set();
-
-                    if (args.ShelfName == "bob" && args.CurrentShelfState == ShelfState.Stopped)
-                        stopEvent.Set();
-                };
-
-                sm.MakeShelf("bob", typeof(AppDomain_Specs_Bootstrapper), GetType().Assembly.GetName());
-
-                readyEvent.WaitOne(60.Seconds());
-
-                sm.GetState("bob").ShouldEqual(ShelfState.Started);
-
-                sm.StopShelf("bob");
-
-                stopEvent.WaitOne(60.Seconds());
-
-                sm.GetState("bob").ShouldEqual(ShelfState.Stopped);
-                
-                //readyEvent.Dispose();
-                //stopEvent.Dispose();
+                TestAppDomainBootsrapper.Started.WaitOne(20.Seconds()).ShouldBeTrue();
             }
+
+            TestAppDomainBootsrapper.Stopped.WaitOne(20.Seconds()).ShouldBeTrue();
         }
+
+        static readonly ILog _log = LogManager.GetLogger(typeof(Using_the_shelf_service_controller_to_start_a_service));
     }
 
-    public class AppDomain_Specs_Bootstrapper :
+
+    public class TestAppDomainBootsrapper :
         Bootstrapper<object>
     {
+        [ThreadStatic]
+        static Semaphore _started;
+
+        [ThreadStatic]
+        static Semaphore _stopped;
+
+        public static Semaphore Started
+        {
+            get
+            {
+                if (_started == null)
+                    _started = new Semaphore(0, 100, "TestAppDomainBootstrapperSemaphore");
+
+                return _started;
+            }
+        }
+
+        public static Semaphore Stopped
+        {
+            get
+            {
+                if (_stopped == null)
+                    _stopped = new Semaphore(0, 100, "TestAppDomainBootstrapperSemaphore");
+
+                return _stopped;
+            }
+        }
+
         public void InitializeHostedService(IServiceConfigurator<object> cfg)
         {
             cfg.HowToBuildService(serviceBuilder => new object());
 
-            cfg.WhenStarted(a => { });
-            cfg.WhenStopped(a => { });
+            cfg.WhenStarted(a => { Started.Release(); });
+            cfg.WhenStopped(a => { Stopped.Release(); });
         }
     }
 }

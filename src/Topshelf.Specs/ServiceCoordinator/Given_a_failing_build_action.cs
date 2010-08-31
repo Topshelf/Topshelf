@@ -13,41 +13,30 @@
 namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
-	using System.Collections.Generic;
 	using Magnum.TestFramework;
-	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using TestObject;
 
 
-	[Scenario]
+    [Scenario, Explicit("Need new scenarios for faults")]
 	public class Given_a_failing_build_action :
 		ServiceCoordinator_SpecsBase
 	{
 		[When]
 		public void A_registered_service_cannot_be_built()
 		{
-			IList<Func<IServiceController>> services = new List<Func<IServiceController>>
-				{
-					() => new ServiceController<TestService>("test", WellknownAddresses.GetServiceCoordinatorProxy())
-						{
-							BuildService = s => { throw new Exception(); },
-							StartAction = x => x.Start(),
-							StopAction = x => x.Stop(),
-							ContinueAction = x => x.Continue(),
-							PauseAction = x => x.Continue()
-						}
-				};
-
-			ServiceCoordinator.RegisterServices(services);
+			CreateService<TestService>("test",
+			                           x => x.Start(),
+			                           x => x.Stop(),
+			                           x => x.Pause(),
+			                           x => x.Continue(),
+			                           (x, c) => { throw new Exception(); });
 		}
 
 		[Then]
-		[Slow]
 		public void An_exception_is_throw_when_service_is_paused()
 		{
-			Assert.That(() => ServiceCoordinator.Start(), Throws.InstanceOf<Exception>());
+			Assert.That(() => Coordinator.Start(), Throws.InstanceOf<Exception>());
 		}
 	}
 }
