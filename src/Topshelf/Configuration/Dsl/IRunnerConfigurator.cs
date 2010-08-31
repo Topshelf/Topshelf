@@ -56,8 +56,8 @@ namespace Topshelf.Configuration.Dsl
         /// <param name="serviceName">The name of the service.</param>
         void SetServiceName(string serviceName);
 
-        //void SetRecoveryOptions(ServiceRecoveryOptions recoveryOptions);
-        IServiceRecoveryOptions SetRecoveryOptions(Action<IServiceRecoveryOptions> action);
+        //void SetRecoveryOptions(Action<ServiceRecoveryOptions> recoveryOptions);
+        void SetRecoveryOptions(ServiceRecoveryOptions recoveryOptions);
 
         /// <summary>
         /// Sets the description of the service as it will appear in the Service Control Manager.
@@ -160,5 +160,6 @@ namespace Topshelf.Configuration.Dsl
         /// </summary>
         /// <param name="timeout">The wait timeout</param>
         void SetEventTimeout(TimeSpan timeout);
+
     }
 }

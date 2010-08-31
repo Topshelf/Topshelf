@@ -10,62 +10,79 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+using Topshelf.WindowsServiceCode;
+
 namespace Stuff
 {
-    using System;
-    using System.IO;
-    using System.Timers;
-    using log4net.Config;
-    using Topshelf;
-    using Topshelf.Configuration;
-    using Topshelf.Configuration.Dsl;
+  using System;
+  using System.IO;
+  using System.Timers;
+  using log4net.Config;
+  using Topshelf;
+  using Topshelf.Configuration;
+  using Topshelf.Configuration.Dsl;
 
-    internal class Program
+  internal class Program
+  {
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+      XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
+      RunConfiguration cfg = RunnerConfigurator.New(x =>
+      {
+        x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
+
+        x.ConfigureService<TownCrier>(s =>
         {
-            XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
-            RunConfiguration cfg = RunnerConfigurator.New(x =>
-            {
-                x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
+          s.Named("tc");
+          s.HowToBuildService(name => new TownCrier());
+          s.WhenStarted(tc => tc.Start());
+          s.WhenStopped(tc => tc.Stop());
+        });
 
-                x.ConfigureService<TownCrier>(s =>
-                {
-                    s.Named("tc");
-                    s.HowToBuildService(name=> new TownCrier());
-                    s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop());
-                });
+        x.RunAsLocalSystem();
 
-                x.RunAsLocalSystem();
+        x.SetRecoveryOptions(new ServiceRecoveryOptions
+                              {
+                                FirstFailureAction = ServiceRecoveryAction.RunAProgram,
+                                SecondFailureAction = ServiceRecoveryAction.RestartTheService,
+                                SubsequentFailureActions = ServiceRecoveryAction.RestartTheComputer,
+                                MinutesToRestartService = 5,
+                                DaysToResetFailAcount = 2,
+                                CommandToLaunchOnFailure ="Sample.exe",
+                                RebootMessage = "OMGWTFBBQ!!!!"
+                              });
 
-                x.SetDescription("Sample Topshelf Host");
-                x.SetDisplayName("Stuff");
-                x.SetServiceName("stuff");
-            });
+        x.SetDescription("Sample Topshelf Host");
+        x.SetDisplayName("Stuff");
+        x.SetServiceName("stuff");
+      });
 
-            Runner.Host(cfg, args);
-        }
+      Runner.Host(cfg, args);
+    }
+    private static void Soo(Action<ServiceRecoveryOptions> action)
+    {
+
+    }
+  }
+
+  public class TownCrier
+  {
+    readonly Timer _timer;
+
+    public TownCrier()
+    {
+      _timer = new Timer(1000) { AutoReset = true };
+      _timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now);
     }
 
-    public class TownCrier
+    public void Start()
     {
-        readonly Timer _timer;
-
-        public TownCrier()
-        {
-            _timer = new Timer(1000) {AutoReset = true};
-            _timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now);
-        }
-
-        public void Start()
-        {
-            _timer.Start();
-        }
-
-        public void Stop()
-        {
-            _timer.Stop();
-        }
+      _timer.Start();
     }
+
+    public void Stop()
+    {
+      _timer.Stop();
+    }
+  }
 }

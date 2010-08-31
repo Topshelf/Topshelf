@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Topshelf.WindowsServiceCode
+﻿namespace Topshelf.WindowsServiceCode
 {
   public class ServiceRecoveryOptions : IServiceRecoveryOptions
   {
@@ -85,19 +80,5 @@ namespace Topshelf.WindowsServiceCode
         return result;
       }
     }
-
-    //public static ServiceRecoveryOptions FromConfiguration(RecoveryOptionsElement recoveryOptionsElement)
-    //{
-    //  var recoveryOptions = new ServiceRecoveryOptions();
-    //  recoveryOptions.FirstFailureAction = recoveryOptionsElement.FirstFailureAction;
-    //  recoveryOptions.SecondFailureAction = recoveryOptionsElement.SecondFailureAction;
-    //  recoveryOptions.SubsequentFailureActions = recoveryOptionsElement.SubsequentFailureActions;
-    //  recoveryOptions.DaysToResetFailAcount = recoveryOptionsElement.DaysToResetFailAcount;
-    //  recoveryOptions.CommandToLaunchOnFailure = recoveryOptionsElement.CommandToLaunchOnFailure;
-    //  recoveryOptions.MinutesToRestartService = recoveryOptionsElement.MinutesToRestartService;
-    //  recoveryOptions.RebootMessage = recoveryOptionsElement.RebootMessage;
-    //  recoveryOptions.Validate();
-    //  return recoveryOptions;
-    //}
   }
 }
