@@ -49,6 +49,10 @@ namespace Topshelf.Commands
 
             var installer = new HostServiceInstaller(_settings);
             WinServiceHelper.Register(_settings.ServiceName.FullName, installer);
+            if (WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
+            {
+              WinServiceHelper.SetRecoveryOptions(_settings.ServiceName.FullName, _settings.RecoveryOptions);
+            }
         }
 
         #endregion

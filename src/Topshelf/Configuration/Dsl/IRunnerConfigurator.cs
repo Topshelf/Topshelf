@@ -10,6 +10,8 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+using Topshelf.WindowsServiceCode;
+
 namespace Topshelf.Configuration.Dsl
 {
     using System;
@@ -53,6 +55,9 @@ namespace Topshelf.Configuration.Dsl
         /// </example>
         /// <param name="serviceName">The name of the service.</param>
         void SetServiceName(string serviceName);
+
+        //void SetRecoveryOptions(ServiceRecoveryOptions recoveryOptions);
+        IServiceRecoveryOptions SetRecoveryOptions(Action<IServiceRecoveryOptions> action);
 
         /// <summary>
         /// Sets the description of the service as it will appear in the Service Control Manager.

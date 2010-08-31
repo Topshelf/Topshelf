@@ -75,9 +75,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SolutionVersion.cs">
-      <Link>SolutionVersion.cs</Link>
-    </Compile>
     <Compile Include="Bottles\BottleException.cs" />
     <Compile Include="Bottles\BottleService.cs" />
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
@@ -114,6 +111,10 @@
     <Compile Include="Shelving\ShelfHandle.cs" />
     <Compile Include="Shelving\ShelfState.cs" />
     <Compile Include="Shelving\ShelfStateChangedEventArgs.cs" />
+    <Compile Include="WindowsServiceCode\IServiceRecoveryOptions.cs" />
+    <Compile Include="WindowsServiceCode\ServiceControlHelper.cs" />
+    <Compile Include="WindowsServiceCode\ServiceRecoveryAction.cs" />
+    <Compile Include="WindowsServiceCode\ServiceRecoveryOptions.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
