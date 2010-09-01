@@ -56,10 +56,11 @@ namespace Topshelf.Configuration.Dsl
       _winServiceSettings.ServiceName = new ServiceName(serviceName);
     }
 
-    public void SetRecoveryOptions(ServiceRecoveryOptions recoveryOptions)
+    public void SetRecoveryOptions(Action<ServiceRecoveryOptions> action)
     {
+      var recoveryOptions = new ServiceRecoveryOptions();
+      action(recoveryOptions);
       _winServiceSettings.RecoveryOptions = recoveryOptions;
-
     }
 
     public void SetDescription(string description)

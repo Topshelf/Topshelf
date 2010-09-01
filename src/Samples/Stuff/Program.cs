@@ -41,16 +41,17 @@ namespace Stuff
 
         x.RunAsLocalSystem();
 
-        x.SetRecoveryOptions(new ServiceRecoveryOptions
-                              {
-                                FirstFailureAction = ServiceRecoveryAction.RunAProgram,
-                                SecondFailureAction = ServiceRecoveryAction.RestartTheService,
-                                SubsequentFailureActions = ServiceRecoveryAction.RestartTheComputer,
-                                MinutesToRestartService = 5,
-                                DaysToResetFailAcount = 2,
-                                CommandToLaunchOnFailure ="Sample.exe",
-                                RebootMessage = "OMGWTFBBQ!!!!"
-                              });
+        x.SetRecoveryOptions(o =>
+                               {
+                                 o.FirstFailureAction = ServiceRecoveryAction.RunAProgram;
+                                 o.SecondFailureAction = ServiceRecoveryAction.RestartTheService;
+                                 o.SubsequentFailureActions = ServiceRecoveryAction.RestartTheComputer;
+                                 o.MinutesToRestartService = 5;
+                                 o.DaysToResetFailAcount = 2;
+                                 o.CommandToLaunchOnFailure = "Sample.exe";
+                                 o.RebootMessage = "OMGWTFBBQ!!!!";
+                               });
+
 
         x.SetDescription("Sample Topshelf Host");
         x.SetDisplayName("Stuff");
@@ -58,10 +59,6 @@ namespace Stuff
       });
 
       Runner.Host(cfg, args);
-    }
-    private static void Soo(Action<ServiceRecoveryOptions> action)
-    {
-
     }
   }
 
