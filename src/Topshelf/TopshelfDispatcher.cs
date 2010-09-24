@@ -26,6 +26,15 @@ namespace Topshelf
         {
             //find the command by the args 'Command'
             var run = new RunCommand(config.Coordinator, config.WinServiceSettings.ServiceName);
+
+			if(!string.IsNullOrEmpty(args.Instance))
+            {
+                _log.Info("Using instance name from commandline.");
+                config.WinServiceSettings.ServiceName = new ServiceName(
+                    config.WinServiceSettings.ServiceName.Name,
+                    args.Instance);
+            }
+
             var command = new List<Command>
                                   {
                                       run,
