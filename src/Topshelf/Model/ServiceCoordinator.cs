@@ -224,6 +224,12 @@ namespace Topshelf.Model
 
 		void OnServiceFolderChanged(ServiceFolderChanged message)
 		{
+			if (message.ServiceName.StartsWith("_"))
+			{
+				_log.InfoFormat("[Topshelf] Folder Change Ignored: {0}", message.ServiceName);
+				return;
+			}
+
 			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
 			if (_serviceCache.Has(message.ServiceName))
