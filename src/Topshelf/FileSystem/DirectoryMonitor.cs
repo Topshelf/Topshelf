@@ -105,7 +105,7 @@ namespace Topshelf.FileSystem
 										if (key == _baseDirectory)
 											return;
 
-										_coordinatorChannel.Send(new ServiceFolderChanged(key));
+										_coordinatorChannel.Send(new ServiceFolderChanged(key, Path.Combine(_baseDirectory, key)));
 									});
 							})
 						.HandleOnFiber(_fiber);
