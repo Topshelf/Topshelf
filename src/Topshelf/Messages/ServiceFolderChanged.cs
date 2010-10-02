@@ -15,12 +15,9 @@ namespace Topshelf.Messages
     public class ServiceFolderChanged :
         ServiceEvent
     {
-		public string FullEventPath { get; set; }
-
-		public ServiceFolderChanged(string name, string fullEventPath)
+		public ServiceFolderChanged(string name)
 			: base(name)
 		{
-			FullEventPath = fullEventPath;
 			EventType = ServiceEventType.FolderChanged;
 		}
 
