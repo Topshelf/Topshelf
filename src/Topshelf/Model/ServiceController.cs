@@ -94,7 +94,7 @@ namespace Topshelf.Model
 
 		protected override void ServiceFaulted(ServiceFault message)
 		{
-			_log.ErrorFormat("[{0}] Faulted: {1}", Name, message.ExceptionMessage);
+			_log.ErrorFormat("[{0}] Faulted: {1}", Name, message.ToLogString());
 		}
 
 		protected override void Start()

@@ -241,7 +241,7 @@ namespace Topshelf.Model
 
 		void OnServiceFault(ServiceFault message)
 		{
-			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ExceptionMessage);
+			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
 
 			EventChannel.Send(message);
 		}
