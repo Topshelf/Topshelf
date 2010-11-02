@@ -1,5 +1,6 @@
 build_output/*
 code_drop/*
+log/*
 
 **/*.suo
 **/*.user
@@ -17,6 +18,7 @@ _ReSharper*
 *.swp
 *.bak
 *.orig
+
 
 TestResult.xml
 submit.xml

@@ -77,6 +77,7 @@
     </Reference>
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParsing_Specs.cs" />
@@ -86,31 +87,10 @@
     <Compile Include="Configuration\RunnerConfigurator_Specs.cs">
     </Compile>
     <Compile Include="Configuration\Credential_Specs.cs" />
+    <Compile Include="ContextSetup.cs" />
     <Compile Include="DirectoryMonitor_Specs.cs" />
-    <Compile Include="Pipeline_Play.cs" />
     <Compile Include="ServiceController_Specs.cs" />
-    <Compile Include="ServiceCoordinator\Given_a_failing_build_action.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ServiceCoordinator\Given_a_failing_continue_event.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ServiceCoordinator\Given_a_failing_pause_event.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ServiceCoordinator\Given_a_failing_start_event.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ServiceCoordinator\Given_a_failing_stop_event.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ServiceCoordinator\Given_a_partially_failing_start_event.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ServiceCoordinator\ServiceCoordinator_Singles_Specs.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ServiceCoordinator\ServiceCoordinator_Specs.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ServiceCoordinator\ServiceCoordinator_SpecsBase.cs">
@@ -118,6 +98,7 @@
     </Compile>
     <Compile Include="ServiceTests\Bob.cs" />
     <Compile Include="ShelfConfiguration_Specs.cs" />
+    <Compile Include="TestChannel.cs" />
     <Compile Include="TestObject\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestObject\TestService2.cs" />
@@ -151,6 +132,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="test.log4net.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

@@ -12,31 +12,31 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Shelving
 {
-    using System;
-    using System.Configuration;
+	using System;
+	using System.Configuration;
 
-    public class ShelfConfiguration :
-        ConfigurationSection
-    {
-        public static ShelfConfiguration GetConfig()
-        {
-            return ConfigurationManager.GetSection("ShelfConfiguration") as ShelfConfiguration;
-        }
 
-        [ConfigurationProperty("Bootstrapper", IsRequired = true)]
-        public string Bootstrapper
-        {
-            get { return (string) this["Bootstrapper"]; }
-        }
+	public class ShelfConfiguration :
+		ConfigurationSection
+	{
+		[ConfigurationProperty("Bootstrapper", IsRequired = true)]
+		public string Bootstrapper
+		{
+			get { return (string)this["Bootstrapper"]; }
+		}
 
-        public Type BootstrapperType
-        {
-            get
-            {
-                var value = Bootstrapper;
-                return Type.GetType(value);
-            }
-        }
+		public Type BootstrapperType
+		{
+			get
+			{
+				string value = Bootstrapper;
+				return Type.GetType(value);
+			}
+		}
 
-    }
+		public static ShelfConfiguration GetConfig()
+		{
+			return ConfigurationManager.GetSection("ShelfConfiguration") as ShelfConfiguration;
+		}
+	}
 }
