@@ -22,7 +22,7 @@ NOTE: If you are looking at the source - please run build.bat before opening the
 # Contributing 
 
 1. `git config --global core.autoclrf false`
-2. Shared ReSharper settings are under src/Topshelf.resharper.xml
+2. Shared ReSharper settings are under src/Topshelf.resharper.xml for formatting and style
 3. Make a pull request
     
 # REQUIREMENTS
