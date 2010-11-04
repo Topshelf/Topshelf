@@ -21,7 +21,7 @@ namespace Topshelf.WindowsServiceCode
 	public class ServiceHost :
 		ServiceBase //TODO: Is this what you would InstallUtil?
 	{
-		static readonly ILog _log = LogManager.GetLogger(typeof(ServiceHost));
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.ServiceHost");
 
 		IServiceCoordinator _coordinator;
 

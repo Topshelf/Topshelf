@@ -24,7 +24,7 @@ namespace Topshelf.Hosts
 	public class CommandLineHost :
 		Host
 	{
-		static readonly ILog _log = LogManager.GetLogger(typeof(CommandLineHost));
+		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.CommandLineHost");
 		readonly ServiceName _serviceName;
 		IServiceCoordinator _coordinator;
 		ManualResetEvent _exit;

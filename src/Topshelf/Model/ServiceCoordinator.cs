@@ -33,7 +33,7 @@ namespace Topshelf.Model
 	public class ServiceCoordinator :
 		IServiceCoordinator
 	{
-		static readonly ILog _log = LogManager.GetLogger(typeof(ServiceCoordinator));
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceCoordinator");
 		readonly Action<IServiceCoordinator> _afterStartingServices;
 		readonly Action<IServiceCoordinator> _afterStoppingServices;
 		readonly Action<IServiceCoordinator> _beforeStartingServices;

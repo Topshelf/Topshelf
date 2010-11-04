@@ -20,7 +20,7 @@ namespace Topshelf.Commands
 	public class InstallService :
         Command
     {
-        static readonly ILog _log = LogManager.GetLogger(typeof(InstallService));
+        static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.InstallService");
 
         readonly WinServiceSettings _settings;
 
