@@ -12,6 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+	using System.Linq;
+	using System.Threading;
 	using FileSystem;
 	using Messages;
 	using Model;
@@ -43,6 +45,8 @@ namespace Topshelf
 
 		public void Stop()
 		{
+			while (_coordinator.GetRunningServices().Count() > 1)
+				Thread.Sleep(100);
 		}
 	}
 }

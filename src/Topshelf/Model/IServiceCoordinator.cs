@@ -36,6 +36,12 @@ namespace Topshelf.Model
 		IServiceController this[string serviceName] { get; }
 
 		/// <summary>
+		/// Returns the services which are not stopped or faulted
+		/// </summary>
+		/// <returns></returns>
+		IEnumerable<IServiceController> GetRunningServices();
+
+		/// <summary>
 		/// Sends a message to the coordinator
 		/// </summary>
 		/// <typeparam name="T">The message type</typeparam>
