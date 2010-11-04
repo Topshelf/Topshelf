@@ -11,8 +11,6 @@ _ReSharper*
 
 *.csproj.user
 *.resharper.user
-*.resharper
-*.ReSharper
 *.cache
 *~
 *.swp
