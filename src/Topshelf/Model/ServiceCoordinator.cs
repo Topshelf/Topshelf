@@ -97,11 +97,11 @@ namespace Topshelf.Model
 
 		public IEnumerable<IServiceController> GetRunningServices()
 		{
-			foreach (var service in _serviceCache)
+			foreach (ServiceStateMachine service in _serviceCache)
 			{
 				if (service.CurrentState != ServiceStateMachine.Stopped
-					&& service.CurrentState != ServiceStateMachine.Completed
-					&& service.CurrentState != ServiceStateMachine.Faulted)
+				    && service.CurrentState != ServiceStateMachine.Completed
+				    && service.CurrentState != ServiceStateMachine.Faulted)
 					yield return service;
 			}
 		}
@@ -237,9 +237,7 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
 			if (_serviceCache.Has(message.ServiceName))
-			{
 				_channel.Send(new RestartService(message.ServiceName));
-			}
 			else
 			{
 				_startupServices.Add(message.ServiceName,
@@ -267,6 +265,12 @@ namespace Topshelf.Model
 
 				if (AllServiceInState(state))
 					break;
+
+				_serviceCache.Where(x => x.CurrentState != state).Each(x =>
+					{
+						_log.DebugFormat("[{0}] {1} (waiting for {2})", x.Name,
+						                 x.CurrentState, state);
+					});
 			}
 
 			if (!AllServiceInState(state))
