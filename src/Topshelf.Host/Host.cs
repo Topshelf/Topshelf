@@ -45,8 +45,6 @@ namespace Topshelf
 
 		public void Stop()
 		{
-			while (_coordinator.GetRunningServices().Count() > 1)
-				Thread.Sleep(100);
 		}
 	}
 }
