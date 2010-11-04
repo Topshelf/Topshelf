@@ -95,6 +95,17 @@ namespace Topshelf.Model
 			}
 		}
 
+		public IEnumerable<IServiceController> GetRunningServices()
+		{
+			foreach (var service in _serviceCache)
+			{
+				if (service.CurrentState != ServiceStateMachine.Stopped
+					&& service.CurrentState != ServiceStateMachine.Completed
+					&& service.CurrentState != ServiceStateMachine.Faulted)
+					yield return service;
+			}
+		}
+
 		public void Send<T>(T message)
 		{
 			if (_channel == null)
