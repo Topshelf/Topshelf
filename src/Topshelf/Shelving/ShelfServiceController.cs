@@ -23,7 +23,7 @@ namespace Topshelf.Shelving
 	public class ShelfServiceController :
 		ServiceStateMachine
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Shelving.ShelfServiceController");
+		static readonly ILog _log = LogManager.GetLogger(typeof(ShelfServiceController));
 
 		readonly AssemblyName[] _assemblyNames;
 		readonly Type _bootstrapperType;

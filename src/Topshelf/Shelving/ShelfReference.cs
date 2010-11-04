@@ -24,7 +24,7 @@ namespace Topshelf.Shelving
 	public class ShelfReference :
 		IDisposable
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Shelving.ShelfReference");
+		static readonly ILog _log = LogManager.GetLogger(typeof(ShelfReference));
 
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;

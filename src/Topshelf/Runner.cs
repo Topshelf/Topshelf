@@ -22,7 +22,7 @@ namespace Topshelf
     /// </summary>
     public static class Runner
     {
-        static readonly ILog _log = LogManager.GetLogger("Topshelf.Runner");
+        static readonly ILog _log = LogManager.GetLogger(typeof(Runner));
 
         static Runner()
         {

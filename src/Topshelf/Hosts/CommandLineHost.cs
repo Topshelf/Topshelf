@@ -18,16 +18,14 @@ namespace Topshelf.Hosts
 	using System.Threading;
 	using Configuration;
 	using log4net;
-	using Magnum.Extensions;
 	using Model;
 
 
 	public class CommandLineHost :
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.CommandLineHost");
+		static readonly ILog _log = LogManager.GetLogger(typeof(CommandLineHost));
 		readonly ServiceName _serviceName;
-		readonly TimeSpan _timeout = 1.Minutes();
 		IServiceCoordinator _coordinator;
 		ManualResetEvent _exit;
 
@@ -58,7 +56,6 @@ namespace Topshelf.Hosts
 			catch (Exception ex)
 			{
 				_log.Error("An exception occurred", ex);
-
 			}
 			finally
 			{

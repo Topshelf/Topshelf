@@ -20,7 +20,7 @@ namespace Topshelf
 
     public static class TopshelfDispatcher
     {
-        static readonly ILog _log = LogManager.GetLogger("Topshelf.TopshelfDispatcher");
+        static readonly ILog _log = LogManager.GetLogger(typeof(TopshelfDispatcher));
 
         public static void Dispatch(RunConfiguration config, TopshelfArguments args)
         {

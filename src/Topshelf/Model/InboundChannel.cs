@@ -21,7 +21,7 @@ namespace Topshelf.Model
 	public class InboundChannel :
 		ServiceChannelBase
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.InboundChannel");
+		static readonly ILog _log = LogManager.GetLogger(typeof(InboundChannel));
 
 		public InboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
 			: base(address, pipeName, x =>
