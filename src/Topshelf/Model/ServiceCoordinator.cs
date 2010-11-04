@@ -254,12 +254,6 @@ namespace Topshelf.Model
 
 				if (AllServiceInState(state))
 					break;
-
-				_serviceCache.Where(x => x.CurrentState != state).Each(x =>
-					{
-						_log.DebugFormat("[{0}] {1} (waiting for {2})", x.Name,
-						                 x.CurrentState, state);
-					});
 			}
 
 			if (!AllServiceInState(state))
