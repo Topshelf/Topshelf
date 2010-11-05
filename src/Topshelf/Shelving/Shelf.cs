@@ -115,7 +115,7 @@ namespace Topshelf.Shelving
 
 				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] {serviceType});
 
-				this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
+				InitializeAndCreateService(serviceType, bootstrapper, cfg);
 			}
 			catch (Exception ex)
 			{
@@ -123,6 +123,10 @@ namespace Topshelf.Shelving
 			}
 		}
 
+		void InitializeAndCreateService(Type serviceType, object bootstrapper, object cfg)
+		{
+			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
+		}
 
 // ReSharper disable UnusedMember.Local
 		void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)

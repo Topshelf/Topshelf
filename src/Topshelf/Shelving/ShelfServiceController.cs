@@ -61,7 +61,7 @@ namespace Topshelf.Shelving
 
 		protected override void Create()
 		{
-			_log.DebugFormat("[{0}] Creating shelf service", Name);
+			_log.DebugFormat("[Shelf:{0}] Creating shelf service", Name);
 
 			_reference = new ShelfReference(Name, _shelfType);
 
@@ -76,47 +76,48 @@ namespace Topshelf.Shelving
 
 		protected override void ServiceCreated(ServiceCreated message)
 		{
-			_log.DebugFormat("[{0}] Shelf created at {1} ({2})", Name, message.Address, message.PipeName);
+			_log.DebugFormat("[Shelf:{0}] Shelf created at {1} ({2})", Name, message.Address, message.PipeName);
 
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
 
 		protected override void ServiceFaulted(ServiceFault message)
 		{
-			_log.ErrorFormat("[{0}] Shelf Service Faulted: {1}", Name, message.ExceptionMessage);
+			_log.ErrorFormat("[Shelf:{0}] Shelf Service Faulted: {1}", Name, message.ExceptionMessage);
 		}
 
 		protected override void Start()
 		{
-			_log.DebugFormat("[{0}] Start", Name);
+			_log.DebugFormat("[Shelf:{0}] Start", Name);
 
 			Send(new StartService(Name));
 		}
 
 		protected override void Stop()
 		{
-			_log.DebugFormat("[{0}] Stop", Name);
+			_log.DebugFormat("[Shelf:{0}] Stop", Name);
 
 			Send(new StopService(Name));
 		}
 
 		protected override void Pause()
 		{
-			_log.DebugFormat("[{0}] Pause", Name);
+			_log.DebugFormat("[Shelf:{0}] Pause", Name);
 
 			Send(new PauseService(Name));
 		}
 
 		protected override void Continue()
 		{
-			_log.DebugFormat("[{0}] Continue", Name);
+			_log.DebugFormat("[Shelf:{0}] Continue", Name);
 
 			Send(new ContinueService(Name));
 		}
 
 		protected override void Unload()
 		{
-			_log.DebugFormat("[{0}] {1}", Name, "Unload");
+			_log.DebugFormat("[Shelf:{0}] {1}", Name, "Unload");
+			Publish<ServiceUnloading>();
 
 			if (_reference != null)
 			{
@@ -124,6 +125,7 @@ namespace Topshelf.Shelving
 				_reference = null;
 			}
 
+			_log.DebugFormat("[Shelf:{0}] {1} complete", Name, "Unload");
 			Publish<ServiceUnloaded>();
 		}
 	}

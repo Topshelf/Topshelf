@@ -15,6 +15,7 @@ namespace Topshelf.Model
 	using System;
 	using System.Diagnostics;
 	using Exceptions;
+	using log4net;
 	using Magnum.Reflection;
 	using Magnum.StateMachine;
 	using Messages;
@@ -25,6 +26,8 @@ namespace Topshelf.Model
 		StateMachine<ServiceStateMachine>,
 		IServiceController
 	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceStateMachine");
+
 		bool _disposed;
 
 		static ServiceStateMachine()
@@ -162,6 +165,7 @@ namespace Topshelf.Model
 					During(Faulted,
 					       When(OnStop)
 					       	.TransitionTo(Completed));
+
 				});
 		}
 

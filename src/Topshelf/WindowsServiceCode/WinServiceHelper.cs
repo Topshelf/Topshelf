@@ -23,7 +23,7 @@ namespace Topshelf.WindowsServiceCode
 
 	public static class WinServiceHelper
     {
-        static readonly ILog _log = LogManager.GetLogger("Topshelf.WidowsServiceCode.WinServiceHelper");
+        static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.WinServiceHelper");
 
         public static Installer[] BuildInstallers(WinServiceSettings settings)
         {

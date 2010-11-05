@@ -15,16 +15,15 @@ namespace Topshelf.WindowsServiceCode
 	using System;
 	using System.ServiceProcess;
 	using log4net;
-	using Magnum.Extensions;
 	using Model;
 
 
 	public class ServiceHost :
 		ServiceBase //TODO: Is this what you would InstallUtil?
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.WidowsServiceCode.ServiceHost");
-		readonly IServiceCoordinator _coordinator;
-		TimeSpan _timeout = 1.Minutes();
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.ServiceHost");
+
+		IServiceCoordinator _coordinator;
 
 
 		public ServiceHost(IServiceCoordinator coordinator)
@@ -34,7 +33,7 @@ namespace Topshelf.WindowsServiceCode
 
 		public void Run()
 		{
-			_log.Debug("Starting up as a windows service application");
+			_log.Debug("[Topshelf] Starting up as a windows service application");
 			var servicesToRun = new ServiceBase[] {this};
 
 			Run(servicesToRun);
@@ -44,8 +43,9 @@ namespace Topshelf.WindowsServiceCode
 		{
 			try
 			{
-				_log.Info("Received service start notification");
-				_log.DebugFormat("Arguments: {0}", string.Join(",", args));
+				_log.Info("[Topshelf] Starting");
+
+				_log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
 
 				_coordinator.Start();
 			}
@@ -60,15 +60,21 @@ namespace Topshelf.WindowsServiceCode
 		{
 			try
 			{
-				_log.Info("Received service stop notification");
+				_log.Info("[Topshelf] Stopping");
 
 				_coordinator.Stop();
-				_coordinator.Dispose();
 			}
 			catch (Exception ex)
 			{
-				_log.Fatal(ex);
+				_log.Fatal("The service did not shut down gracefully", ex);
 				throw;
+			}
+			finally
+			{
+				_coordinator.Dispose();
+				_coordinator = null;
+
+				_log.Info("[Topshelf] Stopped");
 			}
 		}
 	}

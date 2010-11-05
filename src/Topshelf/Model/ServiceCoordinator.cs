@@ -237,9 +237,7 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
 			if (_serviceCache.Has(message.ServiceName))
-			{
 				_channel.Send(new RestartService(message.ServiceName));
-			}
 			else
 			{
 				_startupServices.Add(message.ServiceName,
