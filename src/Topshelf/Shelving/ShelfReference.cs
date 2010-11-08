@@ -15,7 +15,6 @@ namespace Topshelf.Shelving
 	using System;
 	using System.IO;
 	using System.Reflection;
-	using System.Runtime.Remoting;
 	using log4net;
 	using Magnum.Channels;
 	using Magnum.Extensions;
@@ -30,9 +29,8 @@ namespace Topshelf.Shelving
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;
 		bool _disposed;
-		AppDomain _domain;
+		readonly AppDomain _domain;
 		AppDomainSetup _domainSettings;
-		ObjectHandle _handle;
 		OutboundChannel _channel;
 
 		public ShelfReference(string serviceName, ShelfType shelfType)
@@ -81,9 +79,9 @@ namespace Topshelf.Shelving
 
 			Type shelfType = typeof(Shelf);
 
-			_handle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                                 args ?? new object[]{null},
-			                                 null, null, null);
+			_domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
+			                       args ?? new object[]{null},
+			                       null, null, null);
 		}
 
 		void ConfigureAppDomainSettings()

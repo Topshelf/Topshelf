@@ -23,7 +23,7 @@ namespace StuffOnAShelf
 		readonly ILog _log = LogManager.GetLogger(typeof(TheClock));
 		Timer _timer;
 		int _count;
-		ClockFailureMode _failureMode;
+		readonly ClockFailureMode _failureMode;
 
 		public TheClock()
 		{
@@ -43,7 +43,8 @@ namespace StuffOnAShelf
 			if (_failureMode == ClockFailureMode.CrashAfterStart && _count >= 10)
 				throw new InvalidOperationException("Clock was configured to die after start");
 
-			_timer.Change(1000, Timeout.Infinite);
+			if (_timer != null)
+				_timer.Change(1000, Timeout.Infinite);
 		}
 
 		public void Start()

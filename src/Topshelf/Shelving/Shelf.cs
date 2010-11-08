@@ -270,6 +270,9 @@ namespace Topshelf.Shelving
 
 			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
 			                                                  configurationFilePath);
+
+			// Shutdown the logging since the process isn't closing down
+			AppDomain.CurrentDomain.DomainUnload += (sender, args) => LogManager.Shutdown();
 		}
 	}
 }

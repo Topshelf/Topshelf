@@ -12,24 +12,47 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	using System;
+    using System;
+    using System.Collections.Generic;
 
 
-	public class ServiceFault :
-		ServiceEvent
-	{
-		public ServiceFault(string serviceName, Exception ex)
-			: base(serviceName)
-		{
-			EventType = ServiceEventType.Fault;
-			if (ex != null)
-				ExceptionMessage = ex.Message;
-		}
+    public class ServiceFault :
+        ServiceEvent
+    {
+        public ServiceFault(string serviceName, Exception ex)
+            : base(serviceName)
+        {
+            InnerExceptions = new List<ExceptionDetail>();
 
-		protected ServiceFault()
-		{
-		}
+            EventType = ServiceEventType.Fault;
 
-		public string ExceptionMessage { get; protected set; }
-	}
+            if (ex != null)
+            {
+                ExceptionMessage = ex.Message;
+                RecordInnerException(ex.InnerException);
+            }
+        }
+
+        protected ServiceFault()
+        {
+        }
+
+        public IList<ExceptionDetail> InnerExceptions { get; protected set; }
+
+        public string ExceptionMessage { get; protected set; }
+
+        void RecordInnerException(Exception ex)
+        {
+            if (ex == null)
+                return;
+
+            InnerExceptions.Add(new ExceptionDetail
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                });
+
+            RecordInnerException(ex.InnerException);
+        }
+    }
 }

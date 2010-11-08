@@ -226,7 +226,9 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
 			if (_serviceCache.Has(message.ServiceName))
+			{
 				_channel.Send(new RestartService(message.ServiceName));
+			}
 			else
 			{
 				_startupServices.Add(message.ServiceName,
@@ -239,7 +241,7 @@ namespace Topshelf.Model
 
 		void OnServiceFault(ServiceFault message)
 		{
-			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ExceptionMessage);
+			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
 
 			EventChannel.Send(message);
 		}

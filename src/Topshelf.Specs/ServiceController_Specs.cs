@@ -33,7 +33,7 @@ namespace Topshelf.Specs
 			_hostChannel.Dispose();
 		}
 
-		[Test]
+		[SetUp]
 		public void EstablishContext()
 		{
 			_serviceStarted = new FutureChannel<ServiceRunning>();
@@ -68,9 +68,6 @@ namespace Topshelf.Specs
 			//_serviceChannel.Send(new StartService("test"));
 
 			_serviceStarted.WaitUntilCompleted(5.Seconds());
-
-			_serviceController.ShouldBeRunning();
-			_service.Running.IsCompleted.ShouldBeTrue();
 		}
 
 		[Test]
@@ -117,7 +114,12 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_stop()
 		{
+			var stopped = new FutureChannel<ServiceStopped>();
+			_hostChannel.Connect(x => x.AddChannel(stopped));
+
 			_hostChannel.Send(new StopService("test"));
+
+			stopped.WaitUntilCompleted(5.Seconds()).ShouldBeTrue();
 
 			_serviceController.ShouldBeStopped();
 			_service.Stopped.IsCompleted.ShouldBeTrue();
