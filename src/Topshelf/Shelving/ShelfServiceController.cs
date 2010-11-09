@@ -29,6 +29,9 @@ namespace Topshelf.Shelving
 		readonly Type _bootstrapperType;
 		readonly ShelfType _shelfType;
 
+		int _restartCount;
+		int _restartLimit;
+
 		ShelfReference _reference;
 
 		public ShelfServiceController(string name, ServiceChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
@@ -38,19 +41,30 @@ namespace Topshelf.Shelving
 			_shelfType = shelfType;
 			_bootstrapperType = bootstrapperType;
 			_assemblyNames = assemblyNames;
+
+			_restartLimit = 5;
 		}
 
 
 		void Send<T>(T message)
 		{
-			if (_reference == null || _reference.ShelfChannel == null)
+			if (_reference == null)
 			{
-				_log.WarnFormat("Unable to send service message due to null channel, service = {0}, message type = {1}",
+				_log.WarnFormat("Unable to send service message due to null shelf reference, service = {0}, message type = {1}",
 				                Name, typeof(T).ToShortTypeName());
 				return;
 			}
 
-			_reference.ShelfChannel.Send(message);
+			try
+			{
+				_reference.Send(message);
+			}
+			catch (AppDomainUnloadedException ex)
+			{
+				_log.ErrorFormat("[Shelf:{0}] Failed to send to Shelf, AppDomain was unloaded", Name);
+
+				Publish<ServiceUnloaded>();
+			}
 		}
 
 
@@ -84,6 +98,28 @@ namespace Topshelf.Shelving
 		protected override void ServiceFaulted(ServiceFault message)
 		{
 			_log.ErrorFormat("[Shelf:{0}] Shelf Service Faulted: {1}", Name, message.ExceptionMessage);
+
+			try
+			{
+				_reference.Dispose();
+			}
+			catch (Exception ex)
+			{
+				_log.Error("[Shelf:{0}] Exception disposing of reference" + Name, ex);
+			}
+			finally
+			{
+				_reference = null;
+			}
+
+			_log.DebugFormat("[Shelf:{0}] Shelf Reference Discarded", Name);
+
+			if (_restartCount < _restartLimit)
+			{
+				_restartCount++;
+
+				Publish(new RestartService(Name));
+			}
 		}
 
 		protected override void Start()

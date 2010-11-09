@@ -26,14 +26,7 @@ namespace Topshelf
 
         static Runner()
         {
-            AppDomain.CurrentDomain.UnhandledException += UnhandledException;
-			
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-        }
-
-        static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            _log.Fatal("Host encountered an unhandled exception on the AppDomain", (Exception) e.ExceptionObject);
         }
 
         /// <summary>

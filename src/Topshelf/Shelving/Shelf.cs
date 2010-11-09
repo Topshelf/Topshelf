@@ -50,7 +50,7 @@ namespace Topshelf.Shelving
 			_bootstrapperType = bootstrapperType;
 
 			BootstrapLogger();
-			
+
 			_serviceName = AppDomain.CurrentDomain.FriendlyName;
 
 			_log = LogManager.GetLogger("Topshelf.Shelf." + _serviceName);
@@ -171,22 +171,22 @@ namespace Topshelf.Shelving
 
 			x.AddConsumerOf<ServiceCreated>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
+				.HandleOnCallingThread();
 			x.AddConsumerOf<ServiceRunning>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
+				.HandleOnCallingThread();
 			x.AddConsumerOf<ServiceStopped>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
+				.HandleOnCallingThread();
 			x.AddConsumerOf<ServicePaused>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
+				.HandleOnCallingThread();
 			x.AddConsumerOf<ServiceUnloaded>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnFiber(_fiber);
-		    x.AddConsumerOf<ServiceFault>()
-		        .UsingConsumer(m => _coordinatorChannel.Send(m))
-		        .HandleOnFiber(_fiber);
+				.HandleOnCallingThread();
+			x.AddConsumerOf<ServiceFault>()
+				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.HandleOnCallingThread();
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)
@@ -243,22 +243,18 @@ namespace Topshelf.Shelving
 			                                                                      AppDomain.CurrentDomain.FriendlyName,
 			                                                                      e.ExceptionObject));
 
-			if (e.IsTerminating && _coordinatorChannel != null)
-				SendFault(e.ExceptionObject as Exception);
-
-			// try to wait for the message to be sent
-			Thread.Sleep(1.Seconds());
+			Dispose();
 		}
 
-		void SendFault(Exception exception)
+		void SendFault(Exception ex)
 		{
 			try
 			{
-				_channel.Send(new ServiceFault(_serviceName, exception));
+				_channel.Send(new ServiceFault(_serviceName, ex));
 			}
 			catch (Exception)
 			{
-				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), exception);
+				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
 			}
 		}
 

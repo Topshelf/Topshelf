@@ -134,6 +134,11 @@ namespace Topshelf.Model
 					       	.Call(instance => instance.ServiceUnloaded())
 					       	.Call(instance => instance.Publish<ServiceCompleted>()));
 
+					During(Faulted,
+					       When(OnRestart)
+					       	.Call(instance => instance.Create())
+					       	.TransitionTo(CreatingToRestart));
+
 					During(StoppingToRestart,
 					       When(OnStopped)
 					       	.Call(instance => instance.Unload())
@@ -165,7 +170,6 @@ namespace Topshelf.Model
 					During(Faulted,
 					       When(OnStop)
 					       	.TransitionTo(Completed));
-
 				});
 		}
 

@@ -16,7 +16,6 @@ namespace Topshelf.Shelving
 	using System.IO;
 	using System.Reflection;
 	using log4net;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Model;
 
@@ -28,10 +27,10 @@ namespace Topshelf.Shelving
 
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;
-		bool _disposed;
-		readonly AppDomain _domain;
-		AppDomainSetup _domainSettings;
 		OutboundChannel _channel;
+		bool _disposed;
+		AppDomain _domain;
+		AppDomainSetup _domainSettings;
 
 		public ShelfReference(string serviceName, ShelfType shelfType)
 		{
@@ -43,15 +42,23 @@ namespace Topshelf.Shelving
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
 		}
 
-		public UntypedChannel ShelfChannel
-		{
-			get { return _channel; }
-		}
 
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		public void Send<T>(T message)
+		{
+			if (_channel == null)
+			{
+				_log.WarnFormat("Unable to send service message due to null channel, service = {0}, message type = {1}",
+				                _serviceName, typeof(T).ToShortTypeName());
+				return;
+			}
+
+			_channel.Send(message);
 		}
 
 		public void LoadAssembly(AssemblyName assemblyName)
@@ -80,7 +87,7 @@ namespace Topshelf.Shelving
 			Type shelfType = typeof(Shelf);
 
 			_domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                       args ?? new object[]{null},
+			                       args ?? new object[] {null},
 			                       null, null, null);
 		}
 
@@ -125,7 +132,19 @@ namespace Topshelf.Shelving
 					_channel = null;
 				}
 
-				AppDomain.Unload(_domain);
+
+				try
+				{
+					AppDomain.Unload(_domain);
+				}
+				catch (Exception)
+				{
+					_log.DebugFormat("[{0}] AppDomain was already unloaded", _serviceName);
+				}
+				finally
+				{
+					_domain = null;
+				}
 			}
 
 			_disposed = true;
