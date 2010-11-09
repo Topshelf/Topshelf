@@ -27,10 +27,12 @@ namespace Topshelf.Commands
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.InstallService");
 
 		readonly WinServiceSettings _settings;
+		string _commandLine;
 
-		public InstallService(WinServiceSettings settings)
+		public InstallService(WinServiceSettings settings, string commandLine)
 		{
 			_settings = settings;
+			_commandLine = commandLine;
 		}
 
 		#region Command Members
@@ -54,7 +56,7 @@ namespace Topshelf.Commands
 			{
 				if ( Environment.OSVersion.Version.Major == 6)
 				{
-					var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, "install");
+					var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, _commandLine);
 					startInfo.Verb = "runas";
 					startInfo.UseShellExecute = true;
 					startInfo.CreateNoWindow = true;

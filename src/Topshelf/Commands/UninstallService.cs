@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -17,44 +17,44 @@ namespace Topshelf.Commands
 	using System.Diagnostics;
 	using System.Reflection;
 	using Configuration;
-    using log4net;
-    using WindowsServiceCode;
+	using log4net;
+	using WindowsServiceCode;
 
 
 	public class UninstallService :
-        Command
-    {
-        static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.UninstallService");
-        readonly WinServiceSettings _settings;
+		Command
+	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.UninstallService");
+		readonly WinServiceSettings _settings;
+		readonly string _commandLine;
 
 
-        public UninstallService(WinServiceSettings settings)
-        {
-            _settings = settings;
-        }
+		public UninstallService(WinServiceSettings settings, string commandLine)
+		{
+			_settings = settings;
+			_commandLine = commandLine;
+		}
 
-        #region Command Members
+		public ServiceActionNames Name
+		{
+			get { return ServiceActionNames.Uninstall; }
+		}
 
-        public ServiceActionNames Name
-        {
-            get { return ServiceActionNames.Uninstall; }
-        }
+		public void Execute()
+		{
+			if (!WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
+			{
+				string message = string.Format("The {0} service has not been installed.", _settings.ServiceName.FullName);
+				_log.Error(message);
 
-        public void Execute()
-        {
-            if (!WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
-            {
-                string message = string.Format("The {0} service has not been installed.", _settings.ServiceName.FullName);
-                _log.Error(message);
-
-                return;
-            }
+				return;
+			}
 
 			if (!CommandUtil.IsAdministrator)
 			{
 				if (Environment.OSVersion.Version.Major == 6)
 				{
-					var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, "uninstall");
+					var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, _commandLine);
 					startInfo.Verb = "runas";
 					startInfo.UseShellExecute = true;
 					startInfo.CreateNoWindow = true;
@@ -77,10 +77,8 @@ namespace Topshelf.Commands
 			}
 
 
-            var installer = new HostServiceInstaller(_settings);
-            WinServiceHelper.Unregister(_settings.ServiceName.FullName, installer);
-        }
-
-        #endregion
-    }
+			var installer = new HostServiceInstaller(_settings);
+			WinServiceHelper.Unregister(_settings.ServiceName.FullName, installer);
+		}
+	}
 }

@@ -38,6 +38,7 @@ namespace Topshelf.Configuration.Dsl
 		RunnerConfigurator()
 		{
 			_winServiceSettings = new WinServiceSettings();
+			_winServiceSettings.ServiceName = new ServiceName("Topshelf Service");
 			_credentials = Credentials.LocalSystem;
 			_serviceConfigurators = new List<Action<IServiceCoordinator>>();
 		}
