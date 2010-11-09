@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,46 +12,75 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Commands
 {
-    using Configuration;
-    using log4net;
-    using WindowsServiceCode;
+	using System;
+	using System.ComponentModel;
+	using System.Diagnostics;
+	using System.Reflection;
+	using Configuration;
+	using log4net;
+	using WindowsServiceCode;
 
 
 	public class InstallService :
-        Command
-    {
-        static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.InstallService");
+		Command
+	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.InstallService");
 
-        readonly WinServiceSettings _settings;
+		readonly WinServiceSettings _settings;
 
-        public InstallService(WinServiceSettings settings)
-        {
-            _settings = settings;
-        }
+		public InstallService(WinServiceSettings settings)
+		{
+			_settings = settings;
+		}
 
-        #region Command Members
+		#region Command Members
 
-        public ServiceActionNames Name
-        {
-            get { return ServiceActionNames.Install; }
-        }
+		public ServiceActionNames Name
+		{
+			get { return ServiceActionNames.Install; }
+		}
 
-        public void Execute()
-        {
-            _log.Info("Received service install notification");
+		public void Execute()
+		{
+			if (WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
+			{
+				string message = string.Format("The {0} service has already been installed.", _settings.ServiceName.FullName);
+				_log.Error(message);
 
-            if (WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
-            {
-                string message = string.Format("The {0} service has already been installed.", _settings.ServiceName.FullName);
-                _log.Error(message);
+				return;
+			}
 
-                return;
-            }
+			if (!CommandUtil.IsAdministrator)
+			{
+				if ( Environment.OSVersion.Version.Major == 6)
+				{
+					var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, "install");
+					startInfo.Verb = "runas";
+					startInfo.UseShellExecute = true;
+					startInfo.CreateNoWindow = true;
 
-            var installer = new HostServiceInstaller(_settings);
-            WinServiceHelper.Register(_settings.ServiceName.FullName, installer);
-        }
+					try
+					{
+						Process process = Process.Start(startInfo);
+						process.WaitForExit();
 
-        #endregion
-    }
+						return;
+					}
+					catch (Win32Exception ex)
+					{
+						_log.Debug("Process Start Exception", ex);
+					}
+				}
+
+				_log.ErrorFormat("The {0} service can only be installed as an administrator", _settings.ServiceName.FullName);
+				return;
+			}
+
+
+			var installer = new HostServiceInstaller(_settings);
+			WinServiceHelper.Register(_settings.ServiceName.FullName, installer);
+		}
+
+		#endregion
+	}
 }

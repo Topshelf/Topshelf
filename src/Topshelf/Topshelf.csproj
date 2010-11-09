@@ -83,6 +83,7 @@
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandUtil.cs" />
     <Compile Include="Commands\RunCommand.cs" />
     <Compile Include="Commands\InstallService.cs" />
     <Compile Include="Configuration\ServiceName.cs" />

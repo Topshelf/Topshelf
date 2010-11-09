@@ -114,12 +114,20 @@ namespace Topshelf.Shelving
 
 			_log.DebugFormat("[Shelf:{0}] Shelf Reference Discarded", Name);
 
-			if (_restartCount < _restartLimit)
-			{
-				_restartCount++;
+			RestartService();
+		}
 
-				Publish(new RestartService(Name));
+		void RestartService()
+		{
+			if (_restartCount >= _restartLimit)
+			{
+				_log.DebugFormat("[Shelf:{0}] Restart Limit Reached ({1})", Name, _restartCount);
+				return;
 			}
+
+			_restartCount++;
+
+			Publish(new RestartService(Name));
 		}
 
 		protected override void Start()
