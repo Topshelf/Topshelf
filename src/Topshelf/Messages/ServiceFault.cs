@@ -28,7 +28,12 @@ namespace Topshelf.Messages
 
             if (ex != null)
             {
-                ExceptionMessage = ex.Message;
+                ExceptionDetail = new ExceptionDetail
+                    {
+                        Message = ex.Message,
+                        StackTrace = ex.StackTrace
+                    };
+                
                 RecordInnerException(ex.InnerException);
             }
         }
@@ -39,7 +44,7 @@ namespace Topshelf.Messages
 
         public IList<ExceptionDetail> InnerExceptions { get; protected set; }
 
-        public string ExceptionMessage { get; protected set; }
+        public ExceptionDetail ExceptionDetail { get; protected set; }
 
         void RecordInnerException(Exception ex)
         {

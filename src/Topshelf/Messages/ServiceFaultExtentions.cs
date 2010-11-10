@@ -22,7 +22,8 @@ namespace Topshelf.Messages
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine(message.ExceptionMessage);
+            sb.AppendLine(message.ExceptionDetail.Message);
+            sb.AppendLine(message.ExceptionDetail.StackTrace);
 
             message.InnerExceptions.Each(ed =>
                 {
