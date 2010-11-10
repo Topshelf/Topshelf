@@ -160,17 +160,21 @@ namespace Topshelf.Shelving
 
 		protected override void Unload()
 		{
-			_log.DebugFormat("[Shelf:{0}] {1}", Name, "Unload");
+			_log.DebugFormat("[Shelf:{0}] {1}", Name, "Unloading");
 			Publish<ServiceUnloading>();
 
 			if (_reference != null)
 			{
+				Send(new UnloadService(Name));
+
 				_reference.Dispose();
 				_reference = null;
 			}
-
-			_log.DebugFormat("[Shelf:{0}] {1} complete", Name, "Unload");
-			Publish<ServiceUnloaded>();
+			else
+			{
+				Publish<ServiceUnloaded>();
+				_log.WarnFormat("[Shelf:{0}] {1}", Name, "Was already unloaded");
+			}
 		}
 	}
 }
