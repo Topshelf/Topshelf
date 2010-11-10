@@ -95,17 +95,6 @@ namespace Topshelf.Model
 			}
 		}
 
-		public IEnumerable<IServiceController> GetRunningServices()
-		{
-			foreach (ServiceStateMachine service in _serviceCache)
-			{
-				if (service.CurrentState != ServiceStateMachine.Stopped
-				    && service.CurrentState != ServiceStateMachine.Completed
-				    && service.CurrentState != ServiceStateMachine.Faulted)
-					yield return service;
-			}
-		}
-
 		public void Send<T>(T message)
 		{
 			if (_channel == null)
@@ -162,15 +151,20 @@ namespace Topshelf.Model
 			var originatingAppDomain = sender as AppDomain;
 			string serviceName = "Topshelf";
 
+			var ex = e.ExceptionObject as Exception;
+
 			if (originatingAppDomain != null)
 			{
 				serviceName = originatingAppDomain.FriendlyName;
 
-				_channel.Send(new ServiceFault(originatingAppDomain.FriendlyName, e.ExceptionObject as Exception));
+				var exception =
+					new TopshelfException("An unhandled exception occurred within the service: " + serviceName + Environment.NewLine
+					                      + ex.Message + ex.StackTrace);
+
+				_channel.Send(new ServiceFault(originatingAppDomain.FriendlyName, exception));
 			}
 
-			var ex = e.ExceptionObject as Exception;
-            _log.Fatal("An unhandled exception occurred within the service: " + serviceName, ex);
+			_log.Fatal("An unhandled exception occurred within the service: " + serviceName, ex);
 		}
 
 		void CreateCoordinatorChannel()
@@ -268,6 +262,9 @@ namespace Topshelf.Model
 		void OnServiceFault(ServiceFault message)
 		{
 			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
+
+			if (_stopping)
+				_channel.Send(new UnloadService(message.ServiceName));
 
 			EventChannel.Send(message);
 		}

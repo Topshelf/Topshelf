@@ -15,6 +15,7 @@ namespace Topshelf.Shelving
 	using System;
 	using System.IO;
 	using System.Reflection;
+	using System.Runtime.Remoting;
 	using log4net;
 	using Magnum.Extensions;
 	using Model;
@@ -31,6 +32,7 @@ namespace Topshelf.Shelving
 		bool _disposed;
 		AppDomain _domain;
 		AppDomainSetup _domainSettings;
+		ObjectHandle _objectHandle;
 
 		public ShelfReference(string serviceName, ShelfType shelfType)
 		{
@@ -86,7 +88,7 @@ namespace Topshelf.Shelving
 
 			Type shelfType = typeof(Shelf);
 
-			_domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
+			_objectHandle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
 			                       args ?? new object[] {null},
 			                       null, null, null);
 		}
@@ -132,10 +134,11 @@ namespace Topshelf.Shelving
 					_channel = null;
 				}
 
-
 				try
 				{
-					AppDomain.Unload(_domain);
+					_log.DebugFormat("[{0}] Unloading AppDomain", _serviceName);
+
+					_log.InfoFormat("[{0}] AppDomain Unloaded", _serviceName);
 				}
 				catch (Exception)
 				{

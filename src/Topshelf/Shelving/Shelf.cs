@@ -90,6 +90,8 @@ namespace Topshelf.Shelving
 					_coordinatorChannel.Dispose();
 					_coordinatorChannel = null;
 				}
+
+				LogManager.Shutdown();
 			}
 
 			_disposed = true;
@@ -171,22 +173,28 @@ namespace Topshelf.Shelving
 
 			x.AddConsumerOf<ServiceCreated>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnCallingThread();
+				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceRunning>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnCallingThread();
+				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceStopped>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnCallingThread();
+				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServicePaused>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnCallingThread();
+				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceUnloaded>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnCallingThread();
+				.UsingConsumer(m =>
+					{
+						_coordinatorChannel.Send(m);
+						_log.InfoFormat("[{0}] Unloading Shelf and AppDomain", _serviceName);
+						Dispose();
+						AppDomain.Unload(AppDomain.CurrentDomain);
+					})
+				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceFault>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
-				.HandleOnCallingThread();
+				.HandleOnFiber(_fiber);
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)
@@ -270,9 +278,6 @@ namespace Topshelf.Shelving
 
 			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
 			                                                  configurationFilePath);
-
-			// Shutdown the logging since the process isn't closing down
-			AppDomain.CurrentDomain.DomainUnload += (sender, args) => LogManager.Shutdown();
 		}
 	}
 }
