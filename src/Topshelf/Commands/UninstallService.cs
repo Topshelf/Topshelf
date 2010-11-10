@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,45 +12,73 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Commands
 {
-    using Configuration;
-    using log4net;
-    using WinService.SubCommands;
-
-    public class UninstallService :
-        Command
-    {
-        static readonly ILog _log = LogManager.GetLogger(typeof (UninstallService));
-        readonly WinServiceSettings _settings;
+	using System;
+	using System.ComponentModel;
+	using System.Diagnostics;
+	using System.Reflection;
+	using Configuration;
+	using log4net;
+	using WindowsServiceCode;
 
 
-        public UninstallService(WinServiceSettings settings)
-        {
-            _settings = settings;
-        }
+	public class UninstallService :
+		Command
+	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.UninstallService");
+		readonly WinServiceSettings _settings;
+		readonly string _commandLine;
 
-        #region Command Members
 
-        public ServiceActionNames Name
-        {
-            get { return ServiceActionNames.Uninstall; }
-        }
+		public UninstallService(WinServiceSettings settings, string commandLine)
+		{
+			_settings = settings;
+			_commandLine = commandLine;
+		}
 
-        public void Execute()
-        {
-            _log.Info("Received service uninstall notification");
+		public ServiceActionNames Name
+		{
+			get { return ServiceActionNames.Uninstall; }
+		}
 
-            if (!WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
-            {
-                string message = string.Format("The {0} service has not been installed.", _settings.ServiceName.FullName);
-                _log.Error(message);
+		public void Execute()
+		{
+			if (!WinServiceHelper.IsInstalled(_settings.ServiceName.FullName))
+			{
+				string message = string.Format("The {0} service has not been installed.", _settings.ServiceName.FullName);
+				_log.Error(message);
 
-                return;
-            }
+				return;
+			}
 
-            var installer = new HostServiceInstaller(_settings);
-            WinServiceHelper.Unregister(_settings.ServiceName.FullName, installer);
-        }
+			if (!CommandUtil.IsAdministrator)
+			{
+				if (Environment.OSVersion.Version.Major == 6)
+				{
+					var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, _commandLine);
+					startInfo.Verb = "runas";
+					startInfo.UseShellExecute = true;
+					startInfo.CreateNoWindow = true;
 
-        #endregion
-    }
+					try
+					{
+						Process process = Process.Start(startInfo);
+						process.WaitForExit();
+
+						return;
+					}
+					catch (Win32Exception ex)
+					{
+						_log.Debug("Process Start Exception", ex);
+					}
+				}
+
+				_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", _settings.ServiceName.FullName);
+				return;
+			}
+
+
+			var installer = new HostServiceInstaller(_settings);
+			WinServiceHelper.Unregister(_settings.ServiceName.FullName, installer);
+		}
+	}
 }

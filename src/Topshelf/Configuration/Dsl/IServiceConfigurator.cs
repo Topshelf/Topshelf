@@ -12,20 +12,23 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-    using System;
-    using Model;
+	using System;
+	using Model;
 
 
-    public interface IServiceConfigurator<TService> :
-        IDisposable
-    {
-        void Named(string name);
+	public interface IServiceConfigurator<TService> :
+		IDisposable
+		where TService : class
+	{
+		void Named(string name);
 
-        void WhenStarted(Action<TService> startAction);
-        void WhenStopped(Action<TService> stopAction);
-        void WhenPaused(Action<TService> pauseAction);
-        void WhenContinued(Action<TService> continueAction);
+		void WhenStarted(Action<TService> startAction);
+		void WhenStopped(Action<TService> stopAction);
+		void WhenPaused(Action<TService> pauseAction);
+		void WhenContinued(Action<TService> continueAction);
 
-        void HowToBuildService(ServiceBuilder serviceBuilder);
-    }
+		void HowToBuildService(ServiceFactory<TService> serviceFactory);
+		void ConstructUsing(ServiceFactory<TService> serviceFactory);
+		void ConstructUsing(InternalServiceFactory<TService> serviceFactory);
+	}
 }

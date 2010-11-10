@@ -12,20 +12,32 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-    using Magnum.TestFramework;
+	using Commands;
+	using Magnum.TestFramework;
     using NUnit.Framework;
     using Topshelf.Configuration;
+	using Topshelf.Configuration.Dsl;
 
 
-    [Scenario]
+	[Scenario]
     public class Given_a_command_line
     {
-        protected string CommandLine
+		protected RunConfiguration Configuration { get; set; }
+
+    	public Given_a_command_line()
+    	{
+    		Configuration = RunnerConfigurator.New(x => { });
+    	}
+
+    	protected string CommandLine
         {
-            set { Arguments = TopshelfArgumentParser.Parse(value); }
+            set
+            {
+            	Command = new CommandLineArguments(Configuration).GetCommand(value);
+            }
         }
 
-        protected TopshelfArguments Arguments { get; set; }
+        protected Command Command { get; set; }
     }
 
 
@@ -42,13 +54,13 @@ namespace Topshelf.Specs
         [Then]
         public void Action_should_be_run()
         {
-            Arguments.ActionName.ShouldEqual(ServiceActionNames.Run);
+            Command.Name.ShouldEqual(ServiceActionNames.Run);
         }
 
         [Then]
         public void Instance_should_be_empty()
         {
-            Arguments.Instance.ShouldBeEmpty();
+            string.IsNullOrEmpty(Configuration.WinServiceSettings.ServiceName.InstanceName).ShouldBeTrue();
         }
     }
 
@@ -66,7 +78,7 @@ namespace Topshelf.Specs
         [Then]
         public void Action_should_be_run()
         {
-            Arguments.ActionName.ShouldEqual(ServiceActionNames.Run);
+			Command.Name.ShouldEqual(ServiceActionNames.Run);
         }
     }
 
@@ -79,19 +91,19 @@ namespace Topshelf.Specs
         [Given]
         public void Service_install_command_line()
         {
-            CommandLine = "service install";
+            CommandLine = "install";
         }
 
         [Then]
         public void Action_should_be_install()
         {
-            Arguments.ActionName.ShouldEqual(ServiceActionNames.Install);
+            Command.Name.ShouldEqual(ServiceActionNames.Install);
         }
 
         [Then]
         public void Instance_should_be_empty()
         {
-            Arguments.Instance.ShouldBeEmpty();
+            string.IsNullOrEmpty(Configuration.WinServiceSettings.ServiceName.InstanceName).ShouldBeTrue();
         }
     }
 
@@ -109,13 +121,13 @@ namespace Topshelf.Specs
         [Then]
         public void Action_should_be_install()
         {
-            Arguments.ActionName.ShouldEqual(ServiceActionNames.Install);
+            Command.Name.ShouldEqual(ServiceActionNames.Install);
         }
 
         [Then]
         public void Instance_should_be_bob()
         {
-            Arguments.Instance.ShouldEqual("bob");
+            Configuration.WinServiceSettings.ServiceName.InstanceName.ShouldEqual("bob");
         }
     }
 }

@@ -14,8 +14,6 @@ namespace StuffOnAShelf
 {
     using System;
     using System.IO;
-    using System.Timers;
-    using log4net;
     using log4net.Config;
     using Topshelf.Configuration.Dsl;
     using Topshelf.Shelving;
@@ -32,28 +30,6 @@ namespace StuffOnAShelf
                 s.Start();
             });
             cfg.WhenStopped(s => s.Stop());
-        }
-    }
-
-    public class TheClock
-    {
-        readonly Timer _timer;
-        readonly ILog _log = LogManager.GetLogger(typeof(TheClock));
-
-        public TheClock()
-        {
-            _timer = new Timer(1000) { AutoReset = true };
-            _timer.Elapsed += (sender, eventArgs) => _log.Info(DateTime.Now);
-        }
-
-        public void Start()
-        {
-            _timer.Start();
-        }
-
-        public void Stop()
-        {
-            _timer.Stop();
         }
     }
 }

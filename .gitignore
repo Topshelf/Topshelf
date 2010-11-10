@@ -1,5 +1,6 @@
 build_output/*
 code_drop/*
+log/*
 
 **/*.suo
 **/*.user
@@ -10,13 +11,12 @@ _ReSharper*
 
 *.csproj.user
 *.resharper.user
-*.resharper
-*.ReSharper
 *.cache
 *~
 *.swp
 *.bak
 *.orig
+
 
 TestResult.xml
 submit.xml

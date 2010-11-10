@@ -1,5 +1,5 @@
 // Copyright 2007-2010 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,36 +12,41 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-    public class ServiceName
-    {
-        const string _instanceChar = "$";
-        readonly string _instanceName;
-        readonly string _name;
+	public class ServiceName
+	{
+		const string _instanceChar = "$";
+		readonly string _instanceName;
+		readonly string _name;
 
-        public ServiceName(string name) : this(name, null)
-        {
-        }
+		public ServiceName(string name)
+			: this(name, null)
+		{
+		}
 
-        public ServiceName(string name, string instanceName)
-        {
-            _name = name;
-            _instanceName = instanceName;
-        }
+		public ServiceName(string name, string instanceName)
+		{
+			_name = name;
+			_instanceName = instanceName;
+		}
 
-        public string Name
-        {
-            get { return _name; }
-        }
+		public string Name
+		{
+			get { return _name; }
+		}
 
-        public string InstanceName
-        {
-            get { return _instanceName; }
-        }
+		public string InstanceName
+		{
+			get { return _instanceName; }
+		}
 
-        public string FullName
-        {
-            get { return string.IsNullOrEmpty(_instanceName) 
-                ? _name : "{0}{1}{2}".FormatWith(_name, _instanceChar, _instanceName); }
-        }
-    }
+		public string FullName
+		{
+			get
+			{
+				return string.IsNullOrEmpty(_instanceName)
+				       	? _name
+				       	: "{0}{1}{2}".FormatWith(_name, _instanceChar, _instanceName);
+			}
+		}
+	}
 }
