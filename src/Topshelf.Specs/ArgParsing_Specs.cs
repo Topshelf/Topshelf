@@ -60,7 +60,7 @@ namespace Topshelf.Specs
         [Then]
         public void Instance_should_be_empty()
         {
-			Configuration.WinServiceSettings.ServiceName.InstanceName.ShouldBeEmpty();
+            string.IsNullOrEmpty(Configuration.WinServiceSettings.ServiceName.InstanceName).ShouldBeTrue();
         }
     }
 
@@ -103,7 +103,7 @@ namespace Topshelf.Specs
         [Then]
         public void Instance_should_be_empty()
         {
-        	Configuration.WinServiceSettings.ServiceName.InstanceName.ShouldBeEmpty();
+            string.IsNullOrEmpty(Configuration.WinServiceSettings.ServiceName.InstanceName).ShouldBeTrue();
         }
     }
 
