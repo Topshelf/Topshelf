@@ -13,6 +13,7 @@
 namespace Topshelf.Shelving
 {
 	using System;
+	using System.Configuration;
 	using System.IO;
 	using System.Reflection;
 	using System.Runtime.Remoting;
@@ -103,7 +104,9 @@ namespace Topshelf.Shelving
 
 			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-			_domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine("Services", _serviceName));
+			string servicesDirectory = ConfigurationManager.AppSettings["MonitorDirectory"] ?? "Services";
+
+			_domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine(servicesDirectory, _serviceName));
 			_log.DebugFormat("[{0}].ApplicationBase = {1}", _serviceName, _domainSettings.ApplicationBase);
 
 			_domainSettings.ConfigurationFile = Path.Combine(_domainSettings.ApplicationBase, _serviceName + ".config");
