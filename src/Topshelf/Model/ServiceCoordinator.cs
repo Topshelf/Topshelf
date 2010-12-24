@@ -105,6 +105,8 @@ namespace Topshelf.Model
 
 		public void Start()
 		{
+			AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+
 			CreateCoordinatorChannel();
 
 			BeforeStartingServices();
@@ -117,7 +119,6 @@ namespace Topshelf.Model
 
 			AfterStartingServices();
 		}
-
 
 		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
 		{
@@ -143,6 +144,27 @@ namespace Topshelf.Model
 			WaitUntilAllServicesAre(ServiceStateMachine.Completed, _timeout);
 
 			AfterStoppingServices();
+		}
+
+		void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			var originatingAppDomain = sender as AppDomain;
+			string serviceName = "Topshelf";
+
+			var ex = e.ExceptionObject as Exception;
+
+			if (originatingAppDomain != null)
+			{
+				serviceName = originatingAppDomain.FriendlyName;
+
+				var exception =
+					new TopshelfException("An unhandled exception occurred within the service: " + serviceName + Environment.NewLine
+					                      + ex.Message + ex.StackTrace);
+
+				_channel.Send(new ServiceFault(originatingAppDomain.FriendlyName, exception));
+			}
+
+			_log.Fatal("An unhandled exception occurred within the service: " + serviceName, ex);
 		}
 
 		void CreateCoordinatorChannel()
@@ -226,9 +248,7 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
 			if (_serviceCache.Has(message.ServiceName))
-			{
 				_channel.Send(new RestartService(message.ServiceName));
-			}
 			else
 			{
 				_startupServices.Add(message.ServiceName,
@@ -242,6 +262,9 @@ namespace Topshelf.Model
 		void OnServiceFault(ServiceFault message)
 		{
 			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
+
+			if (_stopping)
+				_channel.Send(new UnloadService(message.ServiceName));
 
 			EventChannel.Send(message);
 		}

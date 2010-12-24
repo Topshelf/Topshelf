@@ -10,28 +10,27 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Messages
+namespace Topshelf.Commands
 {
-    using System.Text;
-    using Magnum.Extensions;
+	using System.Security.Principal;
 
 
-    public static class ServiceFaultExtentions
-    {
-        public static string ToLogString(this ServiceFault message)
-        {
-            var sb = new StringBuilder();
+	public static class CommandUtil
+	{
+		public static bool IsAdministrator
+		{
+			get
+			{
+				WindowsIdentity identity = WindowsIdentity.GetCurrent();
 
-            sb.AppendLine(message.ExceptionDetail.Message);
-            sb.AppendLine(message.ExceptionDetail.StackTrace);
+				if (null != identity)
+				{
+					var principal = new WindowsPrincipal(identity);
+					return principal.IsInRole(WindowsBuiltInRole.Administrator);
+				}
 
-            message.InnerExceptions.Each(ed =>
-                {
-                    sb.AppendLine(ed.Message);
-                    sb.AppendLine(ed.StackTrace);
-                });
-
-            return sb.ToString();
-        }
-    }
+				return false;
+			}
+		}
+	}
 }

@@ -13,10 +13,11 @@
 namespace Topshelf.Shelving
 {
 	using System;
+	using System.Configuration;
 	using System.IO;
 	using System.Reflection;
+	using System.Runtime.Remoting;
 	using log4net;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Model;
 
@@ -28,10 +29,11 @@ namespace Topshelf.Shelving
 
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;
-		bool _disposed;
-		readonly AppDomain _domain;
-		AppDomainSetup _domainSettings;
 		OutboundChannel _channel;
+		bool _disposed;
+		AppDomain _domain;
+		AppDomainSetup _domainSettings;
+		ObjectHandle _objectHandle;
 
 		public ShelfReference(string serviceName, ShelfType shelfType)
 		{
@@ -43,15 +45,23 @@ namespace Topshelf.Shelving
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
 		}
 
-		public UntypedChannel ShelfChannel
-		{
-			get { return _channel; }
-		}
 
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		public void Send<T>(T message)
+		{
+			if (_channel == null)
+			{
+				_log.WarnFormat("Unable to send service message due to null channel, service = {0}, message type = {1}",
+				                _serviceName, typeof(T).ToShortTypeName());
+				return;
+			}
+
+			_channel.Send(message);
 		}
 
 		public void LoadAssembly(AssemblyName assemblyName)
@@ -79,8 +89,8 @@ namespace Topshelf.Shelving
 
 			Type shelfType = typeof(Shelf);
 
-			_domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                       args ?? new object[]{null},
+			_objectHandle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
+			                       args ?? new object[] {null},
 			                       null, null, null);
 		}
 
@@ -94,7 +104,9 @@ namespace Topshelf.Shelving
 
 			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-			_domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine("Services", _serviceName));
+			string servicesDirectory = ConfigurationManager.AppSettings["MonitorDirectory"] ?? "Services";
+
+			_domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine(servicesDirectory, _serviceName));
 			_log.DebugFormat("[{0}].ApplicationBase = {1}", _serviceName, _domainSettings.ApplicationBase);
 
 			_domainSettings.ConfigurationFile = Path.Combine(_domainSettings.ApplicationBase, _serviceName + ".config");
@@ -125,7 +137,20 @@ namespace Topshelf.Shelving
 					_channel = null;
 				}
 
-				AppDomain.Unload(_domain);
+				try
+				{
+					_log.DebugFormat("[{0}] Unloading AppDomain", _serviceName);
+
+					_log.InfoFormat("[{0}] AppDomain Unloaded", _serviceName);
+				}
+				catch (Exception)
+				{
+					_log.DebugFormat("[{0}] AppDomain was already unloaded", _serviceName);
+				}
+				finally
+				{
+					_domain = null;
+				}
 			}
 
 			_disposed = true;

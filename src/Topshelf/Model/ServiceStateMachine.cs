@@ -15,6 +15,7 @@ namespace Topshelf.Model
 	using System;
 	using System.Diagnostics;
 	using Exceptions;
+	using log4net;
 	using Magnum.Reflection;
 	using Magnum.StateMachine;
 	using Messages;
@@ -25,6 +26,8 @@ namespace Topshelf.Model
 		StateMachine<ServiceStateMachine>,
 		IServiceController
 	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceStateMachine");
+
 		bool _disposed;
 
 		static ServiceStateMachine()
@@ -51,7 +54,9 @@ namespace Topshelf.Model
 					       	.TransitionTo(Starting),
 					       When(OnFaulted)
 					       	.Call((instance, message) => instance.ServiceFaulted(message))
-					       	.TransitionTo(Faulted)
+					       	.TransitionTo(Faulted),
+					       When(OnStop)
+					       	.TransitionTo(StopRequested)
 						);
 
 					During(Created,
@@ -70,6 +75,8 @@ namespace Topshelf.Model
 					       When(OnRunning)
 					       	.TransitionTo(Running)
 					       	.Call(instance => instance.ServiceRunning()),
+					       When(OnStop)
+					       	.TransitionTo(StopRequested),
 					       When(OnFaulted)
 					       	.Call((instance, message) => instance.ServiceFaulted(message))
 					       	.TransitionTo(Faulted));
@@ -87,6 +94,22 @@ namespace Topshelf.Model
 					       When(OnFaulted)
 					       	.Call((instance, message) => instance.ServiceFaulted(message))
 					       	.TransitionTo(Faulted));
+
+					During(StopRequested,
+					       When(OnRunning)
+					       	.TransitionTo(Stopping)
+					       	.Call((instance, message) => instance.Stop()),
+					       When(OnFaulted)
+					       	.Call((instance, message) => instance.ServiceFaulted(message))
+					       	.TransitionTo(Faulted)
+					       	.Call(instance => instance.Stop()),
+					       When(OnCreated)
+					       	.Call((instance, message) => instance.ServiceCreated(message),
+					       	      HandleServiceCommandException)
+					       	.TransitionTo(Created)
+					       	.Call(instance => instance.Stop(),
+					       	      HandleServiceCommandException)
+					       	.TransitionTo(Stopping));
 
 					During(Stopping,
 					       When(OnStopped)
@@ -130,6 +153,11 @@ namespace Topshelf.Model
 					       	.TransitionTo(Completed)
 					       	.Call(instance => instance.ServiceUnloaded())
 					       	.Call(instance => instance.Publish<ServiceCompleted>()));
+
+					During(Faulted,
+					       When(OnRestart)
+					       	.Call(instance => instance.Create())
+					       	.TransitionTo(CreatingToRestart));
 
 					During(StoppingToRestart,
 					       When(OnStopped)
@@ -215,6 +243,7 @@ namespace Topshelf.Model
 		public static State Pausing { get; set; }
 		public static State Paused { get; set; }
 		public static State Continuing { get; set; }
+		public static State StopRequested { get; set; }
 		public static State Stopping { get; set; }
 		public static State Stopped { get; set; }
 		public static State StoppingToRestart { get; set; }

@@ -26,7 +26,7 @@ Topshelf is an awesome service host for windows services.
 ### Contributing 
 
 1. `git config --global core.autoclrf false`
-2. Shared ReSharper settings are under src/Topshelf.resharper.xml
+2. Shared ReSharper settings are under src/Topshelf.resharper.xml for formatting and style
 3. Make a pull request
 
     

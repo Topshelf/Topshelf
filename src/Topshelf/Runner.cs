@@ -1,5 +1,5 @@
-// Copyright 2007-2008 The Apache Software Foundation.
-// 
+// Copyright 2007-2010 The Apache Software Foundation.
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,40 +12,39 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    using System;
-    using System.IO;
-    using Configuration;
-    using log4net;
+	using System;
+	using System.IO;
+	using Commands;
+	using Configuration;
+	using log4net;
 
-    /// <summary>
-    /// Entry point into the Host infrastructure
-    /// </summary>
-    public static class Runner
-    {
-        static readonly ILog _log = LogManager.GetLogger("Topshelf.Runner");
 
-        static Runner()
-        {
-            AppDomain.CurrentDomain.UnhandledException += UnhandledException;
-			
-            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-        }
+	/// <summary>
+	/// Entry point into the Host infrastructure
+	/// </summary>
+	public static class Runner
+	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Runner");
 
-        static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            _log.Fatal("Host encountered an unhandled exception on the AppDomain", (Exception) e.ExceptionObject);
-        }
+		static Runner()
+		{
+			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+		}
 
-        /// <summary>
-        /// Go go gadget
-        /// </summary>
-        public static void Host(RunConfiguration configuration, string[] args)
-        {
-            if (args.Length > 0)
-                _log.DebugFormat("Command Line Arguments: '{0}'", args);
+		/// <summary>
+		/// Go go gadget
+		/// </summary>
+		public static void Host(RunConfiguration configuration, string[] args)
+		{
+			var commandLine = string.Join(" ", args);
+			if (commandLine.Length > 0)
+				_log.DebugFormat("Command Line Arguments: '{0}'", commandLine);
 
-            var a = TopshelfArgumentParser.Parse(args);
-            TopshelfDispatcher.Dispatch(configuration, a);
-        }
-    }
+
+			Command command = new CommandLineArguments(configuration)
+				.GetCommand(commandLine);
+
+			command.Execute();
+		}
+	}
 }

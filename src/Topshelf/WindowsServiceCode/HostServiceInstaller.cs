@@ -22,7 +22,7 @@ namespace Topshelf.WindowsServiceCode
 	public class HostServiceInstaller :
 		Installer
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.WidowsServiceCode.HostServiceInstaller");
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.HostServiceInstaller");
 		readonly WinServiceSettings _settings;
 
 

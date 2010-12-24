@@ -50,7 +50,7 @@ namespace Topshelf.Shelving
 			_bootstrapperType = bootstrapperType;
 
 			BootstrapLogger();
-			
+
 			_serviceName = AppDomain.CurrentDomain.FriendlyName;
 
 			_log = LogManager.GetLogger("Topshelf.Shelf." + _serviceName);
@@ -90,6 +90,8 @@ namespace Topshelf.Shelving
 					_coordinatorChannel.Dispose();
 					_coordinatorChannel = null;
 				}
+
+				LogManager.Shutdown();
 			}
 
 			_disposed = true;
@@ -115,7 +117,7 @@ namespace Topshelf.Shelving
 
 				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] {serviceType});
 
-				this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
+				InitializeAndCreateService(serviceType, bootstrapper, cfg);
 			}
 			catch (Exception ex)
 			{
@@ -123,6 +125,10 @@ namespace Topshelf.Shelving
 			}
 		}
 
+		void InitializeAndCreateService(Type serviceType, object bootstrapper, object cfg)
+		{
+			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
+		}
 
 // ReSharper disable UnusedMember.Local
 		void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
@@ -178,11 +184,17 @@ namespace Topshelf.Shelving
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceUnloaded>()
+				.UsingConsumer(m =>
+					{
+						_coordinatorChannel.Send(m);
+						_log.InfoFormat("[{0}] Unloading Shelf and AppDomain", _serviceName);
+						Dispose();
+						AppDomain.Unload(AppDomain.CurrentDomain);
+					})
+				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServiceFault>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
-		    x.AddConsumerOf<ServiceFault>()
-		        .UsingConsumer(m => _coordinatorChannel.Send(m))
-		        .HandleOnFiber(_fiber);
 		}
 
 		ServiceStateMachine GetServiceInstance(string key)
@@ -239,22 +251,18 @@ namespace Topshelf.Shelving
 			                                                                      AppDomain.CurrentDomain.FriendlyName,
 			                                                                      e.ExceptionObject));
 
-			if (e.IsTerminating && _coordinatorChannel != null)
-				SendFault(e.ExceptionObject as Exception);
-
-			// try to wait for the message to be sent
-			Thread.Sleep(1.Seconds());
+			Dispose();
 		}
 
-		void SendFault(Exception exception)
+		void SendFault(Exception ex)
 		{
 			try
 			{
-				_channel.Send(new ServiceFault(_serviceName, exception));
+				_channel.Send(new ServiceFault(_serviceName, ex));
 			}
 			catch (Exception)
 			{
-				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), exception);
+				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
 			}
 		}
 
@@ -270,9 +278,6 @@ namespace Topshelf.Shelving
 
 			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
 			                                                  configurationFilePath);
-
-			// Shutdown the logging since the process isn't closing down
-			AppDomain.CurrentDomain.DomainUnload += (sender, args) => LogManager.Shutdown();
 		}
 	}
 }

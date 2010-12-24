@@ -83,6 +83,7 @@
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandUtil.cs" />
     <Compile Include="Commands\RunCommand.cs" />
     <Compile Include="Commands\InstallService.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
+    <Compile Include="InstallCommand.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />
     <Compile Include="Messages\ExceptionDetail.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="Shelving\ShelfReference.cs" />
     <Compile Include="Shelving\ShelfServiceController.cs" />
     <Compile Include="Shelving\ShelfType.cs" />
+    <Compile Include="UninstallCommand.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Exceptions\BuildServiceException.cs" />
@@ -142,7 +145,6 @@
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Shelving\Shelf.cs" />
     <Compile Include="Model\AddressRegistry.cs" />
-    <Compile Include="TopshelfDispatcher.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
@@ -150,7 +152,7 @@
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Model\ServiceController.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
-    <Compile Include="TopshelfArgumentParser.cs" />
+    <Compile Include="CommandLineArguments.cs" />
     <Compile Include="TopshelfArguments.cs" />
     <Compile Include="Configuration\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
