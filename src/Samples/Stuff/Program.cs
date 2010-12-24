@@ -29,6 +29,9 @@ namespace Stuff
             {
                 x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
 
+
+                x.RunAsFromCommandLine();
+
                 x.ConfigureService<TownCrier>(s =>
                 {
                     s.Named("tc");

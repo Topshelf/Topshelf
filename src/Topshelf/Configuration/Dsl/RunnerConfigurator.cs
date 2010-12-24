@@ -216,7 +216,8 @@ namespace Topshelf.Configuration.Dsl
 
 		public void RunAsFromCommandLine()
 		{
-			throw new NotImplementedException("soon though");
+            //this doesn't really do anything
+			//_credentials should be set from the command line
 		}
 
 		public void RunAs(string username, string password)
