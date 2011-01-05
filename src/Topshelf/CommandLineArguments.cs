@@ -35,7 +35,7 @@ namespace Topshelf
 			_commandLine = commandLine;
 
 			Command command = CommandLine.Parse<Command>(commandLine, InitializeCommandLineParser)
-				.DefaultIfEmpty(new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName))
+				.DefaultIfEmpty(new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName, null))
 				.First();
 
 			return command;
@@ -43,7 +43,7 @@ namespace Topshelf
 
 		void InitializeCommandLineParser(ICommandLineElementParser<Command> x)
 		{
-			Parser<IEnumerable<ICommandLineElement>, IDefinitionElement> definitions =
+		    Parser<IEnumerable<ICommandLineElement>, IDefinitionElement> definitions =
 				(from username in x.Definition("username") select username)
 					.Or(from password in x.Definition("password") select password)
 					.Or(from instance in x.Definition("instance") select instance);
@@ -65,7 +65,11 @@ namespace Topshelf
 			      select (Command)new UninstallCommand(_configuration.WinServiceSettings, _commandLine, instance.Value));
 
 			x.Add(from arg in x.Argument("run")
-			      select (Command)new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName));
+                  from instance in definitions.Optional("instance",null)
+			      select (Command)new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName, instance.Value));
+
+            x.Add(from arg in x.Definition("instance")
+                      select (Command)new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName, arg.Value));
 		}
 	}
 }

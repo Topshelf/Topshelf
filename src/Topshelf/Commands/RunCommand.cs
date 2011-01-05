@@ -26,10 +26,13 @@ namespace Topshelf.Commands
 		readonly IServiceCoordinator _coordinator;
 		readonly ServiceName _serviceName;
 
-		public RunCommand(IServiceCoordinator coordinator, ServiceName serviceName)
+		public RunCommand(IServiceCoordinator coordinator, ServiceName serviceName, string instance)
 		{
 			_coordinator = coordinator;
 			_serviceName = serviceName;
+
+            if (instance != null)
+				_serviceName = new ServiceName(serviceName.Name, instance);
 		}
 
 

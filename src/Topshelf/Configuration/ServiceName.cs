@@ -12,6 +12,10 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
+    using System.Diagnostics;
+
+
+    [DebuggerDisplay("{FullName}")]
 	public class ServiceName
 	{
 		const string _instanceChar = "$";
