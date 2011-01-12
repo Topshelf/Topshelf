@@ -20,7 +20,7 @@ namespace Topshelf.Model
 	using Magnum.StateMachine;
 	using Messages;
 
-
+	/*
 	[DebuggerDisplay("Service: {Name}, State: {CurrentState}")]
 	public class ServiceStateMachine :
 		StateMachine<ServiceStateMachine>,
@@ -347,4 +347,5 @@ namespace Topshelf.Model
 			_disposed = true;
 		}
 	}
+	 */
 }

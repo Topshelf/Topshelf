@@ -18,7 +18,7 @@ namespace Topshelf.Model
 	using Magnum.Extensions;
 	using Messages;
 
-
+	/*
 	public class ServiceController<TService> :
 		ServiceStateMachine,
 		IServiceController<TService>
@@ -170,5 +170,5 @@ namespace Topshelf.Model
 				_serviceFactory = null;
 			}
 		}
-	}
+	}*/
 }

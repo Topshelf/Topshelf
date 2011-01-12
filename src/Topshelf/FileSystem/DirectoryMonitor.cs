@@ -15,33 +15,31 @@ namespace Topshelf.FileSystem
 	using System;
 	using System.IO;
 	using System.Linq;
-	using Magnum.Channels;
 	using Magnum.Extensions;
-	using Magnum.Fibers;
-	using Magnum.FileSystem;
 	using Magnum.FileSystem.Events;
 	using Messages;
 	using Model;
-	using Directory = System.IO.Directory;
+	using Stact;
+	using Stact.Internal;
 
 
 	public class DirectoryMonitor :
 		IDisposable
 	{
 		readonly string _baseDirectory;
+		readonly PoolFiber _fiber;
 		ChannelAdapter _channel;
 		ChannelConnection _connection;
-		OutboundChannel _coordinatorChannel;
 		bool _disposed;
-		ThreadPoolFiber _fiber;
 		PollingFileSystemEventProducer _producer;
 		Scheduler _scheduler;
+		IServiceChannel _serviceChannel;
 
-		public DirectoryMonitor(string directory)
+		public DirectoryMonitor(string directory, IServiceChannel serviceChannel)
 		{
 			_baseDirectory = directory;
-			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
-			_fiber = new ThreadPoolFiber();
+			_serviceChannel = serviceChannel;
+			_fiber = new PoolFiber();
 		}
 
 		public void Dispose()
@@ -62,18 +60,14 @@ namespace Topshelf.FileSystem
 			if (disposing)
 			{
 				if (_scheduler != null)
-					_scheduler.Stop();
+					_scheduler.Stop(30.Seconds());
 
 				_fiber.Shutdown(30.Seconds());
 
 				if (_producer != null)
 					_producer.Dispose();
 
-				if (_coordinatorChannel != null)
-				{
-					_coordinatorChannel.Dispose();
-					_coordinatorChannel = null;
-				}
+				_serviceChannel = null;
 			}
 
 			_disposed = true;
@@ -85,10 +79,10 @@ namespace Topshelf.FileSystem
 			if (!Directory.Exists(_baseDirectory))
 				Directory.CreateDirectory(_baseDirectory);
 
-			_scheduler = new TimerScheduler(new ThreadPoolFiber());
+			_scheduler = new TimerScheduler(new PoolFiber());
 			_channel = new ChannelAdapter();
 
-			_producer = new PollingFileSystemEventProducer(_baseDirectory, _channel, _scheduler, new ThreadPoolFiber(),
+			_producer = new PollingFileSystemEventProducer(_baseDirectory, _channel, _scheduler, new PoolFiber(),
 			                                               2.Minutes());
 
 			_connection = _channel.Connect(config =>
@@ -105,7 +99,7 @@ namespace Topshelf.FileSystem
 										if (key == _baseDirectory)
 											return;
 
-										_coordinatorChannel.Send(new ServiceFolderChanged(key));
+										_serviceChannel.Send(new ServiceFolderChanged(key));
 									});
 							})
 						.HandleOnFiber(_fiber);
@@ -122,7 +116,7 @@ namespace Topshelf.FileSystem
 
 			if (_scheduler != null)
 			{
-				_scheduler.Stop();
+				_scheduler.Stop(30.Seconds());
 				_scheduler = null;
 			}
 

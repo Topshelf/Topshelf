@@ -16,6 +16,7 @@ namespace Topshelf.FileSystem
 	using System.Configuration;
 	using System.IO;
 	using Configuration.Dsl;
+	using Model;
 	using Shelving;
 
 
@@ -24,15 +25,15 @@ namespace Topshelf.FileSystem
 	{
 		public void InitializeHostedService(IServiceConfigurator<DirectoryMonitor> cfg)
 		{
-			cfg.HowToBuildService(CreateDirectoryMonitor);
+			cfg.ConstructUsing(CreateDirectoryMonitor);
 
 			cfg.WhenStarted(dm => dm.Start());
 			cfg.WhenStopped(dm => dm.Stop());
 		}
 
-		static DirectoryMonitor CreateDirectoryMonitor(string serviceName)
+		static DirectoryMonitor CreateDirectoryMonitor(string serviceName, IServiceChannel serviceChannel)
 		{
-			return new DirectoryMonitor(GetServicesDirectory());
+			return new DirectoryMonitor(GetServicesDirectory(), serviceChannel);
 		}
 
 		static string GetServicesDirectory()

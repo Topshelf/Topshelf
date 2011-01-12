@@ -17,18 +17,15 @@ namespace Topshelf.Shelving
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
-	using System.Threading;
 	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
-	using Magnum.Channels;
-	using Magnum.Channels.Configuration;
-	using Magnum.Collections;
 	using Magnum.Extensions;
-	using Magnum.Fibers;
 	using Magnum.Reflection;
 	using Messages;
 	using Model;
+	using Stact;
+	using Stact.Configuration;
 
 
 	[DebuggerDisplay("Shelf[{ServiceName}]")]
@@ -41,11 +38,10 @@ namespace Topshelf.Shelving
 		InboundChannel _channel;
 		OutboundChannel _coordinatorChannel;
 		bool _disposed;
-		ThreadPoolFiber _fiber;
-		ServiceStateMachine _service;
-		Cache<string, ServiceStateMachine> _serviceCache;
+		PoolFiber _fiber;
+		IServiceController _service;
 
-		public Shelf(Type bootstrapperType)
+		public Shelf(Type bootstrapperType, Uri address, string pipeName)
 		{
 			_bootstrapperType = bootstrapperType;
 
@@ -57,7 +53,7 @@ namespace Topshelf.Shelving
 
 			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
-			_coordinatorChannel = AddressRegistry.GetOutboundCoordinatorChannel();
+			_coordinatorChannel = new OutboundChannel(address, pipeName);
 
 			Create();
 		}
@@ -115,7 +111,7 @@ namespace Topshelf.Shelving
 
 				_log.DebugFormat("[{0}] Creating configurator for service type: {1}", _serviceName, serviceType.ToShortTypeName());
 
-				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] {serviceType});
+				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] { serviceType });
 
 				InitializeAndCreateService(serviceType, bootstrapper, cfg);
 			}
@@ -127,41 +123,38 @@ namespace Topshelf.Shelving
 
 		void InitializeAndCreateService(Type serviceType, object bootstrapper, object cfg)
 		{
-			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
+			this.FastInvoke(new[] { serviceType }, "InitializeAndCreateHostedService", bootstrapper, cfg);
 		}
 
-// ReSharper disable UnusedMember.Local
+		// ReSharper disable UnusedMember.Local
 		void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
-// ReSharper restore UnusedMember.Local
+			// ReSharper restore UnusedMember.Local
 			where T : class
 		{
 			bootstrapper.FastInvoke("InitializeHostedService", cfg);
 
 			_log.DebugFormat("[{0}] Creating service type: {1}", _serviceName, typeof(T).ToShortTypeName());
 
-			_fiber = new ThreadPoolFiber();
+			_fiber = new PoolFiber();
 
 			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, AddEventForwarders);
 
-			_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, null, _channel);
 
-			_serviceCache = new Cache<string, ServiceStateMachine>();
+			var controllerFactory = new ServiceControllerFactory();
 
-			_channel.Connect(x =>
+			ActorFactory<IServiceController> factory = controllerFactory.CreateFactory(inbox =>
 				{
-					// right now, we are handling one service per shelf, but this could easily be
-					// extended to allowing multiple by taking on some of the same service handling
-					// that the coordinator does for service creation
-					x.AddConsumersFor<ServiceStateMachine>()
-						.BindUsing<ServiceStateMachineBinding, string>()
-						.CreateNewInstanceBy(GetServiceInstance)
-						.HandleOnInstanceFiber()
-						.PersistInMemoryUsing(_serviceCache);
+					_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, inbox, _coordinatorChannel);
+					return _service;
 				});
+
+			ActorInstance instance = factory.GetActor();
+
+			_channel.Connect(x => { x.AddChannel(instance); });
 
 			// this creates the state machine instance in the shelf and tells the servicecontroller
 			// to create the service
-			_channel.Send(new CreateService(_serviceName, _channel.Address, _channel.PipeName));
+			_channel.Send(new CreateService(_serviceName));
 		}
 
 		void AddEventForwarders(ConnectionConfigurator x)
@@ -195,17 +188,6 @@ namespace Topshelf.Shelving
 			x.AddConsumerOf<ServiceFault>()
 				.UsingConsumer(m => _coordinatorChannel.Send(m))
 				.HandleOnFiber(_fiber);
-		}
-
-		ServiceStateMachine GetServiceInstance(string key)
-		{
-			if (key == null)
-				return new ServiceStateMachine(null, _channel);
-
-			if (key == _serviceName)
-				return _service;
-
-			throw new InvalidOperationException("An unknown service was requested: " + key);
 		}
 
 		public static Type FindBootstrapperImplementationType(Type bootstrapper)
@@ -248,8 +230,8 @@ namespace Topshelf.Shelving
 		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			_log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "",
-			                                                                      AppDomain.CurrentDomain.FriendlyName,
-			                                                                      e.ExceptionObject));
+																				  AppDomain.CurrentDomain.FriendlyName,
+																				  e.ExceptionObject));
 
 			Dispose();
 		}
@@ -277,7 +259,7 @@ namespace Topshelf.Shelving
 			XmlConfigurator.ConfigureAndWatch(configurationFile);
 
 			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
-			                                                  configurationFilePath);
+															  configurationFilePath);
 		}
 	}
 }

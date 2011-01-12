@@ -13,11 +13,11 @@
 namespace Topshelf.Specs.ServiceCoordinator
 {
 	using Magnum.Extensions;
-	using Magnum.Fibers;
 	using Magnum.TestFramework;
 	using Messages;
 	using Model;
 	using NUnit.Framework;
+	using Stact;
 	using TestObject;
 
 
@@ -31,11 +31,10 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service = new TestService();
 			_service2 = new TestService2();
 
-			_serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(), x => { }, x => { }, x => { }, 1.Minutes());
+			_serviceCoordinator = new ServiceCoordinator(new PoolFiber(), x => { }, x => { }, x => { }, 1.Minutes());
 			_serviceCoordinator.CreateService("test",
 			                                  n =>
-			                                  new ServiceController<TestService>("test", null,
-			                                                                     AddressRegistry.GetOutboundCoordinatorChannel(),
+			                                  new LocalServiceController<TestService>("test", _serviceCoordinator,
 			                                                                     x => x.Start(),
 			                                                                     x => x.Stop(),
 			                                                                     x => x.Pause(),
@@ -43,8 +42,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			                                                                     (x, c) => _service));
 			_serviceCoordinator.CreateService("test2",
 			                                  n =>
-			                                  new ServiceController<TestService>("test2", null,
-			                                                                     AddressRegistry.GetOutboundCoordinatorChannel(),
+			                                  new LocalServiceController<TestService>("test2", _serviceCoordinator,
 			                                                                     x => x.Start(),
 			                                                                     x => x.Stop(),
 			                                                                     x => x.Pause(),

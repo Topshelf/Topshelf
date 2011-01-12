@@ -16,8 +16,8 @@ namespace Topshelf.Configuration.Dsl
 	using System.Collections.Generic;
 	using System.ServiceProcess;
 	using Magnum.Extensions;
-	using Magnum.Fibers;
 	using Model;
+	using Stact;
 
 
 	public class RunnerConfigurator :
@@ -88,15 +88,15 @@ namespace Topshelf.Configuration.Dsl
 			DependsOn(KnownServiceNames.IIS);
 		}
 
-		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action) where TService : class
+		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action)
+			where TService : class
 		{
 			var configurator = new ServiceConfigurator<TService>();
 			_serviceConfigurators.Add(coordinator =>
 				{
 					action(configurator);
 
-					coordinator.CreateService(configurator.Name, 
-						x => configurator.Create(coordinator, AddressRegistry.GetOutboundCoordinatorChannel()));
+					coordinator.CreateService(configurator.Name, configurator.Create);
 				});
 		}
 
@@ -155,7 +155,7 @@ namespace Topshelf.Configuration.Dsl
 
 		RunConfiguration Create()
 		{
-			var serviceCoordinator = new ServiceCoordinator(new ThreadPoolFiber(),
+			var serviceCoordinator = new ServiceCoordinator(new PoolFiber(),
 			                                                _beforeStartingServices,
 			                                                _afterStartingServices,
 			                                                _afterStoppingServices,

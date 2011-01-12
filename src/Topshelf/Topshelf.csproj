@@ -59,6 +59,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
     </Reference>
+    <Reference Include="Stact">
+      <HintPath>..\..\lib\Stact\Stact.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
@@ -91,6 +94,8 @@
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
+    <Compile Include="FileSystem\FileSystemEventProducer.cs" />
+    <Compile Include="FileSystem\PollingFileSystemEventProducer.cs" />
     <Compile Include="InstallCommand.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />
@@ -120,13 +125,16 @@
     <Compile Include="Messages\StopService.cs" />
     <Compile Include="Messages\UnloadService.cs" />
     <Compile Include="Model\InboundChannel.cs" />
+    <Compile Include="Model\IServiceWorkflow.cs" />
     <Compile Include="Model\OutboundChannel.cs" />
+    <Compile Include="Model\IServiceChannel.cs" />
     <Compile Include="Model\ServiceChannel.cs" />
-    <Compile Include="Model\ServiceChannelBase.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Model\IServiceCoordinator.cs" />
     <Compile Include="Model\ServiceStateMachine.cs" />
     <Compile Include="Model\ServiceStateMachineBinding.cs" />
+    <Compile Include="Model\LocalServiceController.cs" />
+    <Compile Include="Model\ServiceControllerFactory.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
     <Compile Include="Shelving\ShelfReference.cs" />
     <Compile Include="Shelving\ShelfServiceController.cs" />

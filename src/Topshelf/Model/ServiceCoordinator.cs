@@ -21,13 +21,11 @@ namespace Topshelf.Model
 	using Exceptions;
 	using log4net;
 	using Magnum;
-	using Magnum.Channels;
 	using Magnum.Collections;
-	using Magnum.Extensions;
-	using Magnum.Fibers;
-	using Magnum.StateMachine;
 	using Messages;
 	using Shelving;
+	using Stact;
+	using Stact.Workflow;
 
 
 	public class ServiceCoordinator :
@@ -37,15 +35,17 @@ namespace Topshelf.Model
 		readonly Action<IServiceCoordinator> _afterStartingServices;
 		readonly Action<IServiceCoordinator> _afterStoppingServices;
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
+		readonly ServiceControllerFactory _controllerFactory;
 		readonly Fiber _fiber;
-		readonly Cache<string, ServiceStateMachine> _serviceCache;
-		readonly Cache<string, Func<IServiceCoordinator, ServiceStateMachine>> _startupServices;
+		readonly Cache<string, IServiceController> _serviceCache;
+		readonly Cache<string, ActorInstance> _actorCache;
+		readonly Cache<string, Func<Inbox, IServiceChannel, IServiceController>> _startupServices;
 		readonly TimeSpan _timeout;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
-		InboundChannel _channel;
+		UntypedChannel _channel;
+		ChannelConnection _channelConnection;
 
 		volatile bool _disposed;
-
 		volatile bool _stopping;
 
 		public ServiceCoordinator(Fiber fiber,
@@ -60,14 +60,17 @@ namespace Topshelf.Model
 			_beforeStartingServices = beforeStartingServices;
 			_timeout = timeout;
 
-			_startupServices = new Cache<string, Func<IServiceCoordinator, ServiceStateMachine>>();
-			_serviceCache = new Cache<string, ServiceStateMachine>();
+			_controllerFactory = new ServiceControllerFactory();
+
+			_startupServices = new Cache<string, Func<Inbox, IServiceChannel, IServiceController>>();
+			_serviceCache = new Cache<string, IServiceController>();
+			_actorCache = new Cache<string, ActorInstance>();
 
 			EventChannel = new ChannelAdapter();
 		}
 
 		public ServiceCoordinator()
-			: this(new ThreadPoolFiber(), null, null, null, 1.Minutes())
+			: this(new PoolFiber(), null, null, null, Magnum.Extensions.ExtensionsToTimeSpan.Minutes(1))
 		{
 		}
 
@@ -77,22 +80,6 @@ namespace Topshelf.Model
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
-		}
-
-		public int ServiceCount
-		{
-			get { return _serviceCache.Count(); }
-		}
-
-		public IServiceController this[string serviceName]
-		{
-			get
-			{
-				if (_serviceCache.Has(serviceName))
-					return _serviceCache[serviceName];
-
-				return null;
-			}
 		}
 
 		public void Send<T>(T message)
@@ -111,28 +98,30 @@ namespace Topshelf.Model
 
 			BeforeStartingServices();
 
-			string[] servicesToStart = _startupServices.GetAllKeys();
+			_startupServices.Each((name, builder) =>
+				{
+					var factory = _controllerFactory.CreateFactory(inbox =>
+						{
+							IServiceController controller = builder(inbox, this);
+							_serviceCache.Add(name, controller);
 
-			servicesToStart.Each(name => _channel.Send(new CreateService(name, _channel.Address, _channel.PipeName)));
+						return controller;
+					});
 
-			WaitUntilServicesAreRunning(servicesToStart, _timeout);
+					var instance = factory.GetActor();
+					_actorCache.Add(name, instance);
+
+					instance.Send(new CreateService(name));
+				});
+
+			WaitUntilServicesAreRunning(_startupServices.GetAllKeys(), _timeout);
 
 			AfterStartingServices();
 		}
 
-		public void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory)
+		public void CreateService(string serviceName, Func<Inbox, IServiceChannel, IServiceController> serviceFactory)
 		{
 			_startupServices.Add(serviceName, serviceFactory);
-		}
-
-		public IEnumerator<IServiceController> GetEnumerator()
-		{
-			return _serviceCache.Cast<IServiceController>().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
 		}
 
 		public void Stop()
@@ -141,7 +130,7 @@ namespace Topshelf.Model
 
 			SendStopCommandToServices();
 
-			WaitUntilAllServicesAre(ServiceStateMachine.Completed, _timeout);
+			WaitUntilAllServicesAre(_controllerFactory.Workflow.GetState(x => x.Completed), _timeout);
 
 			AfterStoppingServices();
 		}
@@ -172,14 +161,9 @@ namespace Topshelf.Model
 			if (_channel != null)
 				return;
 
-			_channel = AddressRegistry.GetInboundServiceCoordinatorChannel(x =>
+			_channel = new ChannelAdapter();
+			_channelConnection = _channel.Connect(x =>
 				{
-					x.AddConsumersFor<ServiceStateMachine>()
-						.BindUsing<ServiceStateMachineBinding, string>()
-						.CreateNewInstanceBy(GetServiceInstance)
-						.HandleOnInstanceFiber()
-						.PersistInMemoryUsing(_serviceCache);
-
 					x.AddConsumerOf<ServiceEvent>()
 						.UsingConsumer(OnServiceEvent)
 						.HandleOnFiber(_fiber);
@@ -206,21 +190,24 @@ namespace Topshelf.Model
 		{
 			DateTime stopTime = SystemUtil.Now + timeout;
 
+			State running = _controllerFactory.Workflow.GetState(s => s.Running);
+
 			while (SystemUtil.Now < stopTime)
 			{
-				_updated.WaitOne(1.Seconds());
+				_updated.WaitOne(Magnum.Extensions.ExtensionsToTimeSpan.Seconds(1));
 
 				bool success = services
 				               	.Where(key => _serviceCache.Has(key))
 				               	.Select(key => _serviceCache[key])
-				               	.Count(x => x.CurrentState == ServiceStateMachine.Running) == services.Count();
+				               	.Count(x => x.CurrentState == running)
+				               == services.Count();
 				if (success)
 					return;
 
 				bool anyFailed = services
 					.Where(key => _serviceCache.Has(key))
 					.Select(key => _serviceCache[key])
-					.Any(service => service.CurrentState == ServiceStateMachine.Faulted);
+					.Any(service => service.CurrentState == _controllerFactory.Workflow.GetState(s => s.Faulted));
 
 				if (anyFailed)
 					throw new TopshelfException("At least one configured service failed to start");
@@ -234,28 +221,32 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] Received shelf request for {0}{1}", message.ServiceName,
 			                message.BootstrapperType == null
 			                	? ""
-			                	: " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()));
+			                	: " ({0})".FormatWith(Magnum.Extensions.ExtensionsToType.ToShortTypeName(message.BootstrapperType)));
 
-			_startupServices.Add(message.ServiceName,
-			                     x => new ShelfServiceController(message.ServiceName, _channel, message.ShelfType,
-			                                                     message.BootstrapperType, message.AssemblyNames));
+			var factory = _controllerFactory.CreateFactory(inbox =>
+				{
+					IServiceController controller = new ShelfServiceController(inbox, message.ServiceName, _channel, message.ShelfType,
+					                                                           message.BootstrapperType, message.AssemblyNames);
+					_serviceCache.Add(message.ServiceName, controller);
 
-			_channel.Send(new CreateService(message.ServiceName));
+					return controller;
+				});
+
+			var instance = factory.GetActor();
+			_actorCache.Add(message.ServiceName, instance);
+
+			instance.Send(new CreateService(message.ServiceName));
 		}
 
 		void OnServiceFolderChanged(ServiceFolderChanged message)
 		{
 			_log.InfoFormat("[Topshelf] Folder Changed: {0}", message.ServiceName);
 
-			if (_serviceCache.Has(message.ServiceName))
-				_channel.Send(new RestartService(message.ServiceName));
+			if (_actorCache.Has(message.ServiceName))
+				_actorCache[message.ServiceName].Send(new RestartService(message.ServiceName));
 			else
 			{
-				_startupServices.Add(message.ServiceName,
-				                     x => new ShelfServiceController(message.ServiceName, _channel, ShelfType.Folder,
-				                                                     null, new AssemblyName[] {}));
-
-				_channel.Send(new CreateService(message.ServiceName));
+				OnCreateShelfService(new CreateShelfService(message.ServiceName, ShelfType.Folder, null, new AssemblyName[] {}));
 			}
 		}
 
@@ -264,7 +255,7 @@ namespace Topshelf.Model
 			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
 
 			if (_stopping)
-				_channel.Send(new UnloadService(message.ServiceName));
+				_actorCache[message.ServiceName].Send(new UnloadService(message.ServiceName));
 
 			EventChannel.Send(message);
 		}
@@ -275,7 +266,7 @@ namespace Topshelf.Model
 
 			while (SystemUtil.Now < stopTime)
 			{
-				_updated.WaitOne(1.Seconds());
+				_updated.WaitOne(Magnum.Extensions.ExtensionsToTimeSpan.Seconds(1));
 
 				if (AllServiceInState(state))
 					break;
@@ -283,23 +274,13 @@ namespace Topshelf.Model
 
 			if (!AllServiceInState(state))
 			{
-				_serviceCache.Where(x => x.CurrentState != state).Each(x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
+				Magnum.Extensions.ExtensionsToEnumerable.Each(_serviceCache.Where(x => x.CurrentState != state),
+				                                              x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
 
 				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
 			}
 		}
 
-		ServiceStateMachine GetServiceInstance(string key)
-		{
-			if (key == null)
-				return new ServiceStateMachine(null, _channel);
-
-			if (_startupServices.Has(key))
-				return _startupServices[key](this);
-
-			_log.WarnFormat("[Topshelf] No factory for service {0}", key);
-			return new ServiceStateMachine(key, _channel);
-		}
 
 		~ServiceCoordinator()
 		{
@@ -315,7 +296,7 @@ namespace Topshelf.Model
 		void OnServiceStopped(ServiceStopped message)
 		{
 			if (_stopping)
-				_channel.Send(new UnloadService(message.ServiceName));
+				_actorCache[message.ServiceName].Send(new UnloadService(message.ServiceName));
 
 			EventChannel.Send(message);
 		}
@@ -326,12 +307,14 @@ namespace Topshelf.Model
 				return;
 			if (disposing)
 			{
-				if (_channel != null)
+				if(_channelConnection != null)
 				{
 					_log.DebugFormat("[Topshelf] Closing coordinator channel");
-					_channel.Dispose();
-					_channel = null;
+					_channelConnection.Dispose();
+					_channelConnection = null;
 				}
+
+				_channel = null;
 			}
 
 			_disposed = true;
@@ -348,7 +331,7 @@ namespace Topshelf.Model
 				{
 					var message = new StopService(name);
 
-					_channel.Send(message);
+					_actorCache[name].Send(message);
 				});
 		}
 

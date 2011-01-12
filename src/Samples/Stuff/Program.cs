@@ -34,7 +34,7 @@ namespace Stuff
 
                 x.ConfigureService<TownCrier>(s =>
                 {
-                    s.Named("tc");
+                    s.Named("TownCrier");
                     s.HowToBuildService(name=> new TownCrier());
                     s.WhenStarted(tc => tc.Start());
                     s.WhenStopped(tc => tc.Stop());

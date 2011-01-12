@@ -13,7 +13,7 @@
 namespace Topshelf.Specs.TestObject
 {
 	using System;
-	using Magnum;
+	using Stact;
 
 
 	public class TestService

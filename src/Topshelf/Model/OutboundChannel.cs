@@ -14,17 +14,17 @@ namespace Topshelf.Model
 {
 	using System;
 	using log4net;
-	using Magnum.Channels;
-	using Magnum.Channels.Configuration;
+	using Stact;
+	using Stact.Configuration;
 
 
 	public class OutboundChannel :
-		ServiceChannelBase
+		ServiceChannel
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.OutboundChannel");
 
 		public OutboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
-			: base(address, pipeName, x =>
+			: base(x =>
 				{
 					configurator(x);
 

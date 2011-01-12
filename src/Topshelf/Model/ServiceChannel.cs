@@ -13,16 +13,63 @@
 namespace Topshelf.Model
 {
 	using System;
-	using Magnum.Channels;
-	using Magnum.Channels.Configuration;
+	using System.Collections.Generic;
+	using Magnum.Extensions;
+	using Stact;
+	using Stact.Configuration;
 
 
-	public interface ServiceChannel :
-		UntypedChannel
+	public class ServiceChannel :
+		IServiceChannel,
+		UntypedChannel,
+		IDisposable
 	{
-		string PipeName { get; }
-		Uri Address { get; }
+		UntypedChannel _channel;
+		IList<ChannelConnection> _connections;
+		bool _disposed;
 
-		void Connect(Action<ConnectionConfigurator> configurator);
+		protected ServiceChannel(Action<ConnectionConfigurator> configurator)
+		{
+			_channel = new ChannelAdapter();
+			_connections = new List<ChannelConnection>();
+			_connections.Add(_channel.Connect(configurator));
+		}
+
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		public void Send<T>(T message)
+		{
+			_channel.Send(message);
+		}
+
+		public void Connect(Action<ConnectionConfigurator> configurator)
+		{
+			_connections.Add(_channel.Connect(configurator));
+		}
+
+		~ServiceChannel()
+		{
+			Dispose(false);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+			if (disposing)
+			{
+				_connections.Each(x => x.Dispose());
+				_connections = null;
+
+				_channel = null;
+			}
+
+			_disposed = true;
+		}
 	}
 }

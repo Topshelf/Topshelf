@@ -14,16 +14,16 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
-	using Magnum.Channels.Configuration;
 	using Magnum.Extensions;
+	using Stact.Configuration;
 
 
 	public static class AddressRegistry
 	{
-		public static Uri ServiceCoordinatorAddress
-		{
-			get { return GetServiceUri().AppendPath("Coordinator"); }
-		}
+//		public static Uri ServiceCoordinatorAddress
+//		{
+//			get { return GetServiceUri().AppendPath("Coordinator"); }
+//		}
 
 
 		public static string ServiceCoordinatorPipeName
@@ -61,15 +61,15 @@ namespace Topshelf.Model
 			return "{0}/Shelf/{1}".FormatWith(GetPid(), serviceName);
 		}
 
-		public static OutboundChannel GetOutboundCoordinatorChannel()
-		{
-			return new OutboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName);
-		}
-
-		public static InboundChannel GetInboundServiceCoordinatorChannel(Action<ConnectionConfigurator> cfg)
-		{
-			return new InboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName, cfg);
-		}
+//		public static OutboundChannel GetOutboundCoordinatorChannel()
+//		{
+//			return new OutboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName);
+//		}
+//
+//		public static InboundChannel GetInboundServiceCoordinatorChannel(Action<ConnectionConfigurator> cfg)
+//		{
+//			return new InboundChannel(ServiceCoordinatorAddress, ServiceCoordinatorPipeName, cfg);
+//		}
 
 		public static InboundChannel GetInboundServiceChannel(AppDomain appDomain, Action<ConnectionConfigurator> cfg)
 		{

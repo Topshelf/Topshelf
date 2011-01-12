@@ -13,35 +13,16 @@
 namespace Topshelf.Model
 {
 	using System;
-	using System.Collections.Generic;
+	using Stact;
 
 
 	/// <summary>
 	///   Interface to the service controller
 	/// </summary>
 	public interface IServiceCoordinator :
-		IEnumerable<IServiceController>,
+		IServiceChannel,
 		IDisposable
 	{
-		/// <summary>
-		///   The number of services managed by the coordinator
-		/// </summary>
-		int ServiceCount { get; }
-
-		/// <summary>
-		///   Returns the service by name
-		/// </summary>
-		/// <param name = "serviceName">The name of the service to retrieve</param>
-		/// <returns></returns>
-		IServiceController this[string serviceName] { get; }
-
-		/// <summary>
-		/// Sends a message to the coordinator
-		/// </summary>
-		/// <typeparam name="T">The message type</typeparam>
-		/// <param name="message">The message</param>
-		void Send<T>(T message);
-
 		/// <summary>
 		///   Start the services hosted by the coordinator and wait until they have completed starting
 		///   before returning to the caller
@@ -58,6 +39,6 @@ namespace Topshelf.Model
 		/// </summary>
 		/// <param name="serviceName">The name of the service to be created</param>
 		/// <param name="serviceFactory">The factory method to use when the service is created</param>
-		void CreateService(string serviceName, Func<IServiceCoordinator, ServiceStateMachine> serviceFactory);
+		void CreateService(string serviceName, Func<Inbox, IServiceChannel, IServiceController> serviceFactory);
 	}
 }

@@ -14,30 +14,36 @@ namespace Topshelf.Model
 {
 	using System;
 	using log4net;
-	using Magnum.Channels;
-	using Magnum.Channels.Configuration;
+	using Stact;
+	using Stact.Configuration;
 
 
 	public class InboundChannel :
-		ServiceChannelBase
+		ServiceChannel
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.InboundChannel");
+		WcfChannelHost _host;
 
 		public InboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
-			: base(address, pipeName, x =>
-				{
-					configurator(x);
-
-					x.ReceiveFromWcfChannel(address, pipeName)
-						.HandleOnCallingThread();
-				})
+			: base(configurator)
 		{
 			_log.DebugFormat("Opening inbound channel at {0} ({1})", address, pipeName);
+
+			_host = new WcfChannelHost(new SynchronousFiber(), this, address, pipeName);
 		}
 
-		public InboundChannel(Uri address, string pipeName)
-			: this(address, pipeName, x => { })
+		protected override void Dispose(bool disposing)
 		{
+			if (disposing)
+			{
+				if (_host != null)
+				{
+					_host.Dispose();
+					_host = null;
+				}
+			}
+
+			base.Dispose(disposing);
 		}
 	}
 }

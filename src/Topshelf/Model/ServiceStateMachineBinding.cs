@@ -12,9 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-	using Magnum.StateMachine;
+	using Stact.StateMachine;
 
-
+	/*
 	public class ServiceStateMachineBinding :
 		StateMachineBinding<ServiceStateMachine, string>
 	{
@@ -37,5 +37,5 @@ namespace Topshelf.Model
 			Bind(ServiceStateMachine.OnUnloaded, x => x.ServiceName);
 			Bind(ServiceStateMachine.OnFaulted, x => x.ServiceName);
 		}
-	}
+	}*/
 }

@@ -18,26 +18,33 @@ namespace Topshelf.Shelving
 	using Magnum.Extensions;
 	using Messages;
 	using Model;
+	using Stact;
+	using Stact.Workflow;
 
 
 	public class ShelfServiceController :
-		ServiceStateMachine
+		IServiceController
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Shelving.ShelfServiceController");
 
 		readonly AssemblyName[] _assemblyNames;
 		readonly Type _bootstrapperType;
+		readonly UntypedChannel _eventChannel;
+		readonly Inbox _inbox;
+		readonly string _name;
 		readonly ShelfType _shelfType;
+		bool _disposed;
+		ShelfReference _reference;
 
 		int _restartCount;
 		int _restartLimit;
 
-		ShelfReference _reference;
-
-		public ShelfServiceController(string name, ServiceChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
+		public ShelfServiceController(Inbox inbox, string name, UntypedChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
 		                              AssemblyName[] assemblyNames)
-			: base(name, eventChannel)
 		{
+			_inbox = inbox;
+			_name = name;
+			_eventChannel = eventChannel;
 			_shelfType = shelfType;
 			_bootstrapperType = bootstrapperType;
 			_assemblyNames = assemblyNames;
@@ -46,38 +53,23 @@ namespace Topshelf.Shelving
 		}
 
 
-		void Send<T>(T message)
+		public Type ServiceType
 		{
-			if (_reference == null)
-			{
-				_log.WarnFormat("Unable to send service message due to null shelf reference, service = {0}, message type = {1}",
-				                Name, typeof(T).ToShortTypeName());
-				return;
-			}
-
-			try
-			{
-				_reference.Send(message);
-			}
-			catch (AppDomainUnloadedException ex)
-			{
-				_log.ErrorFormat("[Shelf:{0}] Failed to send to Shelf, AppDomain was unloaded", Name);
-
-				Publish<ServiceUnloaded>();
-			}
+			get { return typeof(Shelf); }
 		}
 
+		public State CurrentState { get; set; }
 
-		protected override void Create(CreateService message)
+		public string Name
 		{
-			Create();
+			get { return _name; }
 		}
 
-		protected override void Create()
+		public void Create()
 		{
-			_log.DebugFormat("[Shelf:{0}] Creating shelf service", Name);
+			_log.DebugFormat("[Shelf:{0}] Creating shelf service", _name);
 
-			_reference = new ShelfReference(Name, _shelfType);
+			_reference = new ShelfReference(_name, _shelfType);
 
 			if (_assemblyNames != null)
 				_assemblyNames.Each(_reference.LoadAssembly);
@@ -88,16 +80,90 @@ namespace Topshelf.Shelving
 				_reference.Create();
 		}
 
-		protected override void ServiceCreated(ServiceCreated message)
+		public void Start()
 		{
-			_log.DebugFormat("[Shelf:{0}] Shelf created at {1} ({2})", Name, message.Address, message.PipeName);
+			_log.DebugFormat("[Shelf:{0}] Start", _name);
+
+			Send(new StartService(_name));
+		}
+
+		public void Stop()
+		{
+			_log.DebugFormat("[Shelf:{0}] Stop", _name);
+
+			Send(new StopService(_name));
+		}
+
+		public void Pause()
+		{
+			_log.DebugFormat("[Shelf:{0}] Pause", _name);
+
+			Send(new PauseService(_name));
+		}
+
+		public void Continue()
+		{
+			_log.DebugFormat("[Shelf:{0}] Continue", _name);
+
+			Send(new ContinueService(_name));
+		}
+
+		public void Unload()
+		{
+			_log.DebugFormat("[Shelf:{0}] {1}", _name, "Unloading");
+			_eventChannel.Send(new ServiceUnloading(_name));
+
+			if (_reference != null)
+			{
+				Send(new UnloadService(_name));
+
+				_reference.Dispose();
+				_reference = null;
+			}
+			else
+			{
+				_eventChannel.Send(new ServiceUnloaded(_name));
+				_log.WarnFormat("[Shelf:{0}] {1}", _name, "Was already unloaded");
+			}
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		void Send<T>(T message)
+		{
+			if (_reference == null)
+			{
+				_log.WarnFormat("Unable to send service message due to null shelf reference, service = {0}, message type = {1}",
+				                _name, typeof(T).ToShortTypeName());
+				return;
+			}
+
+			try
+			{
+				_reference.Send(message);
+			}
+			catch (AppDomainUnloadedException ex)
+			{
+				_log.ErrorFormat("[Shelf:{0}] Failed to send to Shelf, AppDomain was unloaded", _name);
+
+				_eventChannel.Send(new ServiceUnloaded(_name));
+			}
+		}
+
+		void Created(ServiceCreated message)
+		{
+			_log.DebugFormat("[Shelf:{0}] Shelf created at {1} ({2})", _name, message.Address, message.PipeName);
 
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
 
-		protected override void ServiceFaulted(ServiceFault message)
+		void Faulted(ServiceFault message)
 		{
-			_log.ErrorFormat("[Shelf:{0}] Shelf Service Faulted: {1}", Name, message.ExceptionDetail);
+			_log.ErrorFormat("[Shelf:{0}] Shelf Service Faulted: {1}", _name, message.ExceptionDetail);
 
 			try
 			{
@@ -105,14 +171,14 @@ namespace Topshelf.Shelving
 			}
 			catch (Exception ex)
 			{
-				_log.Error("[Shelf:{0}] Exception disposing of reference" + Name, ex);
+				_log.Error("[Shelf:{0}] Exception disposing of reference" + _name, ex);
 			}
 			finally
 			{
 				_reference = null;
 			}
 
-			_log.DebugFormat("[Shelf:{0}] Shelf Reference Discarded", Name);
+			_log.DebugFormat("[Shelf:{0}] Shelf Reference Discarded", _name);
 
 			RestartService();
 		}
@@ -121,60 +187,34 @@ namespace Topshelf.Shelving
 		{
 			if (_restartCount >= _restartLimit)
 			{
-				_log.DebugFormat("[Shelf:{0}] Restart Limit Reached ({1})", Name, _restartCount);
+				_log.DebugFormat("[Shelf:{0}] Restart Limit Reached ({1})", _name, _restartCount);
 				return;
 			}
 
 			_restartCount++;
 
-			Publish(new RestartService(Name));
+			_eventChannel.Send(new RestartService(_name));
 		}
 
-		protected override void Start()
+		~ShelfServiceController()
 		{
-			_log.DebugFormat("[Shelf:{0}] Start", Name);
-
-			Send(new StartService(Name));
+			Dispose(false);
 		}
 
-		protected override void Stop()
+		void Dispose(bool disposing)
 		{
-			_log.DebugFormat("[Shelf:{0}] Stop", Name);
-
-			Send(new StopService(Name));
-		}
-
-		protected override void Pause()
-		{
-			_log.DebugFormat("[Shelf:{0}] Pause", Name);
-
-			Send(new PauseService(Name));
-		}
-
-		protected override void Continue()
-		{
-			_log.DebugFormat("[Shelf:{0}] Continue", Name);
-
-			Send(new ContinueService(Name));
-		}
-
-		protected override void Unload()
-		{
-			_log.DebugFormat("[Shelf:{0}] {1}", Name, "Unloading");
-			Publish<ServiceUnloading>();
-
-			if (_reference != null)
+			if (_disposed)
+				return;
+			if (disposing)
 			{
-				Send(new UnloadService(Name));
+				if (_reference != null)
+				{
+					_reference.Dispose();
+					_reference = null;
+				}
+			}
 
-				_reference.Dispose();
-				_reference = null;
-			}
-			else
-			{
-				Publish<ServiceUnloaded>();
-				_log.WarnFormat("[Shelf:{0}] {1}", Name, "Was already unloaded");
-			}
+			_disposed = true;
 		}
 	}
 }

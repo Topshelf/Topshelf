@@ -16,18 +16,20 @@ namespace Topshelf.Specs
 	using System.IO;
 	using System.Threading;
 	using FileSystem;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Messages;
 	using Model;
 	using NUnit.Framework;
 	using Shelving;
+	using Stact;
 
 
-    [TestFixture, Slow, Explicit("Not meaningful any more")]
+	[TestFixture, Slow, Explicit("Not meaningful any more")]
 	public class DirectoryMonitor_Specs
 	{
+		IServiceCoordinator _coordinator;
+
 		[TearDown]
 		[SetUp]
 		public void CleanUp()
@@ -93,11 +95,9 @@ namespace Topshelf.Specs
 			long count = 0;
 			string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 			using (var manualResetEvent = new ManualResetEvent(false))
-			using (var dm = new DirectoryMonitor("."))
+			using (var dm = new DirectoryMonitor(".", _coordinator))
 			{
 				var myChannel = new ChannelAdapter();
-				using (AddressRegistry.GetInboundServiceCoordinatorChannel(x => { }))
-				{
 					dm.Start();
 
 					myChannel.Connect(sc => sc.AddConsumerOf<ServiceFolderChanged>()
@@ -133,7 +133,6 @@ namespace Topshelf.Specs
 					//Console.WriteLine("-- Done");
 
 					count.ShouldEqual(4);
-				}
 			}
 		}
 
