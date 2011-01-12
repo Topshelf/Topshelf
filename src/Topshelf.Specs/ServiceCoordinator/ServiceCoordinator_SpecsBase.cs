@@ -32,13 +32,14 @@ namespace Topshelf.Specs.ServiceCoordinator
 		                                Action<T> continueAction, InternalServiceFactory<T> serviceFactory)
 			where T : class
 		{
-			Coordinator.CreateService(serviceName, n => new LocalServiceController<T>(serviceName,
-			                                                                          Coordinator,
-			                                                                          startAction,
-			                                                                          stopAction,
-			                                                                          pauseAction,
-			                                                                          continueAction,
-			                                                                          serviceFactory));
+			Coordinator.CreateService(serviceName, (inbox, coordinator) => new LocalServiceController<T>(serviceName,
+			                                                                                             inbox,
+			                                                                                             Coordinator,
+			                                                                                             startAction,
+			                                                                                             stopAction,
+			                                                                                             pauseAction,
+			                                                                                             continueAction,
+			                                                                                             serviceFactory));
 		}
 
 		[Given]

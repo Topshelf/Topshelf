@@ -33,16 +33,16 @@ namespace Topshelf.Specs.ServiceCoordinator
 
 			_serviceCoordinator = new ServiceCoordinator(new PoolFiber(), x => { }, x => { }, x => { }, 1.Minutes());
 			_serviceCoordinator.CreateService("test",
-			                                  n =>
-			                                  new LocalServiceController<TestService>("test", _serviceCoordinator,
+			                                  (inbox,coordinator) =>
+			                                  new LocalServiceController<TestService>("test", inbox, coordinator,
 			                                                                     x => x.Start(),
 			                                                                     x => x.Stop(),
 			                                                                     x => x.Pause(),
 			                                                                     x => x.Continue(),
 			                                                                     (x, c) => _service));
 			_serviceCoordinator.CreateService("test2",
-			                                  n =>
-			                                  new LocalServiceController<TestService>("test2", _serviceCoordinator,
+											  (inbox, coordinator) =>
+											  new LocalServiceController<TestService>("test2", inbox, coordinator,
 			                                                                     x => x.Start(),
 			                                                                     x => x.Stop(),
 			                                                                     x => x.Pause(),
