@@ -13,7 +13,6 @@
 namespace Topshelf.Model
 {
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
@@ -253,9 +252,22 @@ namespace Topshelf.Model
 		void OnServiceFault(ServiceFault message)
 		{
 			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
+			
+			if(message.ServiceName == AppDomain.CurrentDomain.FriendlyName)
+			{
+				// we caught an unhandled exception, so what should we do? How about restarting all the services?
+
+				if(_stopping == false)
+				{
+					_actorCache.Each((name,x) => x.Send(new RestartService(name)));
+				}
+			}
 
 			if (_stopping)
-				_actorCache[message.ServiceName].Send(new UnloadService(message.ServiceName));
+			{
+				if(_actorCache.Has(message.ServiceName))
+					_actorCache[message.ServiceName].Send(new UnloadService(message.ServiceName));
+			}
 
 			EventChannel.Send(message);
 		}

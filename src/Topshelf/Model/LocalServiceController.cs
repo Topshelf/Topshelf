@@ -75,7 +75,7 @@ namespace Topshelf.Model
 		{
 			try
 			{
-				_log.DebugFormat("[{0}] Creating service", _name);
+				_log.DebugFormat("[{0}] Create", _name);
 
 				_instance = _serviceFactory(_name, _coordinatorChannel);
 
@@ -84,6 +84,8 @@ namespace Topshelf.Model
 					throw new NullReferenceException("The service instance returned was null for service type "
 					                                 + typeof(TService).ToShortTypeName());
 				}
+
+				_log.InfoFormat("[{0}] Create complete", _name);
 
 				Publish(new ServiceCreated(_name));
 			}

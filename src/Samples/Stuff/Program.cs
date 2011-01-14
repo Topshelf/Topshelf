@@ -14,7 +14,6 @@ namespace Stuff
 {
     using System;
     using System.IO;
-    using System.Timers;
     using log4net.Config;
     using Topshelf;
     using Topshelf.Configuration;
@@ -48,27 +47,6 @@ namespace Stuff
             });
 
             Runner.Host(cfg, args);
-        }
-    }
-
-    public class TownCrier
-    {
-        readonly Timer _timer;
-
-        public TownCrier()
-        {
-            _timer = new Timer(1000) {AutoReset = true};
-            _timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now);
-        }
-
-        public void Start()
-        {
-            _timer.Start();
-        }
-
-        public void Stop()
-        {
-            _timer.Stop();
         }
     }
 }

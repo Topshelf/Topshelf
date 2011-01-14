@@ -26,7 +26,7 @@ namespace Topshelf.Model
 		Event<ContinueService> Continue { get; }
 		Event<RestartService> Restart { get; }
 
-	
+
 		Event<ServiceCreated> OnCreated { get; }
 		Event<ServiceRunning> OnRunning { get; }
 		Event<ServiceStopped> OnStopped { get; }
@@ -47,6 +47,7 @@ namespace Topshelf.Model
 		State Stopping { get; }
 		State Stopped { get; }
 		State StoppingToRestart { get; }
+		State UnloadingToRestart { get; }
 		State CreatingToRestart { get; }
 		State Restarting { get; }
 		State Unloading { get; }

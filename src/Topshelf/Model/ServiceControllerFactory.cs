@@ -74,7 +74,7 @@ namespace Topshelf.Model
 				.TransitionTo(s => s.Starting)
 				.Then(i => i.Start)
 				.InCaseOf()
-				.Exception<BuildServiceException>()
+				.Exception<Exception>()
 				.TransitionTo(s => s.Faulted);
 
 			x.During(s => s.Creating)
@@ -165,19 +165,26 @@ namespace Topshelf.Model
 
 			x.During(s => s.StoppingToRestart)
 				.When(e => e.OnStopped)
+				.TransitionTo(s => s.UnloadingToRestart)
 				.Then(i => i.Unload)
+				.AcceptFault();
+
+			x.During(s => s.UnloadingToRestart)
+				.When(e => e.OnUnloaded)
 				.TransitionTo(s => s.CreatingToRestart)
 				.Then(i => i.Create)
 				.AcceptFault();
 
 			x.During(s => s.CreatingToRestart)
-				.AcceptFault()
+				.AcceptFault();
+
+			x.During(s => s.CreatingToRestart)
 				.When(e => e.OnCreated)
 				.TransitionTo(s => s.Created)
 				.TransitionTo(s => s.Restarting)
 				.Then(i => i.Start())
 				.InCaseOf()
-				.Exception<BuildServiceException>()
+				.Exception<Exception>()
 				.Then((i, m) => { }) // m.Respond(new ServiceFault(i.Name, null /* TODO get ex */)))
 				.TransitionTo(s => s.Faulted);
 
@@ -215,8 +222,8 @@ namespace Topshelf.Model
 		{
 			return configurator
 				.When(e => e.Pause)
-				.Then(i => i.Pause)
-				.TransitionTo(s => s.Pausing);
+				.TransitionTo(s => s.Pausing)
+				.Then(i => i.Pause);
 		}
 
 		public static ActivityConfigurator<IServiceWorkflow, IServiceController, ServiceFault> AcceptFault(
@@ -233,8 +240,8 @@ namespace Topshelf.Model
 		{
 			return configurator
 				.When(e => e.Restart)
-				.Then(i => i.Stop)
-				.TransitionTo(s => s.StoppingToRestart);
+				.TransitionTo(s => s.StoppingToRestart)
+				.Then(i => i.Stop);
 		}
 
 		public static ActivityConfigurator<IServiceWorkflow, IServiceController, ServiceFault> LogFault(
