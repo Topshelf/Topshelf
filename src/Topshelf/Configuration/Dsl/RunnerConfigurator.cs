@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -118,6 +118,11 @@ namespace Topshelf.Configuration.Dsl
 		public void SetEventTimeout(TimeSpan timeout)
 		{
 			_timeout = timeout;
+		}
+
+		public void UseServiceRecovery(Action<IServiceRecoveryConfigurator> recoveryConfigurator)
+		{
+			recoveryConfigurator(new ServiceRecoveryConfigurator(_winServiceSettings.ServiceRecoveryOptions));
 		}
 
 		/// <summary>

@@ -86,6 +86,15 @@
     <Compile Include="Commands\CommandUtil.cs" />
     <Compile Include="Commands\RunCommand.cs" />
     <Compile Include="Commands\InstallService.cs" />
+    <Compile Include="Configuration\Dsl\IServiceFailureConfiguration.cs" />
+    <Compile Include="Configuration\Dsl\IServiceFailureRestartConfiguration.cs" />
+    <Compile Include="Configuration\Dsl\IServiceFailureRestartConfigurationDisplayMessage.cs" />
+    <Compile Include="Configuration\Dsl\IServiceFailureRestartConfigurationWait.cs" />
+    <Compile Include="Configuration\Dsl\IServiceRecoveryConfigurator.cs" />
+    <Compile Include="Configuration\Dsl\ServiceFailure.cs" />
+    <Compile Include="Configuration\Dsl\ServiceFailureConfiguration.cs" />
+    <Compile Include="Configuration\Dsl\ServiceFailureRestartConfiguration.cs" />
+    <Compile Include="Configuration\Dsl\ServiceRecoveryConfigurator.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
     <Compile Include="Exceptions\TopshelfException.cs" />
@@ -132,6 +141,9 @@
     <Compile Include="Shelving\ShelfServiceController.cs" />
     <Compile Include="Shelving\ShelfType.cs" />
     <Compile Include="UninstallCommand.cs" />
+    <Compile Include="WindowsServiceCode\ServiceControlHelper.cs" />
+    <Compile Include="WindowsServiceCode\ServiceRecoveryAction.cs" />
+    <Compile Include="WindowsServiceCode\ServiceRecoveryOptions.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Exceptions\BuildServiceException.cs" />

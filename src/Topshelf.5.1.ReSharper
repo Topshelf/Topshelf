@@ -269,12 +269,16 @@ II.2.12 <HandlesEvent />
       <Naming2 />
     </Web>
     <Xaml>
-      <Naming2 />
+      <Naming2>
+        <UserRule Name="XAML_FIELD" Inspect="True" Prefix="_" Suffix="" Style="aaBb" />
+        <UserRule Name="NAMESPACE_ALIAS" Inspect="True" Prefix="" Suffix="" Style="AaBb" />
+        <UserRule Name="XAML_RESOURCE" Inspect="True" Prefix="" Suffix="" Style="AaBb" />
+      </Naming2>
     </Xaml>
     <XML>
       <FormatSettings />
     </XML>
-    <FileHeader><![CDATA[Copyright 2007-2010 The Apache Software Foundation.
+    <FileHeader><![CDATA[Copyright 2007-2011 The Apache Software Foundation.
  
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 this file except in compliance with the License. You may obtain a copy of the 

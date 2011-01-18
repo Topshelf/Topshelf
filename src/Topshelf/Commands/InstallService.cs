@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -27,7 +27,7 @@ namespace Topshelf.Commands
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Commands.InstallService");
 
 		readonly WinServiceSettings _settings;
-		string _commandLine;
+		readonly string _commandLine;
 
 		public InstallService(WinServiceSettings settings, string commandLine)
 		{
@@ -81,6 +81,7 @@ namespace Topshelf.Commands
 
 			var installer = new HostServiceInstaller(_settings);
 			WinServiceHelper.Register(_settings.ServiceName.FullName, installer);
+			WinServiceHelper.SetRecoveryOptions(_settings.ServiceName.FullName, _settings.ServiceRecoveryOptions);
 		}
 
 		#endregion

@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -15,6 +15,7 @@ namespace Topshelf.Configuration
 	using System.Collections.Generic;
 	using System.Configuration;
 	using System.ServiceProcess;
+	using WindowsServiceCode;
 
 
 	public class WinServiceSettings
@@ -34,6 +35,7 @@ namespace Topshelf.Configuration
 		public string DisplayName { private get; set; }
 		public string Description { get; set; }
 		public Credentials Credentials { get; set; }
+		public ServiceRecoveryOptions ServiceRecoveryOptions { get; set; }
 
 		public string FullDisplayName
 		{
