@@ -20,7 +20,9 @@ namespace Topshelf.WindowsServiceCode
 	using Configuration;
 	using log4net;
 
-
+	/// <summary>
+	/// Taken from http://code.google.com/p/daemoniq. Thanks guys!
+	/// </summary>
 	public static class WinServiceHelper
     {
         static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.WinServiceHelper");
