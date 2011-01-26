@@ -20,6 +20,7 @@ namespace Topshelf.Shelving
 	using log4net;
 	using Magnum.Extensions;
 	using Model;
+	using Stact;
 
 
 	public class ShelfReference :
@@ -29,16 +30,19 @@ namespace Topshelf.Shelving
 
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;
+		readonly UntypedChannel _controllerChannel;
 		OutboundChannel _channel;
 		bool _disposed;
 		AppDomain _domain;
 		AppDomainSetup _domainSettings;
 		ObjectHandle _objectHandle;
+		HostChannel _hostChannel;
 
-		public ShelfReference(string serviceName, ShelfType shelfType)
+		public ShelfReference(string serviceName, ShelfType shelfType, UntypedChannel controllerChannel)
 		{
 			_serviceName = serviceName;
 			_shelfType = shelfType;
+			_controllerChannel = controllerChannel;
 
 			ConfigureAppDomainSettings();
 
@@ -83,14 +87,20 @@ namespace Topshelf.Shelving
 			CreateShelfInstance(bootstrapperType);
 		}
 
-		void CreateShelfInstance(params object[] args)
+		void CreateShelfInstance(Type bootstrapperType)
 		{
+			_log.DebugFormat("[{0}] Creating Host Channel", _serviceName);
+
+			_hostChannel = HostChannelFactory.CreateShelfControllerHost(_controllerChannel, _serviceName);
+
+			_log.InfoFormat("[{0}] Created Host Channel: {1}({2})", _serviceName, _hostChannel.Address, _hostChannel.PipeName);
+
 			_log.DebugFormat("Creating Shelf Instance: " + _serviceName);
 
 			Type shelfType = typeof(Shelf);
 
 			_objectHandle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                       args ?? new object[] {null},
+			                       new object[] {bootstrapperType, _hostChannel.Address, _hostChannel.PipeName},
 			                       null, null, null);
 		}
 
@@ -131,6 +141,12 @@ namespace Topshelf.Shelving
 				return;
 			if (disposing)
 			{
+				if(_hostChannel != null)
+				{
+					_hostChannel.Dispose();
+					_hostChannel = null;
+				}
+
 				if (_channel != null)
 				{
 					_channel.Dispose();

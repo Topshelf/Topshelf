@@ -14,6 +14,7 @@ namespace Topshelf.Shelving
 {
 	using System;
 	using System.Reflection;
+	using Exceptions;
 	using log4net;
 	using Magnum.Extensions;
 	using Messages;
@@ -29,27 +30,37 @@ namespace Topshelf.Shelving
 
 		readonly AssemblyName[] _assemblyNames;
 		readonly Type _bootstrapperType;
-		readonly UntypedChannel _eventChannel;
 		readonly Inbox _inbox;
 		readonly string _name;
+		readonly PublishChannel _publish;
 		readonly ShelfType _shelfType;
 		bool _disposed;
 		ShelfReference _reference;
 
-		int _restartCount;
-		int _restartLimit;
-
-		public ShelfServiceController(Inbox inbox, string name, UntypedChannel eventChannel, ShelfType shelfType, Type bootstrapperType,
-		                              AssemblyName[] assemblyNames)
+		public ShelfServiceController(Inbox inbox, string name, IServiceChannel coordinatorChannel, ShelfType shelfType,
+		                              Type bootstrapperType, AssemblyName[] assemblyNames)
 		{
 			_inbox = inbox;
 			_name = name;
-			_eventChannel = eventChannel;
+			_publish = new PublishChannel(coordinatorChannel, inbox);
 			_shelfType = shelfType;
 			_bootstrapperType = bootstrapperType;
 			_assemblyNames = assemblyNames;
 
-			_restartLimit = 5;
+			_inbox.Loop(loop =>
+				{
+					loop.Receive<ShelfCreated>(x =>
+						{
+							ShelfCreated(x);
+							loop.Repeat();
+						});
+
+					loop.Receive<ServiceUnloaded>(x =>
+						{
+							ShelfUnloaded(x);
+							loop.Repeat();
+						});
+				});
 		}
 
 
@@ -67,17 +78,24 @@ namespace Topshelf.Shelving
 
 		public void Create()
 		{
-			_log.DebugFormat("[Shelf:{0}] Creating shelf service", _name);
+			try
+			{
+				_log.DebugFormat("[Shelf:{0}] Create", _name);
 
-			_reference = new ShelfReference(_name, _shelfType);
+				_reference = new ShelfReference(_name, _shelfType, _publish);
 
-			if (_assemblyNames != null)
-				_assemblyNames.Each(_reference.LoadAssembly);
+				if (_assemblyNames != null)
+					_assemblyNames.Each(_reference.LoadAssembly);
 
-			if (_bootstrapperType != null)
-				_reference.Create(_bootstrapperType);
-			else
-				_reference.Create();
+				if (_bootstrapperType != null)
+					_reference.Create(_bootstrapperType);
+				else
+					_reference.Create();
+			}
+			catch (Exception ex)
+			{
+				_publish.Send(new ServiceFault(_name, new BuildServiceException(_name, _bootstrapperType, ex)));
+			}
 		}
 
 		public void Start()
@@ -111,18 +129,15 @@ namespace Topshelf.Shelving
 		public void Unload()
 		{
 			_log.DebugFormat("[Shelf:{0}] {1}", _name, "Unloading");
-			_eventChannel.Send(new ServiceUnloading(_name));
+			_publish.Send(new ServiceUnloading(_name));
 
 			if (_reference != null)
 			{
 				Send(new UnloadService(_name));
-
-				_reference.Dispose();
-				_reference = null;
 			}
 			else
 			{
-				_eventChannel.Send(new ServiceUnloaded(_name));
+				_publish.Send(new ServiceUnloaded(_name));
 				_log.WarnFormat("[Shelf:{0}] {1}", _name, "Was already unloaded");
 			}
 		}
@@ -150,50 +165,25 @@ namespace Topshelf.Shelving
 			{
 				_log.ErrorFormat("[Shelf:{0}] Failed to send to Shelf, AppDomain was unloaded", _name);
 
-				_eventChannel.Send(new ServiceUnloaded(_name));
+				_publish.Send(new ServiceUnloaded(_name));
 			}
 		}
 
-		void Created(ServiceCreated message)
+		void ShelfCreated(ShelfCreated message)
 		{
 			_log.DebugFormat("[Shelf:{0}] Shelf created at {1} ({2})", _name, message.Address, message.PipeName);
 
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
 
-		void Faulted(ServiceFault message)
+		void ShelfUnloaded(ServiceUnloaded message)
 		{
-			_log.ErrorFormat("[Shelf:{0}] Shelf Service Faulted: {1}", _name, message.ExceptionDetail);
+			_reference.Dispose();
+			_reference = null;
 
-			try
-			{
-				_reference.Dispose();
-			}
-			catch (Exception ex)
-			{
-				_log.Error("[Shelf:{0}] Exception disposing of reference" + _name, ex);
-			}
-			finally
-			{
-				_reference = null;
-			}
+			_log.DebugFormat("[Shelf:{0}] {1}", _name, "Unloaded");
 
-			_log.DebugFormat("[Shelf:{0}] Shelf Reference Discarded", _name);
-
-			RestartService();
-		}
-
-		void RestartService()
-		{
-			if (_restartCount >= _restartLimit)
-			{
-				_log.DebugFormat("[Shelf:{0}] Restart Limit Reached ({1})", _name, _restartCount);
-				return;
-			}
-
-			_restartCount++;
-
-			_eventChannel.Send(new RestartService(_name));
+			_publish.Send(message);
 		}
 
 		~ShelfServiceController()

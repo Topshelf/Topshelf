@@ -20,6 +20,7 @@ namespace Topshelf.Shelving
 	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
+	using Magnum;
 	using Magnum.Extensions;
 	using Magnum.Reflection;
 	using Messages;
@@ -33,17 +34,22 @@ namespace Topshelf.Shelving
 		IDisposable
 	{
 		readonly Type _bootstrapperType;
+		readonly Uri _controllerAddress;
+		readonly string _controllerPipeName;
 		readonly ILog _log;
 		readonly string _serviceName;
-		InboundChannel _channel;
-		OutboundChannel _coordinatorChannel;
+		OutboundChannel _controllerChannel;
 		bool _disposed;
 		PoolFiber _fiber;
 		IServiceController _service;
+		HostChannel _channel;
+		PublishChannel _publish;
 
-		public Shelf(Type bootstrapperType, Uri address, string pipeName)
+		public Shelf(Type bootstrapperType, Uri controllerAddress, string controllerPipeName)
 		{
 			_bootstrapperType = bootstrapperType;
+			_controllerAddress = controllerAddress;
+			_controllerPipeName = controllerPipeName;
 
 			BootstrapLogger();
 
@@ -52,8 +58,6 @@ namespace Topshelf.Shelving
 			_log = LogManager.GetLogger("Topshelf.Shelf." + _serviceName);
 
 			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-
-			_coordinatorChannel = new OutboundChannel(address, pipeName);
 
 			Create();
 		}
@@ -81,10 +85,10 @@ namespace Topshelf.Shelving
 					_channel = null;
 				}
 
-				if (_coordinatorChannel != null)
+				if (_controllerChannel != null)
 				{
-					_coordinatorChannel.Dispose();
-					_coordinatorChannel = null;
+					_controllerChannel.Dispose();
+					_controllerChannel = null;
 				}
 
 				LogManager.Shutdown();
@@ -97,6 +101,8 @@ namespace Topshelf.Shelving
 		{
 			try
 			{
+				_controllerChannel = new OutboundChannel(_controllerAddress, _controllerPipeName);
+
 				Type type = FindBootstrapperImplementationType(_bootstrapperType);
 
 				_log.DebugFormat("[{0}] Creating bootstrapper: {1}", _serviceName, type.ToShortTypeName());
@@ -137,14 +143,17 @@ namespace Topshelf.Shelving
 
 			_fiber = new PoolFiber();
 
-			_channel = AddressRegistry.GetInboundServiceChannel(AppDomain.CurrentDomain, AddEventForwarders);
+			_channel = HostChannelFactory.CreateShelfHost(_serviceName, AddEventForwarders);
 
+			_controllerChannel.Send(new ShelfCreated(_serviceName, _channel.Address, _channel.PipeName));
 
 			var controllerFactory = new ServiceControllerFactory();
 
 			ActorFactory<IServiceController> factory = controllerFactory.CreateFactory(inbox =>
 				{
-					_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, inbox, _coordinatorChannel);
+					_publish = new PublishChannel(_channel, inbox);
+
+					_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, inbox, _publish);
 					return _service;
 				});
 
@@ -154,7 +163,7 @@ namespace Topshelf.Shelving
 
 			// this creates the state machine instance in the shelf and tells the servicecontroller
 			// to create the service
-			_channel.Send(new CreateService(_serviceName));
+			instance.Send(new CreateService(_serviceName));
 		}
 
 		void AddEventForwarders(ConnectionConfigurator x)
@@ -164,29 +173,37 @@ namespace Topshelf.Shelving
 			// is given the shelf channel as the reporting channel for events, and the shelf forwards
 			// the events to the service coordinator
 
+			x.AddConsumerOf<ServiceEvent>()
+				.UsingConsumer(OnServiceEvent)
+				.HandleOnCallingThread();
+
 			x.AddConsumerOf<ServiceCreated>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.UsingConsumer(m => _controllerChannel.Send(m))
+				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServiceFolderChanged>()
+				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceRunning>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceStopped>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServicePaused>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceUnloaded>()
 				.UsingConsumer(m =>
 					{
-						_coordinatorChannel.Send(m);
 						_log.InfoFormat("[{0}] Unloading Shelf and AppDomain", _serviceName);
+						_controllerChannel.Send(m);
+						ThreadUtil.Sleep(1.Seconds());
 						Dispose();
 						AppDomain.Unload(AppDomain.CurrentDomain);
 					})
 				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceFault>()
-				.UsingConsumer(m => _coordinatorChannel.Send(m))
+				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);
 		}
 
@@ -240,12 +257,17 @@ namespace Topshelf.Shelving
 		{
 			try
 			{
-				_channel.Send(new ServiceFault(_serviceName, ex));
+				_controllerChannel.Send(new ServiceFault(_serviceName, ex));
 			}
 			catch (Exception)
 			{
 				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
 			}
+		}
+
+		void OnServiceEvent(ServiceEvent message)
+		{
+			_log.InfoFormat("<{0}> {1}", message.ServiceName, message.EventType);
 		}
 
 		static void BootstrapLogger()

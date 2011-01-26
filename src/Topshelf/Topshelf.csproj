@@ -121,10 +121,11 @@
     <Compile Include="Messages\ServiceUnloaded.cs" />
     <Compile Include="Messages\ServiceStarting.cs" />
     <Compile Include="Messages\ServiceStopping.cs" />
+    <Compile Include="Messages\ShelfCreated.cs" />
     <Compile Include="Messages\StartService.cs" />
     <Compile Include="Messages\StopService.cs" />
     <Compile Include="Messages\UnloadService.cs" />
-    <Compile Include="Model\InboundChannel.cs" />
+    <Compile Include="Model\HostChannel.cs" />
     <Compile Include="Model\IServiceWorkflow.cs" />
     <Compile Include="Model\OutboundChannel.cs" />
     <Compile Include="Model\IServiceChannel.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Model\ServiceStateMachineBinding.cs" />
     <Compile Include="Model\LocalServiceController.cs" />
     <Compile Include="Model\ServiceControllerFactory.cs" />
+    <Compile Include="Shelving\PublishChannel.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
     <Compile Include="Shelving\ShelfReference.cs" />
     <Compile Include="Shelving\ShelfServiceController.cs" />
@@ -152,13 +154,12 @@
     <Compile Include="Configuration\ServiceActionNames.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Shelving\Shelf.cs" />
-    <Compile Include="Model\AddressRegistry.cs" />
+    <Compile Include="Model\HostChannelFactory.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
     <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
-    <Compile Include="Model\ServiceController.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="TopshelfArguments.cs" />

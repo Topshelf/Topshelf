@@ -10,19 +10,29 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Messages
+namespace Topshelf.Shelving
 {
-	public class ServiceCreated :
-		ServiceEvent
+	using Model;
+	using Stact;
+
+
+	public class PublishChannel :
+		UntypedChannel,
+		IServiceChannel
 	{
-		public ServiceCreated(string serviceName)
-			: base(serviceName)
+		readonly IServiceChannel _channel;
+		readonly UntypedChannel _inbox;
+
+		public PublishChannel(IServiceChannel channel, UntypedChannel inbox)
 		{
-			EventType = ServiceEventType.Created;
+			_channel = channel;
+			_inbox = inbox;
 		}
 
-		protected ServiceCreated()
+		public void Send<T>(T message)
 		{
+			_channel.Send(message);
+			_inbox.Send(message);
 		}
 	}
 }

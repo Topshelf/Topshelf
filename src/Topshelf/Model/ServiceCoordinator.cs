@@ -21,6 +21,7 @@ namespace Topshelf.Model
 	using log4net;
 	using Magnum;
 	using Magnum.Collections;
+	using Magnum.Extensions;
 	using Messages;
 	using Shelving;
 	using Stact;
@@ -69,7 +70,7 @@ namespace Topshelf.Model
 		}
 
 		public ServiceCoordinator()
-			: this(new PoolFiber(), null, null, null, Magnum.Extensions.ExtensionsToTimeSpan.Minutes(1))
+			: this(new PoolFiber(), null, null, null, 1.Minutes())
 		{
 		}
 
@@ -193,7 +194,7 @@ namespace Topshelf.Model
 
 			while (SystemUtil.Now < stopTime)
 			{
-				_updated.WaitOne(Magnum.Extensions.ExtensionsToTimeSpan.Seconds(1));
+				_updated.WaitOne(1.Seconds());
 
 				bool success = services
 				               	.Where(key => _serviceCache.Has(key))
@@ -217,14 +218,14 @@ namespace Topshelf.Model
 
 		void OnCreateShelfService(CreateShelfService message)
 		{
-			_log.InfoFormat("[Topshelf] Received shelf request for {0}{1}", message.ServiceName,
+			_log.InfoFormat("[Topshelf] Create Shelf Service: {0}{1}", message.ServiceName,
 			                message.BootstrapperType == null
 			                	? ""
-			                	: " ({0})".FormatWith(Magnum.Extensions.ExtensionsToType.ToShortTypeName(message.BootstrapperType)));
+			                	: " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()));
 
 			var factory = _controllerFactory.CreateFactory(inbox =>
 				{
-					IServiceController controller = new ShelfServiceController(inbox, message.ServiceName, _channel, message.ShelfType,
+					IServiceController controller = new ShelfServiceController(inbox, message.ServiceName, this, message.ShelfType,
 					                                                           message.BootstrapperType, message.AssemblyNames);
 					_serviceCache.Add(message.ServiceName, controller);
 
@@ -278,16 +279,15 @@ namespace Topshelf.Model
 
 			while (SystemUtil.Now < stopTime)
 			{
-				_updated.WaitOne(Magnum.Extensions.ExtensionsToTimeSpan.Seconds(1));
+				_updated.WaitOne(1.Seconds());
 
-				if (AllServiceInState(state))
+				if (GetServicesNotInState(state).Count() == 0)
 					break;
 			}
 
-			if (!AllServiceInState(state))
+			if (GetServicesNotInState(state).Count() > 0)
 			{
-				Magnum.Extensions.ExtensionsToEnumerable.Each(_serviceCache.Where(x => x.CurrentState != state),
-				                                              x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
+				GetServicesNotInState(state).Each(x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
 
 				throw new InvalidOperationException("All services were not {0} within the specified timeout".FormatWith(state.Name));
 			}
@@ -301,7 +301,7 @@ namespace Topshelf.Model
 
 		void OnServiceEvent(ServiceEvent message)
 		{
-			_log.InfoFormat("[{0}] {1}", message.ServiceName, message.EventType);
+			_log.InfoFormat("({0}) {1}", message.ServiceName, message.EventType);
 			_updated.Set();
 		}
 
@@ -332,9 +332,10 @@ namespace Topshelf.Model
 			_disposed = true;
 		}
 
-		bool AllServiceInState(State expected)
+		IEnumerable<IServiceController> GetServicesNotInState(State expected)
 		{
-			return _serviceCache.Count() > 0 && _serviceCache.All(x => x.CurrentState == expected);
+			return _serviceCache
+				.Where(x => x.CurrentState != expected);
 		}
 
 		void SendStopCommandToServices()

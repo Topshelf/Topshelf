@@ -28,5 +28,6 @@ namespace Topshelf.Messages
 		Unloading,
 		Completed,
 		FolderChanged,
+		ShelfCreated,
 	}
 }
