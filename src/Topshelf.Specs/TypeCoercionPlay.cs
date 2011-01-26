@@ -13,6 +13,7 @@
 namespace Topshelf.Specs
 {
     using System;
+    using Model;
     using Shelving;
     using Topshelf.Configuration.Dsl;
 

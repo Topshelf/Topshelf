@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf.Model
 {
 	using System;
 	using System.Reflection;
@@ -18,7 +18,6 @@ namespace Topshelf.Shelving
 	using log4net;
 	using Magnum.Extensions;
 	using Messages;
-	using Model;
 	using Stact;
 	using Stact.Workflow;
 
@@ -26,7 +25,7 @@ namespace Topshelf.Shelving
 	public class ShelfServiceController :
 		IServiceController
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Shelving.ShelfServiceController");
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ShelfServiceController");
 
 		readonly AssemblyName[] _assemblyNames;
 		readonly Type _bootstrapperType;
@@ -132,9 +131,7 @@ namespace Topshelf.Shelving
 			_publish.Send(new ServiceUnloading(_name));
 
 			if (_reference != null)
-			{
 				Send(new UnloadService(_name));
-			}
 			else
 			{
 				_publish.Send(new ServiceUnloaded(_name));

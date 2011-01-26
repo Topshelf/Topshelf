@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf.Model
 {
 	using System;
 	using System.Configuration;
@@ -19,14 +19,13 @@ namespace Topshelf.Shelving
 	using System.Runtime.Remoting;
 	using log4net;
 	using Magnum.Extensions;
-	using Model;
 	using Stact;
 
 
 	public class ShelfReference :
 		IDisposable
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Shelving.ShelfReference");
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ShelfReference");
 
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;

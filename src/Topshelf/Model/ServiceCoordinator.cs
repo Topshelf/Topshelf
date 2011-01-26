@@ -23,7 +23,6 @@ namespace Topshelf.Model
 	using Magnum.Collections;
 	using Magnum.Extensions;
 	using Messages;
-	using Shelving;
 	using Stact;
 	using Stact.Workflow;
 
@@ -32,13 +31,13 @@ namespace Topshelf.Model
 		IServiceCoordinator
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceCoordinator");
+		readonly Cache<string, ActorInstance> _actorCache;
 		readonly Action<IServiceCoordinator> _afterStartingServices;
 		readonly Action<IServiceCoordinator> _afterStoppingServices;
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
 		readonly ServiceControllerFactory _controllerFactory;
 		readonly Fiber _fiber;
 		readonly Cache<string, IServiceController> _serviceCache;
-		readonly Cache<string, ActorInstance> _actorCache;
 		readonly Cache<string, Func<Inbox, IServiceChannel, IServiceController>> _startupServices;
 		readonly TimeSpan _timeout;
 		readonly AutoResetEvent _updated = new AutoResetEvent(true);
@@ -100,15 +99,15 @@ namespace Topshelf.Model
 
 			_startupServices.Each((name, builder) =>
 				{
-					var factory = _controllerFactory.CreateFactory(inbox =>
+					ActorFactory<IServiceController> factory = _controllerFactory.CreateFactory(inbox =>
 						{
 							IServiceController controller = builder(inbox, this);
 							_serviceCache.Add(name, controller);
 
-						return controller;
-					});
+							return controller;
+						});
 
-					var instance = factory.GetActor();
+					ActorInstance instance = factory.GetActor();
 					_actorCache.Add(name, instance);
 
 					instance.Send(new CreateService(name));
@@ -223,7 +222,7 @@ namespace Topshelf.Model
 			                	? ""
 			                	: " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()));
 
-			var factory = _controllerFactory.CreateFactory(inbox =>
+			ActorFactory<IServiceController> factory = _controllerFactory.CreateFactory(inbox =>
 				{
 					IServiceController controller = new ShelfServiceController(inbox, message.ServiceName, this, message.ShelfType,
 					                                                           message.BootstrapperType, message.AssemblyNames);
@@ -232,7 +231,7 @@ namespace Topshelf.Model
 					return controller;
 				});
 
-			var instance = factory.GetActor();
+			ActorInstance instance = factory.GetActor();
 			_actorCache.Add(message.ServiceName, instance);
 
 			instance.Send(new CreateService(message.ServiceName));
@@ -245,28 +244,24 @@ namespace Topshelf.Model
 			if (_actorCache.Has(message.ServiceName))
 				_actorCache[message.ServiceName].Send(new RestartService(message.ServiceName));
 			else
-			{
 				OnCreateShelfService(new CreateShelfService(message.ServiceName, ShelfType.Folder, null, new AssemblyName[] {}));
-			}
 		}
 
 		void OnServiceFault(ServiceFault message)
 		{
 			_log.ErrorFormat("Fault on {0}: {1}", message.ServiceName, message.ToLogString());
-			
-			if(message.ServiceName == AppDomain.CurrentDomain.FriendlyName)
+
+			if (message.ServiceName == AppDomain.CurrentDomain.FriendlyName)
 			{
 				// we caught an unhandled exception, so what should we do? How about restarting all the services?
 
-				if(_stopping == false)
-				{
-					_actorCache.Each((name,x) => x.Send(new RestartService(name)));
-				}
+				if (_stopping == false)
+					_actorCache.Each((name, x) => x.Send(new RestartService(name)));
 			}
 
 			if (_stopping)
 			{
-				if(_actorCache.Has(message.ServiceName))
+				if (_actorCache.Has(message.ServiceName))
 					_actorCache[message.ServiceName].Send(new UnloadService(message.ServiceName));
 			}
 
@@ -319,7 +314,7 @@ namespace Topshelf.Model
 				return;
 			if (disposing)
 			{
-				if(_channelConnection != null)
+				if (_channelConnection != null)
 				{
 					_log.DebugFormat("[Topshelf] Closing coordinator channel");
 					_channelConnection.Dispose();

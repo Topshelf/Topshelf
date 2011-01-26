@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Shelving
+namespace Topshelf.Model
 {
 	using System;
 	using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace Topshelf.Shelving
 	using Magnum.Extensions;
 	using Magnum.Reflection;
 	using Messages;
-	using Model;
+	using Shelving;
 	using Stact;
 	using Stact.Configuration;
 
@@ -38,12 +38,12 @@ namespace Topshelf.Shelving
 		readonly string _controllerPipeName;
 		readonly ILog _log;
 		readonly string _serviceName;
+		HostChannel _channel;
 		OutboundChannel _controllerChannel;
 		bool _disposed;
 		PoolFiber _fiber;
-		IServiceController _service;
-		HostChannel _channel;
 		PublishChannel _publish;
+		IServiceController _service;
 
 		public Shelf(Type bootstrapperType, Uri controllerAddress, string controllerPipeName)
 		{
@@ -117,7 +117,7 @@ namespace Topshelf.Shelving
 
 				_log.DebugFormat("[{0}] Creating configurator for service type: {1}", _serviceName, serviceType.ToShortTypeName());
 
-				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] { serviceType });
+				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] {serviceType});
 
 				InitializeAndCreateService(serviceType, bootstrapper, cfg);
 			}
@@ -129,7 +129,7 @@ namespace Topshelf.Shelving
 
 		void InitializeAndCreateService(Type serviceType, object bootstrapper, object cfg)
 		{
-			this.FastInvoke(new[] { serviceType }, "InitializeAndCreateHostedService", bootstrapper, cfg);
+			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
 		}
 
 		// ReSharper disable UnusedMember.Local
@@ -247,8 +247,8 @@ namespace Topshelf.Shelving
 		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			_log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "",
-																				  AppDomain.CurrentDomain.FriendlyName,
-																				  e.ExceptionObject));
+			                                                                      AppDomain.CurrentDomain.FriendlyName,
+			                                                                      e.ExceptionObject));
 
 			Dispose();
 		}
@@ -281,7 +281,7 @@ namespace Topshelf.Shelving
 			XmlConfigurator.ConfigureAndWatch(configurationFile);
 
 			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
-															  configurationFilePath);
+			                                                  configurationFilePath);
 		}
 	}
 }
