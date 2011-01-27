@@ -15,6 +15,7 @@ namespace Topshelf.Configuration
 	using System.Collections.Generic;
 	using System.Configuration;
 	using System.ServiceProcess;
+	using Extensions;
 	using WindowsServiceCode;
 
 

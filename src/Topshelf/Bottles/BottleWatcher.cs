@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,6 +13,7 @@
 namespace Topshelf.Bottles
 {
 	using System;
+	using Extensions;
 	using FileSystem;
 	using Magnum.Extensions;
 	using Magnum.FileSystem;
@@ -58,7 +59,7 @@ namespace Topshelf.Bottles
 				}
 				catch (Exception ex)
 				{
-					string msg = "There was an error processing the bottle '{0}'".FormatWith(message.Path);
+					string msg = TopshelfExtensions.FormatWith("There was an error processing the bottle '{0}'", message.Path);
 					throw new BottleException(msg, ex);
 				}
 			}

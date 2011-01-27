@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -14,6 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
+	using Extensions;
 	using Magnum.Extensions;
 	using Stact;
 	using Stact.Configuration;
@@ -28,13 +29,13 @@ namespace Topshelf.Model
 
 		static Uri GetServiceUri()
 		{
-			return new Uri("net.pipe://localhost/topshelf_{0}".FormatWith(GetPid()));
+			return new Uri(TopshelfExtensions.FormatWith("net.pipe://localhost/topshelf_{0}", GetPid()));
 		}
 
 		public static HostChannel CreateShelfControllerHost(UntypedChannel controllerChannel, string serviceName)
 		{
 			Uri address = GetServiceUri().AppendPath("controller").AppendPath(serviceName);
-			string pipeName = "{0}/{1}".FormatWith(GetPid(), serviceName);
+			string pipeName = TopshelfExtensions.FormatWith("{0}/{1}", GetPid(), serviceName);
 
 			return new HostChannel(controllerChannel, address, pipeName);
 		}
@@ -42,7 +43,7 @@ namespace Topshelf.Model
 		public static HostChannel CreateShelfHost(string serviceName, Action<ConnectionConfigurator> cfg)
 		{
 			Uri address = GetServiceUri().AppendPath("shelf").AppendPath(serviceName);
-			string pipeName = "{0}/{1}".FormatWith(GetPid(), serviceName);
+			string pipeName = TopshelfExtensions.FormatWith("{0}/{1}", GetPid(), serviceName);
 
 			return new HostChannel(address, pipeName, cfg);
 		}

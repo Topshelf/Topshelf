@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -18,6 +18,7 @@ namespace Topshelf.Model
 	using System.IO;
 	using System.Linq;
 	using Configuration.Dsl;
+	using Extensions;
 	using log4net;
 	using log4net.Config;
 	using Magnum;
@@ -215,7 +216,7 @@ namespace Topshelf.Model
 					return bootstrapper;
 
 				throw new InvalidOperationException(
-					"Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
+					TopshelfExtensions.FormatWith("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.", bootstrapper.GetType().Name));
 			}
 
 			// check configuration first
@@ -246,7 +247,7 @@ namespace Topshelf.Model
 
 		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
-			_log.Error("Unhandled {0}exception in app domain {1}: {2}".FormatWith(e.IsTerminating ? "terminal " : "",
+			_log.Error(TopshelfExtensions.FormatWith("Unhandled {0}exception in app domain {1}: {2}", e.IsTerminating ? "terminal " : "",
 			                                                                      AppDomain.CurrentDomain.FriendlyName,
 			                                                                      e.ExceptionObject));
 
@@ -261,7 +262,7 @@ namespace Topshelf.Model
 			}
 			catch (Exception)
 			{
-				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
+				_log.Error(TopshelfExtensions.FormatWith("[{0}] Failed to send fault", _serviceName), ex);
 			}
 		}
 
