@@ -13,9 +13,9 @@
 namespace Topshelf.Configuration.Dsl
 {
 	using System;
-	using Magnum.Channels;
 	using Magnum.Reflection;
 	using Model;
+	using Stact;
 
 
 	public class ServiceConfigurator<TService> :
@@ -91,14 +91,16 @@ namespace Topshelf.Configuration.Dsl
 			BuildAction = serviceFactory;
 		}
 
-		public ServiceController<TService> Create(IServiceCoordinator coordinator, ServiceChannel coordinatorChannel)
+		public IServiceController<TService> Create(Inbox inbox, IServiceChannel coordinatorChannel)
 		{
-			return Create(Name, coordinator, coordinatorChannel);
+			return Create(Name, inbox, coordinatorChannel);
 		}
 
-		public ServiceController<TService> Create(string serviceName, IServiceCoordinator coordinator, ServiceChannel coordinatorChannel)
+		public IServiceController<TService> Create(string serviceName, Inbox inbox, IServiceChannel coordinatorChannel)
 		{
-			var serviceController = new ServiceController<TService>(serviceName, coordinator, coordinatorChannel,
+			var serviceController = new LocalServiceController<TService>(serviceName, 
+				inbox, 
+				coordinatorChannel, 
 			                                                        StartAction,
 			                                                        StopAction,
 			                                                        PauseAction,

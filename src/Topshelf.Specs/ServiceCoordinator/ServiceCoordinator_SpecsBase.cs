@@ -14,9 +14,9 @@ namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
 	using Magnum.Extensions;
-	using Magnum.Fibers;
 	using Magnum.TestFramework;
 	using Model;
+	using Stact;
 
 
 	[Scenario]
@@ -32,21 +32,20 @@ namespace Topshelf.Specs.ServiceCoordinator
 		                                Action<T> continueAction, InternalServiceFactory<T> serviceFactory)
 			where T : class
 		{
-			Coordinator.CreateService(serviceName,
-			                          n =>
-			                          new ServiceController<T>(serviceName, null,
-			                                                   AddressRegistry.GetOutboundCoordinatorChannel(),
-			                                                   startAction,
-			                                                   stopAction,
-			                                                   pauseAction,
-			                                                   continueAction,
-			                                                   serviceFactory));
+			Coordinator.CreateService(serviceName, (inbox, coordinator) => new LocalServiceController<T>(serviceName,
+			                                                                                             inbox,
+			                                                                                             Coordinator,
+			                                                                                             startAction,
+			                                                                                             stopAction,
+			                                                                                             pauseAction,
+			                                                                                             continueAction,
+			                                                                                             serviceFactory));
 		}
 
 		[Given]
 		public void A_service_coordinator()
 		{
-			Coordinator = new ServiceCoordinator(new ThreadPoolFiber(), Ignored, Ignored, Ignored, 10.Seconds());
+			Coordinator = new ServiceCoordinator(new PoolFiber(), Ignored, Ignored, Ignored, 10.Seconds());
 		}
 
 		[After]

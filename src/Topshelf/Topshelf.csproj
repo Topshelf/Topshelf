@@ -59,6 +59,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
     </Reference>
+    <Reference Include="Stact">
+      <HintPath>..\..\lib\Stact\Stact.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
@@ -100,6 +103,8 @@
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
+    <Compile Include="FileSystem\FileSystemEventProducer.cs" />
+    <Compile Include="FileSystem\PollingFileSystemEventProducer.cs" />
     <Compile Include="InstallCommand.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />
@@ -125,21 +130,24 @@
     <Compile Include="Messages\ServiceUnloaded.cs" />
     <Compile Include="Messages\ServiceStarting.cs" />
     <Compile Include="Messages\ServiceStopping.cs" />
+    <Compile Include="Messages\ShelfCreated.cs" />
     <Compile Include="Messages\StartService.cs" />
     <Compile Include="Messages\StopService.cs" />
     <Compile Include="Messages\UnloadService.cs" />
-    <Compile Include="Model\InboundChannel.cs" />
+    <Compile Include="Model\HostChannel.cs" />
+    <Compile Include="Model\IServiceWorkflow.cs" />
     <Compile Include="Model\OutboundChannel.cs" />
+    <Compile Include="Model\IServiceChannel.cs" />
     <Compile Include="Model\ServiceChannel.cs" />
-    <Compile Include="Model\ServiceChannelBase.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Model\IServiceCoordinator.cs" />
-    <Compile Include="Model\ServiceStateMachine.cs" />
-    <Compile Include="Model\ServiceStateMachineBinding.cs" />
+    <Compile Include="Model\LocalServiceController.cs" />
+    <Compile Include="Model\ServiceControllerFactory.cs" />
+    <Compile Include="Model\PublishChannel.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
-    <Compile Include="Shelving\ShelfReference.cs" />
-    <Compile Include="Shelving\ShelfServiceController.cs" />
-    <Compile Include="Shelving\ShelfType.cs" />
+    <Compile Include="Model\ShelfReference.cs" />
+    <Compile Include="Model\ShelfServiceController.cs" />
+    <Compile Include="Model\ShelfType.cs" />
     <Compile Include="UninstallCommand.cs" />
     <Compile Include="WindowsServiceCode\ServiceControlHelper.cs" />
     <Compile Include="WindowsServiceCode\ServiceRecoveryAction.cs" />
@@ -155,14 +163,13 @@
     <Compile Include="ProcessExtensions.cs" />
     <Compile Include="Configuration\ServiceActionNames.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
-    <Compile Include="Shelving\Shelf.cs" />
-    <Compile Include="Model\AddressRegistry.cs" />
+    <Compile Include="Model\Shelf.cs" />
+    <Compile Include="Model\HostChannelFactory.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
     <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
-    <Compile Include="Model\ServiceController.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="TopshelfArguments.cs" />

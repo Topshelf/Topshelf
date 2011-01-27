@@ -22,11 +22,11 @@ namespace Topshelf
 	{
 		public const string DefaultServiceName = "Topshelf.Host";
 
-		readonly IServiceCoordinator _coordinator;
+		readonly IServiceChannel _serviceChannel;
 
-		public Host(IServiceCoordinator coordinator)
+		public Host(IServiceChannel serviceChannel)
 		{
-			_coordinator = coordinator;
+			_serviceChannel = serviceChannel;
 		}
 
 		public void Start()
@@ -36,9 +36,10 @@ namespace Topshelf
 
 		void CreateDirectoryMonitor()
 		{
-			_coordinator.Send(new CreateShelfService("TopShelf.DirectoryMonitor",
-			                                         ShelfType.Internal,
-			                                         typeof(DirectoryMonitorBootstrapper)));
+			var message = new CreateShelfService("TopShelf.DirectoryMonitor",
+			                                     ShelfType.Internal,
+			                                     typeof(DirectoryMonitorBootstrapper));
+			_serviceChannel.Send(message);
 		}
 
 		public void Stop()

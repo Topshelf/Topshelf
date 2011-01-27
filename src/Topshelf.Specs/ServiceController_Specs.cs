@@ -13,12 +13,12 @@
 namespace Topshelf.Specs
 {
 	using System;
-	using Magnum.Channels;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Messages;
 	using Model;
 	using NUnit.Framework;
+	using Stact;
 	using TestObject;
 	using Topshelf.Configuration.Dsl;
 
@@ -51,15 +51,18 @@ namespace Topshelf.Specs
 				c.HowToBuildService(name => _service);
 
 				_serviceController = c.Create(null, _hostChannel);
+
+				_controllerFactory = new ServiceControllerFactory();
+
+				_factory = _controllerFactory.CreateFactory(x => _serviceController);
+
+				_instance = _factory.GetActor();
+
 			}
 
 			_hostChannel.Connect(x =>
 				{
-					x.AddConsumersFor<ServiceStateMachine>()
-						.BindUsing<ServiceStateMachineBinding, string>()
-						.CreateNewInstanceBy(GetServiceInstance)
-						.HandleOnInstanceFiber()
-						.PersistInMemory();
+					x.AddChannel(_instance);
 
 					x.AddChannel(_serviceStarted);
 				});
@@ -78,7 +81,7 @@ namespace Topshelf.Specs
 			_hostChannel.Send(new PauseService("test"));
 			_hostChannel.Send(new ContinueService("test"));
 
-			_serviceController.ShouldBeRunning();
+			_serviceController.CurrentState.ShouldEqual(_controllerFactory.Workflow.GetState(x => x.Running));
 			_service.WasContinued.IsCompleted.ShouldBeTrue();
 		}
 
@@ -87,8 +90,7 @@ namespace Topshelf.Specs
 		[Explicit("Typing error")]
 		public void Should_expose_contained_type()
 		{
-			_serviceController.ServiceType
-				.ShouldEqual(typeof(TestService));
+			_serviceController.ServiceType.ShouldEqual(typeof(TestService));
 		}
 
 		[Test]
@@ -98,7 +100,7 @@ namespace Topshelf.Specs
 		{
 			_hostChannel.Send(new PauseService("test"));
 
-			_serviceController.ShouldBePaused();
+			_serviceController.CurrentState.ShouldEqual(_controllerFactory.Workflow.GetState(x => x.Paused));
 			_service.Paused.IsCompleted.ShouldBeTrue();
 		}
 
@@ -106,7 +108,7 @@ namespace Topshelf.Specs
 		[Slow]
 		public void Should_start()
 		{
-			_serviceController.ShouldBeRunning();
+			_serviceController.CurrentState.ShouldEqual(_controllerFactory.Workflow.GetState(x => x.Running));
 			_service.Running.IsCompleted.ShouldBeTrue();
 		}
 
@@ -121,55 +123,26 @@ namespace Topshelf.Specs
 
 			stopped.WaitUntilCompleted(5.Seconds()).ShouldBeTrue();
 
-			_serviceController.ShouldBeStopped();
+			_serviceController.CurrentState.ShouldEqual(_controllerFactory.Workflow.GetState(x => x.Stopped));
 			_service.Stopped.IsCompleted.ShouldBeTrue();
-		}
-
-		ServiceStateMachine GetServiceInstance(string key)
-		{
-			// this is needed for refrection
-			if (key == null)
-				return new ServiceStateMachine(null, _hostChannel);
-
-			if (key == _serviceController.Name)
-				return _serviceController;
-
-			throw new InvalidOperationException("An unknown service was requested: " + key);
 		}
 
 		FutureChannel<ServiceRunning> _serviceStarted;
 
-		ServiceController<TestService> _serviceController;
+		IServiceController<TestService> _serviceController;
 		TestService _service;
 		TestChannel _hostChannel;
+		ServiceControllerFactory _controllerFactory;
+		ActorFactory<IServiceController<TestService>> _factory;
+		ActorInstance _instance;
+		IServiceCoordinator _coordinator;
 	}
-
-
-	public static class ServiceAssertions
-	{
-		public static void ShouldBeRunning<TService>(this ServiceController<TService> service)
-			where TService : class
-		{
-			service.CurrentState.ShouldEqual(ServiceStateMachine.Running);
-		}
-
-		public static void ShouldBeStopped<TService>(this ServiceController<TService> service)
-			where TService : class
-		{
-			service.CurrentState.ShouldEqual(ServiceStateMachine.Stopped);
-		}
-
-		public static void ShouldBePaused<TService>(this ServiceController<TService> service)
-			where TService : class
-		{
-			service.CurrentState.ShouldEqual(ServiceStateMachine.Paused);
-		}
-	}
-
 
 	[TestFixture]
 	public class SimpleServiceContainerStuff
 	{
+		IServiceCoordinator _coordinator;
+
 		[Test]
 		public void Should_work()
 		{
@@ -177,7 +150,7 @@ namespace Topshelf.Specs
 			c.WhenStarted(s => s.Start());
 			c.WhenStopped(s => s.Stop());
 
-			using (IServiceController service = c.Create(null, AddressRegistry.GetOutboundCoordinatorChannel()))
+			using (IServiceController service = c.Create(null, _coordinator))
 			{
 //				service.Send(new StartService());
 

@@ -19,6 +19,7 @@ namespace Topshelf.Specs
     using Magnum.Extensions;
     using Magnum.TestFramework;
     using Messages;
+    using Model;
     using NUnit.Framework;
     using Shelving;
     using Topshelf.Configuration.Dsl;

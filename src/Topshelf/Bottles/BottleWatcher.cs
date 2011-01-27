@@ -13,12 +13,13 @@
 namespace Topshelf.Bottles
 {
 	using System;
-	using Magnum.Channels;
+	using FileSystem;
 	using Magnum.Extensions;
-	using Magnum.Fibers;
 	using Magnum.FileSystem;
 	using Magnum.FileSystem.Events;
 	using Magnum.FileSystem.Zip;
+	using Stact;
+	using Stact.Internal;
 
 
 	public class BottleWatcher

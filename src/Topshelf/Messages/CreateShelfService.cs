@@ -14,16 +14,11 @@ namespace Topshelf.Messages
 {
 	using System;
 	using System.Reflection;
-	using Shelving;
+	using Model;
 
 
 	public class CreateShelfService
 	{
-		public CreateShelfService(string serviceName, ShelfType shelfType)
-			: this(serviceName, shelfType, null)
-		{
-		}
-
 		public CreateShelfService(string serviceName, ShelfType shelfType, Type bootstrapperType)
 			: this(serviceName, shelfType, bootstrapperType, new AssemblyName[] {})
 		{

@@ -13,14 +13,40 @@
 namespace Topshelf.Model
 {
 	using System;
-	using Magnum.StateMachine;
+	using Stact;
+	using Stact.Workflow;
 
 
 	public interface IServiceController :
+		Actor,
 		IDisposable
 	{
+		Type ServiceType { get; }
+		State CurrentState { get; set; }
+
 		string Name { get; }
-		State CurrentState { get; }
+
+		void Create();
+
+		void Start();
+
+		void Stop();
+
+		void Unload();
+
+		void Pause();
+		void Continue();
+
+
+//		void Created(ServiceCreated message);
+//		void Running();
+//		void Stopped();
+//		void Restarted();
+//		void Paused();
+//		void Unloaded();
+//		void Completed();
+//		void Faulted(ServiceFault message);
+//		void HandleException<TBody>(TBody message);
 	}
 
 

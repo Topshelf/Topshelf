@@ -24,15 +24,10 @@ namespace Topshelf.FileSystem
 	{
 		public void InitializeHostedService(IServiceConfigurator<DirectoryMonitor> cfg)
 		{
-			cfg.HowToBuildService(CreateDirectoryMonitor);
+			cfg.ConstructUsing((name, channel) => new DirectoryMonitor(GetServicesDirectory(), channel));
 
 			cfg.WhenStarted(dm => dm.Start());
 			cfg.WhenStopped(dm => dm.Stop());
-		}
-
-		static DirectoryMonitor CreateDirectoryMonitor(string serviceName)
-		{
-			return new DirectoryMonitor(GetServicesDirectory());
 		}
 
 		static string GetServicesDirectory()
