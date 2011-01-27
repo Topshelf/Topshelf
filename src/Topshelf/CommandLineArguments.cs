@@ -69,7 +69,7 @@ namespace Topshelf
 			      select (Command)new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName, instance.Value));
 
             x.Add(from arg in x.Definition("instance")
-                      select (Command)new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName, arg.Value));
+                  select (Command)new RunCommand(_configuration.Coordinator, _configuration.WinServiceSettings.ServiceName, arg.Value));
 		}
 	}
 }

@@ -15,6 +15,7 @@ namespace Topshelf.Configuration.Dsl
 	using System;
 	using System.Collections.Generic;
 	using System.ServiceProcess;
+	using Dashboard;
 	using Magnum.Extensions;
 	using Model;
 	using Stact;
@@ -31,8 +32,9 @@ namespace Topshelf.Configuration.Dsl
 		Credentials _credentials;
 		bool _disposed;
 		TimeSpan _timeout = 1.Minutes();
+	    bool _runDashboard;
 
-		/// <summary>
+	    /// <summary>
 		///   Initializes a new instance of the <see cref = "RunnerConfigurator" /> class.
 		/// </summary>
 		RunnerConfigurator()
@@ -88,7 +90,12 @@ namespace Topshelf.Configuration.Dsl
 			DependsOn(KnownServiceNames.IIS);
 		}
 
-		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action)
+	    public void ActivateDashboard()
+	    {
+	        _runDashboard = true;
+	    }
+
+	    public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action)
 			where TService : class
 		{
 			var configurator = new ServiceConfigurator<TService>();
@@ -155,6 +162,10 @@ namespace Topshelf.Configuration.Dsl
 
 		RunConfiguration Create()
 		{
+            if(_runDashboard)
+                EnableDashboard();
+            
+
 			var serviceCoordinator = new ServiceCoordinator(new PoolFiber(),
 			                                                _beforeStartingServices,
 			                                                _afterStartingServices,
@@ -162,6 +173,7 @@ namespace Topshelf.Configuration.Dsl
 			                                                _timeout);
 
 			RegisterServices(serviceCoordinator);
+
 
 			_winServiceSettings.Credentials = _credentials;
 
@@ -174,7 +186,17 @@ namespace Topshelf.Configuration.Dsl
 			return cfg;
 		}
 
-		void RegisterServices(IServiceCoordinator serviceCoordinator)
+	    void EnableDashboard()
+	    {
+	        ConfigureService<TopshelfDashboard>(o=>
+	            {
+	                o.HowToBuildService(name=>new TopshelfDashboard(_winServiceSettings.ServiceName));
+                    o.WhenStarted(s=>s.Start());
+                    o.WhenStopped(s=>s.Stop());
+	            });
+	    }
+
+	    void RegisterServices(IServiceCoordinator serviceCoordinator)
 		{
 			_serviceConfigurators.Each(configurator => configurator(serviceCoordinator));
 		}

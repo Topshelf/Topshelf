@@ -28,6 +28,7 @@ namespace Stuff
             {
                 x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
 
+                x.ActivateDashboard();
 
                 x.RunAsFromCommandLine();
 
