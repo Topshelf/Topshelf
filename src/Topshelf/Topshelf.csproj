@@ -153,14 +153,14 @@
     <Compile Include="WindowsServiceCode\ServiceRecoveryAction.cs" />
     <Compile Include="WindowsServiceCode\ServiceRecoveryOptions.cs" />
     <Compile Include="WindowsServiceCode\WinServiceHelper.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Extensions\TopshelfExtensions.cs" />
     <Compile Include="Exceptions\BuildServiceException.cs" />
     <Compile Include="Hosts\CommandLineHost.cs" />
     <Compile Include="Hosts\Host.cs" />
     <Compile Include="Hosts\WinServiceHost.cs" />
     <Compile Include="WindowsServiceCode\Kernel32.cs" />
     <Compile Include="Model\ServiceFactory.cs" />
-    <Compile Include="ProcessExtensions.cs" />
+    <Compile Include="Extensions\ProcessExtensions.cs" />
     <Compile Include="Configuration\ServiceActionNames.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Model\Shelf.cs" />
