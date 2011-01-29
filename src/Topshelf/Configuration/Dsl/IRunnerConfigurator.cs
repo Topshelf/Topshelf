@@ -156,6 +156,6 @@ namespace Topshelf.Configuration.Dsl
         /// <param name="timeout">The wait timeout</param>
         void SetEventTimeout(TimeSpan timeout);
 
-        void ActivateDashboard();
+        void EnableDashboard();
     }
 }

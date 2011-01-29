@@ -90,7 +90,7 @@ namespace Topshelf.Configuration.Dsl
 			DependsOn(KnownServiceNames.IIS);
 		}
 
-	    public void ActivateDashboard()
+	    public void EnableDashboard()
 	    {
 	        _runDashboard = true;
 	    }
@@ -163,7 +163,7 @@ namespace Topshelf.Configuration.Dsl
 		RunConfiguration Create()
 		{
             if(_runDashboard)
-                EnableDashboard();
+                ConfigureDashboardService();
             
 
 			var serviceCoordinator = new ServiceCoordinator(new PoolFiber(),
@@ -186,11 +186,11 @@ namespace Topshelf.Configuration.Dsl
 			return cfg;
 		}
 
-	    void EnableDashboard()
+	    void ConfigureDashboardService()
 	    {
-	        ConfigureService<TopshelfDashboard>(o=>
+	        ConfigureService<HttpDashboard>(o=>
 	            {
-	                o.HowToBuildService(name=>new TopshelfDashboard(_winServiceSettings.ServiceName));
+	                o.HowToBuildService(name=>new HttpDashboard(_winServiceSettings.ServiceName));
                     o.WhenStarted(s=>s.Start());
                     o.WhenStopped(s=>s.Stop());
 	            });

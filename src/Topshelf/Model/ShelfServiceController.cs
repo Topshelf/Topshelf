@@ -131,7 +131,10 @@ namespace Topshelf.Model
 			_publish.Send(new ServiceUnloading(_name));
 
 			if (_reference != null)
+			{
 				Send(new UnloadService(_name));
+				_reference.Unload();
+			}
 			else
 			{
 				_publish.Send(new ServiceUnloaded(_name));

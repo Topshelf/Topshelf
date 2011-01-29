@@ -14,18 +14,20 @@ namespace Topshelf.Dashboard
 {
     using System;
     using Configuration;
+    using log4net;
     using Stact;
     using Stact.ServerFramework;
 
 
-    public class TopshelfDashboard
+    public class HttpDashboard
     {
+    	readonly ILog _log = LogManager.GetLogger("Topshelf.Dashboard.HttpDashboard");
         static ChannelAdapter _input;
         static HttpServer _server;
         readonly int _port;
         ServiceName _name;
 
-        public TopshelfDashboard(ServiceName name)
+        public HttpDashboard(ServiceName name)
         {
             _name = name;
             _port = 8483;
@@ -36,7 +38,8 @@ namespace Topshelf.Dashboard
         public void Start()
         {
             _input = new ChannelAdapter();
-            ServerUri = new UriBuilder("http", "localhost", _port, "topshelf").Uri;
+            ServerUri = new UriBuilder("http", "localhost", _port, "Topshelf/" + _name.Name).Uri;
+        	_log.InfoFormat("Loading dashboard at Uri: {0}", ServerUri);
             _server = new HttpServer(ServerUri, new PoolFiber(), _input, new PatternMatchConnectionHandler[]
                 {
                     new VersionConnectionHandler(),
