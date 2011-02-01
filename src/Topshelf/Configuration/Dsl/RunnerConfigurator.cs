@@ -162,15 +162,14 @@ namespace Topshelf.Configuration.Dsl
 
 		RunConfiguration Create()
 		{
-            if(_runDashboard)
-                EnableDashboard();
-            
-
 			var serviceCoordinator = new ServiceCoordinator(new PoolFiber(),
 			                                                _beforeStartingServices,
 			                                                _afterStartingServices,
 			                                                _afterStoppingServices,
 			                                                _timeout);
+
+            if(_runDashboard)
+                EnableDashboard(serviceCoordinator);
 
 			RegisterServices(serviceCoordinator);
 
@@ -186,11 +185,11 @@ namespace Topshelf.Configuration.Dsl
 			return cfg;
 		}
 
-	    void EnableDashboard()
+	    void EnableDashboard(ServiceCoordinator co)
 	    {
 	        ConfigureService<TopshelfDashboard>(o=>
 	            {
-	                o.HowToBuildService(name=>new TopshelfDashboard(_winServiceSettings.ServiceName));
+	                o.HowToBuildService(name=>new TopshelfDashboard(_winServiceSettings.ServiceName, co));
                     o.WhenStarted(s=>s.Start());
                     o.WhenStopped(s=>s.Stop());
 	            });

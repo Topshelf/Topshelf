@@ -14,6 +14,7 @@ namespace Topshelf.Dashboard
 {
     using System;
     using Configuration;
+    using Model;
     using Stact;
     using Stact.ServerFramework;
 
@@ -24,10 +25,12 @@ namespace Topshelf.Dashboard
         static HttpServer _server;
         readonly int _port;
         ServiceName _name;
+        readonly ServiceCoordinator _serviceCoordinator;
 
-        public TopshelfDashboard(ServiceName name)
+        public TopshelfDashboard(ServiceName name, ServiceCoordinator serviceCoordinator)
         {
             _name = name;
+            _serviceCoordinator = serviceCoordinator;
             _port = 8483;
         }
 
@@ -42,7 +45,7 @@ namespace Topshelf.Dashboard
                     new VersionConnectionHandler(),
                     new ImageConnectionHandler(),
                     new CssConnectionHandler(),
-                    new DashboardConnectionHandler()
+                    new DashboardConnectionHandler(_serviceCoordinator)
                 });
 
             _server.Start();

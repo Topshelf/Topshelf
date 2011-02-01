@@ -205,12 +205,19 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Dashboard\images\" />
-    <Folder Include="Dashboard\styles\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Dashboard\views\dashboard.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Dashboard\styles\ie.css" />
+    <EmbeddedResource Include="Dashboard\styles\print.css" />
+    <EmbeddedResource Include="Dashboard\styles\screen.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Dashboard\images\control_pause.png" />
+    <EmbeddedResource Include="Dashboard\images\control_play.png" />
+    <EmbeddedResource Include="Dashboard\images\control_stop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,12 +1,16 @@
 ﻿namespace Topshelf.Dashboard
 {
+    using System.Collections.Generic;
+    using Model;
+
+
     public class DashboardView
     {
-        public DashboardView()
+        public DashboardView(IEnumerable<ServiceInfo> infos)
         {
-            Name = "dru";
+            Statuses = infos;
         }
 
-        public string Name { get; set; }
+        public IEnumerable<ServiceInfo> Statuses { get; private set; }
     }
 }
