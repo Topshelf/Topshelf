@@ -166,15 +166,15 @@ namespace Topshelf.Configuration.Dsl
 		void EnableDashboard();
 
         /// <summary>
-        /// Defines an action to perform after installing the services.
+        /// Defines an action to perform after installing the service.
         /// </summary>
-        /// <param name="action">The action that will be performed after the services are installed.</param>
-        void AfterInstallingServices(Action action);
+        /// <param name="action">The action that will be performed after the service is installed.</param>
+        void AfterInstallingService(Action action);
 
         /// <summary>
-        /// Defines an action to perform after uninstalling the services.
+        /// Defines an action to perform after uninstalling the service.
         /// </summary>
-        /// <param name="action">The action that will be performed after the services are uninstalled.</param>
-        void AfterUninstallingServices(Action action);
+        /// <param name="action">The action that will be performed after the service is uninstalled.</param>
+        void AfterUninstallingService(Action action);
     }
 }

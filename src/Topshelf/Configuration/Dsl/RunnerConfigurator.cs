@@ -132,12 +132,12 @@ namespace Topshelf.Configuration.Dsl
 			recoveryConfigurator(new ServiceRecoveryConfigurator(_winServiceSettings.ServiceRecoveryOptions));
 		}
 
-        public void AfterInstallingServices(Action action)
+        public void AfterInstallingService(Action action)
         {
             _winServiceSettings.AfterInstallAction = action;
         }
 
-        public void AfterUninstallingServices(Action action)
+        public void AfterUninstallingService(Action action)
         {
             _winServiceSettings.AfterUninstallAction = action;
         }

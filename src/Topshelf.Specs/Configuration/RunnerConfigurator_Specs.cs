@@ -50,8 +50,8 @@ namespace Topshelf.Specs.Configuration
 					x.DependencyOnMsmq();
 					x.DependencyOnMsSql();
 
-				    x.AfterInstallingServices(() => { });
-                    x.AfterUninstallingServices(() => { });
+				    x.AfterInstallingService(() => { });
+                    x.AfterUninstallingService(() => { });
                 });
 		}
 
