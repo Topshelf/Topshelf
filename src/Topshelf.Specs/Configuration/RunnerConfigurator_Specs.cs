@@ -49,7 +49,10 @@ namespace Topshelf.Specs.Configuration
 					x.DependsOn("ServiceName");
 					x.DependencyOnMsmq();
 					x.DependencyOnMsSql();
-				});
+
+				    x.AfterInstallingServices(() => { });
+                    x.AfterUninstallingServices(() => { });
+                });
 		}
 
 		[Finally]
@@ -104,5 +107,11 @@ namespace Topshelf.Specs.Configuration
 			_runConfiguration.WinServiceSettings.Credentials.AccountType
 				.ShouldEqual(ServiceAccount.User);
 		}
-	}
+
+        [Then]
+        public void Should_have_an_installation_action()
+        {
+            _runConfiguration.WinServiceSettings.AfterInstallAction.ShouldNotBeNull();
+        }
+    }
 }

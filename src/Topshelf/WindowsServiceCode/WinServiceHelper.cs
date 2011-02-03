@@ -65,7 +65,7 @@ namespace Topshelf.WindowsServiceCode
         }
 
 
-        public static void Register(string fullServiceName, HostServiceInstaller installer)
+        public static void Register(string fullServiceName, HostServiceInstaller installer, Action afterInstallAction)
         {
             _log.DebugFormat("Attempting to install '{0}'", fullServiceName);
             if (!IsInstalled(fullServiceName))
@@ -87,6 +87,11 @@ namespace Topshelf.WindowsServiceCode
 
                     ti.Install(savedState);
                 }
+
+                if (afterInstallAction != null)
+                {
+                    afterInstallAction();
+                }
             }
             else
             {
@@ -94,7 +99,7 @@ namespace Topshelf.WindowsServiceCode
             }
         }
 
-        public static void Unregister(string fullServiceName, HostServiceInstaller installer)
+        public static void Unregister(string fullServiceName, HostServiceInstaller installer, Action afterUninstallAction)
         {
             _log.DebugFormat("Attempting to uninstall '{0}'", fullServiceName);
 
@@ -114,6 +119,11 @@ namespace Topshelf.WindowsServiceCode
                     ti.Context = context;
 
                     ti.Uninstall(null);
+                }
+
+                if (afterUninstallAction != null)
+                {
+                    afterUninstallAction();
                 }
             }
             else

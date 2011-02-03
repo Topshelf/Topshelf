@@ -12,7 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration
 {
-	using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
 	using System.Configuration;
 	using System.ServiceProcess;
 	using Extensions;
@@ -37,6 +38,8 @@ namespace Topshelf.Configuration
 		public string Description { get; set; }
 		public Credentials Credentials { get; set; }
 		public ServiceRecoveryOptions ServiceRecoveryOptions { get; set; }
+        public Action AfterInstallAction { get; set; }
+        public Action AfterUninstallAction { get; set; }
 
 		public string FullDisplayName
 		{

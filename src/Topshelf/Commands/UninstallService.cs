@@ -76,9 +76,8 @@ namespace Topshelf.Commands
 				return;
 			}
 
-
 			var installer = new HostServiceInstaller(_settings);
-			WinServiceHelper.Unregister(_settings.ServiceName.FullName, installer);
+			WinServiceHelper.Unregister(_settings.ServiceName.FullName, installer, _settings.AfterUninstallAction);
 		}
 	}
 }
