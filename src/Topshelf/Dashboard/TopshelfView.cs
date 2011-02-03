@@ -1,6 +1,5 @@
 ﻿namespace Topshelf.Dashboard
 {
-    using System;
     using Spark;
 
     public abstract class TopshelfView :
@@ -9,13 +8,15 @@
         public object Model { get; set; }
     }
 
-//    public abstract class TopshelfView<TViewData> :
-//        TopshelfView
-//    {
-//        public override void  SetModel(object data)
-//        {
-//            Model = (TViewData)data;
-//        }
-//        public TViewData Model { get; set; }
-//    }
+    public abstract class TopshelfView<TViewData> :
+        TopshelfView
+    {
+
+        public new TViewData Model { get; set; }
+
+        public void SetModel(object model)
+        {
+            Model = model is TViewData ? (TViewData)model : default(TViewData);
+        }
+    }
 }

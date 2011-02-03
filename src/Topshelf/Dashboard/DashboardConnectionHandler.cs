@@ -1,5 +1,6 @@
 namespace Topshelf.Dashboard
 {
+    using Model;
     using Stact;
     using Stact.ServerFramework;
 
@@ -9,10 +10,10 @@ namespace Topshelf.Dashboard
     {
         readonly StatusChannel _statusChannel;
 
-        public DashboardConnectionHandler() :
+        public DashboardConnectionHandler(ServiceCoordinator serviceCoordinator) :
             base("^/dashboard", "GET")
         {
-            _statusChannel = new StatusChannel();
+            _statusChannel = new StatusChannel(serviceCoordinator);
         }
 
         protected override Channel<ConnectionContext> CreateChannel(ConnectionContext context)
@@ -24,31 +25,27 @@ namespace Topshelf.Dashboard
         class StatusChannel :
             Channel<ConnectionContext>
         {
+            readonly ServiceCoordinator _serviceCoordinator;
             readonly Fiber _fiber;
 
-            public StatusChannel( )
+            public StatusChannel(ServiceCoordinator serviceCoordinator)
             {
+                _serviceCoordinator = serviceCoordinator;
                 _fiber = new PoolFiber();
             }
 
             public void Send(ConnectionContext context)
             {
                 _fiber.Add(() =>
-                {
-                    context.Response.RenderSparkView(new DashboardView(), "dashboard.html");
-                    context.Complete();
-                });
+                    {
+
+                        var infos = _serviceCoordinator.Status();
+                        var view = new DashboardView(infos);
+
+                        context.Response.RenderSparkView(view, "dashboard.html");
+                        context.Complete();
+                    });
             }
         }
-    }
-
-    public class DashboardView
-    {
-        public DashboardView()
-        {
-            Name = "dru";
-        }
-
-        public string Name { get; set; }
     }
 }

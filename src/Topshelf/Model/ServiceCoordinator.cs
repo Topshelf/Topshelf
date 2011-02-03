@@ -290,6 +290,11 @@ namespace Topshelf.Model
 		}
 
 
+        public IEnumerable<ServiceInfo> Status()
+        {
+            return _serviceCache.Select(sc => new ServiceInfo(sc.Name, sc.CurrentState, sc.ServiceType.Name));
+        }
+
 		~ServiceCoordinator()
 		{
 			Dispose(false);
@@ -370,4 +375,18 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] {0} complete", name);
 		}
 	}
+
+    public class ServiceInfo
+    {
+        public string Name { get; private set; }
+        public State CurrentState { get; private set; }
+        public string ServiceType { get; private set; }
+
+        public ServiceInfo(string name, State currentState, string serviceType)
+        {
+            Name = name;
+            CurrentState = currentState;
+            ServiceType = serviceType;
+        }
+    }
 }

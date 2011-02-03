@@ -8,26 +8,32 @@
 
     public class SparkRender
     {
-        readonly EmbeddedViewFolder _viewFolder;
-        readonly SparkViewEngine _engine;
+        static readonly EmbeddedViewFolder _viewFolder;
+
+        static SparkRender()
+        {
+            _viewFolder = new EmbeddedViewFolder(typeof(SparkRender).Assembly, "Topshelf.Dashboard.views");
+        }
 
         public SparkRender()
         {
-            _viewFolder = new EmbeddedViewFolder(typeof(SparkRender).Assembly, "Topshelf.Dashboard.views");
-
-            _engine = new SparkViewEngine
-                {
-                    DefaultPageBaseType = typeof(TopshelfView).FullName,
-                    ViewFolder = _viewFolder
-                };
         }
 
         public string Render<TViewData>(string template, TViewData data)
         {
-            var instance = _engine.CreateInstance(new SparkViewDescriptor().AddTemplate(template));
+            var settings = new SparkSettings();
+            settings.AddNamespace("Topshelf.Dashboard");
+            settings.PageBaseType = typeof(TopshelfView).FullName;
 
-            var view = (TopshelfView)instance;
-            view.Model = data;
+            var engine = new SparkViewEngine(settings)
+                {
+                    ViewFolder = _viewFolder,
+                };
+
+            var instance = engine.CreateInstance(new SparkViewDescriptor().AddTemplate(template));
+
+            var view = (TopshelfView<TViewData>)instance;
+            view.SetModel(data);
 
             var sb = new StringBuilder();
 

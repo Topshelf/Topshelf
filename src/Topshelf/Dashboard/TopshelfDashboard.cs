@@ -15,21 +15,24 @@ namespace Topshelf.Dashboard
     using System;
     using Configuration;
     using log4net;
+    using Model;
     using Stact;
     using Stact.ServerFramework;
 
 
-    public class HttpDashboard
+	public class TopshelfDashboard
     {
-    	readonly ILog _log = LogManager.GetLogger("Topshelf.Dashboard.HttpDashboard");
+		readonly ILog _log = LogManager.GetLogger("Topshelf.Dashboard.TopshelfDashboard");
         static ChannelAdapter _input;
         static HttpServer _server;
         readonly int _port;
         ServiceName _name;
+        readonly ServiceCoordinator _serviceCoordinator;
 
-        public HttpDashboard(ServiceName name)
+        public TopshelfDashboard(ServiceName name, ServiceCoordinator serviceCoordinator)
         {
             _name = name;
+            _serviceCoordinator = serviceCoordinator;
             _port = 8483;
         }
 
@@ -45,7 +48,7 @@ namespace Topshelf.Dashboard
                     new VersionConnectionHandler(),
                     new ImageConnectionHandler(),
                     new CssConnectionHandler(),
-                    new DashboardConnectionHandler()
+                    new DashboardConnectionHandler(_serviceCoordinator)
                 });
 
             _server.Start();
