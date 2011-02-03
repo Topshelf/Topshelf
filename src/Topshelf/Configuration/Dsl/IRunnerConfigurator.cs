@@ -162,5 +162,7 @@ namespace Topshelf.Configuration.Dsl
 		/// </summary>
 		/// <param name="recoveryConfigurator">An action configuring the recovery settings</param>
 		void UseServiceRecovery(Action<IServiceRecoveryConfigurator> recoveryConfigurator);
+
+		void EnableDashboard();
 	}
 }

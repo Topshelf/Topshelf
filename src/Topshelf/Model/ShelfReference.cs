@@ -170,5 +170,14 @@ namespace Topshelf.Model
 
 			_disposed = true;
 		}
+
+		public void Unload()
+		{
+			if(_channel != null)
+			{
+				_channel.Dispose();
+				_channel = null;
+			}
+		}
 	}
 }

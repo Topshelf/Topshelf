@@ -55,12 +55,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Magnum, Version=0.8.180.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Magnum, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
     </Reference>
+    <Reference Include="Spark">
+      <HintPath>..\..\lib\Spark\Spark.dll</HintPath>
+    </Reference>
     <Reference Include="Stact">
       <HintPath>..\..\lib\Stact\Stact.dll</HintPath>
+    </Reference>
+    <Reference Include="Stact.ServerFramework">
+      <HintPath>..\..\lib\Stact\Stact.ServerFramework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -100,6 +106,13 @@
     <Compile Include="Configuration\Dsl\ServiceRecoveryConfigurator.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
+    <Compile Include="Dashboard\CssConnectionHandler.cs" />
+    <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
+    <Compile Include="Dashboard\ImageConnectionHandler.cs" />
+    <Compile Include="Dashboard\ResponseContextExtensions.cs" />
+    <Compile Include="Dashboard\SparkRender.cs" />
+    <Compile Include="Dashboard\HttpDashboard.cs" />
+    <Compile Include="Dashboard\TopshelfView.cs" />
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
@@ -203,7 +216,13 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Dashboard\images\" />
+    <Folder Include="Dashboard\styles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Dashboard\views\dashboard.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
