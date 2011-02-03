@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Dashboard
 {
+	using System;
 	using System.IO;
 	using System.Linq;
 	using Magnum.Extensions;
@@ -19,50 +20,50 @@ namespace Topshelf.Dashboard
 	using Stact.ServerFramework;
 
 
-	public class ImageConnectionHandler :
+	public class StaticResourceHandler :
 		PatternMatchConnectionHandler
 	{
-		readonly ImageChannel _statusChannel;
-
-		public ImageConnectionHandler()
-			:
-				base(".png$", "GET")
+		readonly StaticResourceChannel _channel;
+		public StaticResourceHandler(String pattern, String resourcePrefix, String contentType, params String [] supportedVerbs) :
+			base(pattern, supportedVerbs)
 		{
-			_statusChannel = new ImageChannel();
+			_channel = new StaticResourceChannel(resourcePrefix, contentType);
 		}
 
 		protected override Channel<ConnectionContext> CreateChannel(ConnectionContext context)
 		{
-			return _statusChannel;
+			return _channel;
 		}
 
-
-		class ImageChannel :
+		class StaticResourceChannel : 
 			Channel<ConnectionContext>
 		{
 			readonly Fiber _fiber;
+			readonly string _resourcePrefix;
+			readonly string _contentType;
 
-			public ImageChannel()
+			public StaticResourceChannel(String resourcePrefix, String contentType)
 			{
 				_fiber = new PoolFiber();
-			}
+				_resourcePrefix = resourcePrefix;
 
+				_contentType = contentType;// "text/css";
+			}
 			public void Send(ConnectionContext context)
 			{
 				_fiber.Add(() =>
+				{
+					string localPath = context.Request.Url.LocalPath;
+					string cssName = localPath.Split('/').Last();
+					context.Response.ContentType = _contentType;
+					//_resourcePrefix = "Topshelf.Dashboard.styles.";
+					using (Stream str = GetType().Assembly.GetManifestResourceStream(_resourcePrefix + cssName))
 					{
-						string localPath = context.Request.Url.LocalPath;
-						string imageName = localPath.Split('/').Last();
-						context.Response.ContentType = "image/png";
-						using (
-							Stream str =
-								GetType().Assembly.GetManifestResourceStream("Topshelf.Dashboard.images." + imageName))
-						{
-							byte[] buff = str.ReadToEnd();
-							context.Response.OutputStream.Write(buff, 0, buff.Length);
-						}
-						context.Complete();
-					});
+						byte[] buff = str.ReadToEnd();
+						context.Response.OutputStream.Write(buff, 0, buff.Length);
+					}
+					context.Complete();
+				});
 			}
 		}
 	}

@@ -106,12 +106,11 @@
     <Compile Include="Configuration\Dsl\ServiceRecoveryConfigurator.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
     <Compile Include="Commands\UninstallService.cs" />
-    <Compile Include="Dashboard\CssConnectionHandler.cs" />
     <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
     <Compile Include="Dashboard\DashboardView.cs" />
-    <Compile Include="Dashboard\ImageConnectionHandler.cs" />
     <Compile Include="Dashboard\ResponseContextExtensions.cs" />
     <Compile Include="Dashboard\SparkRender.cs" />
+    <Compile Include="Dashboard\StaticResourceHandler.cs" />
     <Compile Include="Dashboard\TopshelfDashboard.cs" />
     <Compile Include="Dashboard\TopshelfView.cs" />
     <Compile Include="Exceptions\TopshelfException.cs" />

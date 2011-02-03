@@ -46,8 +46,8 @@ namespace Topshelf.Dashboard
 			_server = new HttpServer(ServerUri, new PoolFiber(), _input, new PatternMatchConnectionHandler[]
 				{
 					new VersionConnectionHandler(),
-					new ImageConnectionHandler(),
-					new CssConnectionHandler(),
+					new StaticResourceHandler("\\.png$", "Topshelf.Dashboard.images.", "image/png", "GET"),
+					new StaticResourceHandler("\\.css$", "Topshelf.Dashboard.styles.", "text/css", "GET"),
 					new DashboardConnectionHandler(_serviceCoordinator)
 				});
 
