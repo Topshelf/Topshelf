@@ -145,7 +145,8 @@ namespace Topshelf.WindowsServiceCode
 
 		public static void SetRecoveryOptions(string fullServiceName, ServiceRecoveryOptions recoveryOptions)
 		{
-			ServiceControlHelper.SetServiceRecoveryOptions(fullServiceName, recoveryOptions);
+            if(recoveryOptions != null)
+			    ServiceControlHelper.SetServiceRecoveryOptions(fullServiceName, recoveryOptions);
 		}
     }
 }

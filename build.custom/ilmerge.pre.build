@@ -38,10 +38,10 @@
 		<fileset basedir="${dirs.drop}\${folder.app.drop}">
 			<include name="Topshelf.dll" />
 			<include name="Magnum.dll" />
-            <include name="Stact.dll" />
             <include name="Spark.dll" />
-            <include name="Stact.ServerFramework.dll" />
 			<!-- i don't want this merged in -->
+            <include name="Stact.dll" />
+            <include name="Stact.ServerFramework.dll" />
 			<include name="log4net.dll" />
 		</fileset>
 	</copy>
