@@ -24,6 +24,8 @@ namespace Topshelf.Configuration
 	{
 		public WinServiceSettings()
 		{
+			ServiceRecoveryOptions = new ServiceRecoveryOptions();
+		
 			StartMode = ServiceStartMode.Automatic;
 			Dependencies = new List<string>();
 

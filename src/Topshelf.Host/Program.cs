@@ -35,7 +35,7 @@ namespace Topshelf
 							Console.WriteLine("[Topshelf] All services have been stopped");
 						});
 
-					//x.EnableDashboard();
+					x.EnableDashboard();
 
 					x.ConfigureService<Host>(s =>
 						{
