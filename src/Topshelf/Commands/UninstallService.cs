@@ -50,7 +50,7 @@ namespace Topshelf.Commands
 				return;
 			}
 
-			if (!CommandUtil.IsAdministrator)
+			if (!UserAccessControlUtil.IsAdministrator)
 			{
 				if (Environment.OSVersion.Version.Major == 6)
 				{

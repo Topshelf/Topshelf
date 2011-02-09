@@ -104,7 +104,7 @@ namespace Topshelf.Specs.Configuration
 			_runConfiguration.WinServiceSettings.Credentials.Password
 				.ShouldEqual("pass");
 
-			_runConfiguration.WinServiceSettings.Credentials.AccountType
+			_runConfiguration.WinServiceSettings.Credentials.Account
 				.ShouldEqual(ServiceAccount.User);
 		}
 

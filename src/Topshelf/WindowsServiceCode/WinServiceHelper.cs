@@ -58,7 +58,7 @@ namespace Topshelf.WindowsServiceCode
                             {
                                 Username = credentials.Username,
                                 Password = credentials.Password,
-                                Account = credentials.AccountType
+                                Account = credentials.Account
                             };
 
             return installer;

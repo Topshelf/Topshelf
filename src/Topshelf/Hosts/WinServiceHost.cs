@@ -27,13 +27,13 @@ namespace Topshelf.Hosts
 		readonly ServiceName _fullServiceName;
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.WinServiceHost");
 
-		public WinServiceHost(IServiceCoordinator coordinator, ServiceName fullServiceName)
+		public WinServiceHost(ServiceName fullServiceName, IServiceCoordinator coordinator)
 		{
 			_coordinator = coordinator;
 			_fullServiceName = fullServiceName;
 		}
 
-		public void Host()
+		public void Run()
 		{
 			_log.Info("Starting up as a winservice application");
 
@@ -45,7 +45,7 @@ namespace Topshelf.Hosts
 				_log.Fatal(message);
 				throw new ConfigurationException(message);
 			}
-			var inServiceHost = new ServiceHost(_coordinator);
+			var inServiceHost = new WindowsServiceCode.ServiceHost(_coordinator);
 			inServiceHost.Run();
 		}
 	}

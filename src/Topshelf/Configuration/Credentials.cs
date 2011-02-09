@@ -21,14 +21,14 @@ namespace Topshelf.Configuration
 		IEquatable<Credentials>
 	{
 		static Credentials _commandLine;
-		readonly ServiceAccount _accountType;
+		readonly ServiceAccount _account;
 		readonly string _password;
 		readonly string _username;
 
-		public Credentials(string username, string password, ServiceAccount accountType)
+		public Credentials(string username, string password, ServiceAccount account)
 		{
 			_username = username;
-			_accountType = accountType;
+			_account = account;
 			_password = password;
 		}
 
@@ -63,9 +63,9 @@ namespace Topshelf.Configuration
 			get { return _password; }
 		}
 
-		public ServiceAccount AccountType
+		public ServiceAccount Account
 		{
-			get { return _accountType; }
+			get { return _account; }
 		}
 
 		public bool Equals(Credentials obj)
@@ -75,7 +75,7 @@ namespace Topshelf.Configuration
 			if (ReferenceEquals(this, obj))
 				return true;
 			return Equals(obj._username, _username) && Equals(obj._password, _password) &&
-			       Equals(obj._accountType, _accountType);
+			       Equals(obj._account, _account);
 		}
 
 		public static Credentials Custom(string username, string password)
@@ -105,7 +105,7 @@ namespace Topshelf.Configuration
 			{
 				int result = (_username != null ? _username.GetHashCode() : 0);
 				result = (result*397) ^ (_password != null ? _password.GetHashCode() : 0);
-				result = (result*397) ^ _accountType.GetHashCode();
+				result = (result*397) ^ _account.GetHashCode();
 				return result;
 			}
 		}

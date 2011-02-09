@@ -28,6 +28,39 @@ namespace Topshelf
 		{
 			BootstrapLogger();
 
+			HostFactory.Run(x =>
+				{
+					x.BeforeStartingServices(() =>
+						{
+							Console.WriteLine("[Topshelf] Preparing to start host services");
+						});
+
+					x.AfterStartingServices(() =>
+						{
+							Console.WriteLine("[Topshelf] All services have been started");
+						});
+
+					x.SetServiceName(Host.DefaultServiceName);
+					x.SetDisplayName(Host.DefaultServiceName);
+					x.SetDescription("Topshelf Service Host");
+
+					x.RunAsLocalSystem();
+
+
+					x.Service<Host>(y =>
+						{
+							y.SetServiceName(Host.DefaultServiceName);
+							y.ConstructUsing((name, coordinator) => new Host(coordinator));
+							y.WhenStarted(host => host.Start());
+							y.WhenStopped(host => host.Stop());
+						});
+
+					x.AfterStoppingServices(() =>
+						{
+							Console.WriteLine("[Topshelf] All services have been stopped");
+						});
+				});
+			/*
 			RunConfiguration cfg = RunnerConfigurator.New(x =>
 				{
 					x.AfterStoppingServices(h =>
@@ -67,6 +100,7 @@ namespace Topshelf
 				});
 
 			Runner.Host(cfg, args);
+			*/
 		}
 
 		static void BootstrapLogger()

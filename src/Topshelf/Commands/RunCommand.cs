@@ -48,12 +48,12 @@ namespace Topshelf.Commands
 			if (Process.GetCurrentProcess().GetParent().ProcessName == "services")
 			{
 				_log.Debug("Detected that I am running in the windows services");
-				host = new WinServiceHost(_coordinator, _serviceName);
+				host = new WinServiceHost(_serviceName, _coordinator);
 			}
 			else
-				host = new CommandLineHost(_serviceName, _coordinator);
+				host = new ConsoleRunHost(_serviceName, _coordinator);
 
-			host.Host();
+			host.Run();
 		}
 	}
 }
