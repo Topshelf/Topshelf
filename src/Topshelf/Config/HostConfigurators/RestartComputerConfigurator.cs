@@ -10,13 +10,12 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.WindowsServiceCode
+namespace Topshelf.HostConfigurators
 {
-	public enum ServiceRecoveryAction
+	public interface RestartComputerConfigurator :
+		RecoveryConfigurator
 	{
-		TakeNoAction,
-		RestartTheService,
-		RunAProgram,
-		RestartTheComputer
+		RestartComputerConfigurator DisplayMessage(string message);
+		RestartComputerConfigurator Wait(int minutes);
 	}
 }

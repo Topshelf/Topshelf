@@ -14,8 +14,6 @@ namespace Topshelf
 {
 	using System;
 	using System.IO;
-	using Configuration;
-	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
 
@@ -30,15 +28,9 @@ namespace Topshelf
 
 			HostFactory.Run(x =>
 				{
-					x.BeforeStartingServices(() =>
-						{
-							Console.WriteLine("[Topshelf] Preparing to start host services");
-						});
+					x.BeforeStartingServices(() => { Console.WriteLine("[Topshelf] Preparing to start host services"); });
 
-					x.AfterStartingServices(() =>
-						{
-							Console.WriteLine("[Topshelf] All services have been started");
-						});
+					x.AfterStartingServices(() => { Console.WriteLine("[Topshelf] All services have been started"); });
 
 					x.SetServiceName(Host.DefaultServiceName);
 					x.SetDisplayName(Host.DefaultServiceName);
@@ -46,6 +38,7 @@ namespace Topshelf
 
 					x.RunAsLocalSystem();
 
+					//x.EnableDashboard();
 
 					x.Service<Host>(y =>
 						{
@@ -55,52 +48,8 @@ namespace Topshelf
 							y.WhenStopped(host => host.Stop());
 						});
 
-					x.AfterStoppingServices(() =>
-						{
-							Console.WriteLine("[Topshelf] All services have been stopped");
-						});
+					x.AfterStoppingServices(() => { Console.WriteLine("[Topshelf] All services have been stopped"); });
 				});
-			/*
-			RunConfiguration cfg = RunnerConfigurator.New(x =>
-				{
-					x.AfterStoppingServices(h =>
-						{
-							Console.WriteLine("[Topshelf] All services have been stopped");
-						});
-
-					x.EnableDashboard();
-
-					x.ConfigureService<Host>(s =>
-						{
-							s.Named(Host.DefaultServiceName);
-							s.ConstructUsing((name,coordinator) => new Host(coordinator));
-							s.WhenStarted(tc => tc.Start());
-							s.WhenStopped(tc => tc.Stop());
-						});
-
-					x.RunAsLocalSystem();
-
-					x.SetDescription("Topshelf Hosting Service");
-					x.SetDisplayName(Host.DefaultServiceName);
-					x.SetServiceName(Host.DefaultServiceName);
-
-					x.UseServiceRecovery(rc =>
-						{
-							rc.DaysToResetFailureCount(1);
-							
-							rc.OnFirstFailure()
-								.RestartService();
-
-							rc.OnSecondFailure()
-								.RestartService();
-
-							rc.OnSubsequentFailures()
-								.RestartService();
-						});
-				});
-
-			Runner.Host(cfg, args);
-			*/
 		}
 
 		static void BootstrapLogger()

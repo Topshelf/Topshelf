@@ -10,25 +10,26 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Hosts
+namespace Topshelf.Windows
 {
 	using System;
 	using System.IO;
 	using System.Reflection;
+	using System.ServiceProcess;
 	using Exceptions;
 	using log4net;
 	using Model;
-	using WindowsServiceCode;
 
 
-	public class WinServiceHost :
+	public class WindowsServiceHost :
+		ServiceBase,
 		Host
 	{
-		readonly IServiceCoordinator _coordinator;
 		readonly ServiceDescription _description;
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.WinServiceHost");
+		readonly ILog _log = LogManager.GetLogger("Topshelf.Windows.WindowsServiceHost");
+		IServiceCoordinator _coordinator;
 
-		public WinServiceHost(ServiceDescription description, IServiceCoordinator coordinator)
+		public WindowsServiceHost(ServiceDescription description, IServiceCoordinator coordinator)
 		{
 			_coordinator = coordinator;
 			_description = description;
@@ -40,7 +41,7 @@ namespace Topshelf.Hosts
 
 			_log.Info("Starting up as a winservice application");
 
-			if (!WinServiceHelper.IsInstalled(_description.GetServiceName()))
+			if (!WindowsServiceControlManager.IsInstalled(_description.GetServiceName()))
 			{
 				string message =
 					string.Format("The {0} service has not been installed yet. Please run '{1} install'.",
@@ -48,8 +49,49 @@ namespace Topshelf.Hosts
 				_log.Fatal(message);
 				throw new ConfigurationException(message);
 			}
-			var inServiceHost = new WindowsServiceCode.ServiceHost(_coordinator);
-			inServiceHost.Run();
+
+			_log.Debug("[Topshelf] Starting up as a windows service application");
+
+			Run(this);
+		}
+
+		protected override void OnStart(string[] args)
+		{
+			try
+			{
+				_log.Info("[Topshelf] Starting");
+
+				_log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
+
+				_coordinator.Start();
+			}
+			catch (Exception ex)
+			{
+				_log.Fatal(ex);
+				throw;
+			}
+		}
+
+		protected override void OnStop()
+		{
+			try
+			{
+				_log.Info("[Topshelf] Stopping");
+
+				_coordinator.Stop();
+			}
+			catch (Exception ex)
+			{
+				_log.Fatal("The service did not shut down gracefully", ex);
+				throw;
+			}
+			finally
+			{
+				_coordinator.Dispose();
+				_coordinator = null;
+
+				_log.Info("[Topshelf] Stopped");
+			}
 		}
 	}
 }

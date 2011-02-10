@@ -14,6 +14,7 @@ namespace Topshelf.Dashboard
 {
 	using System.Net;
 	using Magnum.Extensions;
+	using Messages;
 	using Model;
 	using Stact;
 	using Stact.Internal;

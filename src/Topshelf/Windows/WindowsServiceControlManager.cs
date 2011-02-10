@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2011 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -10,23 +10,35 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.WindowsServiceCode
+namespace Topshelf.Windows
 {
 	using System;
 	using System.ComponentModel;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Runtime.InteropServices;
 	using System.Security.Permissions;
 	using System.ServiceProcess;
+	using Magnum.Extensions;
 
 
-	public class ServiceControlHelper
+	/// <summary>
+	/// Taken from http://code.google.com/p/daemoniq. Thanks guys!
+	/// </summary>
+	public static class WindowsServiceControlManager
 	{
 		const int SERVICE_CONFIG_FAILURE_ACTIONS = 2;
 		const int SE_PRIVILEGE_ENABLED = 2;
 		const string SE_SHUTDOWN_NAME = "SeShutdownPrivilege";
 		const int TOKEN_ADJUST_PRIVILEGES = 32;
 		const int TOKEN_QUERY = 8;
+
+		public static bool IsInstalled(string serviceName)
+		{
+			return ServiceController
+				.GetServices()
+				.Any(service => service.ServiceName == serviceName);
+		}
 
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
@@ -65,15 +77,15 @@ namespace Topshelf.WindowsServiceCode
 			ServiceRecoveryOptions recoveryOptions)
 		{
 			bool requiresShutdownPriveleges =
-				recoveryOptions.FirstFailureAction == ServiceRecoveryAction.RestartTheComputer ||
-				recoveryOptions.SecondFailureAction == ServiceRecoveryAction.RestartTheComputer ||
-				recoveryOptions.SubsequentFailureActions == ServiceRecoveryAction.RestartTheComputer;
+				recoveryOptions.FirstFailureAction == ServiceRecoveryAction.RestartComputer ||
+				recoveryOptions.SecondFailureAction == ServiceRecoveryAction.RestartComputer ||
+				recoveryOptions.SubsequentFailureAction == ServiceRecoveryAction.RestartComputer;
 			if (requiresShutdownPriveleges)
 				GrantShutdownPrivileges();
 
 			int actionCount = 3;
 			var restartServiceAfter = (uint)TimeSpan.FromMinutes(
-			                                                     recoveryOptions.MinutesToRestartService).TotalMilliseconds;
+			                                                     recoveryOptions.RestartServiceWaitMinutes).TotalMilliseconds;
 
 			IntPtr failureActionsPointer = IntPtr.Zero;
 			IntPtr actionPointer = IntPtr.Zero;
@@ -86,16 +98,16 @@ namespace Topshelf.WindowsServiceCode
 
 				// Set up the failure actions
 				var failureActions = new SERVICE_FAILURE_ACTIONS();
-				failureActions.dwResetPeriod = (int)TimeSpan.FromDays(recoveryOptions.DaysToResetFailAcount).TotalSeconds;
-				failureActions.cActions = actionCount;
-				failureActions.lpRebootMsg = recoveryOptions.RebootMessage;
+				failureActions.dwResetPeriod = (int)TimeSpan.FromDays(recoveryOptions.ResetFailureCountWaitDays).TotalSeconds;
+				failureActions.cActions = (uint)actionCount;
+				failureActions.lpRebootMsg = recoveryOptions.RestartSystemMessage;
 
 				// allocate memory for the individual actions
 				actionPointer = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(SC_ACTION))*actionCount);
 				ServiceRecoveryAction[] actions = {
 				                                  	recoveryOptions.FirstFailureAction,
 				                                  	recoveryOptions.SecondFailureAction,
-				                                  	recoveryOptions.SubsequentFailureActions
+				                                  	recoveryOptions.SubsequentFailureAction
 				                                  };
 				for (int i = 0; i < actions.Length; i++)
 				{
@@ -105,7 +117,7 @@ namespace Topshelf.WindowsServiceCode
 				}
 				failureActions.lpsaActions = actionPointer;
 
-				string command = recoveryOptions.CommandToLaunchOnFailure;
+				string command = recoveryOptions.RunProgramCommand;
 				if (command != null)
 					failureActions.lpCommand = command;
 
@@ -113,8 +125,7 @@ namespace Topshelf.WindowsServiceCode
 				Marshal.StructureToPtr(failureActions, failureActionsPointer, false);
 
 				// Make the change
-				bool success = ChangeServiceConfig2(
-				                                    controller.ServiceHandle.DangerousGetHandle(),
+				bool success = ChangeServiceConfig2(controller.ServiceHandle.DangerousGetHandle(),
 				                                    SERVICE_CONFIG_FAILURE_ACTIONS,
 				                                    failureActionsPointer);
 
@@ -131,7 +142,10 @@ namespace Topshelf.WindowsServiceCode
 					Marshal.FreeHGlobal(actionPointer);
 
 				if (controller != null)
+				{
 					controller.Close();
+					controller.Dispose();
+				}
 
 				//log.Debug(m => m("Done setting service recovery options."));
 			}
@@ -144,7 +158,7 @@ namespace Topshelf.WindowsServiceCode
 
 			IntPtr tokenHandle = IntPtr.Zero;
 
-			TOKEN_PRIVILEGES tkp = new TOKEN_PRIVILEGES();
+			var tkp = new TOKEN_PRIVILEGES();
 
 			long luid = 0;
 			int retLen = 0;
@@ -184,13 +198,13 @@ namespace Topshelf.WindowsServiceCode
 				case ServiceRecoveryAction.TakeNoAction:
 					actionType = SC_ACTION_TYPE.None;
 					break;
-				case ServiceRecoveryAction.RestartTheService:
+				case ServiceRecoveryAction.RestartService:
 					actionType = SC_ACTION_TYPE.RestartService;
 					break;
-				case ServiceRecoveryAction.RestartTheComputer:
+				case ServiceRecoveryAction.RestartComputer:
 					actionType = SC_ACTION_TYPE.RebootComputer;
 					break;
-				case ServiceRecoveryAction.RunAProgram:
+				case ServiceRecoveryAction.RunProgram:
 					actionType = SC_ACTION_TYPE.RunCommand;
 					break;
 			}
@@ -203,6 +217,7 @@ namespace Topshelf.WindowsServiceCode
 		[StructLayout(LayoutKind.Sequential)]
 		struct LUID_AND_ATTRIBUTES
 		{
+			[MarshalAs(UnmanagedType.U4)]
 			public UInt32 Attributes;
 			public long Luid;
 		}
@@ -211,7 +226,9 @@ namespace Topshelf.WindowsServiceCode
 		[StructLayout(LayoutKind.Sequential)]
 		struct SC_ACTION
 		{
+			[MarshalAs(UnmanagedType.U4)]
 			public uint Delay;
+			[MarshalAs(UnmanagedType.U4)]
 			public SC_ACTION_TYPE Type;
 		}
 
@@ -228,14 +245,17 @@ namespace Topshelf.WindowsServiceCode
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
 		struct SERVICE_FAILURE_ACTIONS
 		{
-			public int cActions;
+			[MarshalAs(UnmanagedType.U4)]
 			public int dwResetPeriod;
+
+			[MarshalAs(UnmanagedType.LPWStr)]
+			public string lpRebootMsg;
 
 			[MarshalAs(UnmanagedType.LPWStr)]
 			public string lpCommand;
 
-			[MarshalAs(UnmanagedType.LPWStr)]
-			public string lpRebootMsg;
+			[MarshalAs(UnmanagedType.U4)]
+			public UInt32 cActions;
 
 			public IntPtr lpsaActions;
 		}

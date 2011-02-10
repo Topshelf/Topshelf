@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
+	using Windows;
 	using WindowsServiceCode;
 
 
@@ -29,12 +30,12 @@ namespace Topshelf.Configuration.Dsl
 
 		public void RestartService()
 		{
-			SetRecoveryOptionForFailure(ServiceRecoveryAction.RestartTheService);
+			SetRecoveryOptionForFailure(ServiceRecoveryAction.RestartService);
 		}
 
 		public IServiceFailureRestartConfiguration RestartComputer()
 		{
-			SetRecoveryOptionForFailure(ServiceRecoveryAction.RestartTheComputer);
+			SetRecoveryOptionForFailure(ServiceRecoveryAction.RestartComputer);
 
 			return new ServiceFailureRestartConfiguration(_serviceRecoveryOptions);
 		}
@@ -50,7 +51,7 @@ namespace Topshelf.Configuration.Dsl
 					_serviceRecoveryOptions.SecondFailureAction = recoveryAction;
 					break;
 				case ServiceFailure.Subsequent:
-					_serviceRecoveryOptions.SubsequentFailureActions = recoveryAction;
+					_serviceRecoveryOptions.SubsequentFailureAction = recoveryAction;
 					break;
 			}
 		}

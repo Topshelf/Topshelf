@@ -14,7 +14,6 @@ namespace Topshelf.Configuration.Dsl
 {
 	using System;
 	using HostConfigurators;
-	using Model;
 
 
 	public interface IRunnerConfigurator :
@@ -48,13 +47,6 @@ namespace Topshelf.Configuration.Dsl
 		/// This means that <c>#</c> will not be a valid character to use in the password.
 		/// </example>
 		void RunAsFromCommandLine();
-
-		/// <summary>
-		/// Sets the length of time the system will wait for events to complete, such as starting or stopping
-		/// services.
-		/// </summary>
-		/// <param name="timeout">The wait timeout</param>
-		void SetEventTimeout(TimeSpan timeout);
 
 		/// <summary>
 		/// Sets up the service recovery options exposed to the windows serivces. 

@@ -12,66 +12,48 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
+	using System;
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.ServiceProcess;
 	using Configuration;
 	using log4net;
+	using Windows;
 	using WindowsServiceCode;
 
 
 	public class UninstallHost :
-		ServiceHost,
+		AbstactInstallerHost,
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");
+		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.UninstallHost");
 
-		public UninstallHost(ServiceDescription description,
-		                     ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials)
-			: base(description, startMode, dependencies, credentials)
+
+		public UninstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
+		                     Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions)
+			: base(description, startMode, dependencies, credentials, preActions, postActions)
 		{
 		}
 
 		public void Run()
 		{
-			if (!WinServiceHelper.IsInstalled(Description.GetServiceName()))
+			if (!WindowsServiceControlManager.IsInstalled(Description.GetServiceName()))
 			{
 				_log.ErrorFormat("The {0} service is not installed.", Description.GetServiceName());
 				return;
 			}
 
-			if (!UserAccessControlUtil.IsAdministrator)
+			if (!WindowsUserAccessControl.IsAdministrator)
 			{
-				if (!UserAccessControlUtil.RerunAsAdministrator())
+				if (!WindowsUserAccessControl.RerunAsAdministrator())
 					_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", Description.GetServiceName());
 
 				return;
 			}
 
-			Uninstall();
-
-			//var installer = new HostServiceInstaller(_settings);
-			//WinServiceHelper.SetRecoveryOptions(_settings.ServiceName.FullName, _settings.ServiceRecoveryOptions);
-			//WinServiceHelper.Register(_settings.ServiceName.FullName, installer, _settings.AfterInstallAction);
-		}
-
-		void Uninstall()
-		{
 			_log.DebugFormat("Attempting to uninstall '{0}'", Description.GetServiceName());
 
-			ExecuteBeforeActions();
-
-			WithInstaller(ti => ti.Uninstall(new Hashtable()));
-
-			ExecuteAfterActions();
-		}
-
-		void ExecuteAfterActions()
-		{
-		}
-
-		void ExecuteBeforeActions()
-		{
+			WithInstaller(ti => ti.Uninstall(null));
 		}
 	}
 }

@@ -13,7 +13,7 @@
 namespace Topshelf.Configuration
 {
     using System.Diagnostics;
-    using Extensions;
+    using Magnum.Extensions;
 
 
 	[DebuggerDisplay("{FullName}")]

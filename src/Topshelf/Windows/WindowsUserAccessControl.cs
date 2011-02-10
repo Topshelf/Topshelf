@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Windows
 {
 	using System;
 	using System.ComponentModel;
@@ -18,11 +18,12 @@ namespace Topshelf
 	using System.Reflection;
 	using System.Security.Principal;
 	using log4net;
+	using Magnum.CommandLineParser;
 
 
-	public static class UserAccessControlUtil
+	public static class WindowsUserAccessControl
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.UserAccessControlUtil");
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Windows.WindowsUserAccessControl");
 
 		public static bool IsAdministrator
 		{
@@ -44,7 +45,7 @@ namespace Topshelf
 		{
 			if (Environment.OSVersion.Version.Major == 6)
 			{
-				var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, Environment.CommandLine)
+				var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, CommandLine.GetUnparsedCommandLine())
 					{
 						Verb = "runas",
 						UseShellExecute = true,
@@ -53,6 +54,8 @@ namespace Topshelf
 
 				try
 				{
+					LogManager.Shutdown();
+
 					Process process = Process.Start(startInfo);
 					process.WaitForExit();
 

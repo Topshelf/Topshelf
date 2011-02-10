@@ -23,23 +23,32 @@ namespace Topshelf.Builders
 	public class InstallBuilder :
 		HostBuilder
 	{
-		readonly IList<string> _dependencies = new List<string>();
+		readonly IList<string> _dependencies;
 		readonly ServiceDescription _description;
-		readonly IList<Action> _postActions = new List<Action>();
-		readonly IList<Action> _preActions = new List<Action>();
+		readonly IList<Action> _postActions;
+		readonly IList<Action> _preActions;
 		Credentials _credentials;
 		ServiceStartMode _startMode;
 
 		public InstallBuilder(ServiceDescription description)
 		{
-			_description = description;
-
+			_preActions = new List<Action>();
+			_postActions = new List<Action>();
+			_dependencies = new List<string>();
+			_startMode = ServiceStartMode.Automatic;
 			_credentials = new Credentials("", "", ServiceAccount.LocalSystem);
+
+			_description = description;
+		}
+
+		public ServiceDescription Description
+		{
+			get { return _description; }
 		}
 
 		public Host Build()
 		{
-			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials);
+			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions);
 		}
 
 		public void Match<T>(Action<T> callback)

@@ -13,7 +13,6 @@
 namespace Topshelf.Bottles
 {
 	using System;
-	using Extensions;
 	using FileSystem;
 	using Magnum.Extensions;
 	using Magnum.FileSystem;
@@ -59,7 +58,7 @@ namespace Topshelf.Bottles
 				}
 				catch (Exception ex)
 				{
-					string msg = TopshelfExtensions.FormatWith("There was an error processing the bottle '{0}'", message.Path);
+					string msg = "There was an error processing the bottle '{0}'".FormatWith(message.Path);
 					throw new BottleException(msg, ex);
 				}
 			}

@@ -10,23 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model
+namespace Topshelf.HostConfigurators
 {
-	public class ServiceInfo
+	public interface RunProgramConfigurator :
+		RecoveryConfigurator
 	{
-		public ServiceInfo(string name, string currentState, string serviceType)
-		{
-			Name = name;
-			CurrentState = currentState;
-			ServiceType = serviceType;
-		}
-
-		protected ServiceInfo()
-		{
-		}
-
-		public string Name { get; private set; }
-		public string CurrentState { get; private set; }
-		public string ServiceType { get; private set; }
+		RecoveryConfigurator WithParameters(string parameters);
 	}
 }

@@ -15,7 +15,7 @@ namespace Topshelf.Configuration.Dsl
 	using System;
 	using Dashboard;
 	using HostConfigurators;
-	using Model;
+
 
 	[Obsolete("Use HostFactory instead")]
 	public class RunnerConfigurator :
@@ -58,11 +58,6 @@ namespace Topshelf.Configuration.Dsl
 				});
 		}
 
-		public void SetEventTimeout(TimeSpan timeout)
-		{
-			//_timeout = timeout;
-		}
-
 		public void UseServiceRecovery(Action<IServiceRecoveryConfigurator> recoveryConfigurator)
 		{
 			//recoveryConfigurator(new ServiceRecoveryConfigurator(_winServiceSettings.ServiceRecoveryOptions));
@@ -74,10 +69,6 @@ namespace Topshelf.Configuration.Dsl
 		}
 
 		public void RunAsFromCommandLine()
-		{
-		}
-
-		void EnableDashboard(ServiceCoordinator co)
 		{
 		}
 

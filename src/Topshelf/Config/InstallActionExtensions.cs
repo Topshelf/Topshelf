@@ -54,7 +54,8 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static HostConfigurator BeforeStartingServices(this HostConfigurator configurator, Action<IServiceCoordinator> callback)
+		public static HostConfigurator BeforeStartingServices(this HostConfigurator configurator,
+		                                                      Action<IServiceCoordinator> callback)
 		{
 			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.BeforeStartingServices(callback)));
 
@@ -68,7 +69,8 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static HostConfigurator AfterStartingServices(this HostConfigurator configurator, Action<IServiceCoordinator> callback)
+		public static HostConfigurator AfterStartingServices(this HostConfigurator configurator,
+		                                                     Action<IServiceCoordinator> callback)
 		{
 			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.AfterStartingServices(callback)));
 
@@ -82,9 +84,17 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static HostConfigurator AfterStoppingServices(this HostConfigurator configurator, Action<IServiceCoordinator> callback)
+		public static HostConfigurator AfterStoppingServices(this HostConfigurator configurator,
+		                                                     Action<IServiceCoordinator> callback)
 		{
 			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.AfterStoppingServices(callback)));
+
+			return configurator;
+		}
+
+		public static HostConfigurator SetEventTimeout(this HostConfigurator configurator, TimeSpan timeout)
+		{
+			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.SetEventTimeout(timeout)));
 
 			return configurator;
 		}

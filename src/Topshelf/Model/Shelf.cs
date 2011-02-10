@@ -19,8 +19,6 @@ namespace Topshelf.Model
 	using System.Linq;
 	using Builders;
 	using Configuration.Dsl;
-	using Extensions;
-	using HostConfigurators;
 	using log4net;
 	using log4net.Config;
 	using Magnum;
@@ -212,7 +210,7 @@ namespace Topshelf.Model
 					return bootstrapper;
 
 				throw new InvalidOperationException(
-					TopshelfExtensions.FormatWith("Bootstrapper type, '{0}', is not a subclass of Bootstrapper.", bootstrapper.GetType().Name));
+					"Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
 			}
 
 			// check configuration first
@@ -243,9 +241,9 @@ namespace Topshelf.Model
 
 		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
-			_log.Error(TopshelfExtensions.FormatWith("Unhandled {0}exception in app domain {1}: {2}", e.IsTerminating ? "terminal " : "",
-			                                                                      AppDomain.CurrentDomain.FriendlyName,
-			                                                                      e.ExceptionObject));
+			_log.ErrorFormat("Unhandled {0}exception in app domain {1}: {2}", e.IsTerminating ? "terminal " : "",
+			                 AppDomain.CurrentDomain.FriendlyName,
+			                 e.ExceptionObject);
 
 			Dispose();
 		}
@@ -258,7 +256,7 @@ namespace Topshelf.Model
 			}
 			catch (Exception)
 			{
-				_log.Error(TopshelfExtensions.FormatWith("[{0}] Failed to send fault", _serviceName), ex);
+				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
 			}
 		}
 

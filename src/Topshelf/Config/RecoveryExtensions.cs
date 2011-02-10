@@ -10,19 +10,24 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Dashboard
+namespace Topshelf
 {
-	using System.Collections.Generic;
-	using Messages;
+	using System;
+	using HostConfigurators;
 
 
-	public class DashboardView
+	public static class RecoveryExtensions
 	{
-		public DashboardView(IEnumerable<ServiceInfo> infos)
+		public static HostConfigurator UseServiceRecovery(this HostConfigurator configurator,
+		                                                  Action<RecoveryConfigurator> configure)
 		{
-			Statuses = infos;
-		}
+			var recoveryConfigurator = new RecoveryHostConfigurator();
 
-		public IEnumerable<ServiceInfo> Statuses { get; private set; }
+			configure(recoveryConfigurator);
+
+			configurator.AddConfigurator(recoveryConfigurator);
+
+			return configurator;
+		}
 	}
 }

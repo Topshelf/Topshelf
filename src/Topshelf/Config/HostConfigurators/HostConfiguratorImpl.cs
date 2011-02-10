@@ -21,24 +21,21 @@ namespace Topshelf.HostConfigurators
 	public class HostConfiguratorImpl :
 		HostConfigurator
 	{
-		readonly IList<Action> _postInstallActions = new List<Action>();
-		readonly IList<Action> _preInstallActions = new List<Action>();
-		Func<ServiceDescription, HostBuilder> _builderFactory;
-
+		readonly IList<HostBuilderConfigurator> _configurators;
 		readonly WindowsServiceDescription _description;
-
-		public WindowsServiceDescription Description
-		{
-			get { return _description; }
-		}
-
-		IList<HostBuilderConfigurator> _configurators = new List<HostBuilderConfigurator>();
+		Func<ServiceDescription, HostBuilder> _builderFactory;
 
 		public HostConfiguratorImpl()
 		{
+			_configurators = new List<HostBuilderConfigurator>();
 			_description = new WindowsServiceDescription();
 
 			_builderFactory = DefaultBuilderFactory;
+		}
+
+		protected WindowsServiceDescription Description
+		{
+			get { return _description; }
 		}
 
 		public void Validate()
@@ -82,11 +79,6 @@ namespace Topshelf.HostConfigurators
 			_configurators.Add(configurator);
 		}
 
-		static HostBuilder DefaultBuilderFactory(ServiceDescription description)
-		{
-			return new RunBuilder(description);
-		}
-
 		public Host CreateHost()
 		{
 			HostBuilder builder = _builderFactory(_description);
@@ -95,6 +87,11 @@ namespace Topshelf.HostConfigurators
 				configurator.Configure(builder);
 
 			return builder.Build();
+		}
+
+		static HostBuilder DefaultBuilderFactory(ServiceDescription description)
+		{
+			return new RunBuilder(description);
 		}
 	}
 }

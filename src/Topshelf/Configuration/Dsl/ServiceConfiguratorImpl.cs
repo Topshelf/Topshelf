@@ -13,7 +13,7 @@
 namespace Topshelf.Configuration.Dsl
 {
 	using System;
-	using Extensions;
+	using Magnum.Extensions;
 	using Magnum.Reflection;
 	using Model;
 	using ServiceConfigurators;

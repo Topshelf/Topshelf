@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
-	using WindowsServiceCode;
+	using Windows;
 
 
 	public class ServiceRecoveryConfigurator :
@@ -42,12 +42,12 @@ namespace Topshelf.Configuration.Dsl
 
 		public void ProgramToExecute(string command)
 		{
-			_serviceRecoveryOptions.CommandToLaunchOnFailure = command;
+			_serviceRecoveryOptions.RunProgramCommand = command;
 		}
 
 		public void DaysToResetFailureCount(int days)
 		{
-			_serviceRecoveryOptions.DaysToResetFailAcount = days;
+			_serviceRecoveryOptions.ResetFailureCountWaitDays = days;
 		}
 	}
 }

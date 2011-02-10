@@ -18,7 +18,6 @@ namespace Topshelf.Model
 	using System.Reflection;
 	using System.Threading;
 	using Exceptions;
-	using Extensions;
 	using log4net;
 	using Magnum;
 	using Magnum.Collections;
@@ -225,7 +224,7 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] Create Shelf Service: {0}{1}", message.ServiceName,
 			                message.BootstrapperType == null
 			                	? ""
-			                	: TopshelfExtensions.FormatWith(" ({0})", message.BootstrapperType.ToShortTypeName()));
+			                	: " ({0})".FormatWith(message.BootstrapperType.ToShortTypeName()));
 
 			ActorFactory<IServiceController> factory = _controllerFactory.CreateFactory(inbox =>
 				{
@@ -290,7 +289,7 @@ namespace Topshelf.Model
 				GetServicesNotInState(state).Each(x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
 
 				throw new InvalidOperationException(
-					TopshelfExtensions.FormatWith("All services were not {0} within the specified timeout", state.Name));
+					"All services were not {0} within the specified timeout".FormatWith(state.Name));
 			}
 		}
 

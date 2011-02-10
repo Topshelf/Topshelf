@@ -21,6 +21,7 @@ namespace Topshelf.Builders
 	using Magnum.Extensions;
 	using Model;
 	using Stact;
+	using Windows;
 
 
 	public class RunBuilder :
@@ -79,7 +80,7 @@ namespace Topshelf.Builders
 			{
 				_log.Debug("Running as a Windows service, using the service host");
 
-				return new WinServiceHost(_description, coordinator);
+				return new WindowsServiceHost(_description, coordinator);
 			}
 
 			_log.Debug("Running as a console application, using the console host");
@@ -111,6 +112,11 @@ namespace Topshelf.Builders
 			_postStopActions.Add(callback);
 		}
 
+
+		public void SetEventTimeout(TimeSpan timeout)
+		{
+			_timeout = timeout;
+		}
 
 		void ExecutePreStartActions(IServiceCoordinator coordinator)
 		{

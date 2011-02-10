@@ -24,17 +24,22 @@ namespace Topshelf.Hosts
 	using WindowsServiceCode;
 
 
-	public abstract class ServiceHost
+	public abstract class AbstactInstallerHost
 	{
 		readonly Credentials _credentials;
 		readonly IEnumerable<string> _dependencies;
 		readonly ServiceDescription _description;
+		readonly IEnumerable<Action> _postActions;
+		readonly IEnumerable<Action> _preActions;
 		readonly ServiceStartMode _startMode;
 
-		protected ServiceHost(ServiceDescription description,
-		                      ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials)
+		protected AbstactInstallerHost(ServiceDescription description,
+		                               ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
+		                               IEnumerable<Action> preActions, IEnumerable<Action> postActions)
 		{
 			_startMode = startMode;
+			_postActions = postActions;
+			_preActions = preActions;
 			_credentials = credentials;
 			_dependencies = dependencies;
 			_description = description;
@@ -48,6 +53,8 @@ namespace Topshelf.Hosts
 		protected void WithInstaller(Action<TransactedInstaller> callback)
 		{
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+			ExecutePreActions();
 
 			using (Installer installer = CreateInstaller())
 			using (var ti = new TransactedInstaller())
@@ -66,9 +73,21 @@ namespace Topshelf.Hosts
 
 				callback(ti);
 			}
+
+			ExecutePostActions();
 		}
 
-		protected Installer CreateInstaller()
+		void ExecutePreActions()
+		{
+			_preActions.Each(x => x());
+		}
+
+		void ExecutePostActions()
+		{
+			_postActions.Each(x => x());
+		}
+
+		Installer CreateInstaller()
 		{
 			var installers = new Installer[]
 				{
@@ -104,15 +123,10 @@ namespace Topshelf.Hosts
 		{
 			var installer = new ServiceProcessInstaller
 				{
-					Account = ServiceAccount.LocalSystem
+					Username = _credentials.Username,
+					Password = _credentials.Password,
+					Account = _credentials.Account,
 				};
-
-			if (_credentials != null)
-			{
-				installer.Username = _credentials.Username;
-				installer.Password = _credentials.Password;
-				installer.Account = _credentials.Account;
-			}
 
 			return installer;
 		}

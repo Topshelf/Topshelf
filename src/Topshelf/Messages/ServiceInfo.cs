@@ -10,19 +10,23 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Dashboard
+namespace Topshelf.Messages
 {
-	using System.Collections.Generic;
-	using Messages;
-
-
-	public class DashboardView
+	public class ServiceInfo
 	{
-		public DashboardView(IEnumerable<ServiceInfo> infos)
+		public ServiceInfo(string name, string currentState, string serviceType)
 		{
-			Statuses = infos;
+			Name = name;
+			CurrentState = currentState;
+			ServiceType = serviceType;
 		}
 
-		public IEnumerable<ServiceInfo> Statuses { get; private set; }
+		protected ServiceInfo()
+		{
+		}
+
+		public string Name { get; private set; }
+		public string CurrentState { get; private set; }
+		public string ServiceType { get; private set; }
 	}
 }

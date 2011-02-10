@@ -91,6 +91,7 @@
     </Compile>
     <Compile Include="Configuration\Credential_Specs.cs" />
     <Compile Include="Config\EmptyConfigurator_Specs.cs" />
+    <Compile Include="Config\Recovery_Specs.cs" />
     <Compile Include="ContextSetup.cs" />
     <Compile Include="DirectoryMonitor_Specs.cs" />
     <Compile Include="ServiceController_Specs.cs" />

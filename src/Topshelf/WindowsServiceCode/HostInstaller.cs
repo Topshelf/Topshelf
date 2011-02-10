@@ -50,7 +50,7 @@ namespace Topshelf.WindowsServiceCode
 			using (RegistryKey services = currentControlSet.OpenSubKey("Services"))
 			using (RegistryKey service = services.OpenSubKey(_description.GetServiceName(), true))
 			{
-				service.SetValue("Description", _description);
+				service.SetValue("Description", _description.Description);
 
 				var imagePath = (string)service.GetValue("ImagePath");
 

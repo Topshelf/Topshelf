@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Configuration.Dsl
 {
+	using Windows;
 	using WindowsServiceCode;
 
 
@@ -27,13 +28,13 @@ namespace Topshelf.Configuration.Dsl
 
 		public IServiceFailureRestartConfigurationWait DisplayMessage(string restartMessage)
 		{
-			_serviceRecoveryOptions.RebootMessage = restartMessage;
+			_serviceRecoveryOptions.RestartSystemMessage = restartMessage;
 			return this;
 		}
 
 		public void Wait(int minutesBeforeRestarting)
 		{
-			_serviceRecoveryOptions.MinutesToRestartService = minutesBeforeRestarting;
+			_serviceRecoveryOptions.RestartServiceWaitMinutes = minutesBeforeRestarting;
 		}
 	}
 }

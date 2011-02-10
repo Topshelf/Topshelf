@@ -14,7 +14,6 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Diagnostics;
-	using Extensions;
 	using Magnum.Extensions;
 	using Stact;
 	using Stact.Configuration;
@@ -29,13 +28,13 @@ namespace Topshelf.Model
 
 		static Uri GetServiceUri()
 		{
-			return new Uri(TopshelfExtensions.FormatWith("net.pipe://localhost/topshelf_{0}", GetPid()));
+			return new Uri("net.pipe://localhost/topshelf_{0}".FormatWith(GetPid()));
 		}
 
 		public static HostChannel CreateShelfControllerHost(UntypedChannel controllerChannel, string serviceName)
 		{
 			Uri address = GetServiceUri().AppendPath("controller").AppendPath(serviceName);
-			string pipeName = TopshelfExtensions.FormatWith("{0}/{1}", GetPid(), serviceName);
+			string pipeName = "{0}/{1}".FormatWith(GetPid(), serviceName);
 
 			return new HostChannel(controllerChannel, address, pipeName);
 		}
@@ -43,7 +42,7 @@ namespace Topshelf.Model
 		public static HostChannel CreateShelfHost(string serviceName, Action<ConnectionConfigurator> cfg)
 		{
 			Uri address = GetServiceUri().AppendPath("shelf").AppendPath(serviceName);
-			string pipeName = TopshelfExtensions.FormatWith("{0}/{1}", GetPid(), serviceName);
+			string pipeName = "{0}/{1}".FormatWith(GetPid(), serviceName);
 
 			return new HostChannel(address, pipeName, cfg);
 		}

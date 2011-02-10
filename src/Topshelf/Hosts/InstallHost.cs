@@ -18,28 +18,25 @@ namespace Topshelf.Hosts
 	using System.ServiceProcess;
 	using Configuration;
 	using log4net;
-	using Magnum.Extensions;
-	using WindowsServiceCode;
+	using Windows;
 
 
 	public class InstallHost :
-		ServiceHost,
+		AbstactInstallerHost,
 		Host
 	{
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");
 
-		IEnumerable<Action> _postInstallActions;
-		IEnumerable<Action> _preInstallActions;
-
 		public InstallHost(ServiceDescription description,
-		                   ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials)
-			: base(description, startMode, dependencies, credentials)
+		                   ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
+		                   IEnumerable<Action> preActions, IEnumerable<Action> postActions)
+			: base(description, startMode, dependencies, credentials, preActions, postActions)
 		{
 		}
 
 		public void Run()
 		{
-			if (WinServiceHelper.IsInstalled(Description.GetServiceName()))
+			if (WindowsServiceControlManager.IsInstalled(Description.GetServiceName()))
 			{
 				string message = string.Format("The {0} service is already installed.", Description.GetServiceName());
 				_log.Error(message);
@@ -47,38 +44,17 @@ namespace Topshelf.Hosts
 				return;
 			}
 
-			if (!UserAccessControlUtil.IsAdministrator)
+			if (!WindowsUserAccessControl.IsAdministrator)
 			{
-				if (!UserAccessControlUtil.RerunAsAdministrator())
+				if (!WindowsUserAccessControl.RerunAsAdministrator())
 					_log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());
 
 				return;
 			}
 
-			Install();
-
-			//WinServiceHelper.SetRecoveryOptions(_settings.ServiceName.FullName, _settings.ServiceRecoveryOptions);
-		}
-
-		void Install()
-		{
 			_log.DebugFormat("Attempting to install '{0}'", Description.GetServiceName());
 
-			ExecutePreInstallActions();
-
 			WithInstaller(ti => ti.Install(new Hashtable()));
-
-			ExecutePostInstallActions();
-		}
-
-		void ExecutePreInstallActions()
-		{
-			_preInstallActions.Each(x => x());
-		}
-
-		void ExecutePostInstallActions()
-		{
-			_postInstallActions.Each(x => x());
 		}
 	}
 }
