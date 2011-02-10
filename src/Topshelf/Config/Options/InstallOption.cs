@@ -21,7 +21,7 @@ namespace Topshelf.Options
 	{
 		public void ApplyTo(HostConfigurator configurator)
 		{
-			configurator.UseBuilder(configuration => new InstallBuilder(configuration));
+			configurator.UseBuilder(description => new InstallBuilder(description));
 		}
 	}
 }

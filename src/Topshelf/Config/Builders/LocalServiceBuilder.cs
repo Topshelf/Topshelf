@@ -13,7 +13,8 @@
 namespace Topshelf.Builders
 {
 	using System;
-	using Topshelf.Model;
+	using Exceptions;
+	using Model;
 	using Stact;
 
 
@@ -21,22 +22,26 @@ namespace Topshelf.Builders
 		ServiceBuilder<T>
 		where T : class
 	{
+		readonly Action<T> _continue;
 		readonly InternalServiceFactory<T> _factory;
-		readonly string _name;
+		readonly Action<T> _pause;
 		readonly Action<T> _start;
 		readonly Action<T> _stop;
 
-		public LocalServiceBuilder(string name, InternalServiceFactory<T> factory, Action<T> start, Action<T> stop)
+		public LocalServiceBuilder(string name, InternalServiceFactory<T> factory, Action<T> start, Action<T> stop,
+		                           Action<T> pause, Action<T> @continue)
 		{
-			_name = name;
+			Name = name;
 			_factory = factory;
 			_start = start;
 			_stop = stop;
+			_pause = pause;
+			_continue = @continue;
 		}
 
 		public IServiceController Build(Inbox inbox, IServiceChannel coordinatorChannel)
 		{
-			var serviceController = new LocalServiceController<T>(_name,
+			var serviceController = new LocalServiceController<T>(Name,
 			                                                      inbox,
 			                                                      coordinatorChannel,
 			                                                      StartService,
@@ -48,27 +53,54 @@ namespace Topshelf.Builders
 			return serviceController;
 		}
 
-		public string Name
-		{
-			get { return _name; }
-		}
+		public string Name { get; private set; }
 
 		void StartService(T service)
 		{
-			_start(service);
+			try
+			{
+				_start(service);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceControlException(Name, typeof(T), "Service Start Exception", ex);
+			}
 		}
 
 		void StopService(T service)
 		{
-			_stop(service);
+			try
+			{
+				_stop(service);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceControlException(Name, typeof(T), "Service Stop Exception", ex);
+			}
 		}
 
 		void PauseService(T service)
 		{
+			try
+			{
+				_pause(service);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceControlException(Name, typeof(T), "Service Pause Exception", ex);
+			}
 		}
 
 		void ContinueService(T service)
 		{
+			try
+			{
+				_continue(service);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceControlException(Name, typeof(T), "Service Continue Exception", ex);
+			}
 		}
 
 		T CreateService(string name, IServiceChannel coordinatorChannel)

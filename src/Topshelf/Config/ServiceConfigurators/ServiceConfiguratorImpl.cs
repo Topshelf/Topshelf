@@ -24,8 +24,10 @@ namespace Topshelf.ServiceConfigurators
 		HostBuilderConfigurator
 		where TService : class
 	{
+		Action<TService> _continue;
 		InternalServiceFactory<TService> _factory;
 		string _name;
+		Action<TService> _pause;
 		Action<TService> _start;
 		Action<TService> _stop;
 
@@ -35,7 +37,7 @@ namespace Topshelf.ServiceConfigurators
 				{
 					string name = _name.IsEmpty() ? typeof(TService).Name : _name;
 
-					var serviceBuilder = new LocalServiceBuilder<TService>(name, _factory, _start, _stop);
+					var serviceBuilder = new LocalServiceBuilder<TService>(name, _factory, _start, _stop, _pause, _continue);
 
 					x.AddServiceBuilder(serviceBuilder);
 				});
@@ -67,9 +69,9 @@ namespace Topshelf.ServiceConfigurators
 			_name = name;
 		}
 
-		public void ConstructUsing(Func<string, IServiceChannel, TService> serviceFactory)
+		public void ConstructUsing(InternalServiceFactory<TService> serviceFactory)
 		{
-			_factory = (n, c) => serviceFactory(n, c);
+			_factory = serviceFactory;
 		}
 
 		public void WhenStarted(Action<TService> startAction)
@@ -80,6 +82,16 @@ namespace Topshelf.ServiceConfigurators
 		public void WhenStopped(Action<TService> stopAction)
 		{
 			_stop = stopAction;
+		}
+
+		public void WhenPaused(Action<TService> pauseAction)
+		{
+			_pause = pauseAction;
+		}
+
+		public void WhenContinued(Action<TService> continueAction)
+		{
+			_continue = continueAction;
 		}
 	}
 }

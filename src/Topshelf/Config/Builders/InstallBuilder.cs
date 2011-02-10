@@ -16,45 +16,36 @@ namespace Topshelf.Builders
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.ServiceProcess;
-	using HostConfigurators;
-	using Topshelf.Configuration;
-	using Topshelf.Hosts;
-	using Magnum.Extensions;
+	using Configuration;
+	using Hosts;
 
 
 	public class InstallBuilder :
 		HostBuilder
 	{
 		readonly IList<string> _dependencies = new List<string>();
-		readonly string _description;
-		readonly string _displayName;
-		readonly string _instanceName;
-		readonly string _serviceName;
-		Credentials _credentials;
+		readonly ServiceDescription _description;
 		readonly IList<Action> _postActions = new List<Action>();
 		readonly IList<Action> _preActions = new List<Action>();
+		Credentials _credentials;
 		ServiceStartMode _startMode;
 
-		public InstallBuilder(HostConfiguration configuration)
+		public InstallBuilder(ServiceDescription description)
 		{
-			_serviceName = configuration.ServiceName;
-			_displayName = configuration.DisplayName.IsEmpty() ? configuration.ServiceName : configuration.DisplayName;
-			_description = configuration.Description.IsEmpty() ? _displayName : configuration.Description;
-			_instanceName = configuration.InstanceName;
+			_description = description;
 
 			_credentials = new Credentials("", "", ServiceAccount.LocalSystem);
 		}
 
 		public Host Build()
 		{
-			return new InstallHost(_serviceName, _instanceName, _displayName, _description, _startMode, _dependencies.ToArray(),
-			                       _credentials);
+			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials);
 		}
 
 		public void Match<T>(Action<T> callback)
 			where T : class, HostBuilder
 		{
-			if (this is T)
+			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
 		}
 
@@ -76,6 +67,11 @@ namespace Topshelf.Builders
 		public void AfterInstall(Action callback)
 		{
 			_postActions.Add(callback);
+		}
+
+		public void AddDependency(string name)
+		{
+			_dependencies.Add(name);
 		}
 	}
 }

@@ -15,6 +15,7 @@ namespace Topshelf.Hosts
 	using System;
 	using System.Collections.Generic;
 	using System.Configuration.Install;
+	using System.IO;
 	using System.Linq;
 	using System.Reflection;
 	using System.ServiceProcess;
@@ -27,27 +28,27 @@ namespace Topshelf.Hosts
 	{
 		readonly Credentials _credentials;
 		readonly IEnumerable<string> _dependencies;
-		readonly string _description;
-		readonly string _displayName;
-		readonly string _instanceName;
+		readonly ServiceDescription _description;
 		readonly ServiceStartMode _startMode;
 
-		protected ServiceHost(string serviceName, string instanceName, string displayName, string description,
+		protected ServiceHost(ServiceDescription description,
 		                      ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials)
 		{
-			ServiceName = serviceName;
 			_startMode = startMode;
-			_instanceName = instanceName;
 			_credentials = credentials;
 			_dependencies = dependencies;
 			_description = description;
-			_displayName = displayName;
 		}
 
-		public string ServiceName { get; private set; }
+		public ServiceDescription Description
+		{
+			get { return _description; }
+		}
 
 		protected void WithInstaller(Action<TransactedInstaller> callback)
 		{
+			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
 			using (Installer installer = CreateInstaller())
 			using (var ti = new TransactedInstaller())
 			{
@@ -77,10 +78,10 @@ namespace Topshelf.Hosts
 
 			string arguments = " ";
 
-			if (_instanceName.IsNotEmpty())
-				arguments += " -instance:{0}".FormatWith(_instanceName);
+			if (_description.InstanceName.IsNotEmpty())
+				arguments += " -instance:{0}".FormatWith(_description.InstanceName);
 
-			var installer = new HostInstaller(ServiceName, _description, arguments, installers);
+			var installer = new HostInstaller(_description, arguments, installers);
 
 			return installer;
 		}
@@ -89,9 +90,9 @@ namespace Topshelf.Hosts
 		{
 			var installer = new ServiceInstaller
 				{
-					ServiceName = ServiceName,
-					Description = _description,
-					DisplayName = _displayName,
+					ServiceName = _description.GetServiceName(),
+					Description = _description.Description,
+					DisplayName = _description.DisplayName,
 					ServicesDependedOn = _dependencies.ToArray(),
 					StartType = _startMode,
 				};

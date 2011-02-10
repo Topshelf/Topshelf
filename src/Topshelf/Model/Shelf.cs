@@ -17,8 +17,10 @@ namespace Topshelf.Model
 	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
+	using Builders;
 	using Configuration.Dsl;
 	using Extensions;
+	using HostConfigurators;
 	using log4net;
 	using log4net.Config;
 	using Magnum;
@@ -43,8 +45,7 @@ namespace Topshelf.Model
 		OutboundChannel _controllerChannel;
 		bool _disposed;
 		PoolFiber _fiber;
-		PublishChannel _publish;
-		IServiceController _service;
+		Host _host;
 
 		public Shelf(Type bootstrapperType, Uri controllerAddress, string controllerPipeName)
 		{
@@ -118,9 +119,7 @@ namespace Topshelf.Model
 
 				_log.DebugFormat("[{0}] Creating configurator for service type: {1}", _serviceName, serviceType.ToShortTypeName());
 
-				object cfg = FastActivator.Create(typeof(ServiceConfigurator<>), new[] {serviceType});
-
-				InitializeAndCreateService(serviceType, bootstrapper, cfg);
+				InitializeAndCreateService(serviceType, bootstrapper);
 			}
 			catch (Exception ex)
 			{
@@ -128,18 +127,16 @@ namespace Topshelf.Model
 			}
 		}
 
-		void InitializeAndCreateService(Type serviceType, object bootstrapper, object cfg)
+		void InitializeAndCreateService(Type serviceType, object bootstrapper)
 		{
-			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper, cfg);
+			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper);
 		}
 
 		// ReSharper disable UnusedMember.Local
-		void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper, ServiceConfigurator<T> cfg)
+		void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper)
 			// ReSharper restore UnusedMember.Local
 			where T : class
 		{
-			bootstrapper.FastInvoke("InitializeHostedService", cfg);
-
 			_log.DebugFormat("[{0}] Creating service type: {1}", _serviceName, typeof(T).ToShortTypeName());
 
 			_fiber = new PoolFiber();
@@ -148,23 +145,22 @@ namespace Topshelf.Model
 
 			_controllerChannel.Send(new ShelfCreated(_serviceName, _channel.Address, _channel.PipeName));
 
-			var controllerFactory = new ServiceControllerFactory();
-
-			ActorFactory<IServiceController> factory = controllerFactory.CreateFactory(inbox =>
+			_host = HostFactory.New(x =>
 				{
-					_publish = new PublishChannel(_channel, inbox);
+					x.SetServiceName(_serviceName);
+					x.UseBuilder(description => new ShelfBuilder(description, _channel));
 
-					_service = cfg.Create(AppDomain.CurrentDomain.FriendlyName, inbox, _publish);
-					return _service;
+					x.Service<T>(s =>
+						{
+							var serviceConfigurator = new ServiceConfiguratorImpl<T>(s);
+
+							bootstrapper.InitializeHostedService(serviceConfigurator);
+
+							s.SetServiceName(_serviceName);
+						});
 				});
 
-			ActorInstance instance = factory.GetActor();
-
-			_channel.Connect(x => { x.AddChannel(instance); });
-
-			// this creates the state machine instance in the shelf and tells the servicecontroller
-			// to create the service
-			instance.Send(new CreateService(_serviceName));
+			_host.Run();
 		}
 
 		void AddEventForwarders(ConnectionConfigurator x)

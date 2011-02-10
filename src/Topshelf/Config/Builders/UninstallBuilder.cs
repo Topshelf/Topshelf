@@ -17,44 +17,35 @@ namespace Topshelf.Builders
 	using System.Linq;
 	using System.ServiceProcess;
 	using Configuration;
-	using HostConfigurators;
 	using Hosts;
-	using Magnum.Extensions;
 
 
 	public class UninstallBuilder :
 		HostBuilder
 	{
 		readonly IList<string> _dependencies = new List<string>();
-		readonly string _description;
-		readonly string _displayName;
-		readonly string _instanceName;
+		readonly ServiceDescription _description;
 		readonly IList<Action> _postActions = new List<Action>();
 		readonly IList<Action> _preActions = new List<Action>();
-		readonly string _serviceName;
 		Credentials _credentials;
 		ServiceStartMode _startMode;
 
-		public UninstallBuilder(HostConfiguration configuration)
+		public UninstallBuilder(ServiceDescription description)
 		{
-			_serviceName = configuration.ServiceName;
-			_displayName = configuration.DisplayName.IsEmpty() ? configuration.ServiceName : configuration.DisplayName;
-			_description = configuration.Description.IsEmpty() ? _displayName : configuration.Description;
-			_instanceName = configuration.InstanceName;
+			_description = description;
 
 			_credentials = new Credentials("", "", ServiceAccount.LocalSystem);
 		}
 
 		public Host Build()
 		{
-			return new UninstallHost(_serviceName, _instanceName, _displayName, _description, _startMode, _dependencies.ToArray(),
-			                         _credentials);
+			return new UninstallHost(_description, _startMode, _dependencies.ToArray(), _credentials);
 		}
 
 		public void Match<T>(Action<T> callback)
 			where T : class, HostBuilder
 		{
-			if (this is T)
+			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
 		}
 

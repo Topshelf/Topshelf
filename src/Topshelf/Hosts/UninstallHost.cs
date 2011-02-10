@@ -26,24 +26,24 @@ namespace Topshelf.Hosts
 	{
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");
 
-		public UninstallHost(string serviceName, string instanceName, string displayName, string description,
+		public UninstallHost(ServiceDescription description,
 		                     ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials)
-			: base(serviceName, instanceName, displayName, description, startMode, dependencies, credentials)
+			: base(description, startMode, dependencies, credentials)
 		{
 		}
 
 		public void Run()
 		{
-			if (!WinServiceHelper.IsInstalled(ServiceName))
+			if (!WinServiceHelper.IsInstalled(Description.GetServiceName()))
 			{
-				_log.ErrorFormat("The {0} service is not installed.", ServiceName);
+				_log.ErrorFormat("The {0} service is not installed.", Description.GetServiceName());
 				return;
 			}
 
 			if (!UserAccessControlUtil.IsAdministrator)
 			{
 				if (!UserAccessControlUtil.RerunAsAdministrator())
-					_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", ServiceName);
+					_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", Description.GetServiceName());
 
 				return;
 			}
@@ -57,7 +57,7 @@ namespace Topshelf.Hosts
 
 		void Uninstall()
 		{
-			_log.DebugFormat("Attempting to uninstall '{0}'", ServiceName);
+			_log.DebugFormat("Attempting to uninstall '{0}'", Description.GetServiceName());
 
 			ExecuteBeforeActions();
 

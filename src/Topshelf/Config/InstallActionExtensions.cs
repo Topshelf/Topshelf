@@ -14,6 +14,7 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using Model;
 
 
 	public static class InstallActionExtensions
@@ -48,6 +49,13 @@ namespace Topshelf
 
 		public static HostConfigurator BeforeStartingServices(this HostConfigurator configurator, Action callback)
 		{
+			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.BeforeStartingServices(_ => callback())));
+
+			return configurator;
+		}
+
+		public static HostConfigurator BeforeStartingServices(this HostConfigurator configurator, Action<IServiceCoordinator> callback)
+		{
 			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.BeforeStartingServices(callback)));
 
 			return configurator;
@@ -55,12 +63,26 @@ namespace Topshelf
 
 		public static HostConfigurator AfterStartingServices(this HostConfigurator configurator, Action callback)
 		{
+			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.AfterStartingServices(_ => callback())));
+
+			return configurator;
+		}
+
+		public static HostConfigurator AfterStartingServices(this HostConfigurator configurator, Action<IServiceCoordinator> callback)
+		{
 			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.AfterStartingServices(callback)));
 
 			return configurator;
 		}
 
 		public static HostConfigurator AfterStoppingServices(this HostConfigurator configurator, Action callback)
+		{
+			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.AfterStoppingServices(_ => callback())));
+
+			return configurator;
+		}
+
+		public static HostConfigurator AfterStoppingServices(this HostConfigurator configurator, Action<IServiceCoordinator> callback)
 		{
 			configurator.AddConfigurator(new RunHostConfiguratorAction(x => x.AfterStoppingServices(callback)));
 

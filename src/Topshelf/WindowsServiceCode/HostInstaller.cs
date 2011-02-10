@@ -22,17 +22,15 @@ namespace Topshelf.WindowsServiceCode
 		Installer
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.HostInstaller");
-		readonly string _description;
+		readonly ServiceDescription _description;
 		readonly string _arguments;
 		readonly Installer[] _installers;
-		readonly string _serviceName;
 
-		public HostInstaller(string serviceName, string description, string arguments, Installer[] installers)
+		public HostInstaller(ServiceDescription description, string arguments, Installer[] installers)
 		{
 			_installers = installers;
 			_arguments = arguments;
 			_description = description;
-			_serviceName = serviceName;
 		}
 
 		public override void Install(IDictionary stateSaver)
@@ -40,7 +38,7 @@ namespace Topshelf.WindowsServiceCode
 			Installers.AddRange(_installers);
 
 			if (_log.IsInfoEnabled)
-				_log.InfoFormat("Installing {0} service", _serviceName);
+				_log.InfoFormat("Installing {0} service", _description.Name);
 
 			base.Install(stateSaver);
 
@@ -50,7 +48,7 @@ namespace Topshelf.WindowsServiceCode
 			using (RegistryKey system = Registry.LocalMachine.OpenSubKey("System"))
 			using (RegistryKey currentControlSet = system.OpenSubKey("CurrentControlSet"))
 			using (RegistryKey services = currentControlSet.OpenSubKey("Services"))
-			using (RegistryKey service = services.OpenSubKey(_serviceName, true))
+			using (RegistryKey service = services.OpenSubKey(_description.GetServiceName(), true))
 			{
 				service.SetValue("Description", _description);
 
@@ -73,7 +71,7 @@ namespace Topshelf.WindowsServiceCode
 		{
 			Installers.AddRange(_installers);
 			if (_log.IsInfoEnabled)
-				_log.InfoFormat("Uninstalling {0} service", _serviceName);
+				_log.InfoFormat("Uninstalling {0} service", _description.Name);
 
 			base.Uninstall(savedState);
 		}

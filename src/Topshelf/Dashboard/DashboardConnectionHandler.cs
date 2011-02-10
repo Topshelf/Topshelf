@@ -12,51 +12,58 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Dashboard
 {
-	using System.Collections.Generic;
+	using System.Net;
+	using Magnum.Extensions;
 	using Model;
 	using Stact;
+	using Stact.Internal;
 	using Stact.ServerFramework;
 
 
 	public class DashboardConnectionHandler :
 		PatternMatchConnectionHandler
 	{
-		readonly StatusChannel _statusChannel;
+		readonly IServiceChannel _serviceCoordinator;
 
-		public DashboardConnectionHandler(ServiceCoordinator serviceCoordinator)
-			:
-				base("^/dashboard", "GET")
+		public DashboardConnectionHandler(IServiceChannel serviceCoordinator)
+			: base("^/dashboard", "GET")
 		{
-			_statusChannel = new StatusChannel(serviceCoordinator);
+			_serviceCoordinator = serviceCoordinator;
 		}
 
 		protected override Channel<ConnectionContext> CreateChannel(ConnectionContext context)
 		{
-			return _statusChannel;
+			return new StatusChannel(_serviceCoordinator);
 		}
 
 
 		class StatusChannel :
 			Channel<ConnectionContext>
 		{
-			readonly Fiber _fiber;
-			readonly ServiceCoordinator _serviceCoordinator;
+			readonly IServiceChannel _serviceCoordinator;
 
-			public StatusChannel(ServiceCoordinator serviceCoordinator)
+			public StatusChannel(IServiceChannel serviceCoordinator)
 			{
 				_serviceCoordinator = serviceCoordinator;
-				_fiber = new PoolFiber();
 			}
 
 			public void Send(ConnectionContext context)
 			{
-				_fiber.Add(() =>
+				AnonymousActor.New(inbox =>
 					{
-						IEnumerable<ServiceInfo> infos = _serviceCoordinator.Status();
-						var view = new DashboardView(infos);
+						_serviceCoordinator.Send<Request<ServiceStatus>>(new RequestImpl<ServiceStatus>(inbox, new ServiceStatus()));
 
-						context.Response.RenderSparkView(view, "dashboard.html");
-						context.Complete();
+						inbox.Receive<Response<ServiceStatus>>(response =>
+							{
+								var view = new DashboardView(response.Body.Services);
+
+								context.Response.RenderSparkView(view, "dashboard.html");
+								context.Complete();
+							}, 30.Seconds(), () =>
+								{
+									context.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
+									context.Complete();
+								});
 					});
 			}
 		}

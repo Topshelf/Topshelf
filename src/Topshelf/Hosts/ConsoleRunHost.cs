@@ -13,10 +13,10 @@
 namespace Topshelf.Hosts
 {
 	using System;
+	using System.IO;
 	using System.Linq;
 	using System.ServiceProcess;
 	using System.Threading;
-	using Configuration;
 	using log4net;
 	using Model;
 
@@ -24,19 +24,21 @@ namespace Topshelf.Hosts
 	public class ConsoleRunHost :
 		Host
 	{
+		readonly ServiceDescription _description;
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.ConsoleRunHost");
-		readonly ServiceName _serviceName;
 		IServiceCoordinator _coordinator;
 		ManualResetEvent _exit;
 
-		public ConsoleRunHost(ServiceName name, IServiceCoordinator coordinator)
+		public ConsoleRunHost(ServiceDescription description, IServiceCoordinator coordinator)
 		{
-			_serviceName = name;
+			_description = description;
 			_coordinator = coordinator;
 		}
 
 		public void Run()
 		{
+			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
 			CheckToSeeIfWinServiceRunning();
 
 			try
@@ -102,8 +104,8 @@ namespace Topshelf.Hosts
 
 		void CheckToSeeIfWinServiceRunning()
 		{
-			if (ServiceController.GetServices().Where(s => s.ServiceName == _serviceName.FullName).Any())
-				_log.WarnFormat("There is an instance of this {0} running as a windows service", _serviceName);
+			if (ServiceController.GetServices().Where(s => s.ServiceName == _description.GetServiceName()).Any())
+				_log.WarnFormat("There is an instance of this {0} running as a windows service", _description);
 		}
 	}
 }

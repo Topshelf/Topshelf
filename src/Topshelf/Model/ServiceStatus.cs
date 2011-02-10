@@ -10,13 +10,19 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.Model
 {
-	public interface HostConfiguration
+	public class ServiceStatus
 	{
-		string Description { get; }
-		string DisplayName { get; }
-		string ServiceName { get; }
-		string InstanceName { get; }
+		public ServiceStatus()
+		{
+		}
+
+		public ServiceStatus(ServiceInfo[] services)
+		{
+			Services = services;
+		}
+
+		public ServiceInfo[] Services { get; private set; }
 	}
 }

@@ -12,122 +12,101 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-	using Commands;
+	using Hosts;
 	using Magnum.TestFramework;
-    using NUnit.Framework;
-    using Topshelf.Configuration;
-	using Topshelf.Configuration.Dsl;
 
 
 	[Scenario]
-    public class Given_a_command_line
+    public class Given_no_command_line
     {
-		protected RunConfiguration Configuration { get; set; }
+    	Host _host;
 
-    	public Given_a_command_line()
+    	[Given]
+        public void An_empty_command_line()
     	{
-    		Configuration = RunnerConfigurator.New(x => { });
+    		_host = HostFactory.New(x =>
+    			{
+    				x.ApplyCommandLine("");
+    			});
     	}
 
-    	protected string CommandLine
-        {
-            set
-            {
-            	Command = new CommandLineArguments(Configuration).GetCommand(value);
-            }
-        }
-
-        protected Command Command { get; set; }
-    }
-
-
-    [Scenario]
-    public class Given_no_command_line :
-        Given_a_command_line
-    {
-        [Given]
-        public void An_empty_command_line()
-        {
-            CommandLine = string.Empty;
-        }
-
-        [Then]
+    	[Then]
         public void Action_should_be_run()
-        {
-            Command.Name.ShouldEqual(ServiceActionNames.Run);
-        }
-
-        [Then]
-        public void Instance_should_be_empty()
-        {
-            string.IsNullOrEmpty(Configuration.WinServiceSettings.ServiceName.InstanceName).ShouldBeTrue();
+    	{
+    		_host.ShouldBeAnInstanceOf<ConsoleRunHost>();
         }
     }
 
 
     [Scenario]
-    public class Given_a_dash_parameter :
-        Given_a_command_line
+    public class Given_a_dash_parameter
     {
-        [Given]
+    	Host _host;
+
+    	[Given]
         public void Dash_something_or_other_command_line()
         {
-            CommandLine = "-SomethingOrOther";
-        }
+			_host = HostFactory.New(x =>
+			{
+				x.ApplyCommandLine("-unknownArgument");
+			});
+		}
 
         [Then]
         public void Action_should_be_run()
         {
-			Command.Name.ShouldEqual(ServiceActionNames.Run);
+        	_host.ShouldBeAnInstanceOf<ConsoleRunHost>();
         }
     }
 
 
     [Scenario]
-    [Explicit("Not Yet Implemented")]
-    public class Given_service_install_command_line :
-        Given_a_command_line
+    public class Given_service_install_command_line
     {
-        [Given]
+    	Host _host;
+
+    	[Given]
         public void Service_install_command_line()
         {
-            CommandLine = "install";
-        }
+			_host = HostFactory.New(x =>
+			{
+				x.ApplyCommandLine("install");
+			});
+		}
 
         [Then]
         public void Action_should_be_install()
         {
-            Command.Name.ShouldEqual(ServiceActionNames.Install);
-        }
-
-        [Then]
-        public void Instance_should_be_empty()
-        {
-            string.IsNullOrEmpty(Configuration.WinServiceSettings.ServiceName.InstanceName).ShouldBeTrue();
+        	_host.ShouldBeAnInstanceOf<InstallHost>();
         }
     }
 
 
     [Scenario]
-    public class Give_install_with_an_instance :
-        Given_a_command_line
+    public class Give_install_with_an_instance
     {
-        [Given]
+    	Host _host;
+
+    	[Given]
         public void An_empty_command_line()
         {
-            CommandLine = "install /instance:bob";
-        }
+			_host = HostFactory.New(x =>
+				{
+					x.SetServiceName("test");
+				x.ApplyCommandLine("install -instance:bob");
+			});
+		}
 
         [Then]
         public void Action_should_be_install()
         {
-            Command.Name.ShouldEqual(ServiceActionNames.Install);
+        	_host.ShouldBeAnInstanceOf<InstallHost>();
         }
 
         [Then]
         public void Instance_should_be_bob()
         {
-            Configuration.WinServiceSettings.ServiceName.InstanceName.ShouldEqual("bob");
+        	((InstallHost)_host).Description.GetServiceName().ShouldEqual("test$bob");
         }
     }
 }

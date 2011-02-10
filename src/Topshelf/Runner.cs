@@ -14,7 +14,6 @@ namespace Topshelf
 {
 	using System;
 	using System.IO;
-	using Commands;
 	using Configuration;
 	using log4net;
 
@@ -24,27 +23,13 @@ namespace Topshelf
 	/// </summary>
 	public static class Runner
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Runner");
-
-		static Runner()
-		{
-			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-		}
-
 		/// <summary>
 		/// Go go gadget
 		/// </summary>
+		[Obsolete("Use the run method on the host returned from the HostFactory")]
 		public static void Host(RunConfiguration configuration, string[] args)
 		{
-			var commandLine = string.Join(" ", args);
-			if (commandLine.Length > 0)
-				_log.DebugFormat("Command Line Arguments: '{0}'", commandLine);
-
-
-			Command command = new CommandLineArguments(configuration)
-				.GetCommand(commandLine);
-
-			command.Execute();
+			configuration.Run();
 		}
 	}
 }

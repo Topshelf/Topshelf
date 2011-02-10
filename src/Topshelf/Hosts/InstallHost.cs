@@ -31,17 +31,17 @@ namespace Topshelf.Hosts
 		IEnumerable<Action> _postInstallActions;
 		IEnumerable<Action> _preInstallActions;
 
-		public InstallHost(string serviceName, string instanceName, string displayName, string description,
+		public InstallHost(ServiceDescription description,
 		                   ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials)
-			: base(serviceName, instanceName, displayName, description, startMode, dependencies, credentials)
+			: base(description, startMode, dependencies, credentials)
 		{
 		}
 
 		public void Run()
 		{
-			if (WinServiceHelper.IsInstalled(ServiceName))
+			if (WinServiceHelper.IsInstalled(Description.GetServiceName()))
 			{
-				string message = string.Format("The {0} service is already installed.", ServiceName);
+				string message = string.Format("The {0} service is already installed.", Description.GetServiceName());
 				_log.Error(message);
 
 				return;
@@ -50,7 +50,7 @@ namespace Topshelf.Hosts
 			if (!UserAccessControlUtil.IsAdministrator)
 			{
 				if (!UserAccessControlUtil.RerunAsAdministrator())
-					_log.ErrorFormat("The {0} service can only be installed as an administrator", ServiceName);
+					_log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());
 
 				return;
 			}
@@ -62,7 +62,7 @@ namespace Topshelf.Hosts
 
 		void Install()
 		{
-			_log.DebugFormat("Attempting to install '{0}'", ServiceName);
+			_log.DebugFormat("Attempting to install '{0}'", Description.GetServiceName());
 
 			ExecutePreInstallActions();
 

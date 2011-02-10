@@ -183,6 +183,10 @@ namespace Topshelf.Model
 					x.AddConsumerOf<ServiceFolderChanged>()
 						.UsingConsumer(OnServiceFolderChanged)
 						.HandleOnFiber(_fiber);
+
+					x.AddConsumerOf<Request<ServiceStatus>>()
+						.UsingConsumer(Status)
+						.HandleOnFiber(_fiber);
 				});
 		}
 
@@ -285,15 +289,21 @@ namespace Topshelf.Model
 			{
 				GetServicesNotInState(state).Each(x => _log.ErrorFormat("[{0}] Failed to stop", x.Name));
 
-				throw new InvalidOperationException(TopshelfExtensions.FormatWith("All services were not {0} within the specified timeout", state.Name));
+				throw new InvalidOperationException(
+					TopshelfExtensions.FormatWith("All services were not {0} within the specified timeout", state.Name));
 			}
 		}
 
+		void Status(Request<ServiceStatus> request)
+		{
+			ServiceInfo[] serviceInfos = _serviceCache
+				.Select(sc => new ServiceInfo(sc.Name, sc.CurrentState.Name, sc.ServiceType.Name))
+				.ToArray();
 
-        public IEnumerable<ServiceInfo> Status()
-        {
-            return _serviceCache.Select(sc => new ServiceInfo(sc.Name, sc.CurrentState, sc.ServiceType.Name));
-        }
+			var status = new ServiceStatus(serviceInfos);
+
+			request.Respond(status);
+		}
 
 		~ServiceCoordinator()
 		{
@@ -375,18 +385,4 @@ namespace Topshelf.Model
 			_log.InfoFormat("[Topshelf] {0} complete", name);
 		}
 	}
-
-    public class ServiceInfo
-    {
-        public string Name { get; private set; }
-        public State CurrentState { get; private set; }
-        public string ServiceType { get; private set; }
-
-        public ServiceInfo(string name, State currentState, string serviceType)
-        {
-            Name = name;
-            CurrentState = currentState;
-            ServiceType = serviceType;
-        }
-    }
 }

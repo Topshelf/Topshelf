@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,6 +13,7 @@
 namespace Topshelf.Specs
 {
 	using System;
+	using Builders;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Messages;
@@ -20,7 +21,6 @@ namespace Topshelf.Specs
 	using NUnit.Framework;
 	using Stact;
 	using TestObject;
-	using Topshelf.Configuration.Dsl;
 
 
 	[TestFixture]
@@ -40,25 +40,15 @@ namespace Topshelf.Specs
 			_service = new TestService();
 			_hostChannel = new TestChannel();
 
+			_coordinator = new Model.ServiceCoordinator();
 
-			using (var c = new ServiceConfigurator<TestService>())
-			{
-				c.Named("test");
-				c.WhenStarted(s => s.Start());
-				c.WhenStopped(s => s.Stop());
-				c.WhenPaused(s => { });
-				c.WhenContinued(s => { });
-				c.HowToBuildService(name => _service);
+			var b = new LocalServiceBuilder<TestService>(_serviceName, (name, coordinator) => _service,
+			                                             x => x.Start(), x => x.Stop(), x => { }, x => { });
 
-				_serviceController = c.Create(null, _hostChannel);
 
-				_controllerFactory = new ServiceControllerFactory();
-
-				_factory = _controllerFactory.CreateFactory(x => _serviceController);
-
-				_instance = _factory.GetActor();
-
-			}
+			_controllerFactory = new ServiceControllerFactory();
+			_factory = _controllerFactory.CreateFactory(inbox => b.Build(inbox, _coordinator));
+			_instance = _factory.GetActor();
 
 			_hostChannel.Connect(x =>
 				{
@@ -67,8 +57,8 @@ namespace Topshelf.Specs
 					x.AddChannel(_serviceStarted);
 				});
 
-			_hostChannel.Send(new CreateService("test"));
-			//_serviceChannel.Send(new StartService("test"));
+			_coordinator.Send(new CreateService(_serviceName));
+			_coordinator.Send(new StartService(_serviceName));
 
 			_serviceStarted.WaitUntilCompleted(5.Seconds());
 		}
@@ -78,8 +68,8 @@ namespace Topshelf.Specs
 		[Explicit("Not Yet Implemented")]
 		public void Should_continue()
 		{
-			_hostChannel.Send(new PauseService("test"));
-			_hostChannel.Send(new ContinueService("test"));
+			_hostChannel.Send(new PauseService(_serviceName));
+			_hostChannel.Send(new ContinueService(_serviceName));
 
 			_serviceController.CurrentState.ShouldEqual(_controllerFactory.Workflow.GetState(x => x.Running));
 			_service.WasContinued.IsCompleted.ShouldBeTrue();
@@ -98,7 +88,7 @@ namespace Topshelf.Specs
 		[Explicit("Not Yet Implemented")]
 		public void Should_pause()
 		{
-			_hostChannel.Send(new PauseService("test"));
+			_hostChannel.Send(new PauseService(_serviceName));
 
 			_serviceController.CurrentState.ShouldEqual(_controllerFactory.Workflow.GetState(x => x.Paused));
 			_service.Paused.IsCompleted.ShouldBeTrue();
@@ -119,7 +109,7 @@ namespace Topshelf.Specs
 			var stopped = new FutureChannel<ServiceStopped>();
 			_hostChannel.Connect(x => x.AddChannel(stopped));
 
-			_hostChannel.Send(new StopService("test"));
+			_hostChannel.Send(new StopService(_serviceName));
 
 			stopped.WaitUntilCompleted(5.Seconds()).ShouldBeTrue();
 
@@ -133,30 +123,24 @@ namespace Topshelf.Specs
 		TestService _service;
 		TestChannel _hostChannel;
 		ServiceControllerFactory _controllerFactory;
-		ActorFactory<IServiceController<TestService>> _factory;
+		ActorFactory<IServiceController> _factory;
 		ActorInstance _instance;
 		IServiceCoordinator _coordinator;
+		string _serviceName = "test";
 	}
 
-	[TestFixture]
-	public class SimpleServiceContainerStuff
+
+	public class TestBuilder :
+		HostBuilder
 	{
-		IServiceCoordinator _coordinator;
-
-		[Test]
-		public void Should_work()
+		public Host Build()
 		{
-			var c = new ServiceConfigurator<TestService>();
-			c.WhenStarted(s => s.Start());
-			c.WhenStopped(s => s.Stop());
+			throw new NotImplementedException();
+		}
 
-			using (IServiceController service = c.Create(null, _coordinator))
-			{
-//				service.Send(new StartService());
-
-				//			service.State
-				//			.ShouldEqual(ServiceState.Started);
-			}
+		public void Match<T>(Action<T> callback)
+			where T : class, HostBuilder
+		{
 		}
 	}
 }

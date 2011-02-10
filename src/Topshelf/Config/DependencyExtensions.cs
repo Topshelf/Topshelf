@@ -1,0 +1,83 @@
+﻿// Copyright 2007-2011 The Apache Software Foundation.
+//  
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
+// this file except in compliance with the License. You may obtain a copy of the 
+// License at 
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0 
+// 
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
+namespace Topshelf
+{
+	using Configuration.Dsl;
+	using HostConfigurators;
+
+
+	public static class DependencyExtensions
+	{
+		public static HostConfigurator AddDependency(this HostConfigurator configurator, string name)
+		{
+			var dependencyConfigurator = new DependencyHostConfigurator(name);
+
+			configurator.AddConfigurator(dependencyConfigurator);
+
+			return configurator;
+		}
+
+		public static HostConfigurator DependsOn(this HostConfigurator configurator, string name)
+		{
+			return AddDependency(configurator, name);
+		}
+
+		public static HostConfigurator DependsOnMsmq(this HostConfigurator configurator)
+		{
+			return AddDependency(configurator, KnownServiceNames.Msmq);
+		}
+
+		public static IRunnerConfigurator DependencyOnMsmq(this IRunnerConfigurator configurator)
+		{
+			configurator.DependsOnMsmq();
+
+			return configurator;
+		}
+
+		public static HostConfigurator DependsOnMsSql(this HostConfigurator configurator)
+		{
+			return AddDependency(configurator, KnownServiceNames.SqlServer);
+		}
+
+		public static IRunnerConfigurator DependencyOnMsSql(this IRunnerConfigurator configurator)
+		{
+			configurator.DependsOnMsSql();
+
+			return configurator;
+		}
+
+		public static HostConfigurator DependsOnEventLog(this HostConfigurator configurator)
+		{
+			return AddDependency(configurator, KnownServiceNames.EventLog);
+		}
+
+		public static IRunnerConfigurator DependencyOnEventLog(this IRunnerConfigurator configurator)
+		{
+			configurator.DependsOnEventLog();
+
+			return configurator;
+		}
+
+		public static HostConfigurator DependsOnIis(this HostConfigurator configurator)
+		{
+			return AddDependency(configurator, KnownServiceNames.IIS);
+		}
+
+		public static IRunnerConfigurator DependencyOnIis(this IRunnerConfigurator configurator)
+		{
+			configurator.DependsOnIis();
+
+			return configurator;
+		}
+	}
+}

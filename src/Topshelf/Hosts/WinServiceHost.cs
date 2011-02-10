@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,8 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
+	using System;
+	using System.IO;
 	using System.Reflection;
-	using Configuration;
 	using Exceptions;
 	using log4net;
 	using Model;
@@ -24,24 +25,26 @@ namespace Topshelf.Hosts
 		Host
 	{
 		readonly IServiceCoordinator _coordinator;
-		readonly ServiceName _fullServiceName;
+		readonly ServiceDescription _description;
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.WinServiceHost");
 
-		public WinServiceHost(ServiceName fullServiceName, IServiceCoordinator coordinator)
+		public WinServiceHost(ServiceDescription description, IServiceCoordinator coordinator)
 		{
 			_coordinator = coordinator;
-			_fullServiceName = fullServiceName;
+			_description = description;
 		}
 
 		public void Run()
 		{
+			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
 			_log.Info("Starting up as a winservice application");
 
-			if (!WinServiceHelper.IsInstalled(_fullServiceName.FullName))
+			if (!WinServiceHelper.IsInstalled(_description.GetServiceName()))
 			{
 				string message =
 					string.Format("The {0} service has not been installed yet. Please run '{1} install'.",
-					              _fullServiceName, Assembly.GetEntryAssembly().GetName());
+					              _description, Assembly.GetEntryAssembly().GetName());
 				_log.Fatal(message);
 				throw new ConfigurationException(message);
 			}

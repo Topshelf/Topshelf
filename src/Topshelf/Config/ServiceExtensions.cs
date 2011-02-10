@@ -31,5 +31,21 @@ namespace Topshelf
 
 			return configurator;
 		}
+
+		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator, Func<T> factory) 
+			where T : class
+		{
+			configurator.ConstructUsing((name, coordinator) => factory());
+			
+			return configurator;
+		}
+
+		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator, Func<string, T> factory) 
+			where T : class
+		{
+			configurator.ConstructUsing((name, coordinator) => factory(name));
+			
+			return configurator;
+		}
 	}
 }

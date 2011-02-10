@@ -13,6 +13,7 @@
 namespace Topshelf
 {
 	using System;
+	using System.IO;
 	using HostConfigurators;
 
 

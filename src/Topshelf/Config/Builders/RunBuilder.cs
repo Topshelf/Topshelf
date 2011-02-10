@@ -15,9 +15,7 @@ namespace Topshelf.Builders
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
-	using Configuration;
 	using Extensions;
-	using HostConfigurators;
 	using Hosts;
 	using log4net;
 	using Magnum.Extensions;
@@ -30,22 +28,32 @@ namespace Topshelf.Builders
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Builders.RunBuilder");
 
-		readonly IList<Action> _postStartActions = new List<Action>();
-		readonly IList<Action> _postStopActions = new List<Action>();
-		readonly IList<Action> _preStartActions = new List<Action>();
-		readonly IList<Action> _preStopActions = new List<Action>();
+		readonly IList<Action<IServiceCoordinator>> _postStartActions = new List<Action<IServiceCoordinator>>();
+		readonly IList<Action<IServiceCoordinator>> _postStopActions = new List<Action<IServiceCoordinator>>();
+		readonly IList<Action<IServiceCoordinator>> _preStartActions = new List<Action<IServiceCoordinator>>();
+		readonly IList<Action<IServiceCoordinator>> _preStopActions = new List<Action<IServiceCoordinator>>();
 		readonly IList<ServiceBuilder> _serviceBuilders = new List<ServiceBuilder>();
-		readonly string _serviceName;
 		IServiceCoordinator _coordinator;
-		TimeSpan _timeout = 1.Minutes();
+		readonly ServiceDescription _description;
 
-
-		public RunBuilder(HostConfiguration configuration)
+		public ServiceDescription Description
 		{
-			_serviceName = configuration.ServiceName;
+			get { return _description; }
 		}
 
-		public Host Build()
+		TimeSpan _timeout = 1.Minutes();
+
+		public RunBuilder(ServiceDescription description)
+		{
+			_description = description;
+		}
+
+		public IList<ServiceBuilder> ServiceBuilders
+		{
+			get { return _serviceBuilders; }
+		}
+
+		public virtual Host Build()
 		{
 			_coordinator = new ServiceCoordinator(new PoolFiber(),
 			                                      ExecutePreStartActions,
@@ -53,31 +61,29 @@ namespace Topshelf.Builders
 			                                      ExecutePostStopActions,
 			                                      _timeout);
 
-			_serviceBuilders.Each(x =>
-				{
-					_coordinator.CreateService(x.Name, x.Build);
-				});
+			_serviceBuilders.Each(x => { _coordinator.CreateService(x.Name, x.Build); });
 
-			return CreateHost(new ServiceName(_serviceName), _coordinator);
+			return CreateHost(_coordinator);
 		}
 
 		public void Match<T>(Action<T> callback)
 			where T : class, HostBuilder
 		{
-			if (this is T)
+			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
 		}
 
-		Host CreateHost(ServiceName serviceName, IServiceCoordinator coordinator)
+		Host CreateHost(IServiceCoordinator coordinator)
 		{
 			if (Process.GetCurrentProcess().GetParent().ProcessName == "services")
 			{
 				_log.Debug("Running as a Windows service, using the service host");
 
-				return new WinServiceHost(serviceName, coordinator);
+				return new WinServiceHost(_description, coordinator);
 			}
 
-			return new ConsoleRunHost(serviceName, coordinator);
+			_log.Debug("Running as a console application, using the console host");
+			return new ConsoleRunHost(_description, coordinator);
 		}
 
 		public void AddServiceBuilder(ServiceBuilder serviceBuilder)
@@ -85,22 +91,22 @@ namespace Topshelf.Builders
 			_serviceBuilders.Add(serviceBuilder);
 		}
 
-		public void BeforeStartingServices(Action callback)
+		public void BeforeStartingServices(Action<IServiceCoordinator> callback)
 		{
 			_preStartActions.Add(callback);
 		}
 
-		public void AfterStartingServices(Action callback)
+		public void AfterStartingServices(Action<IServiceCoordinator> callback)
 		{
 			_postStartActions.Add(callback);
 		}
 
-		public void BeforeStoppingServices(Action callback)
+		public void BeforeStoppingServices(Action<IServiceCoordinator> callback)
 		{
 			_preStopActions.Add(callback);
 		}
 
-		public void AfterStoppingServices(Action callback)
+		public void AfterStoppingServices(Action<IServiceCoordinator> callback)
 		{
 			_postStopActions.Add(callback);
 		}
@@ -108,22 +114,22 @@ namespace Topshelf.Builders
 
 		void ExecutePreStartActions(IServiceCoordinator coordinator)
 		{
-			_preStartActions.Each(x => x());
+			_preStartActions.Each(x => x(coordinator));
 		}
 
 		void ExecutePostStartActions(IServiceCoordinator coordinator)
 		{
-			_postStartActions.Each(x => x());
+			_postStartActions.Each(x => x(coordinator));
 		}
 
 		void ExecutePreStopActions(IServiceCoordinator coordinator)
 		{
-			_preStopActions.Each(x => x());
+			_preStopActions.Each(x => x(coordinator));
 		}
 
 		void ExecutePostStopActions(IServiceCoordinator coordinator)
 		{
-			_postStopActions.Each(x => x());
+			_postStopActions.Each(x => x(coordinator));
 		}
 	}
 }

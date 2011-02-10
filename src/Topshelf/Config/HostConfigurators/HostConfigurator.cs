@@ -39,16 +39,16 @@ namespace Topshelf.HostConfigurators
 		void SetDescription(string description);
 
 		/// <summary>
-		/// Specifies the builder factory to use when the service is invoked
-		/// </summary>
-		/// <param name="builderFactory"></param>
-		void UseBuilder(Func<HostConfiguration, HostBuilder> builderFactory);
-
-		/// <summary>
 		/// Specifies the service instance name that should be used when the service is registered
 		/// </summary>
 		/// <param name="instanceName"></param>
 		void SetInstanceName(string instanceName);
+
+		/// <summary>
+		/// Specifies the builder factory to use when the service is invoked
+		/// </summary>
+		/// <param name="builderFactory"></param>
+		void UseBuilder(Func<ServiceDescription, HostBuilder> builderFactory);
 
 		/// <summary>
 		/// Adds a a configurator for the host builder to the configurator

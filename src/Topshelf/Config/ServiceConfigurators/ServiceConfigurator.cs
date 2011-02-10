@@ -25,10 +25,13 @@ namespace Topshelf.ServiceConfigurators
 
 	public interface ServiceConfigurator<TService> :
 		ServiceConfigurator
+		where TService : class
 	{
 		void SetServiceName(string name);
-		void ConstructUsing(Func<string, IServiceChannel, TService> serviceFactory);
+		void ConstructUsing(InternalServiceFactory<TService> serviceFactory);
 		void WhenStarted(Action<TService> startAction);
 		void WhenStopped(Action<TService> stopAction);
+		void WhenPaused(Action<TService> pauseAction);
+		void WhenContinued(Action<TService> continueAction);
 	}
 }

@@ -10,34 +10,31 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.HostConfigurators
 {
-	using Commands;
-	using Configuration;
+	using Builders;
+	using Magnum.Extensions;
 
 
-	class UninstallCommand : Command
+	public class DependencyHostConfigurator :
+		HostBuilderConfigurator
 	{
-		readonly WinServiceSettings _settings;
-		readonly string _commandLine;
+		string _name;
 
-		public UninstallCommand(WinServiceSettings settings, string commandLine, string instance)
+		public DependencyHostConfigurator(string name)
 		{
-			_settings = settings;
-			_commandLine = commandLine;
-
-			if (instance != null)
-				_settings.ServiceName = new ServiceName(_settings.ServiceName.Name, instance);
+			_name = name;
 		}
 
-		public ServiceActionNames Name
+		public void Validate()
 		{
-			get { return ServiceActionNames.Uninstall; }
+			if (_name.IsEmpty())
+				throw new HostConfigurationException("The dependency specified was empty.");
 		}
 
-		public void Execute()
+		public void Configure(HostBuilder builder)
 		{
-			new UninstallService(_settings, _commandLine).Execute();
+			builder.Match<InstallBuilder>(x => x.AddDependency(_name));
 		}
 	}
 }

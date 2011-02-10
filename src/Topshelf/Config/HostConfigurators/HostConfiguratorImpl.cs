@@ -14,47 +14,39 @@ namespace Topshelf.HostConfigurators
 {
 	using System;
 	using System.Collections.Generic;
-	using System.ServiceProcess;
 	using Builders;
 	using Magnum.Extensions;
 
 
 	public class HostConfiguratorImpl :
-		HostConfigurator,
-		HostConfiguration
+		HostConfigurator
 	{
 		readonly IList<Action> _postInstallActions = new List<Action>();
 		readonly IList<Action> _preInstallActions = new List<Action>();
-		Func<HostConfiguration, HostBuilder> _builderFactory;
+		Func<ServiceDescription, HostBuilder> _builderFactory;
+
+		readonly WindowsServiceDescription _description;
+
+		public WindowsServiceDescription Description
+		{
+			get { return _description; }
+		}
 
 		IList<HostBuilderConfigurator> _configurators = new List<HostBuilderConfigurator>();
 
 		public HostConfiguratorImpl()
 		{
-			StartMode = ServiceStartMode.Automatic;
-
-			ServiceName = "";
-			DisplayName = "";
-			Description = "";
+			_description = new WindowsServiceDescription();
 
 			_builderFactory = DefaultBuilderFactory;
 		}
 
-		public string Username { get; private set; }
-		public string Password { get; private set; }
-		public ServiceStartMode StartMode { get; private set; }
-		public ServiceAccount AccountType { get; private set; }
-		public string Description { get; private set; }
-		public string DisplayName { get; private set; }
-		public string ServiceName { get; private set; }
-		public string InstanceName { get; private set; }
-
 		public void Validate()
 		{
-			if (DisplayName.IsEmpty() && ServiceName.IsEmpty())
+			if (_description.DisplayName.IsEmpty() && _description.Name.IsEmpty())
 				throw new HostConfigurationException("The service display name must be specified.");
 
-			if (ServiceName.IsEmpty())
+			if (_description.Name.IsEmpty())
 				throw new HostConfigurationException("The service name must be specified.");
 
 			_configurators.Each(x => x.Validate());
@@ -62,27 +54,27 @@ namespace Topshelf.HostConfigurators
 
 		public void SetDisplayName(string name)
 		{
-			DisplayName = name;
+			_description.DisplayName = name;
 		}
 
 		public void SetServiceName(string name)
 		{
-			ServiceName = name;
+			_description.Name = name;
 		}
 
 		public void SetDescription(string description)
 		{
-			Description = description;
-		}
-
-		public void UseBuilder(Func<HostConfiguration, HostBuilder> builderFactory)
-		{
-			_builderFactory = builderFactory;
+			_description.Description = description;
 		}
 
 		public void SetInstanceName(string instanceName)
 		{
-			InstanceName = instanceName;
+			_description.InstanceName = instanceName;
+		}
+
+		public void UseBuilder(Func<ServiceDescription, HostBuilder> builderFactory)
+		{
+			_builderFactory = builderFactory;
 		}
 
 		public void AddConfigurator(HostBuilderConfigurator configurator)
@@ -90,29 +82,14 @@ namespace Topshelf.HostConfigurators
 			_configurators.Add(configurator);
 		}
 
-		public void SetUsername(string username)
+		static HostBuilder DefaultBuilderFactory(ServiceDescription description)
 		{
-			Username = username;
-		}
-
-		public void SetPassword(string password)
-		{
-			Password = password;
-		}
-
-		public void SetAccountType(ServiceAccount accountType)
-		{
-			AccountType = accountType;
-		}
-
-		static HostBuilder DefaultBuilderFactory(HostConfiguration configuration)
-		{
-			return new RunBuilder(configuration);
+			return new RunBuilder(description);
 		}
 
 		public Host CreateHost()
 		{
-			HostBuilder builder = _builderFactory(this);
+			HostBuilder builder = _builderFactory(_description);
 
 			foreach (HostBuilderConfigurator configurator in _configurators)
 				configurator.Configure(builder);

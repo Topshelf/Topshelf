@@ -91,9 +91,6 @@
     <Compile Include="Bottles\BottleService.cs" />
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
-    <Compile Include="Commands\Command.cs" />
-    <Compile Include="Commands\RunCommand.cs" />
-    <Compile Include="Commands\InstallService.cs" />
     <Compile Include="Configuration\Dsl\IServiceFailureConfiguration.cs" />
     <Compile Include="Configuration\Dsl\IServiceFailureRestartConfiguration.cs" />
     <Compile Include="Configuration\Dsl\IServiceFailureRestartConfigurationDisplayMessage.cs" />
@@ -104,13 +101,14 @@
     <Compile Include="Configuration\Dsl\ServiceFailureRestartConfiguration.cs" />
     <Compile Include="Configuration\Dsl\ServiceRecoveryConfigurator.cs" />
     <Compile Include="Configuration\ServiceName.cs" />
-    <Compile Include="Commands\UninstallService.cs" />
+    <Compile Include="Config\Builders\ShelfBuilder.cs" />
     <Compile Include="Config\CommandLineConfigurator.cs" />
+    <Compile Include="Config\DependencyExtensions.cs" />
+    <Compile Include="Config\HostConfigurators\DependencyHostConfigurator.cs" />
     <Compile Include="Config\InstallActionExtensions.cs" />
     <Compile Include="Config\Options\AutostartOption.cs" />
     <Compile Include="Config\Configurators\Configurator.cs" />
     <Compile Include="Config\HostConfigurators\HostBuilderConfigurator.cs" />
-    <Compile Include="Config\HostConfigurators\HostConfiguration.cs" />
     <Compile Include="Config\HostConfigurators\HostConfiguratorImpl.cs" />
     <Compile Include="Config\Builders\InstallBuilder.cs" />
     <Compile Include="Config\HostConfigurators\InstallHostConfiguratorAction.cs" />
@@ -134,8 +132,10 @@
     <Compile Include="Config\Options\UninstallOption.cs" />
     <Compile Include="Config\Options\ServiceAccountOption.cs" />
     <Compile Include="Config\RunAsExtensions.cs" />
+    <Compile Include="Config\ServiceDescription.cs" />
     <Compile Include="Config\ServiceExtensions.cs" />
     <Compile Include="Config\StartModeExtensions.cs" />
+    <Compile Include="Config\WindowsServiceDescription.cs" />
     <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
     <Compile Include="Dashboard\DashboardView.cs" />
     <Compile Include="Dashboard\ResponseContextExtensions.cs" />
@@ -143,6 +143,7 @@
     <Compile Include="Dashboard\StaticResourceHandler.cs" />
     <Compile Include="Dashboard\TopshelfDashboard.cs" />
     <Compile Include="Dashboard\TopshelfView.cs" />
+    <Compile Include="Exceptions\ServiceControlException.cs" />
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
@@ -152,8 +153,8 @@
     <Compile Include="HostException.cs" />
     <Compile Include="Hosts\InstallHost.cs" />
     <Compile Include="Hosts\ServiceHost.cs" />
+    <Compile Include="Hosts\ShelfHost.cs" />
     <Compile Include="Hosts\UninstallHost.cs" />
-    <Compile Include="InstallCommand.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />
     <Compile Include="Messages\ExceptionDetail.cs" />
@@ -192,11 +193,12 @@
     <Compile Include="Model\LocalServiceController.cs" />
     <Compile Include="Model\ServiceControllerFactory.cs" />
     <Compile Include="Model\PublishChannel.cs" />
+    <Compile Include="Model\ServiceInfo.cs" />
+    <Compile Include="Model\ServiceStatus.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
     <Compile Include="Model\ShelfReference.cs" />
     <Compile Include="Model\ShelfServiceController.cs" />
     <Compile Include="Model\ShelfType.cs" />
-    <Compile Include="UninstallCommand.cs" />
     <Compile Include="UserAccessControlUtil.cs" />
     <Compile Include="WindowsServiceCode\HostInstaller.cs">
       <SubType>Component</SubType>
@@ -213,7 +215,6 @@
     <Compile Include="WindowsServiceCode\Kernel32.cs" />
     <Compile Include="Model\ServiceFactory.cs" />
     <Compile Include="Extensions\ProcessExtensions.cs" />
-    <Compile Include="Configuration\ServiceActionNames.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Model\Shelf.cs" />
     <Compile Include="Model\HostChannelFactory.cs" />
@@ -222,9 +223,7 @@
     <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
     <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
-    <Compile Include="Configuration\Dsl\ServiceConfigurator.cs" />
-    <Compile Include="CommandLineArguments.cs" />
-    <Compile Include="TopshelfArguments.cs" />
+    <Compile Include="Configuration\Dsl\ServiceConfiguratorImpl.cs" />
     <Compile Include="Configuration\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="WindowsServiceCode\HostServiceInstaller.cs">
@@ -255,7 +254,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Commands\" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dashboard\views\dashboard.html" />
   </ItemGroup>

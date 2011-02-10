@@ -13,7 +13,6 @@
 namespace Topshelf.Dashboard
 {
 	using System;
-	using Configuration;
 	using log4net;
 	using Model;
 	using Stact;
@@ -24,14 +23,14 @@ namespace Topshelf.Dashboard
 	{
 		static ChannelAdapter _input;
 		static HttpServer _server;
+		readonly ServiceDescription _description;
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Dashboard.TopshelfDashboard");
 		readonly int _port;
-		readonly ServiceCoordinator _serviceCoordinator;
-		readonly ServiceName _name;
+		readonly IServiceChannel _serviceCoordinator;
 
-		public TopshelfDashboard(ServiceName name, ServiceCoordinator serviceCoordinator)
+		public TopshelfDashboard(ServiceDescription description, IServiceChannel serviceCoordinator)
 		{
-			_name = name;
+			_description = description;
 			_serviceCoordinator = serviceCoordinator;
 			_port = 8483;
 		}
@@ -41,13 +40,13 @@ namespace Topshelf.Dashboard
 		public void Start()
 		{
 			_input = new ChannelAdapter();
-			ServerUri = new UriBuilder("http", "localhost", _port, "Topshelf/" + _name.Name).Uri;
+			ServerUri = new UriBuilder("http", "localhost", _port, "Topshelf/" + _description.GetServiceName()).Uri;
 			_log.InfoFormat("Loading dashboard at Uri: {0}", ServerUri);
 			_server = new HttpServer(ServerUri, new PoolFiber(), _input, new PatternMatchConnectionHandler[]
 				{
 					new VersionConnectionHandler(),
-					new StaticResourceHandler("\\.png$", "Topshelf.Dashboard.images.", "image/png", "GET"),
-					new StaticResourceHandler("\\.css$", "Topshelf.Dashboard.styles.", "text/css", "GET"),
+					new StaticResourceHandler(@"\.png$", "Topshelf.Dashboard.images.", "image/png", "GET"),
+					new StaticResourceHandler(@"\.css$", "Topshelf.Dashboard.styles.", "text/css", "GET"),
 					new DashboardConnectionHandler(_serviceCoordinator)
 				});
 
