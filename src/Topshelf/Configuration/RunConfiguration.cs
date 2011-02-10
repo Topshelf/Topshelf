@@ -14,7 +14,7 @@ namespace Topshelf.Configuration
 {
 	public class RunConfiguration
 	{
-		Host _host;
+		readonly Host _host;
 
 		public RunConfiguration(Host host)
 		{

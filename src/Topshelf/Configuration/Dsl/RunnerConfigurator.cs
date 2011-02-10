@@ -13,7 +13,6 @@
 namespace Topshelf.Configuration.Dsl
 {
 	using System;
-	using Dashboard;
 	using HostConfigurators;
 
 
@@ -37,16 +36,6 @@ namespace Topshelf.Configuration.Dsl
 			this.StartManually();
 		}
 
-		public void EnableDashboard()
-		{
-			ConfigureService<TopshelfDashboard>(o =>
-			{
-				o.ConstructUsing((name, coordinator) => new TopshelfDashboard(Description, coordinator));
-				o.WhenStarted(s => s.Start());
-				o.WhenStopped(s => s.Stop());
-			});
-		}
-
 		public void ConfigureService<TService>(Action<IServiceConfigurator<TService>> action)
 			where TService : class
 		{
@@ -56,11 +45,6 @@ namespace Topshelf.Configuration.Dsl
 
 					action(configurator);
 				});
-		}
-
-		public void UseServiceRecovery(Action<IServiceRecoveryConfigurator> recoveryConfigurator)
-		{
-			//recoveryConfigurator(new ServiceRecoveryConfigurator(_winServiceSettings.ServiceRecoveryOptions));
 		}
 
 		public void RunAsFromInteractive()

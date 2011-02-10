@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-	using Configuration.Dsl;
 	using HostConfigurators;
 
 
@@ -37,23 +36,9 @@ namespace Topshelf
 			return AddDependency(configurator, KnownServiceNames.Msmq);
 		}
 
-		public static IRunnerConfigurator DependencyOnMsmq(this IRunnerConfigurator configurator)
-		{
-			configurator.DependsOnMsmq();
-
-			return configurator;
-		}
-
 		public static HostConfigurator DependsOnMsSql(this HostConfigurator configurator)
 		{
 			return AddDependency(configurator, KnownServiceNames.SqlServer);
-		}
-
-		public static IRunnerConfigurator DependencyOnMsSql(this IRunnerConfigurator configurator)
-		{
-			configurator.DependsOnMsSql();
-
-			return configurator;
 		}
 
 		public static HostConfigurator DependsOnEventLog(this HostConfigurator configurator)
@@ -61,23 +46,9 @@ namespace Topshelf
 			return AddDependency(configurator, KnownServiceNames.EventLog);
 		}
 
-		public static IRunnerConfigurator DependencyOnEventLog(this IRunnerConfigurator configurator)
-		{
-			configurator.DependsOnEventLog();
-
-			return configurator;
-		}
-
 		public static HostConfigurator DependsOnIis(this HostConfigurator configurator)
 		{
 			return AddDependency(configurator, KnownServiceNames.IIS);
-		}
-
-		public static IRunnerConfigurator DependencyOnIis(this IRunnerConfigurator configurator)
-		{
-			configurator.DependsOnIis();
-
-			return configurator;
 		}
 	}
 }

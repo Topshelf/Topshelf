@@ -14,6 +14,7 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using Model;
 	using ServiceConfigurators;
 
 
@@ -32,19 +33,29 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator, Func<T> factory) 
+		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator, Func<T> factory)
 			where T : class
 		{
-			configurator.ConstructUsing((name, coordinator) => factory());
-			
+			configurator.ConstructUsing((d, name, coordinator) => factory());
+
 			return configurator;
 		}
 
-		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator, Func<string, T> factory) 
+		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator,
+		                                                       Func<string, T> factory)
 			where T : class
 		{
-			configurator.ConstructUsing((name, coordinator) => factory(name));
-			
+			configurator.ConstructUsing((d, name, coordinator) => factory(name));
+
+			return configurator;
+		}
+
+		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator,
+		                                                       InternalServiceFactory<T> factory)
+			where T : class
+		{
+			configurator.ConstructUsing((d, name, coordinator) => factory(name, coordinator));
+
 			return configurator;
 		}
 	}

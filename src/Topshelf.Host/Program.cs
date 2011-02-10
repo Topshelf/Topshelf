@@ -38,7 +38,7 @@ namespace Topshelf
 
 					x.RunAsLocalSystem();
 
-					//x.EnableDashboard();
+					x.EnableDashboard();
 
 					x.Service<Host>(y =>
 						{

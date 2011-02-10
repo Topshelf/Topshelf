@@ -23,15 +23,18 @@ namespace Topshelf.Builders
 		where T : class
 	{
 		readonly Action<T> _continue;
-		readonly InternalServiceFactory<T> _factory;
+		readonly ServiceDescription _description;
+		readonly DescriptionServiceFactory<T> _factory;
 		readonly Action<T> _pause;
 		readonly Action<T> _start;
 		readonly Action<T> _stop;
 
-		public LocalServiceBuilder(string name, InternalServiceFactory<T> factory, Action<T> start, Action<T> stop,
+		public LocalServiceBuilder(ServiceDescription description, string name, DescriptionServiceFactory<T> factory,
+		                           Action<T> start, Action<T> stop,
 		                           Action<T> pause, Action<T> @continue)
 		{
 			Name = name;
+			_description = description;
 			_factory = factory;
 			_start = start;
 			_stop = stop;
@@ -105,7 +108,7 @@ namespace Topshelf.Builders
 
 		T CreateService(string name, IServiceChannel coordinatorChannel)
 		{
-			return _factory(name, coordinatorChannel);
+			return _factory(_description, name, coordinatorChannel);
 		}
 	}
 }

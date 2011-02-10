@@ -42,12 +42,12 @@ namespace Topshelf.Configuration.Dsl
 
 		public void HowToBuildService(ServiceFactory<TService> factory)
 		{
-			_configurator.ConstructUsing((name, coordinator) => factory(name));
+			_configurator.ConstructUsing((d, name, coordinator) => factory(name));
 		}
 
 		public void ConstructUsing(ServiceFactory<TService> factory)
 		{
-			_configurator.ConstructUsing((name, coordinator) => factory(name));
+			_configurator.ConstructUsing((d, name, c) => factory(name));
 		}
 
 		public void Validate()
@@ -60,7 +60,7 @@ namespace Topshelf.Configuration.Dsl
 			_configurator.SetServiceName(name);
 		}
 
-		public void ConstructUsing(InternalServiceFactory<TService> serviceFactory)
+		public void ConstructUsing(DescriptionServiceFactory<TService> serviceFactory)
 		{
 			_configurator.ConstructUsing(serviceFactory);
 		}

@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2011 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -10,12 +10,22 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Configuration.Dsl
+namespace Topshelf
 {
-	public enum ServiceFailure
+	using System.ServiceProcess;
+
+
+	public class Credentials
 	{
-		First,
-		Second,
-		Subsequent
+		public Credentials(string username, string password, ServiceAccount account)
+		{
+			Username = username;
+			Account = account;
+			Password = password;
+		}
+
+		public string Username { get; private set; }
+		public string Password { get; private set; }
+		public ServiceAccount Account { get; private set; }
 	}
 }

@@ -91,20 +91,12 @@
     <Compile Include="Bottles\BottleService.cs" />
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
-    <Compile Include="Configuration\Dsl\IServiceFailureConfiguration.cs" />
-    <Compile Include="Configuration\Dsl\IServiceFailureRestartConfiguration.cs" />
-    <Compile Include="Configuration\Dsl\IServiceFailureRestartConfigurationDisplayMessage.cs" />
-    <Compile Include="Configuration\Dsl\IServiceFailureRestartConfigurationWait.cs" />
-    <Compile Include="Configuration\Dsl\IServiceRecoveryConfigurator.cs" />
-    <Compile Include="Configuration\Dsl\ServiceFailure.cs" />
-    <Compile Include="Configuration\Dsl\ServiceFailureConfiguration.cs" />
-    <Compile Include="Configuration\Dsl\ServiceFailureRestartConfiguration.cs" />
-    <Compile Include="Configuration\Dsl\ServiceRecoveryConfigurator.cs" />
-    <Compile Include="Configuration\ServiceName.cs" />
+    <Compile Include="Configuration\Dsl\RunnerExtensions.cs" />
     <Compile Include="Config\Builders\ShelfBuilder.cs" />
     <Compile Include="Config\CommandLineConfigurator.cs" />
     <Compile Include="Config\DependencyExtensions.cs" />
     <Compile Include="Config\HostConfigurators\DependencyHostConfigurator.cs" />
+    <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
     <Compile Include="Config\HostConfigurators\RunProgramConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\FailureConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\FailureConfiguratorImpl.cs" />
@@ -148,6 +140,7 @@
     <Compile Include="Config\StartModeExtensions.cs" />
     <Compile Include="Config\WindowsServiceDescription.cs" />
     <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
+    <Compile Include="Dashboard\DashboardExtensions.cs" />
     <Compile Include="Dashboard\DashboardView.cs" />
     <Compile Include="Dashboard\ResponseContextExtensions.cs" />
     <Compile Include="Dashboard\SparkRender.cs" />
@@ -235,12 +228,10 @@
     <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorImpl.cs" />
-    <Compile Include="Configuration\Credentials.cs" />
+    <Compile Include="Config\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
-    <Compile Include="Configuration\Dsl\KnownServiceNames.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runner.cs" />
-    <Compile Include="Configuration\WinServiceSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

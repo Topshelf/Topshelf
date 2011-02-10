@@ -28,7 +28,7 @@ namespace Topshelf.ServiceConfigurators
 		where TService : class
 	{
 		void SetServiceName(string name);
-		void ConstructUsing(InternalServiceFactory<TService> serviceFactory);
+		void ConstructUsing(DescriptionServiceFactory<TService> serviceFactory);
 		void WhenStarted(Action<TService> startAction);
 		void WhenStopped(Action<TService> stopAction);
 		void WhenPaused(Action<TService> pauseAction);

@@ -47,13 +47,5 @@ namespace Topshelf.Configuration.Dsl
 		/// This means that <c>#</c> will not be a valid character to use in the password.
 		/// </example>
 		void RunAsFromCommandLine();
-
-		/// <summary>
-		/// Sets up the service recovery options exposed to the windows serivces. 
-		/// </summary>
-		/// <param name="recoveryConfigurator">An action configuring the recovery settings</param>
-		void UseServiceRecovery(Action<IServiceRecoveryConfigurator> recoveryConfigurator);
-
-		void EnableDashboard();
     }
 }

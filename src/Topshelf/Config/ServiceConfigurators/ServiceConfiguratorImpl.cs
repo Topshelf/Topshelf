@@ -25,7 +25,7 @@ namespace Topshelf.ServiceConfigurators
 		where TService : class
 	{
 		Action<TService> _continue;
-		InternalServiceFactory<TService> _factory;
+		DescriptionServiceFactory<TService> _factory;
 		string _name;
 		Action<TService> _pause;
 		Action<TService> _start;
@@ -37,7 +37,7 @@ namespace Topshelf.ServiceConfigurators
 				{
 					string name = _name.IsEmpty() ? typeof(TService).Name : _name;
 
-					var serviceBuilder = new LocalServiceBuilder<TService>(name, _factory, _start, _stop, _pause, _continue);
+					var serviceBuilder = new LocalServiceBuilder<TService>(x.Description, name, _factory, _start, _stop, _pause, _continue);
 
 					x.AddServiceBuilder(serviceBuilder);
 				});
@@ -69,7 +69,7 @@ namespace Topshelf.ServiceConfigurators
 			_name = name;
 		}
 
-		public void ConstructUsing(InternalServiceFactory<TService> serviceFactory)
+		public void ConstructUsing(DescriptionServiceFactory<TService> serviceFactory)
 		{
 			_factory = serviceFactory;
 		}

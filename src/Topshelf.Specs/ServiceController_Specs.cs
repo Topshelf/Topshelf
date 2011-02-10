@@ -42,7 +42,7 @@ namespace Topshelf.Specs
 
 			_coordinator = new Model.ServiceCoordinator();
 
-			var b = new LocalServiceBuilder<TestService>(_serviceName, (name, coordinator) => _service,
+			var b = new LocalServiceBuilder<TestService>(null, _serviceName, (d, name, coordinator) => _service,
 			                                             x => x.Start(), x => x.Stop(), x => { }, x => { });
 
 

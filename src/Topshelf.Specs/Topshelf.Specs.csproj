@@ -89,7 +89,6 @@
     <Compile Include="Bottle\Bottle_Specs.cs" />
     <Compile Include="Configuration\RunnerConfigurator_Specs.cs">
     </Compile>
-    <Compile Include="Configuration\Credential_Specs.cs" />
     <Compile Include="Config\EmptyConfigurator_Specs.cs" />
     <Compile Include="Config\Recovery_Specs.cs" />
     <Compile Include="ContextSetup.cs" />
