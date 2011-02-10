@@ -10,50 +10,23 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.RecoveryConfigurators
 {
-	using System;
-	using Windows;
-
-
-	public class FailureConfiguratorImpl :
-		FailureConfigurator
+	public class RunProgramConfiguratorImpl :
+		RunProgramConfigurator
 	{
 		readonly RecoveryHostConfigurator _configurator;
-		readonly Action<ServiceRecoveryAction> _setter;
 
-		public FailureConfiguratorImpl(RecoveryHostConfigurator configurator, Action<ServiceRecoveryAction> setter)
+		public RunProgramConfiguratorImpl(RecoveryHostConfigurator configurator)
 		{
 			_configurator = configurator;
-			_setter = setter;
 		}
 
-		public RestartServiceConfigurator RestartService()
+		public RecoveryConfigurator WithParameters(string parameters)
 		{
-			_setter(ServiceRecoveryAction.RestartService);
+			_configurator.SetProgramParameters(parameters);
 
-			var restartConfigurator = new RestartServiceConfiguratorImpl(_configurator);
-
-			return restartConfigurator;
-		}
-
-		public RestartComputerConfigurator RestartComputer()
-		{
-			_setter(ServiceRecoveryAction.RestartComputer);
-
-			var restartConfigurator = new RestartComputerConfiguratorImpl(_configurator);
-
-			return restartConfigurator;
-		}
-
-		public RunProgramConfigurator RunProgram(string command)
-		{
-			_setter(ServiceRecoveryAction.RunProgram);
-			_configurator.SetProgram(command);
-
-			var runProgramConfigurator = new RunProgramConfiguratorImpl(_configurator);
-			
-			return runProgramConfigurator;
+			return _configurator;
 		}
 
 		public FailureConfigurator OnFirstFailure()

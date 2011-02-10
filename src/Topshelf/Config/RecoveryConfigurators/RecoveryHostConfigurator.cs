@@ -10,10 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.RecoveryConfigurators
 {
 	using System;
 	using Builders;
+	using HostConfigurators;
 	using log4net;
 	using Windows;
 

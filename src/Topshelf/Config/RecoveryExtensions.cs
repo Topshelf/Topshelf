@@ -14,6 +14,7 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using RecoveryConfigurators;
 
 
 	public static class RecoveryExtensions

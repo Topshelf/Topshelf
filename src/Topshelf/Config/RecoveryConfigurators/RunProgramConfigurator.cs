@@ -10,14 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.RecoveryConfigurators
 {
-	public interface RecoveryConfigurator
+	public interface RunProgramConfigurator :
+		RecoveryConfigurator
 	{
-		FailureConfigurator OnFirstFailure();
-		FailureConfigurator OnSecondFailure();
-		FailureConfigurator OnSubsequentFailures();
-
-		void ResetFailureCountAfter(int days);
+		RecoveryConfigurator WithParameters(string parameters);
 	}
 }
