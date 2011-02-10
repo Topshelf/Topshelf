@@ -138,7 +138,7 @@
     <Compile Include="Config\ServiceDescription.cs" />
     <Compile Include="Config\ServiceExtensions.cs" />
     <Compile Include="Config\StartModeExtensions.cs" />
-    <Compile Include="Config\WindowsServiceDescription.cs" />
+    <Compile Include="Config\HostConfigurators\WindowsServiceDescription.cs" />
     <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
     <Compile Include="Dashboard\DashboardExtensions.cs" />
     <Compile Include="Dashboard\DashboardView.cs" />
