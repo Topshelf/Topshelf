@@ -27,7 +27,7 @@ namespace Topshelf.Dashboard
 		readonly IServiceChannel _serviceCoordinator;
 
 		public DashboardConnectionHandler(IServiceChannel serviceCoordinator)
-			: base("^/(dashboard|)$", "GET")
+			: base("^/$", "GET")
 		{
 			_serviceCoordinator = serviceCoordinator;
 		}
