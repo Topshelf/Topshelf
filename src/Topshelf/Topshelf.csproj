@@ -93,10 +93,14 @@
     <Compile Include="Bottles\BottleWatcher.cs" />
     <Compile Include="Configuration\Dsl\RunnerExtensions.cs" />
     <Compile Include="Config\Builders\ShelfBuilder.cs" />
+    <Compile Include="Config\Builders\StartBuilder.cs" />
+    <Compile Include="Config\Builders\StopBuilder.cs" />
     <Compile Include="Config\CommandLineConfigurator.cs" />
     <Compile Include="Config\DependencyExtensions.cs" />
     <Compile Include="Config\HostConfigurators\DependencyHostConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
+    <Compile Include="Config\Options\StartOption.cs" />
+    <Compile Include="Config\Options\StopOption.cs" />
     <Compile Include="Config\RecoveryConfigurators\RunProgramConfigurator.cs" />
     <Compile Include="Config\RecoveryConfigurators\FailureConfigurator.cs" />
     <Compile Include="Config\RecoveryConfigurators\FailureConfiguratorImpl.cs" />
@@ -156,8 +160,10 @@
     <Compile Include="HostConfigurationException.cs" />
     <Compile Include="HostException.cs" />
     <Compile Include="Hosts\InstallHost.cs" />
-    <Compile Include="Hosts\AbstactInstallerHost.cs" />
+    <Compile Include="Hosts\AbstractInstallerHost.cs" />
     <Compile Include="Hosts\ShelfHost.cs" />
+    <Compile Include="Hosts\StartHost.cs" />
+    <Compile Include="Hosts\StopHost.cs" />
     <Compile Include="Hosts\UninstallHost.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />

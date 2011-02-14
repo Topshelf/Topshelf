@@ -24,7 +24,7 @@ namespace Topshelf.Hosts
 	using WindowsServiceCode;
 
 
-	public abstract class AbstactInstallerHost
+	public abstract class AbstractInstallerHost
 	{
 		readonly Credentials _credentials;
 		readonly IEnumerable<string> _dependencies;
@@ -33,7 +33,7 @@ namespace Topshelf.Hosts
 		readonly IEnumerable<Action> _preActions;
 		readonly ServiceStartMode _startMode;
 
-		protected AbstactInstallerHost(ServiceDescription description,
+		protected AbstractInstallerHost(ServiceDescription description,
 		                               ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
 		                               IEnumerable<Action> preActions, IEnumerable<Action> postActions)
 		{

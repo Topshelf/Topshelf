@@ -22,7 +22,7 @@ namespace Topshelf.Hosts
 
 
 	public class InstallHost :
-		AbstactInstallerHost,
+		AbstractInstallerHost,
 		Host
 	{
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");

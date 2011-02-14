@@ -19,6 +19,8 @@ namespace Topshelf.Windows
 	using System.Runtime.InteropServices;
 	using System.Security.Permissions;
 	using System.ServiceProcess;
+	using System.Threading;
+	using log4net;
 	using Magnum.Extensions;
 
 
@@ -27,6 +29,8 @@ namespace Topshelf.Windows
 	/// </summary>
 	public static class WindowsServiceControlManager
 	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Windows.WindowsServiceControlManager");
+
 		const int SERVICE_CONFIG_FAILURE_ACTIONS = 2;
 		const int SE_PRIVILEGE_ENABLED = 2;
 		const string SE_SHUTDOWN_NAME = "SeShutdownPrivilege";
@@ -266,6 +270,57 @@ namespace Topshelf.Windows
 		{
 			public int PrivilegeCount;
 			public LUID_AND_ATTRIBUTES Privileges;
+		}
+
+
+		public static void Start(string serviceName)
+		{
+			using (var sc = new ServiceController(serviceName))
+			{
+				if(sc.Status == ServiceControllerStatus.Running)
+				{
+					_log.InfoFormat("The {0} service is already running.", serviceName);
+					return;
+				}
+
+				if(sc.Status == ServiceControllerStatus.StartPending)
+				{
+					_log.InfoFormat("The {0} service is already starting.", serviceName);
+					return;
+				}
+
+				sc.Start();
+				while (sc.Status == ServiceControllerStatus.Stopped || sc.Status == ServiceControllerStatus.StartPending)
+				{
+					Thread.Sleep(1000);
+					sc.Refresh();
+				}
+			}
+		}
+
+		public static void Stop(string serviceName)
+		{
+			using (var sc = new ServiceController(serviceName))
+			{
+				if (sc.Status == ServiceControllerStatus.Stopped)
+				{
+					_log.InfoFormat("The {0} service is not running.", serviceName);
+					return;
+				}
+
+				if (sc.Status == ServiceControllerStatus.StopPending)
+				{
+					_log.InfoFormat("The {0} service is already stopping.", serviceName);
+					return;
+				}
+
+				sc.Stop();
+				while (sc.Status == ServiceControllerStatus.Running || sc.Status == ServiceControllerStatus.StopPending	)
+				{
+					Thread.Sleep(1000);
+					sc.Refresh();
+				}
+			}
 		}
 	}
 }

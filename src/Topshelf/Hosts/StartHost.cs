@@ -12,48 +12,45 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Generic;
-	using System.ServiceProcess;
-	using Configuration;
 	using log4net;
 	using Windows;
-	using WindowsServiceCode;
 
 
-	public class UninstallHost :
-		AbstractInstallerHost,
+	public class StartHost :
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.UninstallHost");
+		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.StartHost");
 
-
-		public UninstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
-		                     Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions)
-			: base(description, startMode, dependencies, credentials, preActions, postActions)
+		public StartHost(ServiceDescription description)
 		{
+			Description = description;
 		}
+
+		public ServiceDescription Description { get; private set; }
 
 		public void Run()
 		{
 			if (!WindowsServiceControlManager.IsInstalled(Description.GetServiceName()))
 			{
-				_log.ErrorFormat("The {0} service is not installed.", Description.GetServiceName());
+				string message = string.Format("The {0} service is not installed.", Description.GetServiceName());
+				_log.Error(message);
+
 				return;
 			}
 
 			if (!WindowsUserAccessControl.IsAdministrator)
 			{
 				if (!WindowsUserAccessControl.RerunAsAdministrator())
-					_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", Description.GetServiceName());
+					_log.ErrorFormat("The {0} service can only be started by an administrator", Description.GetServiceName());
 
 				return;
 			}
 
-			_log.DebugFormat("Attempting to uninstall '{0}'", Description.GetServiceName());
+			_log.DebugFormat("Attempting to start '{0}'", Description.GetServiceName());
 
-			WithInstaller(ti => ti.Uninstall(null));
+			WindowsServiceControlManager.Start(Description.GetServiceName());
+
+			_log.InfoFormat("The {0} service has been started.", Description.GetServiceName());
 		}
 	}
 }
