@@ -16,7 +16,6 @@ namespace Topshelf.Builders
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.ServiceProcess;
-	using Configuration;
 	using Hosts;
 
 
@@ -39,6 +38,11 @@ namespace Topshelf.Builders
 			_credentials = new Credentials("", "", ServiceAccount.LocalSystem);
 
 			_description = description;
+		}
+
+		public ServiceDescription Description
+		{
+			get { return _description; }
 		}
 
 		public Host Build()

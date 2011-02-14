@@ -32,9 +32,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("A null callback was specified");
 		}
 
-		public void Configure(HostBuilder builder)
+		public HostBuilder Configure(HostBuilder builder)
 		{
 			builder.Match<InstallBuilder>(x => _callback(x));
+
+			return builder;
 		}
 	}
 }

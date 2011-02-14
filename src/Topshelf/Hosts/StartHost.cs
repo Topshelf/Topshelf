@@ -20,9 +20,11 @@ namespace Topshelf.Hosts
 		Host
 	{
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.StartHost");
+		readonly Host _wrappedHost;
 
-		public StartHost(ServiceDescription description)
+		public StartHost(ServiceDescription description, Host wrappedHost)
 		{
+			_wrappedHost = wrappedHost;
 			Description = description;
 		}
 
@@ -30,19 +32,19 @@ namespace Topshelf.Hosts
 
 		public void Run()
 		{
-			if (!WindowsServiceControlManager.IsInstalled(Description.GetServiceName()))
-			{
-				string message = string.Format("The {0} service is not installed.", Description.GetServiceName());
-				_log.Error(message);
-
-				return;
-			}
-
 			if (!WindowsUserAccessControl.IsAdministrator)
 			{
 				if (!WindowsUserAccessControl.RerunAsAdministrator())
 					_log.ErrorFormat("The {0} service can only be started by an administrator", Description.GetServiceName());
 
+				return;
+			}
+
+			_wrappedHost.Run();
+
+			if (!WindowsServiceControlManager.IsInstalled(Description.GetServiceName()))
+			{
+				_log.ErrorFormat("The {0} service is not installed.", Description.GetServiceName());
 				return;
 			}
 

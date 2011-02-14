@@ -50,9 +50,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("The username and password must be specified for a user account");
 		}
 
-		public void Configure(HostBuilder builder)
+		public HostBuilder Configure(HostBuilder builder)
 		{
 			builder.Match<InstallBuilder>(x => x.RunAs(_username, _password, _accountType));
+
+			return builder;
 		}
 	}
 }

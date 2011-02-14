@@ -30,9 +30,11 @@ namespace Topshelf.HostConfigurators
 		{
 		}
 
-		public void Configure(HostBuilder builder)
+		public HostBuilder Configure(HostBuilder builder)
 		{
 			builder.Match<InstallBuilder>(x => x.SetStartMode(_startMode));
+
+			return builder;
 		}
 	}
 }

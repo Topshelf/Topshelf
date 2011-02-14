@@ -17,6 +17,8 @@ namespace Topshelf.Builders
 
 	public interface HostBuilder
 	{
+		ServiceDescription Description { get; }
+
 		Host Build();
 
 		void Match<T>(Action<T> callback)

@@ -32,9 +32,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("The dependency specified was empty.");
 		}
 
-		public void Configure(HostBuilder builder)
+		public HostBuilder Configure(HostBuilder builder)
 		{
 			builder.Match<InstallBuilder>(x => x.AddDependency(_name));
+
+			return builder;
 		}
 	}
 }

@@ -133,6 +133,11 @@ namespace Topshelf.Specs
 	public class TestBuilder :
 		HostBuilder
 	{
+		public ServiceDescription Description
+		{
+			get { throw new NotImplementedException(); }
+		}
+
 		public Host Build()
 		{
 			throw new NotImplementedException();

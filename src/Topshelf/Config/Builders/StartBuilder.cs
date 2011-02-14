@@ -19,11 +19,13 @@ namespace Topshelf.Builders
 	public class StartBuilder :
 		HostBuilder
 	{
+		readonly HostBuilder _builder;
 		readonly ServiceDescription _description;
 
-		public StartBuilder(ServiceDescription description)
+		public StartBuilder(HostBuilder builder)
 		{
-			_description = description;
+			_builder = builder;
+			_description = builder.Description;
 		}
 
 		public ServiceDescription Description
@@ -33,7 +35,9 @@ namespace Topshelf.Builders
 
 		public Host Build()
 		{
-			return new StartHost(_description);
+			Host wrappedHost = _builder.Build();
+
+			return new StartHost(_description, wrappedHost);
 		}
 
 		public void Match<T>(Action<T> callback)

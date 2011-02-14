@@ -14,10 +14,13 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using log4net;
 
 
 	public static class HostFactory
 	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+
 		public static Host New(Action<HostConfigurator> configure)
 		{
 			var configurator = new HostConfiguratorImpl();
@@ -33,8 +36,15 @@ namespace Topshelf
 
 		public static void Run(Action<HostConfigurator> configure)
 		{
-			New(configure)
-				.Run();
+			try
+			{
+				New(configure)
+					.Run();
+			}
+			catch (Exception ex)
+			{
+				_log.Error("The service exited abnormally with an exception", ex);
+			}
 		}
 	}
 }

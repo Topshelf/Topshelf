@@ -31,7 +31,7 @@ namespace Topshelf.ServiceConfigurators
 		Action<TService> _start;
 		Action<TService> _stop;
 
-		public void Configure(HostBuilder builder)
+		public HostBuilder Configure(HostBuilder builder)
 		{
 			builder.Match<RunBuilder>(x =>
 				{
@@ -41,6 +41,8 @@ namespace Topshelf.ServiceConfigurators
 
 					x.AddServiceBuilder(serviceBuilder);
 				});
+
+			return builder;
 		}
 
 		public void Validate()

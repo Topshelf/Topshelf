@@ -84,7 +84,9 @@ namespace Topshelf.HostConfigurators
 			HostBuilder builder = _builderFactory(_description);
 
 			foreach (HostBuilderConfigurator configurator in _configurators)
-				configurator.Configure(builder);
+			{
+				builder = configurator.Configure(builder);
+			}
 
 			return builder.Build();
 		}

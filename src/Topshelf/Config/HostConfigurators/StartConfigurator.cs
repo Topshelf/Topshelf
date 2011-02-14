@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2011 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,12 +13,18 @@
 namespace Topshelf.HostConfigurators
 {
 	using Builders;
-	using Configurators;
 
 
-	public interface HostBuilderConfigurator :
-		Configurator
+	public class StartConfigurator :
+		HostBuilderConfigurator
 	{
-		HostBuilder Configure(HostBuilder builder);
+		public void Validate()
+		{
+		}
+
+		public HostBuilder Configure(HostBuilder builder)
+		{
+			return new StartBuilder(builder);
+		}
 	}
 }

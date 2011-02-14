@@ -35,9 +35,11 @@ namespace Topshelf.RecoveryConfigurators
 		{
 		}
 
-		public void Configure(HostBuilder builder)
+		public HostBuilder Configure(HostBuilder builder)
 		{
 			builder.Match<InstallBuilder>(x => x.AfterInstall(() => SetRecoveryOptions(x.Description)));
+
+			return builder;
 		}
 
 		public FailureConfigurator OnFirstFailure()

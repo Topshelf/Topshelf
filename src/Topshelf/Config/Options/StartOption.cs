@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Options
 {
-	using Builders;
 	using HostConfigurators;
 
 
@@ -21,7 +20,9 @@ namespace Topshelf.Options
 	{
 		public void ApplyTo(HostConfigurator configurator)
 		{
-			configurator.UseBuilder(description => new StartBuilder(description));
+			var startConfigurator = new StartConfigurator();
+
+			configurator.AddConfigurator(startConfigurator);
 		}
 	}
 }
