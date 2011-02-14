@@ -107,7 +107,10 @@ namespace Topshelf.Model
 		{
 			_domainSettings = AppDomain.CurrentDomain.SetupInformation;
 			if (_shelfType == ShelfType.Internal)
+			{
+				//_domainSettings.LoaderOptimization = LoaderOptimization.MultiDomain;
 				return;
+			}
 
 			_domainSettings.ShadowCopyFiles = "true";
 

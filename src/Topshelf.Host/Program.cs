@@ -22,7 +22,8 @@ namespace Topshelf
 	{
 		static readonly ILog _log = LogManager.GetLogger(Host.DefaultServiceName);
 
-		static void Main(string[] args)
+		[LoaderOptimization(LoaderOptimization.MultiDomainHost)]
+		static void Main()
 		{
 			BootstrapLogger();
 
