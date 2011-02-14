@@ -19,7 +19,6 @@ namespace Topshelf.Hosts
 	using System.Linq;
 	using System.Reflection;
 	using System.ServiceProcess;
-	using Configuration;
 	using Magnum.Extensions;
 	using WindowsServiceCode;
 
@@ -34,8 +33,8 @@ namespace Topshelf.Hosts
 		readonly ServiceStartMode _startMode;
 
 		protected AbstractInstallerHost(ServiceDescription description,
-		                               ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
-		                               IEnumerable<Action> preActions, IEnumerable<Action> postActions)
+		                                ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
+		                                IEnumerable<Action> preActions, IEnumerable<Action> postActions)
 		{
 			_startMode = startMode;
 			_postActions = postActions;
@@ -77,12 +76,14 @@ namespace Topshelf.Hosts
 			ExecutePostActions();
 		}
 
-		void ExecutePreActions()
+		protected abstract void CustomizeInstaller(Installer installer);
+
+		protected void ExecutePreActions()
 		{
 			_preActions.Each(x => x());
 		}
 
-		void ExecutePostActions()
+		protected void ExecutePostActions()
 		{
 			_postActions.Each(x => x());
 		}
@@ -115,6 +116,8 @@ namespace Topshelf.Hosts
 					ServicesDependedOn = _dependencies.ToArray(),
 					StartType = _startMode,
 				};
+
+			CustomizeInstaller(installer);
 
 			return installer;
 		}

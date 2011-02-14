@@ -13,13 +13,11 @@
 namespace Topshelf.Hosts
 {
 	using System;
-	using System.Collections;
 	using System.Collections.Generic;
+	using System.Configuration.Install;
 	using System.ServiceProcess;
-	using Configuration;
 	using log4net;
 	using Windows;
-	using WindowsServiceCode;
 
 
 	public class UninstallHost :
@@ -54,6 +52,13 @@ namespace Topshelf.Hosts
 			_log.DebugFormat("Attempting to uninstall '{0}'", Description.GetServiceName());
 
 			WithInstaller(ti => ti.Uninstall(null));
+		}
+
+		protected override void CustomizeInstaller(Installer installer)
+		{
+			installer.BeforeUninstall += (sender, args) => ExecutePreActions();
+
+			installer.AfterUninstall += (sender, args) => ExecutePostActions();
 		}
 	}
 }

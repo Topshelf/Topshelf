@@ -15,8 +15,8 @@ namespace Topshelf.Hosts
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Configuration.Install;
 	using System.ServiceProcess;
-	using Configuration;
 	using log4net;
 	using Windows;
 
@@ -55,6 +55,13 @@ namespace Topshelf.Hosts
 			_log.DebugFormat("Attempting to install '{0}'", Description.GetServiceName());
 
 			WithInstaller(ti => ti.Install(new Hashtable()));
+		}
+
+		protected override void CustomizeInstaller(Installer installer)
+		{
+			installer.BeforeInstall += (sender, args) => ExecutePreActions();
+
+			installer.AfterInstall += (sender, args) => ExecutePostActions();
 		}
 	}
 }
