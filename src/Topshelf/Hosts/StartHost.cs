@@ -12,7 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
-	using System;
 	using log4net;
 	using Windows;
 
@@ -47,7 +46,7 @@ namespace Topshelf.Hosts
 				return;
 			}
 
-			if(_wrappedHost != null)
+			if (_wrappedHost != null)
 				_wrappedHost.Run();
 
 			if (!WindowsServiceControlManager.IsInstalled(Description.GetServiceName()))

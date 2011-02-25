@@ -28,8 +28,9 @@ namespace Topshelf.Hosts
 
 
 		public UninstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
-		                     Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions)
-			: base(description, startMode, dependencies, credentials, preActions, postActions)
+		                     Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions,
+		                     bool sudo)
+			: base(description, startMode, dependencies, credentials, preActions, postActions, sudo)
 		{
 		}
 
@@ -43,9 +44,15 @@ namespace Topshelf.Hosts
 
 			if (!WindowsUserAccessControl.IsAdministrator)
 			{
-				if (!WindowsUserAccessControl.RerunAsAdministrator())
-					_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", Description.GetServiceName());
+				if (Sudo)
+				{
+					if (WindowsUserAccessControl.RerunAsAdministrator())
+					{
+						return;
+					}
+				}
 
+				_log.ErrorFormat("The {0} service can only be uninstalled as an administrator", Description.GetServiceName());
 				return;
 			}
 

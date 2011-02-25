@@ -19,16 +19,13 @@ namespace Topshelf.Builders
 	public class StartBuilder :
 		HostBuilder
 	{
-		HostBuilder _builder;
 		readonly ServiceDescription _description;
+		HostBuilder _builder;
 
 		public StartBuilder(HostBuilder builder)
 		{
 			_builder = null;
-			builder.Match<InstallBuilder>(x =>
-				{
-					_builder = builder;
-				});
+			builder.Match<InstallBuilder>(x => { _builder = builder; });
 
 			_description = builder.Description;
 		}

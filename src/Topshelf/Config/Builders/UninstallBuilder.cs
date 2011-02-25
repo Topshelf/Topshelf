@@ -28,6 +28,7 @@ namespace Topshelf.Builders
 		readonly IList<Action> _preActions;
 		Credentials _credentials;
 		ServiceStartMode _startMode;
+		bool _sudo;
 
 		public UninstallBuilder(ServiceDescription description)
 		{
@@ -47,7 +48,8 @@ namespace Topshelf.Builders
 
 		public Host Build()
 		{
-			return new UninstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions);
+			return new UninstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions,
+			                         _sudo);
 		}
 
 		public void Match<T>(Action<T> callback)
@@ -55,6 +57,11 @@ namespace Topshelf.Builders
 		{
 			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
+		}
+
+		public void Sudo()
+		{
+			_sudo = true;
 		}
 
 		public void BeforeUninstall(Action callback)

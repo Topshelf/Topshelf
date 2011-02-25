@@ -100,6 +100,7 @@
     <Compile Include="Config\HostConfigurators\DependencyHostConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
     <Compile Include="Config\HostConfigurators\StartConfigurator.cs" />
+    <Compile Include="Config\HostConfigurators\SudoConfigurator.cs" />
     <Compile Include="Config\Options\StartOption.cs" />
     <Compile Include="Config\Options\StopOption.cs" />
     <Compile Include="Config\RecoveryConfigurators\RunProgramConfigurator.cs" />

@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Options
 {
+	using System;
 	using HostConfigurators;
 
 
@@ -30,6 +31,15 @@ namespace Topshelf.Options
 		public void ApplyTo(HostConfigurator configurator)
 		{
 			configurator.RunAs(_username, _password);
+		}
+	}
+
+	public class SudoOption :
+		Option
+	{
+		public void ApplyTo(HostConfigurator configurator)
+		{
+			configurator.AddConfigurator(new SudoConfigurator());
 		}
 	}
 }

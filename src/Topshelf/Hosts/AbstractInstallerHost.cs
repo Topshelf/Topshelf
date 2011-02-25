@@ -32,9 +32,9 @@ namespace Topshelf.Hosts
 		readonly IEnumerable<Action> _preActions;
 		readonly ServiceStartMode _startMode;
 
-		protected AbstractInstallerHost(ServiceDescription description,
-		                                ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
-		                                IEnumerable<Action> preActions, IEnumerable<Action> postActions)
+		protected AbstractInstallerHost(ServiceDescription description, ServiceStartMode startMode,
+		                                IEnumerable<string> dependencies, Credentials credentials,
+		                                IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
 		{
 			_startMode = startMode;
 			_postActions = postActions;
@@ -42,7 +42,10 @@ namespace Topshelf.Hosts
 			_credentials = credentials;
 			_dependencies = dependencies;
 			_description = description;
+			Sudo = sudo;
 		}
+
+		protected bool Sudo { get; private set; }
 
 		public ServiceDescription Description
 		{

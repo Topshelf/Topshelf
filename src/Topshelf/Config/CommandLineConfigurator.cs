@@ -43,6 +43,8 @@ namespace Topshelf
 			      	    select (Option)new StartOption())
 			      	.Or(from arg in x.Argument("stop")
 			      	    select (Option)new StopOption())
+			      	.Or(from arg in x.Switch("sudo")
+			      	    select (Option)new SudoOption())
 			      	.Or(from arg in x.Argument("run")
 			      	    select (Option)new RunOption())
 			      	.Or(from username in x.Definition("username")

@@ -27,10 +27,8 @@ namespace Topshelf.Hosts
 	{
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");
 
-		public InstallHost(ServiceDescription description,
-		                   ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials,
-		                   IEnumerable<Action> preActions, IEnumerable<Action> postActions)
-			: base(description, startMode, dependencies, credentials, preActions, postActions)
+		public InstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
+			: base(description, startMode, dependencies, credentials, preActions, postActions, sudo)
 		{
 		}
 
@@ -46,11 +44,15 @@ namespace Topshelf.Hosts
 
 			if (!WindowsUserAccessControl.IsAdministrator)
 			{
-                //TODO: YO CHRIS! this can cause a recursive loop. baaaaaaaad
-				//if (!WindowsUserAccessControl.RerunAsAdministrator())
-			    
-                _log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());
+				if (Sudo)
+				{
+					if (WindowsUserAccessControl.RerunAsAdministrator())
+					{
+						return;
+					}
+				}
 
+				_log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());
 				return;
 			}
 

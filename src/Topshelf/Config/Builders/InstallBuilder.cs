@@ -28,6 +28,7 @@ namespace Topshelf.Builders
 		readonly IList<Action> _preActions;
 		Credentials _credentials;
 		ServiceStartMode _startMode;
+		bool _sudo;
 
 		public InstallBuilder(ServiceDescription description)
 		{
@@ -47,7 +48,7 @@ namespace Topshelf.Builders
 
 		public Host Build()
 		{
-			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions);
+			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions, _sudo);
 		}
 
 		public void Match<T>(Action<T> callback)
@@ -60,6 +61,11 @@ namespace Topshelf.Builders
 		public void RunAs(string username, string password, ServiceAccount accountType)
 		{
 			_credentials = new Credentials(username, password, accountType);
+		}
+
+		public void Sudo()
+		{
+			_sudo = true;
 		}
 
 		public void SetStartMode(ServiceStartMode startMode)
