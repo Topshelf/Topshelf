@@ -46,8 +46,10 @@ namespace Topshelf.Hosts
 
 			if (!WindowsUserAccessControl.IsAdministrator)
 			{
-				if (!WindowsUserAccessControl.RerunAsAdministrator())
-					_log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());
+                //TODO: YO CHRIS! this can cause a recursive loop. baaaaaaaad
+				//if (!WindowsUserAccessControl.RerunAsAdministrator())
+			    
+                _log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());
 
 				return;
 			}
