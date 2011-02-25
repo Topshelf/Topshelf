@@ -45,7 +45,11 @@ namespace Topshelf.Windows
 		{
 			if (Environment.OSVersion.Version.Major == 6)
 			{
-				var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, CommandLine.GetUnparsedCommandLine())
+				string commandLine = CommandLine.GetUnparsedCommandLine()
+					.Replace("--sudo", "");
+
+				var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location,
+				                                     commandLine)
 					{
 						Verb = "runas",
 						UseShellExecute = true,
