@@ -33,7 +33,7 @@ namespace Topshelf.Model
 		OutboundChannel _channel;
 		bool _disposed;
 		AppDomain _domain;
-		AppDomainSetup _domainSettings;
+		readonly AppDomainSetup _domainSettings;
 		ObjectHandle _objectHandle;
 		HostChannel _hostChannel;
 
@@ -43,7 +43,7 @@ namespace Topshelf.Model
 			_shelfType = shelfType;
 			_controllerChannel = controllerChannel;
 
-			ConfigureAppDomainSettings();
+			_domainSettings = ConfigureAppDomainSettings();
 
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
 		}
@@ -103,26 +103,28 @@ namespace Topshelf.Model
 			                       null, null, null);
 		}
 
-		void ConfigureAppDomainSettings()
+		AppDomainSetup ConfigureAppDomainSettings()
 		{
-			_domainSettings = AppDomain.CurrentDomain.SetupInformation;
+			var domainSettings = AppDomain.CurrentDomain.SetupInformation;
 			if (_shelfType == ShelfType.Internal)
 			{
 				//_domainSettings.LoaderOptimization = LoaderOptimization.MultiDomain;
-				return;
+				return domainSettings;
 			}
 
-			_domainSettings.ShadowCopyFiles = "true";
+			domainSettings.ShadowCopyFiles = "true";
 
 			string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
 			string servicesDirectory = ConfigurationManager.AppSettings["MonitorDirectory"] ?? "Services";
 
-			_domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine(servicesDirectory, _serviceName));
-			_log.DebugFormat("[{0}].ApplicationBase = {1}", _serviceName, _domainSettings.ApplicationBase);
+			domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine(servicesDirectory, _serviceName));
+			_log.DebugFormat("[{0}].ApplicationBase = {1}", _serviceName, domainSettings.ApplicationBase);
 
-			_domainSettings.ConfigurationFile = Path.Combine(_domainSettings.ApplicationBase, _serviceName + ".config");
-			_log.DebugFormat("[{0}].ConfigurationFile = {1}", _serviceName, _domainSettings.ConfigurationFile);
+			domainSettings.ConfigurationFile = Path.Combine(_domainSettings.ApplicationBase, _serviceName + ".config");
+			_log.DebugFormat("[{0}].ConfigurationFile = {1}", _serviceName, domainSettings.ConfigurationFile);
+
+			return domainSettings;
 		}
 
 		public void CreateShelfChannel(Uri uri, string pipeName)
