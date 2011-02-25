@@ -24,30 +24,29 @@ namespace Stuff
         static void Main(string[] args)
         {
             XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
-            RunConfiguration cfg = RunnerConfigurator.New(x =>
-            {
-                x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
 
-                x.EnableDashboard();
-
-                x.RunAsFromCommandLine();
-
-                x.ConfigureService<TownCrier>(s =>
+            var h = HostFactory.New(x =>
                 {
-                    s.Named("TownCrier");
-                    s.HowToBuildService(name=> new TownCrier());
-                    s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop());
+                    x.AfterStoppingServices(n => Console.WriteLine("AfterStoppingServices action invoked, services are stopping"));
+
+                    x.EnableDashboard();
+                    
+                    x.Service<TownCrier>(s =>
+                        {
+                            s.SetServiceName("TownCrier");
+                            s.ConstructUsing(name => new TownCrier());
+                            s.WhenStarted(tc => tc.Start());
+                            s.WhenStopped(tc => tc.Stop());
+                        });
+
+                    x.RunAsLocalSystem();
+
+                    x.SetDescription("Sample Topshelf Host");
+                    x.SetDisplayName("Stuff");
+                    x.SetServiceName("stuff");
                 });
 
-                x.RunAsLocalSystem();
-
-                x.SetDescription("Sample Topshelf Host");
-                x.SetDisplayName("Stuff");
-                x.SetServiceName("stuff");
-            });
-
-            Runner.Host(cfg, args);
+            h.Run();
         }
     }
 }
