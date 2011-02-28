@@ -23,6 +23,9 @@
     <delete>
       <fileset basedir="${dirs.drop}\${folder.app.drop}">
         <include name="**/Magnum.*" />
+	<include name="**/Stact.*" />
+	<include name="**/Newtonsoft.*" />
+	<include name="**/Spark.dll" />
       </fileset>
     </delete>
   </target>

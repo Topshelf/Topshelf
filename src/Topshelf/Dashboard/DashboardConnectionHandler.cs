@@ -18,6 +18,7 @@ namespace Topshelf.Dashboard
 	using Model;
 	using Stact;
 	using Stact.Internal;
+	using Stact.MessageHeaders;
 	using Stact.ServerFramework;
 
 

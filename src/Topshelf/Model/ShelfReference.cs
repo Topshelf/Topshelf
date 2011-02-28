@@ -43,7 +43,7 @@ namespace Topshelf.Model
 			_shelfType = shelfType;
 			_controllerChannel = controllerChannel;
 
-			_domainSettings = ConfigureAppDomainSettings();
+			_domainSettings = ConfigureAppDomainSettings(_serviceName, _shelfType);
 
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
 		}
@@ -103,10 +103,10 @@ namespace Topshelf.Model
 			                       null, null, null);
 		}
 
-		AppDomainSetup ConfigureAppDomainSettings()
+		static AppDomainSetup ConfigureAppDomainSettings(string serviceName, ShelfType shelfType)
 		{
 			var domainSettings = AppDomain.CurrentDomain.SetupInformation;
-			if (_shelfType == ShelfType.Internal)
+			if (shelfType == ShelfType.Internal)
 			{
 				//_domainSettings.LoaderOptimization = LoaderOptimization.MultiDomain;
 				return domainSettings;
@@ -118,11 +118,11 @@ namespace Topshelf.Model
 
 			string servicesDirectory = ConfigurationManager.AppSettings["MonitorDirectory"] ?? "Services";
 
-			domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine(servicesDirectory, _serviceName));
-			_log.DebugFormat("[{0}].ApplicationBase = {1}", _serviceName, domainSettings.ApplicationBase);
+			domainSettings.ApplicationBase = Path.Combine(baseDirectory, Path.Combine(servicesDirectory, serviceName));
+			_log.DebugFormat("[{0}].ApplicationBase = {1}", serviceName, domainSettings.ApplicationBase);
 
-			domainSettings.ConfigurationFile = Path.Combine(_domainSettings.ApplicationBase, _serviceName + ".config");
-			_log.DebugFormat("[{0}].ConfigurationFile = {1}", _serviceName, domainSettings.ConfigurationFile);
+			domainSettings.ConfigurationFile = Path.Combine(domainSettings.ApplicationBase, serviceName + ".config");
+			_log.DebugFormat("[{0}].ConfigurationFile = {1}", serviceName, domainSettings.ConfigurationFile);
 
 			return domainSettings;
 		}

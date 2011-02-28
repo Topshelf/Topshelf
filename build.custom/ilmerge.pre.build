@@ -36,13 +36,14 @@
     <echo message="Copying files from '${dirs.drop}\${folder.app.drop}' to ${dirs.merge.from}."/>
 	<copy todir="${dirs.merge.from}">
 		<fileset basedir="${dirs.drop}\${folder.app.drop}">
-			<include name="Topshelf.dll" />
-			<include name="Magnum.dll" />
-            <include name="Spark.dll" />
-			<!-- i don't want this merged in -->
-            <include name="Stact.dll" />
-            <include name="Stact.ServerFramework.dll" />
-			<include name="log4net.dll" />
+		<include name="Topshelf.dll" />
+		<include name="Magnum.FileSystem.dll" />
+		<include name="Newtonsoft.Json.dll" />
+		<include name="Magnum.dll" />
+ 		<include name="Spark.dll" />
+            	<include name="Stact.dll" />
+            	<include name="Stact.ServerFramework.dll" />
+		<include name="log4net.dll" />
 		</fileset>
 	</copy>
   </target>
