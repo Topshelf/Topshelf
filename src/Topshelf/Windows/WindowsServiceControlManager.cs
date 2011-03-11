@@ -67,7 +67,7 @@ namespace Topshelf.Windows
 			                      IntPtr PreviousState, ref int ReturnLength);
 
 
-		[DllImport("advapi32.dll")]
+		[DllImport("advapi32.dll", CharSet=CharSet.Unicode)]
 		static extern bool
 			LookupPrivilegeValue(string lpSystemName, string lpName, ref long lpLuid);
 
