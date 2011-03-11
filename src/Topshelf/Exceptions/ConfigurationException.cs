@@ -15,6 +15,7 @@ namespace Topshelf.Exceptions
     using System;
     using System.Runtime.Serialization;
 
+	[Serializable]
     public class ConfigurationException :
         Exception
     {
