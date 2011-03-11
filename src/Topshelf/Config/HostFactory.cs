@@ -38,6 +38,9 @@ namespace Topshelf
 		{
 			try
 			{
+			    _log.InfoFormat(".Net Runtime {0}", Environment.Version);
+			    _log.InfoFormat("Topshelf v{0}", typeof(HostFactory).Assembly.GetName().Version);
+
 				New(configure)
 					.Run();
 			}
