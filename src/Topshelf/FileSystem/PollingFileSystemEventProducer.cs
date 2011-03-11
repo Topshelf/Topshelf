@@ -21,8 +21,6 @@ namespace Topshelf.FileSystem
 	using Magnum.Extensions;
 	using Magnum.FileSystem.Internal;
 	using Stact;
-	using Directory = Magnum.FileSystem.Directory;
-	using File = Magnum.FileSystem.File;
 
 
 	public class PollingFileSystemEventProducer :
@@ -173,14 +171,12 @@ namespace Topshelf.FileSystem
 			try
 			{
 				string hashValue;
-				using (FileStream f = System.IO.File.OpenRead(file))
+				using (FileStream f = File.OpenRead(file))
 				using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
 				{
 					byte[] fileHash = md5.ComputeHash(f);
 
 					hashValue = BitConverter.ToString(fileHash).Replace("-", "");
-
-					f.Close();
 				}
 
 				return new Guid(hashValue);
