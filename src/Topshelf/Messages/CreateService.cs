@@ -12,6 +12,10 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
+	using System;
+
+
+	[Serializable]
 	public class CreateService :
 		ServiceCommand
 	{
