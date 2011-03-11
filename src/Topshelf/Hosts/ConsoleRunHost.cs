@@ -62,9 +62,9 @@ namespace Topshelf.Hosts
 			finally
 			{
 				ShutdownCoordinator();
+			    _exit.Close();
+			    _exit = null;
 			}
-			_exit.Close();
-			_exit = null;
 		}
 
 		void ShutdownCoordinator()
