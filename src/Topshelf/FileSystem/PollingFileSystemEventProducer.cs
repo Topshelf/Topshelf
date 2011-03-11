@@ -178,8 +178,6 @@ namespace Topshelf.FileSystem
 					byte[] fileHash = md5.ComputeHash(f);
 
 					hashValue = BitConverter.ToString(fileHash).Replace("-", "");
-
-					f.Close();
 				}
 
 				return new Guid(hashValue);
