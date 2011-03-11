@@ -336,6 +336,12 @@ namespace Topshelf.Model
 					_channelConnection = null;
 				}
 
+                if(_updated != null && _updated.Implements<IDisposable>())
+                {
+                    var disp = (IDisposable)_updated;
+                    disp.Dispose();
+                }
+
 				_channel = null;
 			}
 
