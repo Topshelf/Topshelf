@@ -1,4 +1,4 @@
-// Copyright 2007-2008 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -17,12 +17,10 @@ namespace Topshelf.FileSystem
 	using System.IO;
 	using System.Linq;
 	using System.Security.Cryptography;
-	using Magnum.FileSystem.Events;
 	using Magnum.Extensions;
+	using Magnum.FileSystem.Events;
 	using Magnum.FileSystem.Internal;
 	using Stact;
-	using Directory = Magnum.FileSystem.Directory;
-	using File = Magnum.FileSystem.File;
 
 
 	public class PollingFileSystemEventProducer :
@@ -48,8 +46,9 @@ namespace Topshelf.FileSystem
 		/// <param name="fiber">Fiber to schedule on</param>
 		/// <param name="checkInterval">The maximal time between events or polls on a given file</param>
 		public PollingFileSystemEventProducer(string directory, UntypedChannel channel, Scheduler scheduler, Fiber fiber,
-											  TimeSpan checkInterval) :
-			this(directory, channel, scheduler, fiber, checkInterval, true)
+		                                      TimeSpan checkInterval)
+			:
+				this(directory, channel, scheduler, fiber, checkInterval, true)
 		{
 		}
 
@@ -63,7 +62,7 @@ namespace Topshelf.FileSystem
 		/// <param name="checkInterval">The maximal time between events or polls on a given file</param>
 		/// <param name="checkSubDirectory">Indicates if subdirectorys will be checked or ignored</param>
 		public PollingFileSystemEventProducer(string directory, UntypedChannel channel, Scheduler scheduler, Fiber fiber,
-											  TimeSpan checkInterval, bool checkSubDirectory)
+		                                      TimeSpan checkInterval, bool checkSubDirectory)
 		{
 			_directory = directory;
 			_channel = channel;
@@ -74,15 +73,15 @@ namespace Topshelf.FileSystem
 
 			_scheduledAction = scheduler.Schedule(3.Seconds(), _fiber, HashFileSystem);
 
-			ChannelAdapter myChannel = new ChannelAdapter();
+			var myChannel = new ChannelAdapter();
 
 			_connection = myChannel.Connect(connectionConfigurator =>
-			{
-				connectionConfigurator.AddConsumerOf<FileSystemChanged>().UsingConsumer(HandleFileSystemChangedAndCreated);
-				connectionConfigurator.AddConsumerOf<FileSystemCreated>().UsingConsumer(HandleFileSystemChangedAndCreated);
-				connectionConfigurator.AddConsumerOf<FileSystemRenamed>().UsingConsumer(HandleFileSystemRenamed);
-				connectionConfigurator.AddConsumerOf<FileSystemDeleted>().UsingConsumer(HandleFileSystemDeleted);
-			});
+				{
+					connectionConfigurator.AddConsumerOf<FileSystemChanged>().UsingConsumer(HandleFileSystemChangedAndCreated);
+					connectionConfigurator.AddConsumerOf<FileSystemCreated>().UsingConsumer(HandleFileSystemChangedAndCreated);
+					connectionConfigurator.AddConsumerOf<FileSystemRenamed>().UsingConsumer(HandleFileSystemRenamed);
+					connectionConfigurator.AddConsumerOf<FileSystemDeleted>().UsingConsumer(HandleFileSystemDeleted);
+				});
 
 			_fileSystemEventProducer = new FileSystemEventProducer(directory, myChannel, checkSubDirectory);
 		}
@@ -139,7 +138,7 @@ namespace Topshelf.FileSystem
 		{
 			try
 			{
-				Dictionary<string, Guid> newHashes = new Dictionary<string, Guid>();
+				var newHashes = new Dictionary<string, Guid>();
 
 				ProcessDirectory(newHashes, _directory);
 
@@ -157,7 +156,7 @@ namespace Topshelf.FileSystem
 
 		void ProcessDirectory(Dictionary<string, Guid> hashes, string baseDirectory)
 		{
-			string[] files = System.IO.Directory.GetFiles(baseDirectory);
+			string[] files = Directory.GetFiles(baseDirectory);
 
 			foreach (string file in files)
 			{
@@ -165,7 +164,7 @@ namespace Topshelf.FileSystem
 				hashes.Add(fullFileName, GenerateHashForFile(fullFileName));
 			}
 
-			System.IO.Directory.GetDirectories(baseDirectory).ToList().Each(dir => ProcessDirectory(hashes, dir));
+			Directory.GetDirectories(baseDirectory).ToList().Each(dir => ProcessDirectory(hashes, dir));
 		}
 
 		static Guid GenerateHashForFile(string file)
@@ -173,8 +172,8 @@ namespace Topshelf.FileSystem
 			try
 			{
 				string hashValue;
-				using (FileStream f = System.IO.File.OpenRead(file))
-				using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
+				using (FileStream f = File.OpenRead(file))
+				using (var md5 = new MD5CryptoServiceProvider())
 				{
 					byte[] fileHash = md5.ComputeHash(f);
 

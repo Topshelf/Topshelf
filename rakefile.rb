@@ -7,7 +7,7 @@ require 'albacore'
 RESULTS_DIR = "results"
 BUILD_NUMBER_BASE = "2.2.0"
 PRODUCT = "Topshelf"
-COPYRIGHT = 'Copyright 2007-2011 Travis Smith, Chris Patternson, Dru Sellers, et al. All rights reserved.';
+COPYRIGHT = 'Copyright 2007-2011 Travis Smith, Chris Patterson, Dru Sellers, et al. All rights reserved.';
 COMMON_ASSEMBLY_INFO = 'src/CommonAssemblyInfo.cs';
 CLR_TOOLS_VERSION = "v4.0.30319"
 
@@ -115,5 +115,5 @@ end
 
 desc "Build the nuget package"
 task :nuget do
-#	sh "lib/nuget.exe pack packaging/nuget/fubumvc.nuspec -o artifacts"
+#	sh "lib/nuget.exe pack packaging/nuget/topshelf.nuspec -o artifacts"
 end

@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -26,16 +26,16 @@ namespace Topshelf.Model
 		IDisposable
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ShelfReference");
+		readonly UntypedChannel _controllerChannel;
+		readonly AppDomainSetup _domainSettings;
 
 		readonly string _serviceName;
 		readonly ShelfType _shelfType;
-		readonly UntypedChannel _controllerChannel;
 		OutboundChannel _channel;
 		bool _disposed;
 		AppDomain _domain;
-		readonly AppDomainSetup _domainSettings;
-		ObjectHandle _objectHandle;
 		HostChannel _hostChannel;
+		ObjectHandle _objectHandle;
 
 		public ShelfReference(string serviceName, ShelfType shelfType, UntypedChannel controllerChannel)
 		{
@@ -48,12 +48,12 @@ namespace Topshelf.Model
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
 		}
 
-
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
+
 
 		public void Send<T>(T message)
 		{
@@ -99,13 +99,13 @@ namespace Topshelf.Model
 			Type shelfType = typeof(Shelf);
 
 			_objectHandle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
-			                       new object[] {bootstrapperType, _hostChannel.Address, _hostChannel.PipeName},
-			                       null, null, null);
+			                                       new object[] {bootstrapperType, _hostChannel.Address, _hostChannel.PipeName},
+			                                       null, null, null);
 		}
 
 		static AppDomainSetup ConfigureAppDomainSettings(string serviceName, ShelfType shelfType)
 		{
-			var domainSettings = AppDomain.CurrentDomain.SetupInformation;
+			AppDomainSetup domainSettings = AppDomain.CurrentDomain.SetupInformation;
 			if (shelfType == ShelfType.Internal)
 			{
 				//_domainSettings.LoaderOptimization = LoaderOptimization.MultiDomain;
@@ -145,7 +145,7 @@ namespace Topshelf.Model
 				return;
 			if (disposing)
 			{
-				if(_hostChannel != null)
+				if (_hostChannel != null)
 				{
 					_hostChannel.Dispose();
 					_hostChannel = null;
@@ -178,7 +178,7 @@ namespace Topshelf.Model
 
 		public void Unload()
 		{
-			if(_channel != null)
+			if (_channel != null)
 			{
 				_channel.Dispose();
 				_channel = null;

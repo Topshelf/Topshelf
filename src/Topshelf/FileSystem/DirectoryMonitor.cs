@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,6 +13,7 @@
 namespace Topshelf.FileSystem
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
 	using Magnum.Extensions;
@@ -31,12 +32,16 @@ namespace Topshelf.FileSystem
 		ChannelAdapter _channel;
 		ChannelConnection _connection;
 		bool _disposed;
+		TimeSpan _idlePeriod = 15.Seconds();
+		IDictionary<string, ScheduledOperation> _pendingNotifications;
 		PollingFileSystemEventProducer _producer;
 		Scheduler _scheduler;
 		IServiceChannel _serviceChannel;
 
 		public DirectoryMonitor(string directory, IServiceChannel serviceChannel)
 		{
+			_pendingNotifications = new Dictionary<string, ScheduledOperation>();
+
 			_baseDirectory = directory;
 			_serviceChannel = serviceChannel;
 			_fiber = new PoolFiber();
@@ -83,27 +88,33 @@ namespace Topshelf.FileSystem
 			_channel = new ChannelAdapter();
 
 			_producer = new PollingFileSystemEventProducer(_baseDirectory, _channel, _scheduler, new PoolFiber(),
-			                                               2.Minutes());
+			                                               10.Minutes());
 
-			_connection = _channel.Connect(config =>
+			_connection = _channel.Connect(x =>
 				{
-					config
-						.AddConsumerOf<FileSystemEvent>()
-						.BufferFor(3.Seconds())
-						.UseScheduler(_scheduler)
-						.Distinct(fsEvent => GetChangedDirectory(fsEvent.Path))
-						.UsingConsumer(fsEvents =>
-							{
-								fsEvents.Keys.Distinct().Each(key =>
-									{
-										if (key == _baseDirectory)
-											return;
-
-										_serviceChannel.Send(new ServiceFolderChanged(key));
-									});
-							})
+					x.AddConsumerOf<FileSystemEvent>()
+						.UsingConsumer(msg => ScheduleFolderChangeNotification(GetChangedDirectory(msg.Path)))
 						.HandleOnFiber(_fiber);
 				});
+		}
+
+		void ScheduleFolderChangeNotification(string directory)
+		{
+			if (directory == _baseDirectory)
+				return;
+
+			ScheduledOperation op;
+			if (_pendingNotifications.TryGetValue(directory, out op))
+			{
+				op.Cancel();
+				_pendingNotifications.Remove(directory);
+			}
+
+			_pendingNotifications.Add(directory, _scheduler.Schedule(_idlePeriod, _fiber, () =>
+				{
+					_serviceChannel.Send(new ServiceFolderChanged(directory));
+					_pendingNotifications.Remove(directory);
+				}));
 		}
 
 		public void Stop()
@@ -113,6 +124,8 @@ namespace Topshelf.FileSystem
 				_producer.Dispose();
 				_producer = null;
 			}
+
+			_pendingNotifications.Each(x => x.Value.Cancel());
 
 			if (_scheduler != null)
 			{

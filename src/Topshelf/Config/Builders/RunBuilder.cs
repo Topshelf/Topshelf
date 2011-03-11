@@ -76,7 +76,8 @@ namespace Topshelf.Builders
 
 		Host CreateHost(IServiceCoordinator coordinator)
 		{
-			if (Process.GetCurrentProcess().GetParent().ProcessName == "services")
+			var process = Process.GetCurrentProcess().GetParent();
+			if (process != null && process.ProcessName == "services")
 			{
 				_log.Debug("Running as a Windows service, using the service host");
 

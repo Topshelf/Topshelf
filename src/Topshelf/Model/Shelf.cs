@@ -21,7 +21,6 @@ namespace Topshelf.Model
 	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
-	using Magnum;
 	using Magnum.Extensions;
 	using Magnum.Reflection;
 	using Messages;
@@ -58,8 +57,14 @@ namespace Topshelf.Model
 			_log = LogManager.GetLogger("Topshelf.Shelf." + _serviceName);
 
 			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+			AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
 
 			Create();
+		}
+
+		void OnDomainUnload(object sender, EventArgs e)
+		{
+			LogManager.Shutdown();
 		}
 
 		public void Dispose()
@@ -192,7 +197,6 @@ namespace Topshelf.Model
 					{
 						_log.InfoFormat("[{0}] Unloading Shelf and AppDomain", _serviceName);
 						_controllerChannel.Send(m);
-						ThreadUtil.Sleep(1.Seconds());
 						Dispose();
 						AppDomain.Unload(AppDomain.CurrentDomain);
 					})
