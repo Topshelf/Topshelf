@@ -147,7 +147,6 @@ namespace Topshelf.Windows
 
 				if (controller != null)
 				{
-					controller.Close();
 					controller.Dispose();
 				}
 
