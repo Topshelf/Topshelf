@@ -21,30 +21,27 @@ namespace Topshelf.Bottles
 	using Stact;
 	using Stact.Internal;
 
-
 	public class BottleWatcher
 	{
 		Action<Directory> _actionToTake;
-		ChannelAdapter _eventChannel;
-		Func<Fiber> _fiberFactory = () => new SynchronousFiber();
-		Scheduler _scheduler;
-		PollingFileSystemEventProducer _watcher;
 
 		public IDisposable Watch(string directoryToWatch, Action<Directory> actionToTake)
 		{
+			_actionToTake = actionToTake;
+
+		    Func<Fiber> fiberFactory = () => new SynchronousFiber();
+
 			if (!System.IO.Directory.Exists(directoryToWatch))
 				System.IO.Directory.CreateDirectory(directoryToWatch);
 
-			_actionToTake = actionToTake;
-			_eventChannel = new ChannelAdapter();
-			_eventChannel.Connect(x => x.AddConsumerOf<FileCreated>().UsingConsumer(ProcessNewFile));
+			var eventChannel = new ChannelAdapter();
+			eventChannel.Connect(x => x.AddConsumerOf<FileCreated>().UsingConsumer(ProcessNewFile));
 
-			_scheduler = new TimerScheduler(_fiberFactory());
-			_watcher = new PollingFileSystemEventProducer(directoryToWatch, _eventChannel, _scheduler, _fiberFactory(),
+			Scheduler scheduler = new TimerScheduler(fiberFactory());
+			var watcher = new PollingFileSystemEventProducer(directoryToWatch, eventChannel, scheduler, fiberFactory(),
 			                                              1.Seconds());
 
-
-			return _watcher;
+			return watcher;
 		}
 
 		void ProcessNewFile(FileCreated message)
@@ -63,5 +60,7 @@ namespace Topshelf.Bottles
 				}
 			}
 		}
+
+
 	}
 }
