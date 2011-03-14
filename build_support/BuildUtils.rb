@@ -8,6 +8,7 @@ class NUnitRunner
 		@resultsDir = paths.fetch(:results, 'results')
 		@compilePlatform = paths.fetch(:platform, '')
 		@compileTarget = paths.fetch(:compilemode, 'debug')
+		@framework = paths.fetch(:target_framework_version, 'v4.0')
 	
 		@nunitExe = File.join('lib', 'nunit', 'net-2.0', "nunit-console#{(@compilePlatform.empty? ? '' : "-#{@compilePlatform}")}.exe").gsub('/','\\') + ' /nothread'
 	end
@@ -17,7 +18,7 @@ class NUnitRunner
 		
 		assemblies.each do |assem|
 			file = File.expand_path("#{@sourceDir}/#{assem}/bin/#{@compileTarget}/#{assem}.dll")
-			sh "#{@nunitExe} \"#{file}\""
+			sh "#{@nunitExe} \"#{file}\" /framework=#{@framework}"
 		end
 	end
 end

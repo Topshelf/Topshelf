@@ -10,12 +10,17 @@ PRODUCT = "Topshelf"
 COPYRIGHT = 'Copyright 2007-2011 Travis Smith, Chris Patterson, Dru Sellers, et al. All rights reserved.';
 COMMON_ASSEMBLY_INFO = 'src/CommonAssemblyInfo.cs';
 CLR_TOOLS_VERSION = "v4.0.30319"
+# Either "NET35" or "NET40".
+BUILD_CONFIG_KEY = "NET40"
 
 props = { 
     :stage => File.expand_path("build_output"),
     :stage_merged => File.expand_path("build_merged"), 
-    :artifacts => File.expand_path("build_artifacts") 
+    :artifacts => File.expand_path("build_artifacts"),
+	:target_framework_version => (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
 }
+
+ 
 
 desc "Displays a list of tasks"
 task :help do
@@ -83,7 +88,11 @@ end
 
 desc "Compiles the app"
 task :compile => [:clean, :version] do
-  MSBuildRunner.compile :compilemode => COMPILE_TARGET, :solutionfile => 'src/Topshelf.sln', :clrversion => CLR_TOOLS_VERSION
+  MSBuildRunner.compile :compilemode => COMPILE_TARGET, 
+	:solutionfile => 'src/Topshelf.sln', 
+	:clrversion => CLR_TOOLS_VERSION,
+	:properties => ["BuildConfigKey=#{BUILD_CONFIG_KEY}", 
+					"TargetFrameworkVersion=#{props[:target_framework_version]}"]
   
   copyOutputFiles "bin/", "*.{dll,pdb}", props[:stage]
 end
@@ -99,7 +108,11 @@ task :test => [:unit_test]
 
 desc "Runs unit tests"
 task :unit_test => :compile do
-  runner = NUnitRunner.new :compilemode => COMPILE_TARGET, :source => 'src', :platform => 'x86'
+  runner = NUnitRunner.new :compilemode => COMPILE_TARGET, 
+	:source => 'src', 
+	:platform => 'x86',
+	:target_framework_version => props[:target_framework_version]
+	
   runner.executeTests ['Topshelf.Specs']
 end
 

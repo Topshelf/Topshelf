@@ -12,6 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
+	using System;
+
+	[Serializable]
 	public abstract class ServiceCommand
 	{
 		protected ServiceCommand(string serviceName)
