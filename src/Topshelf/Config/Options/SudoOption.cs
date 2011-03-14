@@ -15,21 +15,12 @@ namespace Topshelf.Options
 	using HostConfigurators;
 
 
-	public class ServiceAccountOption :
+	public class SudoOption :
 		Option
 	{
-		readonly string _password;
-		readonly string _username;
-
-		public ServiceAccountOption(string username, string password)
-		{
-			_username = username;
-			_password = password;
-		}
-
 		public void ApplyTo(HostConfigurator configurator)
 		{
-			configurator.RunAs(_username, _password);
+			configurator.AddConfigurator(new SudoConfigurator());
 		}
 	}
 }
