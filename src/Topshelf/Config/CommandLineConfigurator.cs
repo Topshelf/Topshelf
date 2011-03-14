@@ -41,6 +41,8 @@ namespace Topshelf
 			      	    select (Option)new UninstallOption())
 			      	.Or(from arg in x.Argument("start")
 			      	    select (Option)new StartOption())
+			      	.Or(from arg in x.Argument("help")
+			      	    select (Option)new HelpOption())
 			      	.Or(from arg in x.Argument("stop")
 			      	    select (Option)new StopOption())
 			      	.Or(from arg in x.Switch("sudo")
@@ -52,6 +54,8 @@ namespace Topshelf
 			      	    select (Option)new ServiceAccountOption(username.Value, password.Value))
 			      	.Or(from autostart in x.Switch("autostart")
 			      	    select (Option)new AutostartOption())
+			      	.Or(from autostart in x.Switch("help")
+			      	    select (Option)new HelpOption())
 			      	.Or(from instance in x.Definition("instance")
 			      	    select (Option)new InstanceOption(instance.Value)));
 		}

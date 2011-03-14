@@ -13,9 +13,7 @@
 namespace Topshelf
 {
 	using System;
-	using System.IO;
 	using Configuration;
-	using log4net;
 
 
 	/// <summary>
