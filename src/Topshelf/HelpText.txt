@@ -9,21 +9,21 @@ Command-Line Reference
 
     install             Installs the service
 
-      -autostart        Specifies that the service should start automatically
+      --autostart        Specifies that the service should start automatically
       -instance         Specifies an instance name if registering the service
                         multiple times
       -username         The username to run the service
       -password         The password for the specified username
-      -localservice     Run the service with the local service account
-      -networkservice   Run the service with the network service permission
-      -start            Start the service after it has been installed
-      -sudo             Prompts for UAC if running on Vista/W7/2008
+      --localservice     Run the service with the local service account
+      --networkservice   Run the service with the network service permission
+      start            Start the service after it has been installed
+      --sudo             Prompts for UAC if running on Vista/W7/2008
 
     uninstall           Uninstalls the service
 
       -instance         Specifies an instance name if registering the service
                         multiple times
-      -sudo             Prompts for UAC if running on Vista/W7/2008
+      --sudo             Prompts for UAC if running on Vista/W7/2008
 
 Examples:
 
