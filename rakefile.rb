@@ -136,22 +136,24 @@ task :integration_tests => [:prepare_examples] do
 	puts "TODO: Integration tests."
 end
 
-desc "Runs the performance tests (a form of integation tests arguably)"
+desc "Runs the performance tests (a form of integation tests arguably)."
 task :perf_tests => [:compile] do
 	puts "TODO: Performance tests."
 end
 
 desc "Target used for the CI server. It both builds, tests and packages."
-task :ci => [:default, :package]
+task :ci => [:default, :package, :moma]
 
-desc "ZIPs up the build results"
+desc "ZIPs up the build results and runs the MoMA analyzer."
 zip :package do |zip|
 	zip.directories_to_zip = [props[:stage]]
 	zip.output_file = 'topshelf.zip'
 	zip.output_path = [props[:artifacts]]
 end
 
+desc "Runs the MoMA mono analyzer on the project files. Start the executable manually without --nogui to update the profiles once in a while though, or you'll always get the same report from the analyzer."
 task :moma => [:compile] do
+	puts "Analyzing project fitness for mono:"
 	dlls = project_outputs(props).join(' ')
 	sh "lib/MoMA/MoMA.exe --nogui --out #{File.join(props[:artifacts], 'MoMA-report.html')} #{dlls}"
 end

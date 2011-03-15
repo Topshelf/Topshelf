@@ -46,3 +46,6 @@ Examples:
 		If you are trying to use the Shelving feature, this will install
 		the host service. The host is a service in itself and hosts your
 		services in different AppDomains.
+
+		When it's installed run:
+		Topshelf.Host start

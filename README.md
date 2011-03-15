@@ -40,6 +40,7 @@ We are currently working on more documentation in order to get started. In princ
     `<TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.0</TargetFrameworkVersion 
    
    Change `v4.0` to `v3.5`. The build script itself won't be affected by this change, but it'll help Visual Studio know what version we're building for.
+  3. Edit Topshelf.Host/app.config and uncomment the supportedRuntime- and runtime-elements.
    
 ### Contributing 
 
