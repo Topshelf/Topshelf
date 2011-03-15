@@ -20,7 +20,7 @@ namespace Topshelf
 
 	public class Program
 	{
-		static readonly ILog _log = LogManager.GetLogger(Host.DefaultServiceName);
+		static readonly ILog _log = LogManager.GetLogger(ShelfHost.DefaultServiceName);
 
 		[LoaderOptimization(LoaderOptimization.MultiDomainHost)]
 		static void Main()
@@ -33,18 +33,18 @@ namespace Topshelf
 
 					x.AfterStartingServices(() => { Console.WriteLine("[Topshelf] All services have been started"); });
 
-					x.SetServiceName(Host.DefaultServiceName);
-					x.SetDisplayName(Host.DefaultServiceName);
+					x.SetServiceName(ShelfHost.DefaultServiceName);
+					x.SetDisplayName(ShelfHost.DefaultServiceName);
 					x.SetDescription("Topshelf Service Host");
 
 					x.RunAsLocalSystem();
 
 					x.EnableDashboard();
 
-					x.Service<Host>(y =>
+					x.Service<ShelfHost>(y =>
 						{
-							y.SetServiceName(Host.DefaultServiceName);
-							y.ConstructUsing((name, coordinator) => new Host(coordinator));
+							y.SetServiceName(ShelfHost.DefaultServiceName);
+							y.ConstructUsing((name, coordinator) => new ShelfHost(coordinator));
 							y.WhenStarted(host => host.Start());
 							y.WhenStopped(host => host.Stop());
 						});
