@@ -42,11 +42,22 @@ task :help do
   end
 end
 
+class MSILMerge
+  include Albacore::Task
+  include Albacore::RunCommand
+
+  def execute
+	puts "Running ilmerge"
+	run_command "lib/ILMerge/ILMerge.exe"
+	#, "/internalize:build.custom/ilmerge.internalize.ignore.txt /target:dll /out:code_drop/#{OUTPUT_PATH}/Topshelf.dll /log:code_drop/ilmerge.log /ndebug /allowDup Topshelf.dll Magnum.dll Newtonsoft.Json.dll Spark.dll Stact.dll Stact.ServerFramework.dll"
+  end
+end
+
 desc "Compiles, unit tests, generates the database"
 task :all => [:default]
 
 desc "**Default**, compiles and runs tests"
-task :default => [:clean, :compile, :tests, :prepare_examples]
+task :default => [:clean, :compile, :tests, :prepare_examples, :ilmerge]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
@@ -92,6 +103,9 @@ task :compile => [:global_version, :run_msbuild] do
 	
 	puts 'Copying files relevant for \'Shelving\'.'
 	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe,config,xml}", File.join( props[:stage], OUTPUT_PATH, 'for_shelving' )
+end
+
+msilmerge :ilmerge do |ilm|
 end
 
 desc "Prepare examples"
