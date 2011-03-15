@@ -3,34 +3,33 @@ require 'erb'
 class NUnitRunner
 	include FileTest
 
-	def initialize(paths)
-		@sourceDir = paths.fetch(:source, 'source')
-		@resultsDir = paths.fetch(:results, 'results')
-		@compilePlatform = paths.fetch(:platform, '')
-		@compileTarget = paths.fetch(:compilemode, 'debug')
-		@framework = paths.fetch(:target_framework_version, 'v4.0')
-	
-		@nunitExe = File.join('lib', 'nunit', 'net-2.0', "nunit-console#{(@compilePlatform.empty? ? '' : "-#{@compilePlatform}")}.exe").gsub('/','\\') + ' /nothread'
+	def initialize(command, working_directory, framework, flags)
+		@command = command
+		@working_directory = working_directory
+		@framework = framework || 'v4.0'
+		@flags = flags
+		
+		# prepare the command
+		@cmd = "#{command} /framework=#{@framework}"
+		@cmd += ' ' + @flags.join(' ') unless @flags.nil?
 	end
 	
-	def executeTests(assemblies)
-		Dir.mkdir @resultsDir unless exists?(@resultsDir)
-		
+	def run(assemblies)
 		assemblies.each do |assem|
-			file = File.expand_path("#{@sourceDir}/#{assem}/bin/#{@compileTarget}/#{assem}.dll")
-			sh "#{@nunitExe} \"#{file}\" /framework=#{@framework}"
+			file = File.expand_path("#{@working_directory}/#{assem}")
+			sh "#{@cmd} \"#{file}\""
 		end
 	end
 end
 
 class MSBuildRunner
 	def self.compile(attributes)
-		compileTarget = attributes.fetch(:compilemode, 'debug')
+		build_config = attributes.fetch(:build_config)
 	    solutionFile = attributes[:solutionfile]
 	    
 	    attributes[:projFile] = solutionFile
 	    attributes[:properties] ||= []
-	    attributes[:properties] << "Configuration=#{compileTarget}"
+	    attributes[:properties] << "Configuration=#{build_config}"
 	    attributes[:extraSwitches] = ["maxcpucount:2", "v:m", "t:rebuild"]
 		
 		self.runProjFile(attributes);
@@ -38,7 +37,7 @@ class MSBuildRunner
 	
 	def self.runProjFile(attributes)
 		version = attributes.fetch(:clrversion, 'v4.0.30319')
-		compileTarget = attributes.fetch(:compilemode, 'debug')
+		build_config = attributes.fetch(:build_config, 'debug')
 	    projFile = attributes[:projFile]
 		
 		frameworkDir = File.join(ENV['windir'].dup, 'Microsoft.NET', 'Framework', version)
