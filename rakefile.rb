@@ -43,7 +43,7 @@ desc "Compiles, unit tests, generates the database"
 task :all => [:default]
 
 desc "**Default**, compiles and runs tests"
-task :default => [:clean, :compile, :tests]
+task :default => [:clean, :compile, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
@@ -82,11 +82,22 @@ task :clean do
 	Dir.mkdir props[:artifacts] unless exists?(props[:artifacts])
 end
 
-desc "Cleans, versions and compiles the application."
+desc "Cleans, versions, compiles the application and generates build_output/."
 task :compile => [:global_version, :run_msbuild] do
-	['Topshelf','Topshelf.Host'].each{ |proj|
-		copyOutputFiles "src/#{proj}/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe}", props[:stage]
-	}
+	puts 'Copying files relevant for \'Linking\''
+	copyOutputFiles "src/Topshelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,config,xml}", File.join( props[:stage], 'for_linking' )
+	
+	puts 'Copying files relevant for \'Shelving\'.'
+	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe,config,xml}", File.join( props[:stage], 'for_shelving' )
+end
+
+desc "Prepare examples"
+task :prepare_examples => [:compile] do
+	puts "Preparing samples"
+	for_shelving = File.join(props[:stage], 'for_shelving')
+	targ = File.join(for_shelving, 'Services', 'clock' )
+	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,xml,config}", targ
+	copy('doc/Using Shelving.txt', for_shelving)
 end
 
 desc "Only compiles the application."
@@ -99,9 +110,10 @@ msbuild :run_msbuild do |msb|
 end
 
 def copyOutputFiles(fromDir, filePattern, outDir)
-  Dir.glob(File.join(fromDir, filePattern)){|file|
-	copy(file, outDir) if File.file?(file)
-  } 
+	FileUtils.mkdir_p outDir unless exists?(outDir)
+	Dir.glob(File.join(fromDir, filePattern)){|file|
+		copy(file, outDir) if File.file?(file)
+	}
 end
 
 task :tests => [:unit_tests, :integration_tests, :perf_tests]
@@ -119,7 +131,7 @@ task :unit_tests => [:compile] do
 end
 
 desc "Runs the integation tests"
-task :integration_tests => [:compile] do 
+task :integration_tests => [:prepare_examples] do 
 	puts "TODO: Integration tests."
 end
 

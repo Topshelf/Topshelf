@@ -29,9 +29,9 @@ namespace Topshelf
 
 			HostFactory.Run(x =>
 				{
-					x.BeforeStartingServices(() => { Console.WriteLine("[Topshelf] Preparing to start host services"); });
+					x.BeforeStartingServices(() => Console.WriteLine("[Topshelf] Preparing to start host services"));
 
-					x.AfterStartingServices(() => { Console.WriteLine("[Topshelf] All services have been started"); });
+					x.AfterStartingServices(() => Console.WriteLine("[Topshelf] All services have been started"));
 
 					x.SetServiceName(ShelfHost.DefaultServiceName);
 					x.SetDisplayName(ShelfHost.DefaultServiceName);
@@ -49,7 +49,7 @@ namespace Topshelf
 							y.WhenStopped(host => host.Stop());
 						});
 
-					x.AfterStoppingServices(() => { Console.WriteLine("[Topshelf] All services have been stopped"); });
+					x.AfterStoppingServices(() => Console.WriteLine("[Topshelf] All services have been stopped"));
 				});
 
 			// shutdown log4net just before we exit!
