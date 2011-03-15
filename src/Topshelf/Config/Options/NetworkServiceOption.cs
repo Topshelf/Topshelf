@@ -10,41 +10,17 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Options
 {
-	using System;
 	using HostConfigurators;
-	using log4net;
 
 
-	public static class HostFactory
+	public class NetworkServiceOption :
+		Option
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf");
-
-		public static Host New(Action<HostConfigurator> configure)
+		public void ApplyTo(HostConfigurator configurator)
 		{
-			var configurator = new HostConfiguratorImpl();
-
-			configure(configurator);
-
-			configurator.ApplyCommandLine();
-
-			configurator.Validate();
-
-			return configurator.CreateHost();
-		}
-
-		public static void Run(Action<HostConfigurator> configure)
-		{
-			try
-			{
-				New(configure)
-					.Run();
-			}
-			catch (Exception ex)
-			{
-				_log.Error("The service exited abnormally with an exception", ex);
-			}
+			configurator.RunAsNetworkService();
 		}
 	}
 }

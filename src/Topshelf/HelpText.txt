@@ -1,0 +1,44 @@
+﻿Topshelf is a library that simplifies the creation of Windows services using .NET.
+
+Command-Line Reference
+
+  service.exe [verb] [-option:value] [-switch]
+
+    run                 Runs the service from the command line (default)
+    help, --help        Displays help
+
+    install             Installs the service
+
+      --autostart        Specifies that the service should start automatically
+      -instance         Specifies an instance name if registering the service
+                        multiple times
+      -username         The username to run the service
+      -password         The password for the specified username
+      --localservice     Run the service with the local service account
+      --networkservice   Run the service with the network service permission
+      start            Start the service after it has been installed
+      --sudo             Prompts for UAC if running on Vista/W7/2008
+
+    uninstall           Uninstalls the service
+
+      -instance         Specifies an instance name if registering the service
+                        multiple times
+      --sudo             Prompts for UAC if running on Vista/W7/2008
+
+Examples:
+
+    service install
+        Installs the service into the service control manager
+
+    service install -username:joe -password:bob -autostart
+        Installs the service using the specified username/password and
+        configures the service to start automatically at machine startup
+
+    service uninstall
+        Uninstalls the service
+
+    service install -instance:001
+        Installs the service, appending the instance name to the service name
+        so that the service can be installed multiple times. You may need to
+        tweak the log4net.config to make this play nicely with the log files.
+

@@ -15,12 +15,15 @@ namespace Topshelf.HostConfigurators
 	using System;
 	using System.Collections.Generic;
 	using Builders;
+	using log4net;
 	using Magnum.Extensions;
 
 
 	public class HostConfiguratorImpl :
 		HostConfigurator
 	{
+		static readonly ILog _log = LogManager.GetLogger("Topshelf");
+
 		readonly IList<HostBuilderConfigurator> _configurators;
 		readonly WindowsServiceDescription _description;
 		Func<ServiceDescription, HostBuilder> _builderFactory;
@@ -81,6 +84,9 @@ namespace Topshelf.HostConfigurators
 
 		public Host CreateHost()
 		{
+			_log.InfoFormat("Topshelf v{0}, .NET Framework v{1}", typeof(HostFactory).Assembly.GetName().Version,
+				Environment.Version);
+
 			HostBuilder builder = _builderFactory(_description);
 
 			foreach (HostBuilderConfigurator configurator in _configurators)

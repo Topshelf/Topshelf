@@ -10,40 +10,40 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Hosts
 {
 	using System;
-	using HostConfigurators;
-	using log4net;
+	using System.IO;
+	using System.Reflection;
 
 
-	public static class HostFactory
+	public class HelpHost :
+		Host
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf");
+		readonly ServiceDescription _description;
 
-		public static Host New(Action<HostConfigurator> configure)
+		public HelpHost(ServiceDescription description)
 		{
-			var configurator = new HostConfiguratorImpl();
-
-			configure(configurator);
-
-			configurator.ApplyCommandLine();
-
-			configurator.Validate();
-
-			return configurator.CreateHost();
+			_description = description;
 		}
 
-		public static void Run(Action<HostConfigurator> configure)
+		public void Run()
 		{
-			try
+			const string helpText = "Topshelf.HelpText.txt";
+
+			Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(helpText);
+			if (stream == null)
 			{
-				New(configure)
-					.Run();
+				Console.WriteLine("Unable to load help text");
+				return;
 			}
-			catch (Exception ex)
+
+			using (stream)
+			using (TextReader reader = new StreamReader(stream))
 			{
-				_log.Error("The service exited abnormally with an exception", ex);
+				string text = reader.ReadToEnd();
+
+				Console.WriteLine(text);
 			}
 		}
 	}

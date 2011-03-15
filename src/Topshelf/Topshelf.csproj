@@ -99,6 +99,7 @@
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
     <Compile Include="Configuration\Dsl\RunnerExtensions.cs" />
+    <Compile Include="Config\Builders\HelpBuilder.cs" />
     <Compile Include="Config\Builders\ShelfBuilder.cs" />
     <Compile Include="Config\Builders\StartBuilder.cs" />
     <Compile Include="Config\Builders\StopBuilder.cs" />
@@ -108,8 +109,12 @@
     <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
     <Compile Include="Config\HostConfigurators\StartConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\SudoConfigurator.cs" />
+    <Compile Include="Config\Options\HelpOption.cs" />
+    <Compile Include="Config\Options\LocalServiceOption.cs" />
+    <Compile Include="Config\Options\NetworkServiceOption.cs" />
     <Compile Include="Config\Options\StartOption.cs" />
     <Compile Include="Config\Options\StopOption.cs" />
+    <Compile Include="Config\Options\SudoOption.cs" />
     <Compile Include="Config\RecoveryConfigurators\RunProgramConfigurator.cs" />
     <Compile Include="Config\RecoveryConfigurators\FailureConfigurator.cs" />
     <Compile Include="Config\RecoveryConfigurators\FailureConfiguratorImpl.cs" />
@@ -168,6 +173,7 @@
     <Compile Include="FileSystem\PollingFileSystemEventProducer.cs" />
     <Compile Include="HostConfigurationException.cs" />
     <Compile Include="HostException.cs" />
+    <Compile Include="Hosts\HelpHost.cs" />
     <Compile Include="Hosts\InstallHost.cs" />
     <Compile Include="Hosts\AbstractInstallerHost.cs" />
     <Compile Include="Hosts\ShelfHost.cs" />
@@ -266,6 +272,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HelpText.txt" />
     <Content Include="Bottles\_About Bottles.txt" />
     <Content Include="Messages\_About Messages.txt" />
   </ItemGroup>
