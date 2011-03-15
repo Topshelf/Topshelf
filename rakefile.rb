@@ -9,7 +9,7 @@ BUILD_NUMBER_BASE = '2.2.1'
 PRODUCT = 'Topshelf'
 CLR_TOOLS_VERSION = 'v4.0.30319'
 
-BUILD_CONFIG = ENV['BUILD_CONFIG'] || "Debug"
+BUILD_CONFIG = ENV['BUILD_CONFIG'] || "Release"
 BUILD_CONFIG_KEY = ENV['BUILD_CONFIG_KEY'] || 'NET40'
 BUILD_PLATFORM = ENV['BUILD_PLATFORM'] || 'x86' # we might want to vary this a little
 TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
@@ -21,7 +21,7 @@ props = {
 	:projects => ["Topshelf", "Topshelf.Host"]
 }
 
-puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION}."
+puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION} in #{BUILD_CONFIG}-mode."
  
 desc "Displays a list of tasks"
 task :help do
@@ -49,13 +49,9 @@ task :default => [:clean, :compile, :tests, :prepare_examples]
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
   asm_version = BUILD_NUMBER_BASE + ".0"
-  
-  begin
-    commit = `git log -1 --pretty=format:%H`
-	commit_date = `git log -1 --pretty=format:%ai`
-  rescue
-    commit = "git unavailable"
-  end
+  commit_data = get_commit_hash_and_date
+  commit = commit_data[0]
+  commit_date = commit_data[1]
   build_number = "#{BUILD_NUMBER_BASE}.#{Date.today.strftime('%y%j')}"
   tc_build_number = ENV["BUILD_NUMBER"]
   puts "##teamcity[buildNumber '#{build_number}-#{tc_build_number}']" unless tc_build_number.nil?
@@ -99,6 +95,10 @@ task :prepare_examples => [:compile] do
 	targ = File.join(for_shelving, 'Services', 'clock' )
 	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,xml,config}", targ
 	copy('doc/Using Shelving.txt', for_shelving)
+	commit_data = get_commit_hash_and_date
+	what_commit = File.new File.join(props[:stage], "#{commit_data[0]} - #{commit_data[1]}.txt"), "w"
+	what_commit.puts "The file name denotes what commit these files were built off of. You can also find that information in the assembly info accessible through code."
+	what_commit.close
 end
 
 desc "Only compiles the application."
@@ -158,6 +158,8 @@ task :moma => [:compile] do
 	sh "lib/MoMA/MoMA.exe --nogui --out #{File.join(props[:artifacts], 'MoMA-report.html')} #{dlls}"
 end
 
+# TODO: create tasks for installing and running samples!
+
 desc "Builds the nuget package"
 task :nuget do
 #	sh "lib/nuget.exe pack packaging/nuget/topshelf.nuspec -o artifacts"
@@ -169,6 +171,18 @@ def project_outputs(props)
 		find_all{ |path| exists?(path) }
 end
 
+def get_commit_hash_and_date
+	begin
+		commit = `git log -1 --pretty=format:%H`
+		git_date = `git log -1 --date=iso --pretty=format:%ad`
+		commit_date = DateTime.parse( git_date ).strftime("%Y-%m-%d %H%M%S")
+	rescue
+		commit = "git unavailable"
+	end
+	
+	[commit, commit_date]
+end
+
 def waitfor(&block)
 	checks = 0
 	
@@ -177,5 +191,5 @@ def waitfor(&block)
 		checks += 1
 	end
 	
-	raise 'waitfor timeout expired' if checks > 10
+	raise 'waitfor timeout expired. make sure that you aren\'t running something from the build output folders' if checks > 10
 end
