@@ -43,6 +43,9 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\SolutionVersion.cs">
+      <Link>SolutionVersion.cs</Link>
+    </Compile>
     <Compile Include="AShelvedClock.cs" />
     <Compile Include="ClockFailureMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

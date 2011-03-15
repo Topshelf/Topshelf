@@ -5,14 +5,13 @@ require File.dirname(__FILE__) + "/build_support/BuildUtils.rb"
 include FileTest
 require 'albacore'
 
-RESULTS_DIR = 'results'
 BUILD_NUMBER_BASE = '2.2.1'
 PRODUCT = 'Topshelf'
 CLR_TOOLS_VERSION = 'v4.0.30319'
 
 BUILD_CONFIG = ENV['BUILD_CONFIG'] || "Debug"
 BUILD_CONFIG_KEY = ENV['BUILD_CONFIG_KEY'] || 'NET40'
-BUILD_PLATFORM = ENV['BUILD_PLATFORM'] || 'x86'
+BUILD_PLATFORM = ENV['BUILD_PLATFORM'] || 'x86' # we might want to vary this a little
 TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
 
 props = { 
@@ -25,7 +24,6 @@ puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION}."
  
 desc "Displays a list of tasks"
 task :help do
-  
 
   taskHash = Hash[*(`rake.bat -T`.split(/\n/).collect { |l| l.match(/rake (\S+)\s+\#\s(.+)/).to_a }.collect { |l| [l[1], l[2]] }).flatten] 
  
@@ -47,26 +45,31 @@ task :all => [:default]
 desc "**Default**, compiles and runs tests"
 task :default => [:clean, :compile, :tests]
 
-desc "Update the version information for the build"
-assemblyinfo :version do |asm|
+desc "Update the common version information for the build. You can call this task without building."
+assemblyinfo :global_version do |asm|
   asm_version = BUILD_NUMBER_BASE + ".0"
   
   begin
     commit = `git log -1 --pretty=format:%H`
+	commit_date = `git log -1 --pretty=format:%ai`
   rescue
     commit = "git unavailable"
   end
   build_number = "#{BUILD_NUMBER_BASE}.#{Date.today.strftime('%y%j')}"
   tc_build_number = ENV["BUILD_NUMBER"]
   puts "##teamcity[buildNumber '#{build_number}-#{tc_build_number}']" unless tc_build_number.nil?
-  asm.trademark = commit
+  
+  # Assembly file config
   asm.product_name = PRODUCT
-  asm.description = build_number
+  asm.description = "Topshelf is an open source project for hosting services without friction. Either link Topshelf to your program and it *becomes* a service installer or use Topshelf.Host to shelf your services by placing them in subfolders of the 'Services' folder under the folder of Topshelf.Host.exe. github.com/Topshelf. topshelf-project.com. Original author company: CFT & ACM."
   asm.version = asm_version
   asm.file_version = build_number
-  asm.custom_attributes :AssemblyInformationalVersion => asm_version
+  asm.custom_attributes :AssemblyInformationalVersion => "#{asm_version} - #{commit} - #{commit_date}",
+	:ComVisibleAttribute => false,
+	:CLSCompliantAttribute => true
   asm.copyright = COPYRIGHT
   asm.output_file = 'src/SolutionVersion.cs'
+  asm.namespaces "System", "System.Reflection", "System.Runtime.InteropServices", "System.Security"
 end
 
 desc "Prepares the working directory for a new build"
@@ -80,8 +83,10 @@ task :clean do
 end
 
 desc "Cleans, versions and compiles the application."
-task :compile => [:version, :run_msbuild] do
-  copyOutputFiles "bin/", "*.{dll,pdb}", props[:stage]
+task :compile => [:global_version, :run_msbuild] do
+	['Topshelf','Topshelf.Host'].each{ |proj|
+		copyOutputFiles "src/#{proj}/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe}", props[:stage]
+	}
 end
 
 desc "Only compiles the application."
@@ -94,7 +99,7 @@ msbuild :run_msbuild do |msb|
 end
 
 def copyOutputFiles(fromDir, filePattern, outDir)
-  Dir.glob(File.join(fromDir, filePattern)){|file| 		
+  Dir.glob(File.join(fromDir, filePattern)){|file|
 	copy(file, outDir) if File.file?(file)
   } 
 end

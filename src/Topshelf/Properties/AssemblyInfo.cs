@@ -3,6 +3,9 @@ using System.Management.Instrumentation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+// Put a title on the individual assembly!
+[assembly: AssemblyTitle("Topshelf")]
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.

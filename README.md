@@ -23,12 +23,15 @@ We are currently working on more documentation in order to get started. In princ
 
  1. Clone the source down to your machine. 
    `git clone git://github.com/Topshelf/Topshelf.git`
- 2. Run `build.bat`. NOTE: You must have git on the path (open a regular command line and type git).
- 3. OR: Run `rake`. You can build for .Net 3.5 with 
+ 2. Download git, ruby and gems. Install -- a tutorial is here: [http://guides.rubyonrails.org/command_line.html]
+ 3. Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
+	* You must have git on the path in order to do this. (Right click on `Computer` > `Advanced System Settings`, `Advanced` (tab) > `Environment Variables...` > Append the git executable's directory at the end of the PATH environment variable.
+ 4. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.
+ 5. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below:
 
 #### Editing in Visual Studio
 
- 1. Run `rake` in the root folder.
+ 1. Run `rake global_version` in the root folder.
  2. Double-click/open the .sln file.
  
  You can alternatively edit and build for .Net 3.5 instead of .Net 4.0 with this step:

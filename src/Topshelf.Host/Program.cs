@@ -51,6 +51,9 @@ namespace Topshelf
 
 					x.AfterStoppingServices(() => { Console.WriteLine("[Topshelf] All services have been stopped"); });
 				});
+
+			// shutdown log4net just before we exit!
+			LogManager.Shutdown();
 		}
 
 		static void BootstrapLogger()
@@ -59,7 +62,13 @@ namespace Topshelf
 
 			var configurationFile = new FileInfo(configurationFilePath);
 
-			XmlConfigurator.ConfigureAndWatch(configurationFile);
+			// if we can't find the log4net configuration file, perform a basic configuration which at
+			// least logs to trace/debug, which means we can attach a debugger
+			// to the process!
+			if (configurationFile.Exists)
+				XmlConfigurator.ConfigureAndWatch(configurationFile);
+			else
+				BasicConfigurator.Configure();
 
 			_log.DebugFormat("Logging configuration loaded: {0}", configurationFilePath);
 		}
