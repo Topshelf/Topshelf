@@ -1,0 +1,2 @@
+Spark.*
+log4net.dll

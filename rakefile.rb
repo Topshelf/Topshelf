@@ -4,6 +4,8 @@ require File.dirname(__FILE__) + "/build_support/BuildUtils.rb"
 
 include FileTest
 require 'albacore'
+require File.dirname(__FILE__) + "/build_support/ilmergeconfig.rb"
+require File.dirname(__FILE__) + "/build_support/ILMerge.rb"
 
 BUILD_NUMBER_BASE = '2.2.1'
 PRODUCT = 'Topshelf'
@@ -17,6 +19,7 @@ MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
 OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-2.0')
 
 props = { 
+	:build_support => File.expand_path("build_support"),
     :stage => File.expand_path("build_output"),
     :stage_merged => File.expand_path("build_merged"), 
     :artifacts => File.expand_path("build_artifacts"),
@@ -42,16 +45,6 @@ task :help do
   end
 end
 
-class MSILMerge
-  include Albacore::Task
-  include Albacore::RunCommand
-
-  def execute
-	puts "Running ilmerge"
-	run_command "lib/ILMerge/ILMerge.exe"
-	#, "/internalize:build.custom/ilmerge.internalize.ignore.txt /target:dll /out:code_drop/#{OUTPUT_PATH}/Topshelf.dll /log:code_drop/ilmerge.log /ndebug /allowDup Topshelf.dll Magnum.dll Newtonsoft.Json.dll Spark.dll Stact.dll Stact.ServerFramework.dll"
-  end
-end
 
 desc "Compiles, unit tests, generates the database"
 task :all => [:default]
@@ -105,7 +98,15 @@ task :compile => [:global_version, :run_msbuild] do
 	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe,config,xml}", File.join( props[:stage], OUTPUT_PATH, 'for_shelving' )
 end
 
-msilmerge :ilmerge do |ilm|
+ilmerge :ilmerge do |ilm|
+	out = File.join(props[:stage], OUTPUT_PATH, 'Topshelf.dll')
+	ilm.output = out
+	ilm.internalize = File.join(props[:build_support], 'internalize.txt')
+	ilm.working_directory = File.join( props[:stage], OUTPUT_PATH, 'for_linking' )
+	ilm.target = :library
+	ilm.log = File.join( props[:stage], 'ilmerge.log' )
+	ilm.allow_dupes = true
+	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]
 end
 
 desc "Prepare examples"
