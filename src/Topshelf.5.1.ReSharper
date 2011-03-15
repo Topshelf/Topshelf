@@ -323,4 +323,10 @@ specific language governing permissions and limitations under the License.
       </PredefinedRule>
     </Naming2>
   </CodeStyleSettings>
+  <CodeAnnotations>
+    <Namespace>JetBrains.Annotations</Namespace>
+    <Namespace>Topshelf.Internal</Namespace>
+    <Namespace>Topshelf.Utils</Namespace>
+    <DefaultNamespace>JetBrains.Annotations</DefaultNamespace>
+  </CodeAnnotations>
 </Configuration>

@@ -12,28 +12,39 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+	using System;
 	using System.ServiceProcess;
 	using HostConfigurators;
+	using Internal;
 
 
 	public static class StartModeExtensions
 	{
-		public static HostConfigurator StartAutomatically(this HostConfigurator configurator)
+		public static HostConfigurator StartAutomatically([NotNull] this HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.AddConfigurator(new StartModeHostConfigurator(ServiceStartMode.Automatic));
 
 			return configurator;
 		}
 
-		public static HostConfigurator StartManually(this HostConfigurator configurator)
+		public static HostConfigurator StartManually([NotNull] this HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.AddConfigurator(new StartModeHostConfigurator(ServiceStartMode.Manual));
 
 			return configurator;
 		}
 
-		public static HostConfigurator Disabled(this HostConfigurator configurator)
+		public static HostConfigurator Disabled([NotNull] this HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.AddConfigurator(new StartModeHostConfigurator(ServiceStartMode.Disabled));
 
 			return configurator;

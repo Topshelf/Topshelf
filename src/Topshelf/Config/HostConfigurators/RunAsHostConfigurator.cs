@@ -12,8 +12,10 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.HostConfigurators
 {
+	using System;
 	using System.ServiceProcess;
 	using Builders;
+	using Internal;
 	using Magnum.Extensions;
 
 
@@ -50,8 +52,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("The username and password must be specified for a user account");
 		}
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<InstallBuilder>(x => x.RunAs(_username, _password, _accountType));
 
 			return builder;

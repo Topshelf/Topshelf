@@ -14,9 +14,11 @@ namespace Topshelf.Builders
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.ServiceProcess;
 	using Hosts;
+	using log4net;
 
 
 	public class InstallBuilder :
@@ -29,6 +31,7 @@ namespace Topshelf.Builders
 		Credentials _credentials;
 		ServiceStartMode _startMode;
 		bool _sudo;
+		static readonly ILog _logger = LogManager.GetLogger(typeof(InstallBuilder));
 
 		public InstallBuilder(ServiceDescription description)
 		{
@@ -54,8 +57,19 @@ namespace Topshelf.Builders
 		public void Match<T>(Action<T> callback)
 			where T : class, HostBuilder
 		{
-			if (typeof(T).IsAssignableFrom(GetType()))
-				callback(this as T);
+			if (callback != null)
+			{
+				if (typeof(T).IsAssignableFrom(GetType()))
+					callback(this as T);
+			}
+			else
+			{
+				_logger.Warn("Match{{T}} called with callback of null. If you are running the host " 
+					+ "in debug mode, the next log message will print a stack trace.");
+#if DEBUG
+				_logger.Warn(new StackTrace());
+#endif
+			}
 		}
 
 		public void RunAs(string username, string password, ServiceAccount accountType)

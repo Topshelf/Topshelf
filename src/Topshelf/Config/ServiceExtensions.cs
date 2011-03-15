@@ -14,16 +14,21 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using Internal;
 	using Model;
 	using ServiceConfigurators;
 
 
 	public static class ServiceExtensions
 	{
-		public static HostConfigurator Service<TService>(this HostConfigurator configurator,
-		                                                 Action<ServiceConfigurator<TService>> callback)
+		public static HostConfigurator Service<TService>([NotNull] this HostConfigurator configurator, [NotNull] Action<ServiceConfigurator<TService>> callback)
 			where TService : class
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+
 			var serviceConfigurator = new ServiceConfiguratorImpl<TService>();
 
 			callback(serviceConfigurator);
@@ -33,27 +38,36 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator, Func<T> factory)
+		public static ServiceConfigurator<T> ConstructUsing<T>([NotNull] this ServiceConfigurator<T> configurator, Func<T> factory)
 			where T : class
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.ConstructUsing((d, name, coordinator) => factory());
 
 			return configurator;
 		}
 
-		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator,
+		public static ServiceConfigurator<T> ConstructUsing<T>([NotNull] this ServiceConfigurator<T> configurator,
 		                                                       Func<string, T> factory)
 			where T : class
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.ConstructUsing((d, name, coordinator) => factory(name));
 
 			return configurator;
 		}
 
-		public static ServiceConfigurator<T> ConstructUsing<T>(this ServiceConfigurator<T> configurator,
+		public static ServiceConfigurator<T> ConstructUsing<T>([NotNull] this ServiceConfigurator<T> configurator,
 		                                                       InternalServiceFactory<T> factory)
 			where T : class
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.ConstructUsing((d, name, coordinator) => factory(name, coordinator));
 
 			return configurator;

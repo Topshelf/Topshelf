@@ -304,11 +304,6 @@ namespace Topshelf.Model
 			request.Respond(status);
 		}
 
-		~ServiceCoordinator()
-		{
-			Dispose(false);
-		}
-
 		void OnServiceEvent(ServiceEvent message)
 		{
 			_log.InfoFormat("({0}) {1}", message.ServiceName, message.EventType);

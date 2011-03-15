@@ -73,11 +73,6 @@ namespace Topshelf.Model
 			GC.SuppressFinalize(this);
 		}
 
-		~Shelf()
-		{
-			Dispose(false);
-		}
-
 		void Dispose(bool disposing)
 		{
 			if (_disposed)

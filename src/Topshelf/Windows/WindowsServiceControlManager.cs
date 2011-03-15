@@ -20,6 +20,7 @@ namespace Topshelf.Windows
 	using System.Security.Permissions;
 	using System.ServiceProcess;
 	using System.Threading;
+	using Internal;
 	using log4net;
 	using Magnum.Extensions;
 
@@ -77,9 +78,11 @@ namespace Topshelf.Windows
 
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 		public static void SetServiceRecoveryOptions(
-			string serviceName,
-			ServiceRecoveryOptions recoveryOptions)
+			string serviceName, [NotNull] ServiceRecoveryOptions recoveryOptions)
 		{
+			if (recoveryOptions == null)
+				throw new ArgumentNullException("recoveryOptions");
+
 			bool requiresShutdownPriveleges =
 				recoveryOptions.FirstFailureAction == ServiceRecoveryAction.RestartComputer ||
 				recoveryOptions.SecondFailureAction == ServiceRecoveryAction.RestartComputer ||

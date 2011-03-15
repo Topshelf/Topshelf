@@ -62,12 +62,12 @@ assemblyinfo :global_version do |asm|
   
   # Assembly file config
   asm.product_name = PRODUCT
-  asm.description = "Topshelf is an open source project for hosting services without friction. Either link Topshelf to your program and it *becomes* a service installer or use Topshelf.Host to shelf your services by placing them in subfolders of the 'Services' folder under the folder of Topshelf.Host.exe. github.com/Topshelf. topshelf-project.com. Original author company: CFT & ACM."
+  asm.description = "Git commit hash: #{commit} - #{commit_date} - Topshelf is an open source project for hosting services without friction. Either link Topshelf to your program and it *becomes* a service installer or use Topshelf.Host to shelf your services by placing them in subfolders of the 'Services' folder under the folder of Topshelf.Host.exe. github.com/Topshelf. topshelf-project.com. Original author company: CFT & ACM."
   asm.version = asm_version
   asm.file_version = build_number
-  asm.custom_attributes :AssemblyInformationalVersion => "#{asm_version} - #{commit} - #{commit_date}",
+  asm.custom_attributes :AssemblyInformationalVersion => "#{asm_version}",
 	:ComVisibleAttribute => false,
-	:CLSCompliantAttribute => true
+	:CLSCompliantAttribute => false # Henrik: at the moment the project isn't CLS compliant due to dependencies.
   asm.copyright = COPYRIGHT
   asm.output_file = 'src/SolutionVersion.cs'
   asm.namespaces "System", "System.Reflection", "System.Runtime.InteropServices", "System.Security"

@@ -14,6 +14,7 @@ namespace Topshelf
 {
 	using System;
 	using Configuration;
+	using Internal;
 
 
 	/// <summary>
@@ -25,8 +26,11 @@ namespace Topshelf
 		/// Go go gadget
 		/// </summary>
 		[Obsolete("Use the run method on the host returned from the HostFactory")]
-		public static void Host(RunConfiguration configuration, string[] args)
+		public static void Host([NotNull] RunConfiguration configuration, string[] args)
 		{
+			if (configuration == null)
+				throw new ArgumentNullException("configuration");
+
 			configuration.Run();
 		}
 	}

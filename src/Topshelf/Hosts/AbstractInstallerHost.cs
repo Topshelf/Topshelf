@@ -54,6 +54,9 @@ namespace Topshelf.Hosts
 
 		protected void WithInstaller(Action<TransactedInstaller> callback)
 		{
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
 			ExecutePreActions();
@@ -64,6 +67,7 @@ namespace Topshelf.Hosts
 				ti.Installers.Add(installer);
 
 				Assembly assembly = Assembly.GetEntryAssembly();
+
 				if (assembly == null)
 					throw new HostException("Assembly.GetEntryAssembly() is null for some reason.");
 

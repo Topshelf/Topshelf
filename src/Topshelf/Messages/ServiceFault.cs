@@ -12,52 +12,52 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    using System;
-    using System.Collections.Generic;
+	using System;
+	using System.Collections.Generic;
 
 
-    public class ServiceFault :
-        ServiceEvent
-    {
-        public ServiceFault(string serviceName, Exception ex)
-            : base(serviceName)
-        {
-            InnerExceptions = new List<ExceptionDetail>();
+	public class ServiceFault :
+		ServiceEvent
+	{
+		public ServiceFault(string serviceName, Exception ex)
+			: base(serviceName)
+		{
+			InnerExceptions = new List<ExceptionDetail>();
 
-            EventType = ServiceEventType.Fault;
+			EventType = ServiceEventType.Fault;
 
-            if (ex != null)
-            {
-                ExceptionDetail = new ExceptionDetail
-                    {
-                        Message = ex.Message,
-                        StackTrace = ex.StackTrace
-                    };
-                
-                RecordInnerException(ex.InnerException);
-            }
-        }
+			if (ex != null)
+			{
+				ExceptionDetail = new ExceptionDetail
+					{
+						Message = ex.Message,
+						StackTrace = ex.StackTrace
+					};
 
-        protected ServiceFault()
-        {
-        }
+				RecordInnerException(ex.InnerException);
+			}
+		}
 
-        public IList<ExceptionDetail> InnerExceptions { get; protected set; }
+		protected ServiceFault()
+		{
+		}
 
-        public ExceptionDetail ExceptionDetail { get; protected set; }
+		public IList<ExceptionDetail> InnerExceptions { get; private set; }
 
-        void RecordInnerException(Exception ex)
-        {
-            if (ex == null)
-                return;
+		public ExceptionDetail ExceptionDetail { get; private set; }
 
-            InnerExceptions.Add(new ExceptionDetail
-                {
-                    Message = ex.Message,
-                    StackTrace = ex.StackTrace
-                });
+		void RecordInnerException(Exception ex)
+		{
+			if (ex == null)
+				return;
 
-            RecordInnerException(ex.InnerException);
-        }
-    }
+			InnerExceptions.Add(new ExceptionDetail
+				{
+					Message = ex.Message,
+					StackTrace = ex.StackTrace
+				});
+
+			RecordInnerException(ex.InnerException);
+		}
+	}
 }

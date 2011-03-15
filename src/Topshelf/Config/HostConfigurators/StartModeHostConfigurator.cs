@@ -12,8 +12,10 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.HostConfigurators
 {
+	using System;
 	using System.ServiceProcess;
 	using Builders;
+	using Internal;
 
 
 	public class StartModeHostConfigurator :
@@ -30,8 +32,11 @@ namespace Topshelf.HostConfigurators
 		{
 		}
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<InstallBuilder>(x => x.SetStartMode(_startMode));
 
 			return builder;

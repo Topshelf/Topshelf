@@ -81,7 +81,7 @@ namespace Topshelf.Model
 
 				if (_instance == null)
 				{
-					throw new NullReferenceException("The service instance returned was null for service type "
+					throw new ApplicationException("The service instance returned was null for service type "
 					                                 + typeof(TService).ToShortTypeName());
 				}
 
@@ -166,11 +166,6 @@ namespace Topshelf.Model
 		{
 			_coordinatorChannel.Send(message);
 			_inbox.Send(message);
-		}
-
-		~LocalServiceController()
-		{
-			Dispose(false);
 		}
 
 		void Dispose(bool disposing)

@@ -12,14 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+	using System;
 	using System.ServiceProcess;
 	using HostConfigurators;
+	using Internal;
 
 
 	public static class RunAsExtensions
 	{
-		public static HostConfigurator RunAs(this HostConfigurator configurator, string username, string password)
+		public static HostConfigurator RunAs([NotNull] this HostConfigurator configurator, string username, string password)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			var runAsConfigurator = new RunAsHostConfigurator(username, password, ServiceAccount.User);
 
 			configurator.AddConfigurator(runAsConfigurator);
@@ -27,8 +32,11 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static HostConfigurator RunAsNetworkService(this HostConfigurator configurator)
+		public static HostConfigurator RunAsNetworkService([NotNull] this HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			var runAsConfigurator = new RunAsHostConfigurator(ServiceAccount.NetworkService);
 
 			configurator.AddConfigurator(runAsConfigurator);
@@ -36,8 +44,11 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static HostConfigurator RunAsLocalSystem(this HostConfigurator configurator)
+		public static HostConfigurator RunAsLocalSystem([NotNull] this HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			var runAsConfigurator = new RunAsHostConfigurator(ServiceAccount.LocalSystem);
 
 			configurator.AddConfigurator(runAsConfigurator);
@@ -45,8 +56,11 @@ namespace Topshelf
 			return configurator;
 		}
 
-		public static HostConfigurator RunAsLocalService(this HostConfigurator configurator)
+		public static HostConfigurator RunAsLocalService([NotNull] this HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			var runAsConfigurator = new RunAsHostConfigurator(ServiceAccount.LocalService);
 
 			configurator.AddConfigurator(runAsConfigurator);

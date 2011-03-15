@@ -14,6 +14,7 @@ namespace Topshelf.HostConfigurators
 {
 	using System;
 	using Builders;
+	using Internal;
 
 
 	public class RunHostConfiguratorAction :
@@ -32,8 +33,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("A null callback was specified");
 		}
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<RunBuilder>(x => _callback(x));
 
 			return builder;

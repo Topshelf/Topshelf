@@ -100,11 +100,6 @@ namespace Topshelf.FileSystem
 				_channel.Send(new DirectoryRenamedImpl(e.Name, e.FullPath, e.OldName, e.OldFullPath));
 		}
 
-		~FileSystemEventProducer()
-		{
-			Dispose(false);
-		}
-
 		private void Dispose(bool disposing)
 		{
 			if (_disposed) return;

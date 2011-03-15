@@ -19,8 +19,7 @@ namespace Topshelf.Dashboard
 	{
 		public static void RenderSparkView<TViewData>(this ResponseContext cxt, TViewData data, string template)
 		{
-			var render = new SparkRender();
-			string output = render.Render(template, data);
+			string output = SparkRender.Render(template, data);
 			cxt.WriteHtml(output);
 		}
 	}

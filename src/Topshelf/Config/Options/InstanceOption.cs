@@ -12,7 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Options
 {
+	using System;
 	using HostConfigurators;
+	using Internal;
 
 
 	public class InstanceOption :
@@ -25,8 +27,11 @@ namespace Topshelf.Options
 			_instanceName = instanceName;
 		}
 
-		public void ApplyTo(HostConfigurator configurator)
+		public void ApplyTo([NotNull] HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			configurator.SetInstanceName(_instanceName);
 		}
 	}

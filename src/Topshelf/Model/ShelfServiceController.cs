@@ -93,7 +93,12 @@ namespace Topshelf.Model
 			}
 			catch (Exception ex)
 			{
-				_publish.Send(new ServiceFault(_name, new BuildServiceException(_name, _bootstrapperType, ex)));
+				var buildServiceException = 
+					_bootstrapperType == null 
+					? new BuildServiceException(_name)
+					: new BuildServiceException(_name, _bootstrapperType, ex);
+
+				_publish.Send(new ServiceFault(_name, buildServiceException));
 			}
 		}
 
@@ -163,7 +168,8 @@ namespace Topshelf.Model
 			}
 			catch (AppDomainUnloadedException ex)
 			{
-				_log.ErrorFormat("[Shelf:{0}] Failed to send to Shelf, AppDomain was unloaded", _name);
+				_log.ErrorFormat("[Shelf:{0}] Failed to send to Shelf, AppDomain was unloaded. See next log message for details.", _name);
+				_log.Error("See inner exception", ex);
 
 				_publish.Send(new ServiceUnloaded(_name));
 			}
@@ -186,15 +192,11 @@ namespace Topshelf.Model
 			_publish.Send(message);
 		}
 
-		~ShelfServiceController()
-		{
-			Dispose(false);
-		}
-
 		void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;
+
 			if (disposing)
 			{
 				if (_reference != null)

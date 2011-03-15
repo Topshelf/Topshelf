@@ -18,16 +18,11 @@ namespace Topshelf.Dashboard
 	using Spark.FileSystem;
 
 
-	public class SparkRender
+	public static class SparkRender
 	{
-		static readonly EmbeddedViewFolder _viewFolder;
+		static readonly EmbeddedViewFolder _viewFolder = new EmbeddedViewFolder(typeof(SparkRender).Assembly, "Topshelf.Dashboard.views");
 
-		static SparkRender()
-		{
-			_viewFolder = new EmbeddedViewFolder(typeof(SparkRender).Assembly, "Topshelf.Dashboard.views");
-		}
-
-		public string Render<TViewData>(string template, TViewData data)
+		public static string Render<TViewData>(string template, TViewData data)
 		{
 			var settings = new SparkSettings();
 			settings.AddNamespace("Topshelf.Dashboard");

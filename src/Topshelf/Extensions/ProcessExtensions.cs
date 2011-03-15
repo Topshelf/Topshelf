@@ -15,6 +15,7 @@ namespace Topshelf.Extensions
 	using System;
 	using System.Diagnostics;
 	using System.Runtime.InteropServices;
+	using Internal;
 	using log4net;
 	using WindowsServiceCode;
 
@@ -23,8 +24,11 @@ namespace Topshelf.Extensions
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
 
-		public static Process GetParent(this Process child)
+		public static Process GetParent([NotNull] this Process child)
 		{
+			if (child == null)
+				throw new ArgumentNullException("child");
+
 			try
 			{
 				int parentPid = 0;

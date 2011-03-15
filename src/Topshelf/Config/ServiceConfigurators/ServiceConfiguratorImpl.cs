@@ -15,6 +15,7 @@ namespace Topshelf.ServiceConfigurators
 	using System;
 	using Builders;
 	using HostConfigurators;
+	using Internal;
 	using Magnum.Extensions;
 	using Model;
 
@@ -31,8 +32,11 @@ namespace Topshelf.ServiceConfigurators
 		Action<TService> _start;
 		Action<TService> _stop;
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<RunBuilder>(x =>
 				{
 					string name = _name.IsEmpty() ? typeof(TService).Name : _name;

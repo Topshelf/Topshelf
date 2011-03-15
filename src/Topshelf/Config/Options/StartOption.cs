@@ -12,14 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Options
 {
+	using System;
 	using HostConfigurators;
+	using Internal;
 
 
 	public class StartOption :
 		Option
 	{
-		public void ApplyTo(HostConfigurator configurator)
+		public void ApplyTo([NotNull] HostConfigurator configurator)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			var startConfigurator = new StartConfigurator();
 
 			configurator.AddConfigurator(startConfigurator);

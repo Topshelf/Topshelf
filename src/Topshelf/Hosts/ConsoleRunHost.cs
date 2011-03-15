@@ -22,7 +22,7 @@ namespace Topshelf.Hosts
 
 
 	public class ConsoleRunHost :
-		Host
+		Host, IDisposable
 	{
 		readonly ServiceDescription _description;
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.ConsoleRunHost");
@@ -106,6 +106,25 @@ namespace Topshelf.Hosts
 		{
 			if (ServiceController.GetServices().Where(s => s.ServiceName == _description.GetServiceName()).Any())
 				_log.WarnFormat("There is an instance of this {0} running as a windows service", _description);
+		}
+
+		bool _disposed;
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+			if (disposing)
+				_exit.Dispose();
+
+			_disposed = true;
 		}
 	}
 }

@@ -16,14 +16,18 @@ namespace Topshelf.FileSystem
 	using System.Configuration;
 	using System.IO;
 	using Configuration.Dsl;
+	using Internal;
 	using Shelving;
 
 
 	public class DirectoryMonitorBootstrapper :
 		Bootstrapper<DirectoryMonitor>
 	{
-		public void InitializeHostedService(IServiceConfigurator<DirectoryMonitor> cfg)
+		public void InitializeHostedService([NotNull] IServiceConfigurator<DirectoryMonitor> cfg)
 		{
+			if (cfg == null)
+				throw new ArgumentNullException("cfg");
+
 			cfg.ConstructUsing((d, name, channel) => new DirectoryMonitor(GetServicesDirectory(), channel));
 
 			cfg.WhenStarted(dm => dm.Start());

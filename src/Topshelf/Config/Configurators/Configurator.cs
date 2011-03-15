@@ -18,6 +18,7 @@ namespace Topshelf.Configurators
 	}
 
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
 	public interface Configurator<T> :
 		Configurator
 	{

@@ -53,10 +53,8 @@ namespace Topshelf.FileSystem
 			GC.SuppressFinalize(this);
 		}
 
-		~DirectoryMonitor()
-		{
-			Dispose(false);
-		}
+		// Henrik: I removed the finalizer, no unmanaged objects. See
+		// http://blogs.msdn.com/b/tom/archive/2008/04/25/understanding-when-to-use-a-finalizer-in-your-net-class.aspx
 
 		void Dispose(bool disposing)
 		{

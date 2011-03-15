@@ -12,26 +12,37 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    using System.Text;
-    using Magnum.Extensions;
+	using System;
+	using System.Text;
+	using Internal;
+	using Magnum.Extensions;
 
 
-    public static class ServiceFaultExtentions
-    {
-        public static string ToLogString(this ServiceFault message)
-        {
-            var sb = new StringBuilder();
+	public static class ServiceFaultExtentions
+	{
+		public static string ToLogString([NotNull] this ServiceFault message)
+		{
+			if (message == null)
+				throw new ArgumentNullException("message");
 
-            sb.AppendLine(message.ExceptionDetail.Message);
-            sb.AppendLine(message.ExceptionDetail.StackTrace);
+			var sb = new StringBuilder();
 
-            message.InnerExceptions.Each(ed =>
-                {
-                    sb.AppendLine(ed.Message);
-                    sb.AppendLine(ed.StackTrace);
-                });
+			if (message.ExceptionDetail != null)
+			{
+				sb.AppendLine(message.ExceptionDetail.Message);
+				sb.AppendLine(message.ExceptionDetail.StackTrace);
+			}
 
-            return sb.ToString();
-        }
-    }
+			if (message.InnerExceptions != null)
+			{
+				message.InnerExceptions.Each(ed =>
+					{
+						sb.AppendLine(ed.Message);
+						sb.AppendLine(ed.StackTrace);
+					});
+			}
+
+			return sb.ToString();
+		}
+	}
 }

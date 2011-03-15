@@ -17,6 +17,7 @@ namespace Topshelf.Builders
 	using System.Diagnostics;
 	using Extensions;
 	using Hosts;
+	using Internal;
 	using log4net;
 	using Magnum.Extensions;
 	using Model;
@@ -25,7 +26,7 @@ namespace Topshelf.Builders
 
 
 	public class RunBuilder :
-		HostBuilder
+		HostBuilder, IDisposable
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf.Builders.RunBuilder");
 
@@ -67,9 +68,12 @@ namespace Topshelf.Builders
 			return CreateHost(_coordinator);
 		}
 
-		public void Match<T>(Action<T> callback)
+		public void Match<T>([NotNull] Action<T> callback)
 			where T : class, HostBuilder
 		{
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+
 			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
 		}
@@ -137,6 +141,26 @@ namespace Topshelf.Builders
 		void ExecutePostStopActions(IServiceCoordinator coordinator)
 		{
 			_postStopActions.Each(x => x(coordinator));
+		}
+
+
+		bool _disposed;
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+			if (disposing)
+				_coordinator.Dispose();
+
+			_disposed = true;
 		}
 	}
 }

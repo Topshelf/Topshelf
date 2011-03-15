@@ -16,6 +16,7 @@ namespace Topshelf.Hosts
 	using System.Collections.Generic;
 	using System.Configuration.Install;
 	using System.ServiceProcess;
+	using Internal;
 	using log4net;
 	using Windows;
 
@@ -61,8 +62,11 @@ namespace Topshelf.Hosts
 			WithInstaller(ti => ti.Uninstall(null));
 		}
 
-		protected override void CustomizeInstaller(Installer installer)
+		protected override void CustomizeInstaller([NotNull] Installer installer)
 		{
+			if (installer == null)
+				throw new ArgumentNullException("installer");
+
 			installer.BeforeUninstall += (sender, args) => ExecutePreActions();
 
 			installer.AfterUninstall += (sender, args) => ExecutePostActions();

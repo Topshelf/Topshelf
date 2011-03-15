@@ -12,13 +12,21 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+	using System;
 	using HostConfigurators;
+	using Internal;
 
 
 	public static class DependencyExtensions
 	{
-		public static HostConfigurator AddDependency(this HostConfigurator configurator, string name)
+		public static HostConfigurator AddDependency([NotNull] this HostConfigurator configurator, [NotNull] string name)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
+			if (name == null)
+				throw new ArgumentNullException("name");
+
 			var dependencyConfigurator = new DependencyHostConfigurator(name);
 
 			configurator.AddConfigurator(dependencyConfigurator);

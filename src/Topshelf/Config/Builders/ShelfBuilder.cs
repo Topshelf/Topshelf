@@ -12,8 +12,10 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Builders
 {
+	using System;
 	using System.Linq;
 	using Hosts;
+	using Internal;
 	using log4net;
 	using Messages;
 	using Model;
@@ -26,9 +28,12 @@ namespace Topshelf.Builders
 		readonly ILog _log;
 		readonly HostChannel _channel;
 
-		public ShelfBuilder(ServiceDescription description, HostChannel channel)
+		public ShelfBuilder([NotNull] ServiceDescription description, HostChannel channel)
 			: base(description)
 		{
+			if (description == null)
+				throw new ArgumentNullException("description");
+
 			_channel = channel;
 			_log = LogManager.GetLogger("Topshelf.Shelf." + description.Name);
 		}

@@ -17,6 +17,8 @@ namespace Topshelf.FileSystem
 	using System.IO;
 	using System.Linq;
 	using System.Security.Cryptography;
+	using Internal;
+	using log4net;
 	using Magnum.Extensions;
 	using Magnum.FileSystem.Events;
 	using Magnum.FileSystem.Internal;
@@ -36,6 +38,7 @@ namespace Topshelf.FileSystem
 		readonly Scheduler _scheduler;
 		bool _disposed;
 		ScheduledOperation _scheduledAction;
+		static readonly ILog _logger = LogManager.GetLogger(typeof(PollingFileSystemEventProducer));
 
 		/// <summary>
 		/// Creates a PollingFileSystemEventProducer
@@ -61,9 +64,12 @@ namespace Topshelf.FileSystem
 		/// <param name="fiber">Fiber to schedule on</param>
 		/// <param name="checkInterval">The maximal time between events or polls on a given file</param>
 		/// <param name="checkSubDirectory">Indicates if subdirectorys will be checked or ignored</param>
-		public PollingFileSystemEventProducer(string directory, UntypedChannel channel, Scheduler scheduler, Fiber fiber,
+		public PollingFileSystemEventProducer(string directory, UntypedChannel channel, [NotNull] Scheduler scheduler, Fiber fiber,
 		                                      TimeSpan checkInterval, bool checkSubDirectory)
 		{
+			if (scheduler == null)
+				throw new ArgumentNullException("scheduler");
+
 			_directory = directory;
 			_channel = channel;
 			_fiber = fiber;
@@ -182,17 +188,18 @@ namespace Topshelf.FileSystem
 
 				return new Guid(hashValue);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
+				_logger.ErrorFormat("Problem hashing file '{0}'. See the next log message for details.", file);
+
 				// chew up exception and say empty hash
 				// can we do something more interesting than this?
+				// Henrik: perhaps log it so that we can abduce a better exception handling policy in the future?
+				_logger.Error("Problem creating MD5 hash of file '{0}'. See inner exception details (have a look at the " 
+					+ "piece of code generating this to have a look at whether we can do something better).", e);
+
 				return Guid.Empty;
 			}
-		}
-
-		~PollingFileSystemEventProducer()
-		{
-			Dispose(false);
 		}
 
 		void Dispose(bool disposing)

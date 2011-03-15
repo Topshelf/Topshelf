@@ -35,6 +35,7 @@ namespace Topshelf.Model
 		void Unload();
 
 		void Pause();
+
 		void Continue();
 
 

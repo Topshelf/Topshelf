@@ -14,6 +14,7 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using Internal;
 	using log4net;
 
 
@@ -21,8 +22,11 @@ namespace Topshelf
 	{
 		static readonly ILog _log = LogManager.GetLogger("Topshelf");
 
-		public static Host New(Action<HostConfigurator> configure)
+		public static Host New([NotNull] Action<HostConfigurator> configure)
 		{
+			if (configure == null)
+				throw new ArgumentNullException("configure");
+
 			var configurator = new HostConfiguratorImpl();
 
 			configure(configurator);

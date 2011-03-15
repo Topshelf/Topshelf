@@ -17,6 +17,7 @@ namespace Topshelf.ServiceConfigurators
 	using Model;
 
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces")]
 	public interface ServiceConfigurator :
 		Configurator
 	{

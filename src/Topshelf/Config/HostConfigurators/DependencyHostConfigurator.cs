@@ -12,17 +12,22 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.HostConfigurators
 {
+	using System;
 	using Builders;
+	using Internal;
 	using Magnum.Extensions;
 
 
 	public class DependencyHostConfigurator :
 		HostBuilderConfigurator
 	{
-		string _name;
+		readonly string _name;
 
-		public DependencyHostConfigurator(string name)
+		public DependencyHostConfigurator([NotNull] string name)
 		{
+			if (name == null)
+				throw new ArgumentNullException("name");
+
 			_name = name;
 		}
 
@@ -32,8 +37,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("The dependency specified was empty.");
 		}
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<InstallBuilder>(x => x.AddDependency(_name));
 
 			return builder;

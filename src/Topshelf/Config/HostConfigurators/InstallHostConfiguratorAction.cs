@@ -14,6 +14,7 @@ namespace Topshelf.HostConfigurators
 {
 	using System;
 	using Builders;
+	using Internal;
 
 
 	public class InstallHostConfiguratorAction :
@@ -21,8 +22,11 @@ namespace Topshelf.HostConfigurators
 	{
 		readonly Action<InstallBuilder> _callback;
 
-		public InstallHostConfiguratorAction(Action<InstallBuilder> callback)
+		public InstallHostConfiguratorAction([NotNull] Action<InstallBuilder> callback)
 		{
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+
 			_callback = callback;
 		}
 
@@ -32,8 +36,11 @@ namespace Topshelf.HostConfigurators
 				throw new HostConfigurationException("A null callback was specified");
 		}
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<InstallBuilder>(x => _callback(x));
 
 			return builder;

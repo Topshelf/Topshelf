@@ -17,6 +17,7 @@ namespace Topshelf.Model
 	using System.IO;
 	using System.Reflection;
 	using System.Runtime.Remoting;
+	using Internal;
 	using log4net;
 	using Magnum.Extensions;
 	using Stact;
@@ -77,8 +78,11 @@ namespace Topshelf.Model
 			CreateShelfInstance(null);
 		}
 
-		public void Create(Type bootstrapperType)
+		public void Create([NotNull] Type bootstrapperType)
 		{
+			if (bootstrapperType == null)
+				throw new ArgumentNullException("bootstrapperType");
+
 			_log.DebugFormat("[{0}].BootstrapperType = {1}", _serviceName, bootstrapperType.ToShortTypeName());
 			_log.DebugFormat("[{0}].BootstrapperAssembly = {1}", _serviceName, bootstrapperType.Assembly.GetName().Name);
 			_log.DebugFormat("[{0}].BootstrapperVersion = {1}", _serviceName, bootstrapperType.Assembly.GetName().Version);
@@ -100,7 +104,7 @@ namespace Topshelf.Model
 
 			_objectHandle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
 			                                       new object[] {bootstrapperType, _hostChannel.Address, _hostChannel.PipeName},
-			                                       null, null, null);
+			                                       null, null);
 		}
 
 		static AppDomainSetup ConfigureAppDomainSettings(string serviceName, ShelfType shelfType)
@@ -134,15 +138,11 @@ namespace Topshelf.Model
 			_channel = new OutboundChannel(uri, pipeName);
 		}
 
-		~ShelfReference()
-		{
-			Dispose(false);
-		}
-
 		void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;
+
 			if (disposing)
 			{
 				if (_hostChannel != null)
@@ -161,9 +161,12 @@ namespace Topshelf.Model
 				{
 					_log.DebugFormat("[{0}] Unloading AppDomain", _serviceName);
 
+					AppDomain.Unload(_domain);
+
 					_log.InfoFormat("[{0}] AppDomain Unloaded", _serviceName);
 				}
-				catch (Exception)
+				catch (CannotUnloadAppDomainException) 
+					// Henrik: Why do we need to catch the base type Exception here? I've changed it to CannotUnloadAppDomainException.
 				{
 					_log.DebugFormat("[{0}] AppDomain was already unloaded", _serviceName);
 				}

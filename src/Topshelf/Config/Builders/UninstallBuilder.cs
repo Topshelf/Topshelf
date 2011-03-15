@@ -17,6 +17,7 @@ namespace Topshelf.Builders
 	using System.Linq;
 	using System.ServiceProcess;
 	using Hosts;
+	using Internal;
 
 
 	public class UninstallBuilder :
@@ -52,9 +53,12 @@ namespace Topshelf.Builders
 			                         _sudo);
 		}
 
-		public void Match<T>(Action<T> callback)
+		public void Match<T>([NotNull] Action<T> callback)
 			where T : class, HostBuilder
 		{
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+
 			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
 		}

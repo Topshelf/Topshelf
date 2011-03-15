@@ -34,6 +34,7 @@ namespace Topshelf.Shelving
 			}
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
 		public static ShelfConfiguration GetConfig()
 		{
 			return ConfigurationManager.GetSection("ShelfConfiguration") as ShelfConfiguration;

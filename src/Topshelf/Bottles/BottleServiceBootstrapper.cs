@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Bottles
 {
+	using System;
 	using Configuration.Dsl;
 	using Shelving;
 
@@ -21,6 +22,9 @@ namespace Topshelf.Bottles
 	{
 		public void InitializeHostedService(IServiceConfigurator<BottleService> cfg)
 		{
+			if (cfg == null)
+				throw new ArgumentNullException("cfg");
+
 			cfg.HowToBuildService(name => new BottleService());
 			cfg.WhenStarted(s => s.Start());
 			cfg.WhenStopped(s => s.Stop());

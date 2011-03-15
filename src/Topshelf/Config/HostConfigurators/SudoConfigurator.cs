@@ -12,7 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.HostConfigurators
 {
+	using System;
 	using Builders;
+	using Internal;
 
 
 	public class SudoConfigurator :
@@ -22,8 +24,11 @@ namespace Topshelf.HostConfigurators
 		{
 		}
 
-		public HostBuilder Configure(HostBuilder builder)
+		public HostBuilder Configure([NotNull] HostBuilder builder)
 		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
 			builder.Match<InstallBuilder>(x => x.Sudo());
 			builder.Match<UninstallBuilder>(x => x.Sudo());
 

@@ -52,11 +52,6 @@ namespace Topshelf.Model
 			_connections.Add(_channel.Connect(configurator));
 		}
 
-		~ServiceChannel()
-		{
-			Dispose(false);
-		}
-
 		protected virtual void Dispose(bool disposing)
 		{
 			if (_disposed)

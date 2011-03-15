@@ -17,25 +17,21 @@ namespace Topshelf
 		/// <summary>
 		/// The name of the service as it is registered in the service control manager
 		/// </summary>
-		/// <param name="name"></param>
 		string Name { get; }
 
 		/// <summary>
 		/// The name of the service as it should be displayed in the service control manager
 		/// </summary>
-		/// <param name="name"></param>
 		string DisplayName { get; }
 
 		/// <summary>
 		/// The description of the service that is displayed in the service control manager
 		/// </summary>
-		/// <param name="description"></param>
 		string Description { get; }
 
 		/// <summary>
 		/// The service instance name that should be used when the service is registered
 		/// </summary>
-		/// <param name="instanceName"></param>
 		string InstanceName { get; }
 
 		/// <summary>
@@ -43,6 +39,7 @@ namespace Topshelf
 		/// Example: myservice$bob
 		/// </summary>
 		/// <returns></returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
 		string GetServiceName();
 	}
 }

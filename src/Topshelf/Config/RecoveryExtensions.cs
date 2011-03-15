@@ -14,14 +14,19 @@ namespace Topshelf
 {
 	using System;
 	using HostConfigurators;
+	using Internal;
 	using RecoveryConfigurators;
 
 
 	public static class RecoveryExtensions
 	{
-		public static HostConfigurator UseServiceRecovery(this HostConfigurator configurator,
-		                                                  Action<RecoveryConfigurator> configure)
+		public static HostConfigurator UseServiceRecovery([NotNull] this HostConfigurator configurator, [NotNull] Action<RecoveryConfigurator> configure)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+			if (configure == null)
+				throw new ArgumentNullException("configure");
+
 			var recoveryConfigurator = new RecoveryHostConfigurator();
 
 			configure(recoveryConfigurator);

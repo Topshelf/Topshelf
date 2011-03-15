@@ -38,7 +38,8 @@ namespace Topshelf.Hosts
 				return;
 			}
 
-			using (stream)
+			//using (stream) // Henrik: StreamReader already disposes this stream. 
+			// See http://stackoverflow.com/questions/1065168/does-disposing-streamreader-close-the-stream
 			using (TextReader reader = new StreamReader(stream))
 			{
 				string text = reader.ReadToEnd();

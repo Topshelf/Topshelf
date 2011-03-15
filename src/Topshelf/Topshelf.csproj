@@ -41,6 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <NoWarn>1591</NoWarn>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -221,6 +222,7 @@
     <Compile Include="Model\ShelfReference.cs" />
     <Compile Include="Model\ShelfServiceController.cs" />
     <Compile Include="Model\ShelfType.cs" />
+    <Compile Include="Internal\ReSharperStaticAnalysis.cs" />
     <Compile Include="Windows\WindowsUserAccessControl.cs" />
     <Compile Include="WindowsServiceCode\HostInstaller.cs">
       <SubType>Component</SubType>

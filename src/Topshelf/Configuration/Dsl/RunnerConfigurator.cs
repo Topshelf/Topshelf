@@ -14,6 +14,7 @@ namespace Topshelf.Configuration.Dsl
 {
 	using System;
 	using HostConfigurators;
+	using Internal;
 
 
 	[Obsolete("Use HostFactory instead")]
@@ -56,8 +57,11 @@ namespace Topshelf.Configuration.Dsl
 		{
 		}
 
-		public static RunConfiguration New(Action<IRunnerConfigurator> action)
+		public static RunConfiguration New([NotNull] Action<IRunnerConfigurator> action)
 		{
+			if (action == null)
+				throw new ArgumentNullException("action");
+
 			var configurator = new RunnerConfigurator();
 
 			action(configurator);

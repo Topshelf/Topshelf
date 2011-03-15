@@ -14,6 +14,7 @@ namespace Topshelf.Builders
 {
 	using System;
 	using Hosts;
+	using Internal;
 
 
 	public class StartBuilder :
@@ -47,9 +48,12 @@ namespace Topshelf.Builders
 			return new StartHost(_description);
 		}
 
-		public void Match<T>(Action<T> callback)
+		public void Match<T>([NotNull] Action<T> callback)
 			where T : class, HostBuilder
 		{
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+
 			if (typeof(T).IsAssignableFrom(GetType()))
 				callback(this as T);
 		}

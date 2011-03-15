@@ -71,11 +71,6 @@ namespace Topshelf.Model
 			_connections.Add(_output.Connect(configurator));
 		}
 
-		~HostChannel()
-		{
-			Dispose(false);
-		}
-
 		void Dispose(bool disposing)
 		{
 			if (_disposed)

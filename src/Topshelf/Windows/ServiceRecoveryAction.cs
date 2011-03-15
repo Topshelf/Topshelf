@@ -12,7 +12,12 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Windows
 {
-	public enum ServiceRecoveryAction : uint
+	// Henrik: I removed uint from this enum in order to remove a CLSCompiant warning. It's now 'int', the default.
+	// but according to Find All Usages, it's only ever used for switching anyway. 
+	// Besides, we're not above log2(2^31) number of mutually exclusive options, or 2^31 options in this enum anyway, 
+	// so it should work with int, yeah?
+
+	public enum ServiceRecoveryAction
 	{
 		TakeNoAction,
 		RestartService,
