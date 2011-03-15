@@ -9,10 +9,12 @@ BUILD_NUMBER_BASE = '2.2.1'
 PRODUCT = 'Topshelf'
 CLR_TOOLS_VERSION = 'v4.0.30319'
 
-BUILD_CONFIG = ENV['BUILD_CONFIG'] || "Debug"
+BUILD_CONFIG = ENV['BUILD_CONFIG'] || "Release"
 BUILD_CONFIG_KEY = ENV['BUILD_CONFIG_KEY'] || 'NET40'
 BUILD_PLATFORM = ENV['BUILD_PLATFORM'] || 'x86' # we might want to vary this a little
 TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
+MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
+OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-2.0')
 
 props = { 
     :stage => File.expand_path("build_output"),
@@ -86,16 +88,16 @@ end
 desc "Cleans, versions, compiles the application and generates build_output/."
 task :compile => [:global_version, :run_msbuild] do
 	puts 'Copying files relevant for \'Linking\''
-	copyOutputFiles "src/Topshelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,config,xml}", File.join( props[:stage], 'for_linking' )
+	copyOutputFiles "src/Topshelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,config,xml}", File.join( props[:stage], OUTPUT_PATH, 'for_linking' )
 	
 	puts 'Copying files relevant for \'Shelving\'.'
-	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe,config,xml}", File.join( props[:stage], 'for_shelving' )
+	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe,config,xml}", File.join( props[:stage], OUTPUT_PATH, 'for_shelving' )
 end
 
 desc "Prepare examples"
 task :prepare_examples => [:compile] do
 	puts "Preparing samples"
-	for_shelving = File.join(props[:stage], 'for_shelving')
+	for_shelving = File.join(props[:stage], OUTPUT_PATH, 'for_shelving')
 	targ = File.join(for_shelving, 'Services', 'clock' )
 	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,xml,config}", targ
 	copy('doc/Using Shelving.txt', for_shelving)
@@ -104,8 +106,8 @@ end
 desc "Only compiles the application."
 msbuild :run_msbuild do |msb|
 	msb.properties :Configuration => BUILD_CONFIG,
-		:BuildConfigKey => BUILD_CONFIG_KEY, 
-		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION
+		:BuildConfigKey => BUILD_CONFIG_KEY
+	msb.use MSB_USE
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'
 end

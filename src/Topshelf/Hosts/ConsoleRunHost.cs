@@ -122,7 +122,7 @@ namespace Topshelf.Hosts
 				return;
 
 			if (disposing)
-				_exit.Dispose();
+				(_exit as IDisposable).Dispose();
 
 			_disposed = true;
 		}
