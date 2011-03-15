@@ -269,7 +269,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="HelpText.txt" />
+    <EmbeddedResource Include="HelpText.txt" />
     <Content Include="Bottles\_About Bottles.txt" />
     <Content Include="Messages\_About Messages.txt" />
   </ItemGroup>
