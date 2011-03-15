@@ -17,7 +17,8 @@ TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
 props = { 
     :stage => File.expand_path("build_output"),
     :stage_merged => File.expand_path("build_merged"), 
-    :artifacts => File.expand_path("build_artifacts")
+    :artifacts => File.expand_path("build_artifacts"),
+	:projects => ["Topshelf", "Topshelf.Host"]
 }
 
 puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION}."
@@ -150,9 +151,20 @@ zip :package do |zip|
 	zip.output_path = [props[:artifacts]]
 end
 
+task :moma => [:compile] do
+	dlls = project_outputs(props).join(' ')
+	sh "lib/MoMA/MoMA.exe --nogui --out #{File.join(props[:artifacts], 'MoMA-report.html')} #{dlls}"
+end
+
 desc "Builds the nuget package"
 task :nuget do
 #	sh "lib/nuget.exe pack packaging/nuget/topshelf.nuspec -o artifacts"
+end
+
+def project_outputs(props)
+	props[:projects].map{ |p| "src/#{p}/bin/#{BUILD_CONFIG}/#{p}.dll" }.
+		concat( props[:projects].map{ |p| "src/#{p}/bin/#{BUILD_CONFIG}/#{p}.exe" } ).
+		find_all{ |path| exists?(path) }
 end
 
 def waitfor(&block)
