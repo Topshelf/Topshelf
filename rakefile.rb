@@ -20,7 +20,6 @@ OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-3.5')
 
 props = { 
 	:build_support => File.expand_path("build_support"),
-    :bin => File.expand_path("bin"),
     :stage => File.expand_path("build_output"),
     :output => File.join( File.expand_path("build_output"), OUTPUT_PATH ),
     :artifacts => File.expand_path("build_artifacts"),
@@ -94,21 +93,23 @@ task :clean do
 end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
-task :compile => [:global_version, :run_msbuild] do
+task :compile => [:global_version, :run_msbuild, :run_msbuildx86] do
 	puts 'Copying unmerged dependencies to output folder'
-	copyOutputFiles File.join(props[:bin], "host"), "log4net.{dll,pdb,xml,config}", props[:output]
-	copyOutputFiles File.join(props[:bin], "host"), "Topshelf.Host.{exe,pdb}", props[:output]
-	copyOutputFiles File.join(props[:bin], "host"), "Topshelf.Host.exe.config", props[:output]
+	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "log4net.{dll,pdb,xml,config}", props[:output]
+	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "Topshelf.Host.{exe,pdb}", props[:output]
+	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "Topshelf.Host.exe.config", props[:output]
+	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe", File.join(props[:output], 'Topshelf.Host-x86.exe'))
+	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.pdb", File.join(props[:output], 'Topshelf.Host-x86.pdb'))
 end
 
 ilmerge :ilmerge do |ilm|
 	out = File.join(props[:output], 'Topshelf.dll')
 	ilm.output = out
 	ilm.internalize = File.join(props[:build_support], 'internalize.txt')
-	ilm.working_directory = File.join( props[:bin], 'lib' )
+	ilm.working_directory = "src/Topshelf/bin/#{BUILD_CONFIG}"
 	ilm.target = :library
     ilm.use MSB_USE
-	ilm.log = File.join( props[:bin], 'ilmerge.log' )
+	ilm.log = File.join( File.expand_path("src"), "Topshelf","bin","#{BUILD_CONFIG}", 'ilmerge.log' )
 	ilm.allow_dupes = true
 	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]
 end
@@ -126,8 +127,20 @@ end
 
 desc "Only compiles the application."
 msbuild :run_msbuild do |msb|
-	msb.properties :Configuration => BUILD_CONFIG,
-		:BuildConfigKey => BUILD_CONFIG_KEY
+	msb.properties :Configuration => BUILD_CONFIG, 
+		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
+		:Platform => 'Any CPU'
+	msb.use MSB_USE
+	msb.targets :Clean, :Build
+	msb.solution = 'src/Topshelf.sln'
+end
+
+desc "Only compiles the application."
+msbuild :run_msbuildx86 do |msb|
+	msb.properties :Configuration => BUILD_CONFIG, 
+		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
+		:Platform => 'x86',
+		:OutputPath => 'bin/Release-x86'
 	msb.use MSB_USE
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'
