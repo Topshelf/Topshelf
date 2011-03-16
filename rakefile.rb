@@ -104,7 +104,7 @@ ilmerge :ilmerge do |ilm|
 	ilm.internalize = File.join(props[:build_support], 'internalize.txt')
 	ilm.working_directory = File.join( props[:bin], 'lib' )
 	ilm.target = :library
-	ilm.log = File.join( props[:stage], 'ilmerge.log' )
+	ilm.log = File.join( props[:bin], 'ilmerge.log' )
 	ilm.allow_dupes = true
 	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]
 end
