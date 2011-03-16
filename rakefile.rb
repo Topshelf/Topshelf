@@ -16,7 +16,7 @@ BUILD_CONFIG_KEY = ENV['BUILD_CONFIG_KEY'] || 'NET40'
 BUILD_PLATFORM = ENV['BUILD_PLATFORM'] || 'x86' # we might want to vary this a little
 TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
 MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
-OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-2.0')
+OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-3.5')
 
 props = { 
 	:build_support => File.expand_path("build_support"),
@@ -52,6 +52,9 @@ task :all => [:default]
 
 desc "**Default**, compiles and runs tests"
 task :default => [:clean, :compile, :ilmerge, :tests, :prepare_examples]
+
+desc "**DO NOT CLEAR OUTPUT FOLDER**, compiles and runs tests"
+task :unclean => [:compile, :ilmerge, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
@@ -104,6 +107,7 @@ ilmerge :ilmerge do |ilm|
 	ilm.internalize = File.join(props[:build_support], 'internalize.txt')
 	ilm.working_directory = File.join( props[:bin], 'lib' )
 	ilm.target = :library
+    ilm.use MSB_USE
 	ilm.log = File.join( props[:bin], 'ilmerge.log' )
 	ilm.allow_dupes = true
 	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]

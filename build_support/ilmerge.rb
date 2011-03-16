@@ -12,8 +12,10 @@ class ILMerge
   def initialize
 	@debug = true
 	@allow_dupes = true
-	@platform_version = "v4"
-	@platform_directory = get_net_version(:net4)
+	
+	self.use :net4
+#	@platform_version = "v4"
+#	@platform_directory = get_net_version(:net4)
 	
     super()
     update_attributes ilmerge.to_hash
@@ -32,6 +34,8 @@ class ILMerge
     params << @references.map{|r| format_reference(r)} unless @references.nil?
     
 	puts "Running ILMerge: " + params.join(' ')
+	FileUtils.rm_rf @log unless @log.nil?
+
     result = run_command "ILMerge", params
     
     failure_message = 'ILMerge Failed. See Build Log For Detail'
@@ -39,8 +43,16 @@ class ILMerge
   end
 	#, "/internalize:build.custom/ilmerge.internalize.ignore.txt /target:dll /out:code_drop/#{OUTPUT_PATH}/Topshelf.dll /log:code_drop/ilmerge.log /ndebug /allowDup Topshelf.dll Magnum.dll Newtonsoft.Json.dll Spark.dll Stact.dll Stact.ServerFramework.dll"
 	
-  def platform_directory(netversion)
-	get_net_version(netversion)
+  def use(netversion)
+	case netversion
+	when :net2, :net20, :net35
+	  @platform_version = nil
+	when :net4, :net40
+	  @platform_version = "v4"
+	else
+	  fail "#{netversion} is not a supported .net version"
+	end
+	@platform_directory = get_net_version(netversion)
   end
 	
   def format_reference(resource)
