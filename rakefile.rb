@@ -139,8 +139,7 @@ desc "Only compiles the application."
 msbuild :run_msbuildx86 do |msb|
 	msb.properties :Configuration => BUILD_CONFIG, 
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
-		:Platform => 'x86',
-		:OutputPath => 'bin/Release-x86'
+		:Platform => 'x86'
 	msb.use MSB_USE
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'

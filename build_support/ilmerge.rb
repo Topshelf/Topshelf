@@ -30,6 +30,7 @@ class ILMerge
     params << "/allowDup" unless @allow_dupes.nil?
     params << "/ndebug" unless @debug
 	params << "/targetplatform:#{@platform_version},#{@platform_directory}" unless @platform_version.nil?
+	#params << @platform_version unless @platform_version.nil?
 	params << "#{@assembly}"
     params << @references.map{|r| format_reference(r)} unless @references.nil?
     
@@ -46,13 +47,14 @@ class ILMerge
   def use(netversion)
 	case netversion
 	when :net2, :net20, :net35
-	  @platform_version = nil
+	  @platform_version = "v2"
+	  @platform_directory = get_net_version(:net2)
 	when :net4, :net40
 	  @platform_version = "v4"
+	@platform_directory = get_net_version(:net4)
 	else
 	  fail "#{netversion} is not a supported .net version"
 	end
-	@platform_directory = get_net_version(netversion)
   end
 	
   def format_reference(resource)
