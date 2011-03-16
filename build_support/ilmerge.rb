@@ -10,7 +10,7 @@ class ILMerge
   attr_array :references
 
   def initialize
-	@debug = false
+	@debug = true
 	@allow_dupes = true
 	@platform_version = "v4"
 	@platform_directory = get_net_version(:net4)

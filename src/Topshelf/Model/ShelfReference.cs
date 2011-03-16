@@ -165,10 +165,13 @@ namespace Topshelf.Model
 
 					_log.InfoFormat("[{0}] AppDomain Unloaded", _serviceName);
 				}
-				catch (CannotUnloadAppDomainException) 
-					// Henrik: Why do we need to catch the base type Exception here? I've changed it to CannotUnloadAppDomainException.
+				catch (AppDomainUnloadedException)
 				{
-					_log.DebugFormat("[{0}] AppDomain was already unloaded", _serviceName);
+					// this is fine, just means the shelf was good and unloaded properly
+				}
+				catch (CannotUnloadAppDomainException)
+				{
+					_log.DebugFormat("[{0}] Unable to unload the AppDomain", _serviceName);
 				}
 				finally
 				{

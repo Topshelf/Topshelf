@@ -20,8 +20,9 @@ OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-2.0')
 
 props = { 
 	:build_support => File.expand_path("build_support"),
+    :bin => File.expand_path("bin"),
     :stage => File.expand_path("build_output"),
-    :stage_merged => File.expand_path("build_merged"), 
+    :output => File.join( File.expand_path("build_output"), OUTPUT_PATH ),
     :artifacts => File.expand_path("build_artifacts"),
 	:projects => ["Topshelf", "Topshelf.Host"]
 }
@@ -50,7 +51,7 @@ desc "Compiles, unit tests, generates the database"
 task :all => [:default]
 
 desc "**Default**, compiles and runs tests"
-task :default => [:clean, :compile, :tests, :prepare_examples, :ilmerge]
+task :default => [:clean, :compile, :ilmerge, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
@@ -91,18 +92,17 @@ end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
 task :compile => [:global_version, :run_msbuild] do
-	puts 'Copying files relevant for \'Linking\''
-	copyOutputFiles "src/Topshelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,config,xml}", File.join( props[:stage], OUTPUT_PATH, 'for_linking' )
-	
-	puts 'Copying files relevant for \'Shelving\'.'
-	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "*.{dll,pdb,exe,config,xml}", File.join( props[:stage], OUTPUT_PATH, 'for_shelving' )
+	puts 'Copying unmerged dependencies to output folder'
+	copyOutputFiles File.join(props[:bin], "host"), "log4net.{dll,pdb,xml,config}", props[:output]
+	copyOutputFiles File.join(props[:bin], "host"), "Topshelf.Host.{exe,pdb}", props[:output]
+	copyOutputFiles File.join(props[:bin], "host"), "Topshelf.Host.exe.config", props[:output]
 end
 
 ilmerge :ilmerge do |ilm|
-	out = File.join(props[:stage], OUTPUT_PATH, 'Topshelf.dll')
+	out = File.join(props[:output], 'Topshelf.dll')
 	ilm.output = out
 	ilm.internalize = File.join(props[:build_support], 'internalize.txt')
-	ilm.working_directory = File.join( props[:stage], OUTPUT_PATH, 'for_linking' )
+	ilm.working_directory = File.join( props[:bin], 'lib' )
 	ilm.target = :library
 	ilm.log = File.join( props[:stage], 'ilmerge.log' )
 	ilm.allow_dupes = true
@@ -112,10 +112,12 @@ end
 desc "Prepare examples"
 task :prepare_examples => [:compile] do
 	puts "Preparing samples"
-	for_shelving = File.join(props[:stage], OUTPUT_PATH, 'for_shelving')
-	targ = File.join(for_shelving, 'Services', 'clock' )
-	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "*.{dll,pdb,xml,config}", targ
-	copy('doc/Using Shelving.txt', for_shelving)
+	targ = File.join(props[:output], 'Services', 'clock' )
+	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "clock.*", targ
+	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "StuffOnAShelf.{dll}", targ
+	copyOutputFiles props[:output], "Topshelf.{dll}", targ
+	copyOutputFiles props[:output], "log4net.{dll,pdb}", targ
+	copy('doc/Using Shelving.txt', props[:output])
 end
 
 desc "Only compiles the application."
@@ -141,11 +143,11 @@ task :unit_tests => [:compile] do
 	Dir.mkdir props[:artifacts] unless exists?(props[:artifacts])
 
 	runner = NUnitRunner.new(File.join('lib', 'nunit', 'net-2.0',  "nunit-console#{(BUILD_PLATFORM.empty? ? '' : "-#{BUILD_PLATFORM}")}.exe"),
-		'src',
+		'tests',
 		TARGET_FRAMEWORK_VERSION,
 		['/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results.xml')}\""])
 
-	runner.run ['Topshelf.Specs'].map{ |assem| "#{assem}/bin/#{BUILD_CONFIG}/#{assem}.dll" }
+	runner.run ['Topshelf.Specs'].map{ |assem| "#{assem}.dll" }
 end
 
 desc "Runs the integation tests"
