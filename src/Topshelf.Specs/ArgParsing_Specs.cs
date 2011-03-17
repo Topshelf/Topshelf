@@ -89,7 +89,7 @@ namespace Topshelf.Specs
     }
 
 
-    [Scenario]
+    [Scenario, Explicit]
     public class Give_install_with_an_instance
     {
     	Host _host;
@@ -104,7 +104,7 @@ namespace Topshelf.Specs
 			});
 		}
 
-        [Then]
+	   	[Then]
         public void Action_should_be_install()
         {
         	_host.ShouldBeAnInstanceOf<InstallHost>();

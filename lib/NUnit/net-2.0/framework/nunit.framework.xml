@@ -3145,6 +3145,41 @@
             </summary>
             <param name="writer">The writer on which the description is displayed</param>
         </member>
+        <member name="M:NUnit.Framework.Constraints.ContainsConstraint.Using(System.Collections.IComparer)">
+            <summary>
+            Flag the constraint to use the supplied IComparer object.
+            </summary>
+            <param name="comparer">The IComparer object to use.</param>
+            <returns>Self.</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ContainsConstraint.Using``1(System.Collections.Generic.IComparer{``0})">
+            <summary>
+            Flag the constraint to use the supplied IComparer object.
+            </summary>
+            <param name="comparer">The IComparer object to use.</param>
+            <returns>Self.</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ContainsConstraint.Using``1(System.Comparison{``0})">
+            <summary>
+            Flag the constraint to use the supplied Comparison object.
+            </summary>
+            <param name="comparer">The IComparer object to use.</param>
+            <returns>Self.</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ContainsConstraint.Using(System.Collections.IEqualityComparer)">
+            <summary>
+            Flag the constraint to use the supplied IEqualityComparer object.
+            </summary>
+            <param name="comparer">The IComparer object to use.</param>
+            <returns>Self.</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ContainsConstraint.Using``1(System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Flag the constraint to use the supplied IEqualityComparer object.
+            </summary>
+            <param name="comparer">The IComparer object to use.</param>
+            <returns>Self.</returns>
+        </member>
         <member name="P:NUnit.Framework.Constraints.ContainsConstraint.IgnoreCase">
             <summary>
             Flag the constraint to ignore case and return self.
@@ -4016,6 +4051,11 @@
             <param name="actual">The value to be tested</param>
             <returns>True for success, false for failure</returns>
         </member>
+        <member name="M:NUnit.Framework.Constraints.PathConstraint.IsMatch(System.String,System.String)">
+            <summary>
+            Returns true if the expected path and actual path match
+            </summary>
+        </member>
         <member name="M:NUnit.Framework.Constraints.PathConstraint.GetStringRepresentation">
             <summary>
             Returns the string representation of this constraint
@@ -4034,6 +4074,7 @@
             </summary>
             <param name="path1">The first path</param>
             <param name="path2">The second path</param>
+            <param name="ignoreCase">Indicates whether case should be ignored</param>
             <returns></returns>
         </member>
         <member name="M:NUnit.Framework.Constraints.PathConstraint.IsSubPath(System.String,System.String,System.Boolean)">
@@ -4042,6 +4083,7 @@
             </summary>
             <param name="path1">The first path - supposed to be the parent path</param>
             <param name="path2">The second path - supposed to be the child path</param>
+            <param name="ignoreCase">Indicates whether case should be ignored</param>
             <returns></returns>
         </member>
         <member name="M:NUnit.Framework.Constraints.PathConstraint.IsSamePathOrUnder(System.String,System.String)">
@@ -4079,7 +4121,8 @@
             <summary>
             Test whether the constraint is satisfied by a given value
             </summary>
-            <param name="actual">The value to be tested</param>
+            <param name="expectedPath">The expected path</param>
+            <param name="actualPath">The actual path</param>
             <returns>True for success, false for failure</returns>
         </member>
         <member name="M:NUnit.Framework.Constraints.SamePathConstraint.WriteDescriptionTo(NUnit.Framework.Constraints.MessageWriter)">
@@ -4103,7 +4146,8 @@
             <summary>
             Test whether the constraint is satisfied by a given value
             </summary>
-            <param name="actual">The value to be tested</param>
+            <param name="expectedPath">The expected path</param>
+            <param name="actualPath">The actual path</param>
             <returns>True for success, false for failure</returns>
         </member>
         <member name="M:NUnit.Framework.Constraints.SubPathConstraint.WriteDescriptionTo(NUnit.Framework.Constraints.MessageWriter)">
@@ -4127,7 +4171,8 @@
             <summary>
             Test whether the constraint is satisfied by a given value
             </summary>
-            <param name="actual">The value to be tested</param>
+            <param name="expectedPath">The expected path</param>
+            <param name="actualPath">The actual path</param>
             <returns>True for success, false for failure</returns>
         </member>
         <member name="M:NUnit.Framework.Constraints.SamePathOrUnderConstraint.WriteDescriptionTo(NUnit.Framework.Constraints.MessageWriter)">
@@ -4428,6 +4473,38 @@
             <summary>
             Appends an Or operator to the expression.
             </summary>
+        </member>
+        <member name="T:NUnit.Framework.Constraints.ReusableConstraint">
+            <summary>
+            ReusableConstraint wraps a resolved constraint so that it
+            may be saved and reused as needed.
+            </summary>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ReusableConstraint.#ctor(NUnit.Framework.Constraints.IResolveConstraint)">
+            <summary>
+            Construct a ReusableConstraint
+            </summary>
+            <param name="c">The constraint or expression to be reused</param>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ReusableConstraint.op_Implicit(NUnit.Framework.Constraints.Constraint)~NUnit.Framework.Constraints.ReusableConstraint">
+            <summary>
+            Conversion operator from a normal constraint to a ReusableConstraint.
+            </summary>
+            <param name="c">The original constraint to be wrapped as a ReusableConstraint</param>
+            <returns></returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ReusableConstraint.ToString">
+            <summary>
+            Returns the string representation of the constraint.
+            </summary>
+            <returns>A string representing the constraint</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ReusableConstraint.Resolve">
+            <summary>
+            Resolves the ReusableConstraint by returning the constraint
+            that it originally wrapped.
+            </summary>
+            <returns>A resolved constraint</returns>
         </member>
         <member name="T:NUnit.Framework.Constraints.SameAsConstraint">
             <summary>
@@ -4760,6 +4837,14 @@
             </summary>
             <param name="actual">The value to be tested</param>
             <returns>True if no exception is thrown, otherwise false</returns>
+        </member>
+        <member name="M:NUnit.Framework.Constraints.ThrowsNothingConstraint.Matches(NUnit.Framework.Constraints.ActualValueDelegate)">
+            <summary>
+            Converts an ActualValueDelegate to a TestDelegate
+            before calling the primary overload.
+            </summary>
+            <param name="del"></param>
+            <returns></returns>
         </member>
         <member name="M:NUnit.Framework.Constraints.ThrowsNothingConstraint.WriteDescriptionTo(NUnit.Framework.Constraints.MessageWriter)">
             <summary>
@@ -9860,6 +9945,12 @@
             Provide the context information of the current test
             </summary>
         </member>
+        <member name="M:NUnit.Framework.TestContext.#ctor(System.Collections.IDictionary)">
+            <summary>
+            Constructs a TestContext using the provided context dictionary
+            </summary>
+            <param name="context">A context dictionary</param>
+        </member>
         <member name="P:NUnit.Framework.TestContext.CurrentContext">
             <summary>
             Get the current test context. This is created
@@ -9868,11 +9959,33 @@
             outside the test for which it is created.
             </summary>
         </member>
+        <member name="P:NUnit.Framework.TestContext.Test">
+            <summary>
+            Gets a TestAdapter representing the currently executing test in this context.
+            </summary>
+        </member>
+        <member name="P:NUnit.Framework.TestContext.Result">
+            <summary>
+            Gets a ResultAdapter representing the current result for the test 
+            executing in this context.
+            </summary>
+        </member>
+        <member name="P:NUnit.Framework.TestContext.TestDirectory">
+            <summary>
+            Gets the current directory for this TestContext
+            </summary>
+        </member>
         <member name="T:NUnit.Framework.TestContext.TestAdapter">
             <summary>
             TestAdapter adapts a Test for consumption by
             the user test code.
             </summary>
+        </member>
+        <member name="M:NUnit.Framework.TestContext.TestAdapter.#ctor(System.Collections.IDictionary)">
+            <summary>
+            Constructs a TestAdapter for this context
+            </summary>
+            <param name="context">The context dictionary</param>
         </member>
         <member name="P:NUnit.Framework.TestContext.TestAdapter.Name">
             <summary>
@@ -9897,9 +10010,9 @@
         </member>
         <member name="M:NUnit.Framework.TestContext.ResultAdapter.#ctor(System.Collections.IDictionary)">
             <summary>
-            Construct a ResultAdapter for a TestResult
+            Construct a ResultAdapter for a context
             </summary>
-            <param name="result">The TestResult to be adapted</param>
+            <param name="context">The context holding the result</param>
         </member>
         <member name="P:NUnit.Framework.TestContext.ResultAdapter.State">
             <summary>
