@@ -157,26 +157,7 @@ namespace Topshelf.Model
 					_channel = null;
 				}
 
-				try
-				{
-					_log.DebugFormat("[{0}] Unloading AppDomain", _serviceName);
-
-					AppDomain.Unload(_domain);
-
-					_log.InfoFormat("[{0}] AppDomain Unloaded", _serviceName);
-				}
-				catch (AppDomainUnloadedException)
-				{
-					// this is fine, just means the shelf was good and unloaded properly
-				}
-				catch (CannotUnloadAppDomainException)
-				{
-					_log.DebugFormat("[{0}] Unable to unload the AppDomain", _serviceName);
-				}
-				finally
-				{
-					_domain = null;
-				}
+				_domain = null;
 			}
 
 			_disposed = true;
