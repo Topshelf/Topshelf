@@ -26,7 +26,7 @@ props = {
 	:projects => ["Topshelf", "Topshelf.Host"]
 }
 
-puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION}."
+puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION} in #{BUILD_CONFIG}-mode."
  
 desc "Displays a list of tasks"
 task :help do
@@ -58,13 +58,9 @@ task :unclean => [:compile, :ilmerge, :tests, :prepare_examples]
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
   asm_version = BUILD_NUMBER_BASE + ".0"
-  
-  begin
-    commit = `git log -1 --pretty=format:%H`
-	commit_date = `git log -1 --pretty=format:%ai`
-  rescue
-    commit = "git unavailable"
-  end
+  commit_data = get_commit_hash_and_date
+  commit = commit_data[0]
+  commit_date = commit_data[1]
   build_number = "#{BUILD_NUMBER_BASE}.#{Date.today.strftime('%y%j')}"
   tc_build_number = ENV["BUILD_NUMBER"]
   puts "##teamcity[buildNumber '#{build_number}-#{tc_build_number}']" unless tc_build_number.nil?
@@ -100,6 +96,7 @@ task :compile => [:global_version, :run_msbuild, :run_msbuildx86] do
 	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "Topshelf.Host.exe.config", props[:output]
 	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe", File.join(props[:output], 'Topshelf.Host-x86.exe'))
 	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.pdb", File.join(props[:output], 'Topshelf.Host-x86.pdb'))
+	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe.config", File.join(props[:output], 'Topshelf.Host-x86.exe.config'))
 end
 
 ilmerge :ilmerge do |ilm|
@@ -123,11 +120,16 @@ task :prepare_examples => [:compile] do
 	copyOutputFiles props[:output], "Topshelf.{dll}", targ
 	copyOutputFiles props[:output], "log4net.{dll,pdb}", targ
 	copy('doc/Using Shelving.txt', props[:output])
+	commit_data = get_commit_hash_and_date
+	what_commit = File.new File.join(props[:output], "#{commit_data[0]} - #{commit_data[1]}.txt"), "w"
+	what_commit.puts "The file name denotes what commit these files were built off of. You can also find that information in the assembly info accessible through code."
+	what_commit.close
 end
 
 desc "Only compiles the application."
 msbuild :run_msbuild do |msb|
 	msb.properties :Configuration => BUILD_CONFIG, 
+	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
 		:Platform => 'Any CPU'
 	msb.use MSB_USE
@@ -138,6 +140,7 @@ end
 desc "Only compiles the application."
 msbuild :run_msbuildx86 do |msb|
 	msb.properties :Configuration => BUILD_CONFIG, 
+	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
 		:Platform => 'x86'
 	msb.use MSB_USE
@@ -193,6 +196,8 @@ task :moma => [:compile] do
 	sh "lib/MoMA/MoMA.exe --nogui --out #{File.join(props[:artifacts], 'MoMA-report.html')} #{dlls}"
 end
 
+# TODO: create tasks for installing and running samples!
+
 desc "Builds the nuget package"
 task :nuget do
 #	sh "lib/nuget.exe pack packaging/nuget/topshelf.nuspec -o artifacts"
@@ -204,6 +209,18 @@ def project_outputs(props)
 		find_all{ |path| exists?(path) }
 end
 
+def get_commit_hash_and_date
+	begin
+		commit = `git log -1 --pretty=format:%H`
+		git_date = `git log -1 --date=iso --pretty=format:%ad`
+		commit_date = DateTime.parse( git_date ).strftime("%Y-%m-%d %H%M%S")
+	rescue
+		commit = "git unavailable"
+	end
+	
+	[commit, commit_date]
+end
+
 def waitfor(&block)
 	checks = 0
 	
@@ -212,5 +229,5 @@ def waitfor(&block)
 		checks += 1
 	end
 	
-	raise 'waitfor timeout expired' if checks > 10
+	raise 'waitfor timeout expired. make sure that you aren\'t running something from the build output folders' if checks > 10
 end
