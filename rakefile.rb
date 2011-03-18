@@ -19,6 +19,7 @@ MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
 OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-3.5')
 
 props = { 
+  :src => File.expand_path("src"),
   :build_support => File.expand_path("build_support"),
   :stage => File.expand_path("build_output"),
   :output => File.join( File.expand_path("build_output"), OUTPUT_PATH ),
@@ -93,22 +94,22 @@ end
 desc "Cleans, versions, compiles the application and generates build_output/."
 task :compile => [:global_version, :build, :build_x86] do
 	puts 'Copying unmerged dependencies to output folder'
-	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "log4net.{dll,pdb,xml,config}", props[:output]
-	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "Topshelf.Host.{exe,pdb}", props[:output]
-	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "Topshelf.Host.exe.config", props[:output]
-	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe", File.join(props[:output], 'Topshelf.Host-x86.exe'))
-	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.pdb", File.join(props[:output], 'Topshelf.Host-x86.pdb'))
-	copy("src/Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe.config", File.join(props[:output], 'Topshelf.Host-x86.exe.config'))
+	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "log4net.{dll,pdb,xml,config}", props[:output]
+	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.{exe,pdb}", props[:output]
+	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.exe.config", props[:output]
+	copy(File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe"), File.join(props[:output], 'Topshelf.Host-x86.exe'))
+	copy(File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.pdb"), File.join(props[:output], 'Topshelf.Host-x86.pdb'))
+	copy(File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe.config"), File.join(props[:output], 'Topshelf.Host-x86.exe.config'))
 end
 
 ilmerge :ilmerge do |ilm|
 	out = File.join(props[:output], 'Topshelf.dll')
 	ilm.output = out
 	ilm.internalize = File.join(props[:build_support], 'internalize.txt')
-	ilm.working_directory = "src/Topshelf/bin/#{BUILD_CONFIG}"
+	ilm.working_directory = File.join(props[:src], "Topshelf/bin/#{BUILD_CONFIG}")
 	ilm.target = :library
     ilm.use MSB_USE
-	ilm.log = File.join( File.expand_path("src"), "Topshelf","bin","#{BUILD_CONFIG}", 'ilmerge.log' )
+	ilm.log = File.join( props[:src], "Topshelf","bin","#{BUILD_CONFIG}", 'ilmerge.log' )
 	ilm.allow_dupes = true
 	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]
 end
@@ -117,8 +118,8 @@ desc "Prepare examples"
 task :prepare_examples => [:compile] do
 	puts "Preparing samples"
 	targ = File.join(props[:output], 'Services', 'clock' )
-	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "clock.*", targ
-	copyOutputFiles "src/Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}", "StuffOnAShelf.{dll}", targ
+	copyOutputFiles File.join(props[:src], "Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}"), "clock.*", targ
+	copyOutputFiles File.join(props[:src], "Samples/StuffOnAShelf/bin/#{BUILD_CONFIG}"), "StuffOnAShelf.{dll}", targ
 	copyOutputFiles props[:output], "Topshelf.{dll}", targ
 	copyOutputFiles props[:output], "log4net.{dll,pdb}", targ
 	copy('doc/Using Shelving.txt', props[:output])
