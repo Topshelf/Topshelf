@@ -8,3 +8,6 @@ call rake unclean
 
 echo Creating NU package
 lib\nuget pack Topshelf.nuspec /OutputDirectory build_artifacts 
+
+echo Create ZIP package
+call rake package
