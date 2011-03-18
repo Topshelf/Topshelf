@@ -5,7 +5,7 @@ require File.dirname(__FILE__) + "/build_support/BuildUtils.rb"
 include FileTest
 require 'albacore'
 require File.dirname(__FILE__) + "/build_support/ilmergeconfig.rb"
-require File.dirname(__FILE__) + "/build_support/ILMerge.rb"
+require File.dirname(__FILE__) + "/build_support/ilmerge.rb"
 
 BUILD_NUMBER_BASE = '2.2.1'
 PRODUCT = 'Topshelf'
@@ -19,11 +19,11 @@ MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
 OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'net-4.0' : 'net-3.5')
 
 props = { 
-	:build_support => File.expand_path("build_support"),
-    :stage => File.expand_path("build_output"),
-    :output => File.join( File.expand_path("build_output"), OUTPUT_PATH ),
-    :artifacts => File.expand_path("build_artifacts"),
-	:projects => ["Topshelf", "Topshelf.Host"]
+  :build_support => File.expand_path("build_support"),
+  :stage => File.expand_path("build_output"),
+  :output => File.join( File.expand_path("build_output"), OUTPUT_PATH ),
+  :artifacts => File.expand_path("build_artifacts"),
+  :projects => ["Topshelf", "Topshelf.Host"]
 }
 
 puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION} in #{BUILD_CONFIG}-mode."
@@ -46,13 +46,13 @@ task :help do
 end
 
 
-desc "Compiles, unit tests, generates the database"
-task :all => [:default]
+desc "Cleans, compiles, il-merges, unit tests, prepares examples, packages zip and runs MoMA"
+task :all => [:default, :package, :moma]
 
 desc "**Default**, compiles and runs tests"
 task :default => [:clean, :compile, :ilmerge, :tests, :prepare_examples]
 
-desc "**DO NOT CLEAR OUTPUT FOLDER**, compiles and runs tests"
+desc "**DOOES NOT CLEAR OUTPUT FOLDER**, compiles and runs tests"
 task :unclean => [:compile, :ilmerge, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
@@ -80,16 +80,18 @@ end
 
 desc "Prepares the working directory for a new build"
 task :clean do
-	#TODO: do any other tasks required to clean/prepare the working directory
+	FileUtils.rm_rf props[:artifacts]
 	FileUtils.rm_rf props[:stage]
 	# work around latency issue where folder still exists for a short while after it is removed
 	waitfor { !exists?(props[:stage]) }
+	waitfor { !exists?(props[:artifacts]) }
+	
 	Dir.mkdir props[:stage]
 	Dir.mkdir props[:artifacts] unless exists?(props[:artifacts])
 end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
-task :compile => [:global_version, :run_msbuild, :run_msbuildx86] do
+task :compile => [:global_version, :build, :build_x86] do
 	puts 'Copying unmerged dependencies to output folder'
 	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "log4net.{dll,pdb,xml,config}", props[:output]
 	copyOutputFiles "src/Topshelf.Host/bin/#{BUILD_CONFIG}", "Topshelf.Host.{exe,pdb}", props[:output]
@@ -126,23 +128,17 @@ task :prepare_examples => [:compile] do
 	what_commit.close
 end
 
-desc "Only compiles the application."
-msbuild :run_msbuild do |msb|
-	msb.properties :Configuration => BUILD_CONFIG, 
-	    :BuildConfigKey => BUILD_CONFIG_KEY,
-		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
-		:Platform => 'Any CPU'
-	msb.use MSB_USE
-	msb.targets :Clean, :Build
-	msb.solution = 'src/Topshelf.sln'
+desc "INTERNAL: Compiles the app in x86 mode"
+task :build_x86 do |msb|
+	Rake::Task[:build].invoke('x86')
 end
 
 desc "Only compiles the application."
-msbuild :run_msbuildx86 do |msb|
+msbuild :build, :platform do |msb, args|
 	msb.properties :Configuration => BUILD_CONFIG, 
 	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
-		:Platform => 'x86'
+		:Platform => args[:platform] || 'Any CPU'
 	msb.use MSB_USE
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'
@@ -185,7 +181,7 @@ task :ci => [:default, :package, :moma]
 desc "ZIPs up the build results and runs the MoMA analyzer."
 zip :package do |zip|
 	zip.directories_to_zip = [props[:stage]]
-	zip.output_file = 'topshelf.zip'
+	zip.output_file = "topshelf-#{BUILD_NUMBER_BASE}.zip"
 	zip.output_path = [props[:artifacts]]
 end
 

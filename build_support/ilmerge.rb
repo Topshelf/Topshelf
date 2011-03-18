@@ -1,5 +1,5 @@
 require 'albacore/albacoretask'
-require 'build_support/ilmergeconfig'
+require File.dirname(__FILE__) + '/ilmergeconfig.rb'
 
 class ILMerge
   include Albacore::Task

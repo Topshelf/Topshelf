@@ -1,6 +1,6 @@
 Run `Topshelf.Host install` in order to install the service host.
 
-It will look in the directory it is install in, for the directory called Services. 
+It will look in the directory it is installed in, for the directory called Services. 
 Every folder in Services gets launched as a service under the service host.
 
 (this file is copied from the /doc folder)
