@@ -130,16 +130,22 @@ task :prepare_examples => [:compile] do
 end
 
 desc "INTERNAL: Compiles the app in x86 mode"
-task :build_x86 do |msb|
-	Rake::Task[:build].invoke('x86')
-end
-
-desc "Only compiles the application."
-msbuild :build, :platform do |msb, args|
+msbuild :build_x86 do |msb|
 	msb.properties :Configuration => BUILD_CONFIG, 
 	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
-		:Platform => args[:platform] || 'Any CPU'
+		:Platform => 'x86'
+	msb.use MSB_USE
+	msb.targets :Clean, :Build
+	msb.solution = 'src/Topshelf.sln'
+end
+
+desc "Only compiles the application."
+msbuild :build do |msb|
+	msb.properties :Configuration => BUILD_CONFIG, 
+	    :BuildConfigKey => BUILD_CONFIG_KEY,
+		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
+		:Platform => 'Any CPU'
 	msb.use MSB_USE
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'
