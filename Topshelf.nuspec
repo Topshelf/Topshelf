@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<package> 
+  <metadata> 
+    <id>Topshelf</id> 
+    <version>2.2.1.0</version> 
+    <authors>Chris Patterson, Dru Sellers, Travis Smith</authors>
+    <description>Topshelf is a service library and hosting framework for .NET</description> 
+    <language>en-US</language>
+    <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
+  </metadata> 
+  <files>
+    <file src="build_output\**\*" target="lib" />
+  </files>
+</package>
+
