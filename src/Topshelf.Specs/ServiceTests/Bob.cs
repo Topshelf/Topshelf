@@ -1,61 +1,61 @@
 namespace Topshelf.Specs.ServiceTests
 {
-    using System;
-    using NUnit.Framework;
-    using Topshelf.Configuration;
-    using Topshelf.Configuration.Dsl;
+	using NUnit.Framework;
+	using Topshelf.Configuration;
+	using Topshelf.Configuration.Dsl;
 
-    [Category("Integration")]
-    [Explicit] //don't just run these for shits and giggles yet
-    [TestFixture]
-    public class Bob
-    {
-        RunConfiguration _configuration;
 
-        [TestFixtureSetUp]
-        public void EstablishContext()
-        {
-            _configuration = RunnerConfigurator.New(x =>
-            {
-                x.SetDescription("topshelf test installation");
-                x.SetDisplayName("TOPSHELF-TEST");
-                x.SetServiceName("TOPSHELF-TEST");
+	[Category("Integration")]
+	[Explicit] //don't just run these for shits and giggles yet
+	[TestFixture]
+	public class Bob
+	{
+		[Test]
+		public void Should_Install()
+		{
+			var commandline = new[] {"service", "-install"};
+			Runner.Host(_configuration, commandline);
 
-                x.RunAsLocalSystem();
+			//assert the service installed
+		}
 
-                x.ConfigureService<TestInstall>(s =>
-                {
-                    s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop());
-                });
-            });
-        }
+		[Test]
+		public void Should_Uninstall()
+		{
+			var commandline = new[] {"service", "-uninstall"};
+		}
 
-        [Test]
-        public void Should_Install()
-        {
-            var commandline = new[] { "service", "-install" };
-            Runner.Host(_configuration, commandline);
+		RunConfiguration _configuration;
 
-            //assert the service installed
-        }
+		[TestFixtureSetUp]
+		public void EstablishContext()
+		{
+			_configuration = RunnerConfigurator.New(x =>
+				{
+					x.SetDescription("topshelf test installation");
+					x.SetDisplayName("TOPSHELF-TEST");
+					x.SetServiceName("TOPSHELF-TEST");
 
-        [Test]
-        public void Should_Uninstall()
-        {
-            var commandline = new[] { "service", "-uninstall" };
+					x.RunAsLocalSystem();
 
-        }
-    }
+					x.ConfigureService<TestInstall>(s =>
+						{
+							s.WhenStarted(tc => tc.Start());
+							s.WhenStopped(tc => tc.Stop());
+						});
+				});
+		}
+	}
 
-    public class TestInstall
-    {
-        public void Start()
-        {
-        }
-        public void Stop()
-        {
 
-        }
-    }
+	public class TestInstall
+	{
+		public void Start()
+		{
+		}
+
+		public void Stop()
+		{
+		}
+	}
 }

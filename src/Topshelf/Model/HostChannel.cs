@@ -14,6 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using System.Collections.Generic;
+	using Internal;
 	using log4net;
 	using Magnum.Extensions;
 	using Stact;
@@ -33,16 +34,28 @@ namespace Topshelf.Model
 		bool _disposed;
 		WcfChannelHost _host;
 
-		public HostChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
+		public HostChannel([NotNull] Uri address, [NotNull] string pipeName, [NotNull] Action<ConnectionConfigurator> configurator)
 			: this(new ChannelAdapter(), address, pipeName)
 		{
+			if (configurator == null)
+				throw new ArgumentNullException("configurator");
+
 			_connections = new List<ChannelConnection>();
 
 			_connections.Add(_output.Connect(configurator));
 		}
 
-		public HostChannel(UntypedChannel output, Uri address, string pipeName)
+		public HostChannel([NotNull] UntypedChannel output, 
+			[NotNull] Uri address, 
+			[NotNull] string pipeName)
 		{
+			if (output == null)
+				throw new ArgumentNullException("output");
+			if (address == null)
+				throw new ArgumentNullException("address");
+			if (pipeName == null)
+				throw new ArgumentNullException("pipeName");
+
 			_output = output;
 			_address = address;
 			_pipeName = pipeName;

@@ -19,6 +19,10 @@ namespace Topshelf.Messages
 	public class ServiceFault :
 		ServiceEvent
 	{
+		protected ServiceFault()
+		{
+		}
+
 		public ServiceFault(string serviceName, Exception ex)
 			: base(serviceName)
 		{
@@ -26,37 +30,32 @@ namespace Topshelf.Messages
 
 			EventType = ServiceEventType.Fault;
 
-			if (ex != null)
-			{
-				ExceptionDetail = new ExceptionDetail
-					{
-						Message = ex.Message,
-						StackTrace = ex.StackTrace
-					};
-
-				RecordInnerException(ex.InnerException);
-			}
-		}
-
-		protected ServiceFault()
-		{
+			if (ex == null)
+				return;
+			
+			ExceptionDetail = DetailsFor(ex);
+			RecordInnerException(ex.InnerException);
 		}
 
 		public IList<ExceptionDetail> InnerExceptions { get; private set; }
 
 		public ExceptionDetail ExceptionDetail { get; private set; }
 
+		static ExceptionDetail DetailsFor(Exception ex)
+		{
+			return new ExceptionDetail(ex.GetType().FullName,
+			                           ex.Message,
+			                           ex.StackTrace,
+			                           ex.HelpLink,
+			                           ex.ToString());
+		}
+
 		void RecordInnerException(Exception ex)
 		{
 			if (ex == null)
 				return;
 
-			InnerExceptions.Add(new ExceptionDetail
-				{
-					Message = ex.Message,
-					StackTrace = ex.StackTrace
-				});
-
+			InnerExceptions.Add(DetailsFor(ex));
 			RecordInnerException(ex.InnerException);
 		}
 	}

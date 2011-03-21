@@ -17,6 +17,7 @@ namespace Topshelf.Windows
 	using System.Reflection;
 	using System.ServiceProcess;
 	using Exceptions;
+	using Internal;
 	using log4net;
 	using Model;
 
@@ -29,8 +30,13 @@ namespace Topshelf.Windows
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Windows.WindowsServiceHost");
 		IServiceCoordinator _coordinator;
 
-		public WindowsServiceHost(ServiceDescription description, IServiceCoordinator coordinator)
+		public WindowsServiceHost([NotNull] ServiceDescription description, [NotNull] IServiceCoordinator coordinator)
 		{
+			if (description == null)
+				throw new ArgumentNullException("description");
+			if (coordinator == null)
+				throw new ArgumentNullException("coordinator");
+
 			_coordinator = coordinator;
 			_description = description;
 		}

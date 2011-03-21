@@ -45,8 +45,11 @@ namespace Topshelf.Builders
 
 		TimeSpan _timeout = 1.Minutes();
 
-		public RunBuilder(ServiceDescription description)
+		public RunBuilder([NotNull] ServiceDescription description)
 		{
+			if (description == null)
+				throw new ArgumentNullException("description");
+
 			_description = description;
 		}
 

@@ -17,6 +17,7 @@ namespace Topshelf.Hosts
 	using System.Linq;
 	using System.ServiceProcess;
 	using System.Threading;
+	using Internal;
 	using log4net;
 	using Model;
 
@@ -29,8 +30,13 @@ namespace Topshelf.Hosts
 		IServiceCoordinator _coordinator;
 		ManualResetEvent _exit;
 
-		public ConsoleRunHost(ServiceDescription description, IServiceCoordinator coordinator)
+		public ConsoleRunHost([NotNull] ServiceDescription description, [NotNull] IServiceCoordinator coordinator)
 		{
+			if (description == null)
+				throw new ArgumentNullException("description");
+			if (coordinator == null)
+				throw new ArgumentNullException("coordinator");
+
 			_description = description;
 			_coordinator = coordinator;
 		}
@@ -62,8 +68,7 @@ namespace Topshelf.Hosts
 			finally
 			{
 				ShutdownCoordinator();
-			    _exit.Close();
-			    _exit = null;
+				_exit.Close();
 			}
 		}
 
@@ -122,7 +127,10 @@ namespace Topshelf.Hosts
 				return;
 
 			if (disposing)
+			{
 				(_exit as IDisposable).Dispose();
+				Console.CancelKeyPress -= HandleCancelKeyPress;
+			}
 
 			_disposed = true;
 		}

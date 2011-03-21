@@ -17,7 +17,6 @@ namespace Topshelf.Messages
 	using Internal;
 	using Magnum.Extensions;
 
-
 	public static class ServiceFaultExtentions
 	{
 		public static string ToLogString([NotNull] this ServiceFault message)
@@ -28,21 +27,21 @@ namespace Topshelf.Messages
 			var sb = new StringBuilder();
 
 			if (message.ExceptionDetail != null)
-			{
-				sb.AppendLine(message.ExceptionDetail.Message);
-				sb.AppendLine(message.ExceptionDetail.StackTrace);
-			}
+				AppendDetails(sb, message.ExceptionDetail);
 
 			if (message.InnerExceptions != null)
-			{
-				message.InnerExceptions.Each(ed =>
-					{
-						sb.AppendLine(ed.Message);
-						sb.AppendLine(ed.StackTrace);
-					});
-			}
+				message.InnerExceptions.Each(ed => AppendDetails(sb, ed));
 
 			return sb.ToString();
+		}
+
+		static void AppendDetails(StringBuilder sb, ExceptionDetail ed)
+		{
+			sb.AppendLine(ed.ExceptionTypeName);
+			sb.AppendLine(ed.Message);
+			sb.AppendLine(ed.StackTrace);
+			sb.AppendLine(string.Format("HelpLink: {0}", ed.HelpLink));
+			sb.AppendLine();
 		}
 	}
 }

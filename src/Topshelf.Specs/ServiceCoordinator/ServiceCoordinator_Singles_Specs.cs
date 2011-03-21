@@ -99,7 +99,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 			_service2.Paused.IsCompleted.ShouldBeTrue();
 		}
 
-        [Ignore("Failing")]
+		[Ignore("Failing")]
         [Test]
 		public void Stop_individual_service()
 		{

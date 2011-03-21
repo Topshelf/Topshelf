@@ -21,18 +21,21 @@ namespace Topshelf.Builders
 	using Model;
 	using Stact;
 
-
+	/// <summary>
+	/// This class is responsible for configuring the shelf by building service controllers
+	/// for all the shelved services.
+	/// </summary>
 	public class ShelfBuilder :
 		RunBuilder
 	{
 		readonly ILog _log;
 		readonly HostChannel _channel;
 
-		public ShelfBuilder([NotNull] ServiceDescription description, HostChannel channel)
+		public ShelfBuilder([NotNull] ServiceDescription description, [NotNull] HostChannel channel)
 			: base(description)
 		{
-			if (description == null)
-				throw new ArgumentNullException("description");
+			if (channel == null)
+				throw new ArgumentNullException("channel");
 
 			_channel = channel;
 			_log = LogManager.GetLogger("Topshelf.Shelf." + description.Name);
@@ -59,7 +62,7 @@ namespace Topshelf.Builders
 
 			ActorInstance instance = factory.GetActor();
 
-			_channel.Connect(x => { x.AddChannel(instance); });
+			_channel.Connect(x => x.AddChannel(instance));
 
 			// this creates the state machine instance in the shelf and tells the servicecontroller
 			// to create the service

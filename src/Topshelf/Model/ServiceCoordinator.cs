@@ -139,12 +139,15 @@ namespace Topshelf.Model
 			var originatingAppDomain = sender as AppDomain;
 			string serviceName = "Topshelf";
 
-			var ex = e.ExceptionObject as Exception;
+			// prefer cast over 'as' keyword if not checking for null,
+			var ex = (Exception)e.ExceptionObject;
 
 			if (originatingAppDomain != null)
 			{
 				serviceName = originatingAppDomain.FriendlyName;
 
+				// TODO: Give fuller exception details in the fault message; 
+				// the exception arguments contains more information than we are sending
 				var exception =
 					new TopshelfException("An unhandled exception occurred within the service: " + serviceName + Environment.NewLine
 					                      + ex.Message + ex.StackTrace);

@@ -172,6 +172,7 @@ namespace Topshelf.Model
 		{
 			if (_disposed)
 				return;
+
 			if (disposing)
 			{
 				_startAction = null;

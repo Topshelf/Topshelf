@@ -12,6 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.HostConfigurators
 {
+	using System;
+	using System.Diagnostics.Contracts;
+	using Internal;
 	using Magnum.Extensions;
 
 
@@ -22,30 +25,55 @@ namespace Topshelf.HostConfigurators
 		string _description;
 		string _displayName;
 
+		/// <summary>
+		/// Creates a new WindowsServiceDescription using empty strings for the properties.
+		/// The class is required to have names by the consumers.
+		/// </summary>
 		public WindowsServiceDescription()
+			: this(string.Empty, string.Empty)
 		{
-			Name = "";
-			DisplayName = "";
-			Description = "";
-			InstanceName = "";
 		}
 
+		/// <summary>
+		/// Creates a new WindowsServiceDescription instance using the
+		/// passed parameters.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="instanceName"></param>
+		public WindowsServiceDescription([NotNull] string name, [NotNull] string instanceName)
+		{
+			if (name == null)
+				throw new ArgumentNullException("name");
+			if (instanceName == null)
+				throw new ArgumentNullException("instanceName");
+			
+			Name = name;
+			DisplayName = string.Empty;
+			Description = string.Empty;
+			InstanceName = instanceName;
+		}
+
+		[NotNull]
 		public string Name { get; set; }
 
+		[NotNull]
 		public string DisplayName
 		{
 			get { return _displayName.IsEmpty() ? Name : _displayName; }
 			set { _displayName = value; }
 		}
 
+		[NotNull]
 		public string Description
 		{
 			get { return _description.IsEmpty() ? DisplayName : _description; }
 			set { _description = value; }
 		}
 
+		[NotNull]
 		public string InstanceName { get; set; }
 
+		[Pure]
 		public string GetServiceName()
 		{
 			return InstanceName.IsEmpty() ? Name : Name + InstanceSeparator + InstanceName;

@@ -12,9 +12,24 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-    public class ExceptionDetail
-    {
-        public string Message { get; set; }
-        public string StackTrace { get; set; }
-    }
+	using System;
+
+	[Serializable]
+	public class ExceptionDetail
+	{
+		public ExceptionDetail(string exceptionTypeName, string message, string stackTrace, string helpLink, string stringRepresentation)
+		{
+			ExceptionTypeName = exceptionTypeName;
+			Message = message;
+			StackTrace = stackTrace;
+			HelpLink = helpLink;
+			StringRepresentation = stringRepresentation;
+		}
+
+		public string ExceptionTypeName { get; private set; }
+		public string Message { get; private set; }
+		public string StackTrace { get; private set; }
+		public string HelpLink { get; private set; }
+		public string StringRepresentation { get; private set; }
+	}
 }
