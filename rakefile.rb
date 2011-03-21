@@ -232,5 +232,5 @@ def waitfor(&block)
 		checks += 1
 	end
 	
-	raise 'waitfor timeout expired. make sure that you aren\'t running something from the build output folders' if checks > 10
+	raise 'Waitfor timeout expired. Make sure that you aren\'t running something from the build output folders, or that you have browsed to it through Explorer.' if checks > 10
 end
