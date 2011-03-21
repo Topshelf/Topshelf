@@ -248,7 +248,7 @@ namespace Topshelf.Model
 			this ActivityConfigurator<IServiceWorkflow, IServiceController, ServiceFault> configurator)
 		{
 			return configurator
-				.Then((i, m) => { _log.ErrorFormat("[{0}] Fault: {1}", i.Name, m.ToLogString()); });
+				.Then((i, m) => _log.ErrorFormat("[{0}] Fault: {1}", i.Name, m.ToLogString()));
 		}
 	}
 }

@@ -27,7 +27,12 @@ We are currently working on more documentation in order to get started. In princ
  3. Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
 	* You must have git on the path in order to do this. (Right click on `Computer` > `Advanced System Settings`, `Advanced` (tab) > `Environment Variables...` > Append the git executable's directory at the end of the PATH environment variable.
  4. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.
- 5. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below:
+ 5. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below.
+ 6. In order to debug one of your services together with Topshelf:
+	a) set Topshelf.Host as the startup project
+	b) add "run" as parameters when Topshelf.Host starts (in the debug tab of properties)
+	c) Add your service to the 'Services' folder.
+	d) (open your own files and place debug points in them)
 
 #### Editing in Visual Studio
 
@@ -48,11 +53,15 @@ We are currently working on more documentation in order to get started. In princ
 2. Shared ReSharper settings are under src/Topshelf.resharper.xml for formatting and style. ReSharper should pick up on this automatically when you launch Visual Studio.
 3. Make a pull request
 
-    
+## Some hints
+ * Have a look at the readme-files along with the samples
+ * Make sure that your Shelved services don't change anything inside the 'Services' folder.
+ * Your service's .config-file needs to be named 'ServiceName.config', even if your dll is named 'ServiceName.dll' and App.config
+   would be transformed into 'ServiceName.dll.config'. 'ServiceName.dll.config' won't be searched for when looking for a bootstrapper.
+
 # REQUIREMENTS
 * .NET Framework 3.5
-* Alternative build: .Net Framework 4.0
+* OR: .Net Framework 4.0
 
 # CREDITS
 Logo Design by [The Agile Badger](http://www.theagilebadger.com)  
-UppercuT - Automated Builds in moments, not days! [Project UppercuT](http://projectuppercut.org)

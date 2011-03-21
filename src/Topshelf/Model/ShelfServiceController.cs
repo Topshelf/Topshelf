@@ -93,9 +93,13 @@ namespace Topshelf.Model
 			}
 			catch (Exception ex)
 			{
+				// Henrik: remove this line in favor of the other exception handling mechanism 
+				// handling the faulted state, but right now I want the binding information.
+				_log.Error("cannot create shelf", ex);
+
 				var buildServiceException = 
 					_bootstrapperType == null 
-					? new BuildServiceException(_name)
+					? new BuildServiceException(_name, ex)
 					: new BuildServiceException(_name, _bootstrapperType, ex);
 
 				_publish.Send(new ServiceFault(_name, buildServiceException));

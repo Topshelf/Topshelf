@@ -104,7 +104,7 @@ namespace Topshelf.Model
 
 			_objectHandle = _domain.CreateInstance(shelfType.Assembly.GetName().FullName, shelfType.FullName, true, 0, null,
 			                                       new object[] {bootstrapperType, _hostChannel.Address, _hostChannel.PipeName},
-			                                       null, null, null);
+			                                       null, null);
 		}
 
 		static AppDomainSetup ConfigureAppDomainSettings(string serviceName, ShelfType shelfType)
@@ -126,7 +126,9 @@ namespace Topshelf.Model
 			_log.DebugFormat("[{0}].ApplicationBase = {1}", serviceName, domainSettings.ApplicationBase);
 
 			domainSettings.ConfigurationFile = Path.Combine(domainSettings.ApplicationBase, serviceName + ".config");
-			_log.DebugFormat("[{0}].ConfigurationFile = {1}", serviceName, domainSettings.ConfigurationFile);
+
+			_log.DebugFormat("[{0}].ConfigurationFile = {1} -- {2}", serviceName, domainSettings.ConfigurationFile, 
+				File.Exists(domainSettings.ConfigurationFile) ? "Found config file" : "DID NOT FIND CONFIGURATION FILE!");
 
 			return domainSettings;
 		}

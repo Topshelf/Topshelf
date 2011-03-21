@@ -28,8 +28,8 @@ namespace Topshelf.Exceptions
 		{
 		}
 
-		public BuildServiceException(string message, Exception innerException)
-			: base(message, innerException)
+		public BuildServiceException(string name, Exception innerException)
+			: base(string.Format("Couldn't build '{0}'.", name), innerException)
 		{
 		}
 
