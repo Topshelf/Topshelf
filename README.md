@@ -9,11 +9,43 @@ NOTE: If you are looking at the source - please run build.bat before opening the
 
 ## Overview
 # INFO
-Topshelf is an awesome service host for windows services.
+Topshelf is an awesome service host for windows services. Choose between two modes; either 
 
 ## Getting started with TopShelf
 
-We are currently working on more documentation in order to get started. In principle, download the zip file.
+Get started in four simple steps!
+
+<dl>
+	<dt>Step 1 (get the bits):</dt>
+	<dd>
+		<p>[Download the code][github-dl]</p>
+	</dd>
+	
+	<dt>Step 2 (pick your poison):</dt>
+	<dd>
+		<p>Choose whether you want your service [*Shelved*][proj-shelving] or [*Installed*][proj-install]. My personal
+		preference is the Shelving-feature.</p>
+	</dd>
+	
+	<dt>Step 3 (use examples):</dt>
+	<dd>
+		<h5>For shelving</h5>
+		<p>Extract the downloaded files and execute <code>Topshelf.Host.exe run</code> in the folder with the binaries. Watch the log folder for output.</p>
+		
+		<h5>For installing</h5>
+		<p>Go to the <code>Examples/clock</code> folder and run <code>Clock.exe install</code>
+	</dd>
+	
+	<dt>Step 4 (use it yourself):</dt>
+	<dd>
+		<p>Add a reference to the Topshelf.dll-dll as can be seen in the examples.</p>
+	</dd>
+</dl>
+
+
+[github-dl] https://github.com/Topshelf/Topshelf/downloads  "The github download page"
+[proj-shelving] http://topshelf-project.com/documentation/shelving/  "The project's site"
+[proj-install] http://topshelf-project.com/documentation/getting-started/  "
 
 ### Mailing List
 
