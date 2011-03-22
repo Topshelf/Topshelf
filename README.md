@@ -76,11 +76,11 @@ We are currently working on more documentation in order to get started. In princ
 	<tbody>
 		<tr>
 			<td>.NET Framework 3.5</td>
-			<td>`rake`</td>
+			<td><code>rake</code></td>
 		</tr>
 		<tr>
 			<td>.Net Framework 4.0</td>
-			<td>`rake BUILD_CONFIG_KEY=NET35`</td>
+			<td><code>rake BUILD_CONFIG_KEY=NET35</code></td>
 		</tr>
 	</tbody>
 </table>
