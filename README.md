@@ -43,9 +43,9 @@ Get started in four simple steps!
 </dl>
 
 
-[github-dl] https://github.com/Topshelf/Topshelf/downloads  "The github download page"
-[proj-shelving] http://topshelf-project.com/documentation/shelving/  "The project's site"
-[proj-install] http://topshelf-project.com/documentation/getting-started/  "
+[github-dl]: https://github.com/Topshelf/Topshelf/downloads  "The github download page"
+[proj-shelving]: http://topshelf-project.com/documentation/shelving/  "The project's site"
+[proj-install]: http://topshelf-project.com/documentation/getting-started/  "How to link your services to enable installing out-of-the-box"
 
 ### Mailing List
 
