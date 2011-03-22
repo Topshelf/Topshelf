@@ -12,16 +12,16 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Messages
 {
-	public class ServiceFolderChanged :
+	public class ServiceFolderRemoved :
 		ServiceEvent
 	{
-		public ServiceFolderChanged(string name)
+		public ServiceFolderRemoved(string name)
 			: base(name)
 		{
-			EventType = ServiceEventType.FolderChanged;
+			EventType = ServiceEventType.FolderRemoved;
 		}
 
-		protected ServiceFolderChanged()
+		protected ServiceFolderRemoved()
 		{
 		}
 	}

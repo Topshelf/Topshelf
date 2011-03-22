@@ -197,6 +197,7 @@
     <Compile Include="Messages\ServiceEvent.cs" />
     <Compile Include="Messages\ServiceEventType.cs" />
     <Compile Include="Messages\ServiceCommand.cs" />
+    <Compile Include="Messages\ServiceFolderRemoved.cs" />
     <Compile Include="Messages\ServicePaused.cs" />
     <Compile Include="Messages\ServicePausing.cs" />
     <Compile Include="Messages\ServiceCreated.cs" />

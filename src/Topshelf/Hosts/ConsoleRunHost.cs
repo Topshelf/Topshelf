@@ -98,24 +98,19 @@ namespace Topshelf.Hosts
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		void HandleCancelKeyPress(object sender, ConsoleCancelEventArgs consoleCancelEventArgs)
 		{
-			if (_hasCancelled)
-			{
-				consoleCancelEventArgs.Cancel = true;
-				return;
-			}
-
 			if (consoleCancelEventArgs.SpecialKey == ConsoleSpecialKey.ControlBreak)
 			{
 				_log.Error("Control+Break detected, terminating service (not cleanly, use Control+C to exit cleanly)");
 				return;
 			}
 
-			//Console.CancelKeyPress -= HandleCancelKeyPress;
+			consoleCancelEventArgs.Cancel = true;
+
+			if (_hasCancelled)
+				return;
 
 			_log.Info("Control+C detected, exiting.");
 			_exit.Set();
-
-			consoleCancelEventArgs.Cancel = true;
 
 			_hasCancelled = true;
 		}

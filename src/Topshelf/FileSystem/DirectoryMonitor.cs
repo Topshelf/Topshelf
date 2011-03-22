@@ -110,9 +110,20 @@ namespace Topshelf.FileSystem
 
 			_pendingNotifications.Add(directory, _scheduler.Schedule(_idlePeriod, _fiber, () =>
 				{
-					_serviceChannel.Send(new ServiceFolderChanged(directory));
+					SendFolderNotification(directory);
+
 					_pendingNotifications.Remove(directory);
 				}));
+		}
+
+		void SendFolderNotification(string directory)
+		{
+			var serviceFolderExists = Directory.Exists(Path.Combine(_baseDirectory, directory));
+
+			if (serviceFolderExists)
+				_serviceChannel.Send(new ServiceFolderChanged(directory));
+			else
+				_serviceChannel.Send(new ServiceFolderRemoved(directory));
 		}
 
 		public void Stop()

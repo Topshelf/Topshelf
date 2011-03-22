@@ -178,6 +178,9 @@ namespace Topshelf.Model
 			x.AddConsumerOf<ServiceFolderChanged>()
 				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);
+			x.AddConsumerOf<ServiceFolderRemoved>()
+				.UsingConsumer(m => _controllerChannel.Send(m))
+				.HandleOnFiber(_fiber);
 			x.AddConsumerOf<ServiceRunning>()
 				.UsingConsumer(m => _controllerChannel.Send(m))
 				.HandleOnFiber(_fiber);

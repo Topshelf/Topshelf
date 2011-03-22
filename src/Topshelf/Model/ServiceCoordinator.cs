@@ -186,6 +186,10 @@ namespace Topshelf.Model
 						.UsingConsumer(OnServiceFolderChanged)
 						.HandleOnFiber(_fiber);
 
+					x.AddConsumerOf<ServiceFolderRemoved>()
+						.UsingConsumer(OnServiceFolderRemoved)
+						.HandleOnFiber(_fiber);
+
 					x.AddConsumerOf<Request<ServiceStatus>>()
 						.UsingConsumer(Status)
 						.HandleOnFiber(_fiber);
@@ -252,6 +256,40 @@ namespace Topshelf.Model
 				_actorCache[message.ServiceName].Send(new RestartService(message.ServiceName));
 			else
 				OnCreateShelfService(new CreateShelfService(message.ServiceName, ShelfType.Folder, null, new AssemblyName[] {}));
+		}
+
+		void OnServiceFolderRemoved(ServiceFolderRemoved message)
+		{
+			_log.InfoFormat("[Topshelf] Folder Removed: {0}", message.ServiceName);
+
+			if (_actorCache.Has(message.ServiceName))
+			{
+				var actor = _actorCache[message.ServiceName];
+
+				_actorCache.Remove(message.ServiceName);
+				_serviceCache.Remove(message.ServiceName);
+
+				ChannelConnection connection = null;
+				connection = _channel.Connect(x =>
+					{
+						x.AddConsumerOf<ServiceStopped>()
+							.Where(m => m.ServiceName == message.ServiceName)
+							.UsingConsumer(_ =>
+								{
+									actor.Send(new UnloadService(message.ServiceName));
+								});
+
+						x.AddConsumerOf<ServiceUnloaded>()
+							.Where(m => m.ServiceName == message.ServiceName)
+							.UsingConsumer(_ =>
+								{
+									// actor.Exit(); why timeout?
+									connection.Dispose();
+								});
+					});
+
+				actor.Send(new StopService(message.ServiceName));
+			}
 		}
 
 		void OnServiceFault(ServiceFault message)
