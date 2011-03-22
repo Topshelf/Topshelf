@@ -4,9 +4,6 @@
 # LICENSE
 Apache 2.0 - see LICENSE
 
-# IMPORTANT
-NOTE: If you are looking at the source - please run build.bat before opening the solution. It creates the SolutionVersion.cs file that is necessary for a successful build.
-
 # INFO
 Topshelf is an awesome service host for windows services. Choose between two modes of operation by either having your services *Shelved* or *Installed*. A quick 4-step guide to get started can be found below.
 
@@ -49,7 +46,7 @@ Get started in four simple steps!
  1. Clone the source down to your machine. 
    `git clone git://github.com/Topshelf/Topshelf.git`
  2. Download git, ruby and gems. Install – a tutorial is [here][gems]
- 3. Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
+ 3. **Important:** Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
 	* You must have git on the path in order to do this. (Right click on `Computer` > `Advanced System Settings`, `Advanced` (tab) > `Environment Variables...` > Append the git executable's directory at the end of the PATH environment variable.
  4. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.
  5. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below.
