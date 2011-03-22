@@ -87,6 +87,10 @@ Get started in four simple steps!
 In general you should define your tasks to have the least number of dependencies to function. Paths should be placed in the props dictionary at the start of the rake file.
 
 [fowler-rake]: http://martinfowler.com/articles/rake.html  "An article about Rake for building"
+ 
+### Contributing: what do we need help with?
+
+Have a look at [the issues page][https://github.com/Topshelf/Topshelf/issues]. Issues range from the advanced, e.g. improving the service-hosting system with service-per-process) to the simple, e.g. improving the rake file or writing code summaries for the classes inside the .cs files.
   
 ## Some hints
  * Have a look at the readme-files along with the samples
