@@ -65,8 +65,25 @@ We are currently working on more documentation in order to get started. In princ
     `public delegate TService DescriptionServiceFactory< TService >( ServiceDescription description,  string name,  IServiceChannel coordinatorChannel) : MulticastDelegate`
 
 # REQUIREMENTS
-* .NET Framework 3.5
-* OR: .Net Framework 4.0
+
+<table>
+	<thead>
+		<tr>
+			<th>Framework</th>
+			<th>Build command</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>.NET Framework 3.5</td>
+			<td>`rake`</td>
+		</tr>
+		<tr>
+			<td>.Net Framework 4.0</td>
+			<td>`rake BUILD_CONFIG_KEY=NET35`</td>
+		</tr>
+	</tbody>
+</table>
 
 # CREDITS
 Logo Design by [The Agile Badger](http://www.theagilebadger.com)  
