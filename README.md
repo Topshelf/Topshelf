@@ -41,6 +41,13 @@ Get started in four simple steps!
 
 [Topshelf Discuss](http://groups.google.com/group/topshelf-discuss)
 
+   
+### Contributing 
+
+1. `git config --global core.autoclrf false`
+2. Shared ReSharper settings are under src/Topshelf.resharper.xml for formatting and style. ReSharper should pick up on this automatically when you launch Visual Studio.
+3. Make a pull request
+
 ### Source
 
  1. Clone the source down to your machine. 
@@ -70,13 +77,14 @@ Get started in four simple steps!
    
    Change `v4.0` to `v3.5`. The build script itself won't be affected by this change, but it'll help Visual Studio know what version we're building for.
   3. Edit Topshelf.Host/app.config and uncomment the supportedRuntime- and runtime-elements.
-   
-### Contributing 
 
-1. `git config --global core.autoclrf false`
-2. Shared ReSharper settings are under src/Topshelf.resharper.xml for formatting and style. ReSharper should pick up on this automatically when you launch Visual Studio.
-3. Make a pull request
+#### Editing the rake script
 
+ * Getting an overview: `rake help`
+ * Getting descriptions of the tasks: `rake -P`
+ 
+In general you should define your tasks to have the least number of dependencies to function. Paths should be placed in the props dictionary at the start of the rake file.
+  
 ## Some hints
  * Have a look at the readme-files along with the samples
  * Make sure that your Shelved services don't change anything inside the 'Services' folder.
