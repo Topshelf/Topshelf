@@ -82,7 +82,8 @@ Get started in four simple steps!
 
  * Getting an overview: `rake help`
  * Getting descriptions of the tasks: `rake -P`
- * Read some articles; currently we need help with environments configuration and reducing the noise in tasks by making the files FileTask-s themselves. Some of this stuff is discussed [here][fowler-rake]
+ * Read some articles; currently we need help with environments configuration and reducing the noise in tasks by making the files FileTask-s themselves. Some of this stuff is discussed [here][fowler-rake].
+
 In general you should define your tasks to have the least number of dependencies to function. Paths should be placed in the props dictionary at the start of the rake file.
 
 [fowler-rake]: http://martinfowler.com/articles/rake.html  "An article about Rake for building"
