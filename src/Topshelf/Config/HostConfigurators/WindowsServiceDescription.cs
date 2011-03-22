@@ -73,6 +73,8 @@ namespace Topshelf.HostConfigurators
 		[NotNull]
 		public string InstanceName { get; set; }
 
+#if NET40
+#endif
 		public string GetServiceName()
 		{
 			return InstanceName.IsEmpty() ? Name : Name + InstanceSeparator + InstanceName;

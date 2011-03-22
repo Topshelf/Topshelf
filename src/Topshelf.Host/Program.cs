@@ -17,7 +17,6 @@ namespace Topshelf
 	using log4net;
 	using log4net.Config;
 
-
 	public class Program
 	{
 		static readonly ILog _log = LogManager.GetLogger(ShelfHost.DefaultServiceName);
