@@ -58,11 +58,11 @@ We are currently working on more documentation in order to get started. In princ
  * Make sure that your Shelved services don't change anything inside the 'Services' folder.
  * Your service's .config-file needs to be named 'ServiceName.config', even if your dll is named 'ServiceName.dll' and App.config
    would be transformed into 'ServiceName.dll.config'. 'ServiceName.dll.config' won't be searched for when looking for a bootstrapper.
- * When you use your Bootstrapper<T>, you have the option of either calling HowToBuildService(), or ConstructUsing(). 
-   HowToBuildService actually calls ConstructUsing internally and you need the third argument -- the communication channel. This is
+ * When you use your `Bootstrapper<T>`, you have the option of either calling `HowToBuildService`, or `ConstructUsing`. 
+   HowToBuildService actually calls `ConstructUsing` internally and you need the third argument -- the communication channel. This is
    the signature of the delegate you pass to ConstructUsing:
 
-	public delegate TService DescriptionServiceFactory< TService >( ServiceDescription description,  string name,  IServiceChannel coordinatorChannel) : MulticastDelegate
+    `public delegate TService DescriptionServiceFactory< TService >( ServiceDescription description,  string name,  IServiceChannel coordinatorChannel) : MulticastDelegate`
 
 # REQUIREMENTS
 * .NET Framework 3.5
