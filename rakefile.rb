@@ -88,7 +88,7 @@ task :clean do
 	waitfor { !exists?(props[:artifacts]) }
 	
 	Dir.mkdir props[:stage]
-	Dir.mkdir props[:artifacts] unless exists?(props[:artifacts])
+	Dir.mkdir props[:artifacts]
 end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
