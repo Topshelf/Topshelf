@@ -41,11 +41,6 @@ Get started in four simple steps!
 	</dd>
 </dl>
 
-
-[github-dl]:   "The github download page"
-[proj-shelving]:   "The project's site"
-[proj-install]:   
-
 ### Mailing List
 
 [Topshelf Discuss](http://groups.google.com/group/topshelf-discuss)
