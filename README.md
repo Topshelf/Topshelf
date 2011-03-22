@@ -18,13 +18,12 @@ Get started in four simple steps!
 <dl>
 	<dt>Step 1 (get the bits):</dt>
 	<dd>
-		<p>[Download the code][github-dl]</p>
+		<p><a href="https://github.com/Topshelf/Topshelf/downloads">Download the code</a></p>
 	</dd>
 	
 	<dt>Step 2 (pick your poison):</dt>
 	<dd>
-		<p>Choose whether you want your service [Shelved][proj-shelving] or [Installed][proj-install]. My personal
-		preference is the Shelving-feature.</p>
+		<p>Choose whether you want your service <a href="http://topshelf-project.com/documentation/shelving/">Shelved</a> or <a href="http://topshelf-project.com/documentation/getting-started/" title="How to link your services to enable installing out-of-the-box">Installed</a>. My personal preference is the Shelving-feature.</p>
 	</dd>
 	
 	<dt>Step 3 (use examples):</dt>
@@ -43,9 +42,9 @@ Get started in four simple steps!
 </dl>
 
 
-[github-dl]: https://github.com/Topshelf/Topshelf/downloads  "The github download page"
-[proj-shelving]: http://topshelf-project.com/documentation/shelving/  "The project's site"
-[proj-install]: http://topshelf-project.com/documentation/getting-started/  "How to link your services to enable installing out-of-the-box"
+[github-dl]:   "The github download page"
+[proj-shelving]:   "The project's site"
+[proj-install]:   
 
 ### Mailing List
 
