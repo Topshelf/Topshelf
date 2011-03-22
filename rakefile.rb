@@ -123,6 +123,7 @@ task :prepare_examples => [:compile] do
 	copyOutputFiles props[:output], "Topshelf.{dll}", targ
 	copyOutputFiles props[:output], "log4net.{dll,pdb}", targ
 	copy('doc/Using Shelving.txt', props[:output])
+	copy('doc/log4net.config.example', props[:output])
 	commit_data = get_commit_hash_and_date
 	what_commit = File.new File.join(props[:output], "#{commit_data[0]} - #{commit_data[1]}.txt"), "w"
 	what_commit.puts "The file name denotes what commit these files were built off of. You can also find that information in the assembly info accessible through code."
