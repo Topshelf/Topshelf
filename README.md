@@ -9,7 +9,7 @@ NOTE: If you are looking at the source - please run build.bat before opening the
 
 ## Overview
 # INFO
-Topshelf is an awesome service host for windows services. Choose between two modes; either 
+Topshelf is an awesome service host for windows services. Choose between two modes of operation by either having your services *Shelved* or *Installed*. A quick 4-step guide to get started can be found below.
 
 ## Getting started with TopShelf
 
