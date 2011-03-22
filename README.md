@@ -111,3 +111,4 @@ Get started in four simple steps!
 
 # CREDITS
 Logo Design by [The Agile Badger](http://www.theagilebadger.com)  
+Copyright 2007-2011 Travis Smith, Chris Patterson, Dru Sellers, Henrik Feldt et al. All rights reserved
