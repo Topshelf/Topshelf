@@ -23,7 +23,7 @@ Get started in four simple steps!
 	
 	<dt>Step 2 (pick your poison):</dt>
 	<dd>
-		<p>Choose whether you want your service [*Shelved*][proj-shelving] or [*Installed*][proj-install]. My personal
+		<p>Choose whether you want your service [Shelved][proj-shelving] or [Installed][proj-install]. My personal
 		preference is the Shelving-feature.</p>
 	</dd>
 	
