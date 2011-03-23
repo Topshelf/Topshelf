@@ -38,7 +38,7 @@ namespace Topshelf.WindowsServiceCode
 			Installers.AddRange(_installers);
 
 			if (_log.IsInfoEnabled)
-				_log.InfoFormat("Installing {0} service", _description.Name);
+				_log.InfoFormat("Installing {0} service", _description.DisplayName);
 
 			base.Install(stateSaver);
 

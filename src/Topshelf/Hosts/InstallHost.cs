@@ -28,7 +28,8 @@ namespace Topshelf.Hosts
 	{
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");
 
-		public InstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies, Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
+		public InstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
+		                   Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
 			: base(description, startMode, dependencies, credentials, preActions, postActions, sudo)
 		{
 		}
@@ -48,9 +49,7 @@ namespace Topshelf.Hosts
 				if (Sudo)
 				{
 					if (WindowsUserAccessControl.RerunAsAdministrator())
-					{
 						return;
-					}
 				}
 
 				_log.ErrorFormat("The {0} service can only be installed as an administrator", Description.GetServiceName());

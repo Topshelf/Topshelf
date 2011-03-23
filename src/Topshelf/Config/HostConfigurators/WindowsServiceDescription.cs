@@ -46,11 +46,12 @@ namespace Topshelf.HostConfigurators
 				throw new ArgumentNullException("name");
 			if (instanceName == null)
 				throw new ArgumentNullException("instanceName");
-			
+
 			Name = name;
-			DisplayName = string.Empty;
-			Description = string.Empty;
 			InstanceName = instanceName;
+
+			_displayName = "";
+			_description = "";
 		}
 
 		[NotNull]
@@ -59,7 +60,15 @@ namespace Topshelf.HostConfigurators
 		[NotNull]
 		public string DisplayName
 		{
-			get { return _displayName.IsEmpty() ? Name : _displayName; }
+			get
+			{
+				string displayName = _displayName.IsNotEmpty() ? _displayName : Name;
+
+				if (InstanceName.IsNotEmpty())
+					return "{0} (Instance: {1})".FormatWith(displayName, InstanceName);
+
+				return displayName;
+			}
 			set { _displayName = value; }
 		}
 
@@ -74,6 +83,7 @@ namespace Topshelf.HostConfigurators
 		public string InstanceName { get; set; }
 
 #if NET40
+		[Pure]
 #endif
 		public string GetServiceName()
 		{
