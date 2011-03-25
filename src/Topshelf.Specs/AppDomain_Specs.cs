@@ -26,7 +26,7 @@ namespace Topshelf.Specs
 
 
 	[TestFixture]
-	[Slow]
+	[Explicit]
 	public class Using_the_shelf_service_controller_to_start_a_service
 	{
 		[SetUp]
