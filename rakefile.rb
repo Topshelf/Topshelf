@@ -52,10 +52,10 @@ desc "Cleans, compiles, il-merges, unit tests, prepares examples, packages zip a
 task :all => [:default, :package, :moma]
 
 desc "**Default**, compiles and runs tests"
-task :default => [:clean, :compile, :ilmerge, :tests, :prepare_examples]
+task :default => [:clean, :compile, :tests, :prepare_examples]
 
 desc "**DOOES NOT CLEAR OUTPUT FOLDER**, compiles and runs tests"
-task :unclean => [:compile, :ilmerge, :tests, :prepare_examples]
+task :unclean => [:prepare, :compile, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
@@ -90,12 +90,19 @@ task :clean do
 
 	Dir.mkdir props[:stage]
 	Dir.mkdir props[:artifacts]
+        Dir.mkdir props[:output]
+end
+
+task :prepare do
+        Dir.mkdir props[:output]
 end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
-task :compile => [:global_version, :build, :build_x86] do
+task :compile => [:global_version, :build] do
 	puts 'Copying unmerged dependencies to output folder'
 	copyOutputFiles File.join(props[:lib], "Magnum/#{OUTPUT_PATH}"), "Magnum.{dll,pdb,xml}", File.join(props[:src], "Topshelf/bin/#{BUILD_CONFIG}")
+	copyOutputFiles File.join(props[:src], "Topshelf.Dashboard/bin/#{BUILD_CONFIG}"), "Topshelf.Dashboard.{dll,pdb,xml,config}", props[:output]
+	copyOutputFiles File.join(props[:src], "Topshelf.Dashboard/bin/#{BUILD_CONFIG}"), "Spark.{dll,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "log4net.{dll,pdb,xml,config}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.{exe,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.exe.config", props[:output]
@@ -113,7 +120,7 @@ ilmerge :ilmerge do |ilm|
     ilm.use MSB_USE
 	ilm.log = File.join( props[:src], "Topshelf","bin","#{BUILD_CONFIG}", 'ilmerge.log' )
 	ilm.allow_dupes = true
-	ilm.references = [ 'Topshelf.dll', 'Stact.dll', 'Stact.ServerFramework.dll', 'Magnum.dll', 'Spark.dll' ]
+	ilm.references = [ 'Topshelf.dll', 'Stact.dll', 'Stact.ServerFramework.dll', 'Magnum.dll']
 end
 
 desc "Prepare examples"
@@ -132,6 +139,8 @@ task :prepare_examples => [:compile] do
 	what_commit.close
 end
 
+task :build => [:build_ts, :ilmerge, :build_host, :build_x86]
+
 desc "INTERNAL: Compiles the app in x86 mode"
 msbuild :build_x86 do |msb|
 	msb.properties :Configuration => BUILD_CONFIG,
@@ -140,11 +149,11 @@ msbuild :build_x86 do |msb|
 		:Platform => 'x86'
 	msb.use MSB_USE
 	msb.targets :Clean, :Build
-	msb.solution = 'src/Topshelf.sln'
+	msb.solution = 'src/Topshelf.Host.sln'
 end
 
 desc "Only compiles the application."
-msbuild :build do |msb|
+msbuild :build_ts do |msb|
 	msb.properties :Configuration => BUILD_CONFIG,
 	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
@@ -152,6 +161,17 @@ msbuild :build do |msb|
 	msb.use MSB_USE
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'
+end
+
+desc "Only compiles the application."
+msbuild :build_host do |msb|
+	msb.properties :Configuration => BUILD_CONFIG,
+	    :BuildConfigKey => BUILD_CONFIG_KEY,
+		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
+		:Platform => 'Any CPU'
+	msb.use MSB_USE
+	msb.targets :Clean, :Build
+	msb.solution = 'src/Topshelf.Host.sln'
 end
 
 def copyOutputFiles(fromDir, filePattern, outDir)
@@ -210,6 +230,7 @@ end
 desc "Builds the nuget package"
 task :nuget do
 	sh "lib/nuget pack topshelf.nuspec /OutputDirectory build_artifacts"
+	sh "lib/nuget pack topshelf.dashboard.nuspec /OutputDirectory build_artifacts"
 end
 
 def project_outputs(props)

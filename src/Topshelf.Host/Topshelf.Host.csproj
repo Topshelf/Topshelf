@@ -8,7 +8,7 @@
     <ProjectGuid>{5E6657AD-E81C-4C76-AA45-7D0032AA5C31}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Topshelf</RootNamespace>
+    <RootNamespace>Topshelf.Host</RootNamespace>
     <AssemblyName>Topshelf.Host</AssemblyName>
     <TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
@@ -42,7 +42,7 @@
     <OutputPath>bin\Release-x86\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Topshelf.Program</StartupObject>
+    <StartupObject>Topshelf.Host.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>tsicon.ico</ApplicationIcon>
@@ -87,15 +87,20 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+	<Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
       <HintPath>..\..\lib\log4net\net35-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
       <HintPath>..\..\lib\log4net\net40-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Topshelf" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+      <HintPath>..\..\build_output\net35\Topshelf.dll</HintPath>
+    </Reference>
+    <Reference Include="Topshelf" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+      <HintPath>..\..\build_output\net40\Topshelf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -107,12 +112,6 @@
     <Compile Include="ShelfHost.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Topshelf\Topshelf.csproj">
-      <Project>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</Project>
-      <Name>Topshelf</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -121,6 +120,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="tsicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Topshelf.Dashboard\Topshelf.Dashboard.csproj">
+      <Project>{67C7C55C-A602-4E95-B75F-D37194E9F676}</Project>
+      <Name>Topshelf.Dashboard</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

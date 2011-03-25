@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Topshelf</id>
+    <id>Topshelf.Dashboard</id>
     <version>2.3.0.0</version>
     <authors>Chris Patterson, Dru Sellers, Travis Smith</authors>
     <description>Topshelf is a service library and hosting framework for .NET</description>
@@ -11,15 +11,17 @@
     <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
     <dependencies>
       <dependency id="log4net" version="1.2.11" />
+      <dependency id="Topshelf" version="2.3.0.0" />
+      <dependency id="Spark" version="1.6" />
     </dependencies>
   </metadata>
   <files>
-    <file src="build_output\NET35\Topshelf.dll" target="lib\NET35" />
-    <file src="build_output\NET35\Topshelf.xml" target="lib\NET35" />
-    <file src="build_output\NET35\Topshelf.pdb" target="lib\NET35" />
-    <file src="build_output\NET40\Topshelf.dll" target="lib\NET40" />
-    <file src="build_output\NET40\Topshelf.xml" target="lib\NET40" />
-    <file src="build_output\NET40\Topshelf.pdb" target="lib\NET40" />
+    <file src="build_output\NET35\Topshelf.Dashboard.dll" target="lib\NET35" />
+    <file src="build_output\NET35\Topshelf.Dashboard.xml" target="lib\NET35" />
+    <file src="build_output\NET35\Topshelf.Dashboard.pdb" target="lib\NET35" />
+    <file src="build_output\NET40\Topshelf.Dashboard.dll" target="lib\NET40" />
+    <file src="build_output\NET40\Topshelf.Dashboard.xml" target="lib\NET40" />
+    <file src="build_output\NET40\Topshelf.Dashboard.pdb" target="lib\NET40" />
   </files>
 </package>
 

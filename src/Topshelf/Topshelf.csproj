@@ -69,12 +69,6 @@
     <Reference Include="Magnum" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
       <HintPath>..\..\lib\Magnum\net-4.0\Magnum.dll</HintPath>
     </Reference>
-    <Reference Include="Spark" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
-      <HintPath>..\..\lib\Spark\NET35\Spark.dll</HintPath>
-    </Reference>
-    <Reference Include="Spark" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
-      <HintPath>..\..\lib\Spark\NET40\Spark.dll</HintPath>
-    </Reference>
     <Reference Include="Stact" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
       <HintPath>..\..\lib\Stact\net-3.5\Stact.dll</HintPath>
     </Reference>
@@ -91,13 +85,11 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Management.Instrumentation">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
@@ -173,14 +165,6 @@
     <Compile Include="Config\ServiceExtensions.cs" />
     <Compile Include="Config\StartModeExtensions.cs" />
     <Compile Include="Config\HostConfigurators\WindowsServiceDescription.cs" />
-    <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
-    <Compile Include="Dashboard\DashboardExtensions.cs" />
-    <Compile Include="Dashboard\DashboardView.cs" />
-    <Compile Include="Dashboard\ResponseContextExtensions.cs" />
-    <Compile Include="Dashboard\SparkRender.cs" />
-    <Compile Include="Dashboard\StaticResourceHandler.cs" />
-    <Compile Include="Dashboard\TopshelfDashboard.cs" />
-    <Compile Include="Dashboard\TopshelfView.cs" />
     <Compile Include="Exceptions\ServiceControlException.cs" />
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
@@ -296,23 +280,10 @@
     <Content Include="Messages\_About Messages.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Dashboard\views\dashboard.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Dashboard\styles\ie.css" />
-    <EmbeddedResource Include="Dashboard\styles\print.css" />
-    <EmbeddedResource Include="Dashboard\styles\screen.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Dashboard\images\control_pause.png" />
-    <EmbeddedResource Include="Dashboard\images\control_play.png" />
-    <EmbeddedResource Include="Dashboard\images\control_stop.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="OS\Osx\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

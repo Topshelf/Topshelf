@@ -20,7 +20,7 @@ namespace Topshelf.Dashboard
 	using Stact.ServerFramework;
 
 
-	public class StaticResourceHandler :
+    class StaticResourceHandler :
 		PatternMatchConnectionHandler
 	{
 		readonly StaticResourceChannel _channel;
@@ -47,7 +47,7 @@ namespace Topshelf.Dashboard
 				_fiber = new PoolFiber();
 				_resourcePrefix = resourcePrefix;
 
-				_contentType = contentType;// "text/css";
+				_contentType = contentType;
 			}
 			public void Send(ConnectionContext context)
 			{
@@ -56,8 +56,9 @@ namespace Topshelf.Dashboard
 					string localPath = context.Request.Url.LocalPath;
 					string cssName = localPath.Split('/').Last();
 					context.Response.ContentType = _contentType;
-					//_resourcePrefix = "Topshelf.Dashboard.styles.";
-					using (Stream str = GetType().Assembly.GetManifestResourceStream(_resourcePrefix + cssName))
+				    var name = _resourcePrefix + cssName;
+
+				    using (Stream str = GetType().Assembly.GetManifestResourceStream(name))
 					{
 						byte[] buff = str.ReadToEnd();
 						context.Response.OutputStream.Write(buff, 0, buff.Length);
