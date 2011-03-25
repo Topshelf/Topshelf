@@ -59,13 +59,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Spark">
-      <HintPath>..\..\lib\Spark\Spark.dll</HintPath>
-    </Reference>
     <Reference Include="Stact">
       <HintPath>..\..\lib\Stact\Stact.dll</HintPath>
     </Reference>
@@ -149,14 +142,6 @@
     <Compile Include="Config\ServiceExtensions.cs" />
     <Compile Include="Config\StartModeExtensions.cs" />
     <Compile Include="Config\HostConfigurators\WindowsServiceDescription.cs" />
-    <Compile Include="Dashboard\DashboardConnectionHandler.cs" />
-    <Compile Include="Dashboard\DashboardExtensions.cs" />
-    <Compile Include="Dashboard\DashboardView.cs" />
-    <Compile Include="Dashboard\ResponseContextExtensions.cs" />
-    <Compile Include="Dashboard\SparkRender.cs" />
-    <Compile Include="Dashboard\StaticResourceHandler.cs" />
-    <Compile Include="Dashboard\TopshelfDashboard.cs" />
-    <Compile Include="Dashboard\TopshelfView.cs" />
     <Compile Include="Exceptions\ServiceControlException.cs" />
     <Compile Include="Exceptions\TopshelfException.cs" />
     <Compile Include="FileSystem\DirectoryMonitor.cs" />
@@ -263,19 +248,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <EmbeddedResource Include="Dashboard\views\dashboard.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Dashboard\styles\ie.css" />
-    <EmbeddedResource Include="Dashboard\styles\print.css" />
-    <EmbeddedResource Include="Dashboard\styles\screen.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Dashboard\images\control_pause.png" />
-    <EmbeddedResource Include="Dashboard\images\control_play.png" />
-    <EmbeddedResource Include="Dashboard\images\control_stop.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -8,7 +8,7 @@
     <ProjectGuid>{5E6657AD-E81C-4C76-AA45-7D0032AA5C31}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Topshelf</RootNamespace>
+    <RootNamespace>Topshelf.Host</RootNamespace>
     <AssemblyName>Topshelf.Host</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Topshelf.Program</StartupObject>
+    <StartupObject>Topshelf.Host.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>tsicon.ico</ApplicationIcon>
@@ -55,6 +55,10 @@
     <Compile Include="Host.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Topshelf.Dashboard\Topshelf.Dashboard.csproj">
+      <Project>{67C7C55C-A602-4E95-B75F-D37194E9F676}</Project>
+      <Name>Topshelf.Dashboard</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">
       <Project>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</Project>
       <Name>Topshelf</Name>

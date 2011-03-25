@@ -16,8 +16,8 @@ namespace Stuff
     using System.IO;
     using log4net.Config;
     using Topshelf;
-    using Topshelf.Configuration;
-    using Topshelf.Configuration.Dsl;
+    using Topshelf.Dashboard;
+
 
     internal class Program
     {
