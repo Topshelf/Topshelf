@@ -51,13 +51,13 @@ namespace Topshelf.Model
 					loop.Receive<ShelfCreated>(x =>
 						{
 							ShelfCreated(x);
-							loop.Repeat();
+							loop.Continue();
 						});
 
 					loop.Receive<ServiceUnloaded>(x =>
 						{
 							ShelfUnloaded(x);
-							loop.Repeat();
+							loop.Continue();
 						});
 				});
 		}

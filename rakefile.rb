@@ -111,7 +111,7 @@ ilmerge :ilmerge do |ilm|
     ilm.use MSB_USE
 	ilm.log = File.join( props[:src], "Topshelf","bin","#{BUILD_CONFIG}", 'ilmerge.log' )
 	ilm.allow_dupes = true
-	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]
+	ilm.references = [ 'Topshelf.dll', 'Magnum.dll', 'Magnum.FileSystem.dll', 'Ionic.Zip.dll', 'System.Threading.dll', 'Newtonsoft.Json.dll', 'Spark.dll', 'Stact.dll', 'Stact.ServerFramework.dll' ]
 end
 
 desc "Prepare examples"

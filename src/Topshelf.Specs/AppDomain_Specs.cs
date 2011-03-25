@@ -42,8 +42,14 @@ namespace Topshelf.Specs
 			DirectoryMonitor_Specs.CopyFileToDir("TopShelf.dll", bobPath);
 			DirectoryMonitor_Specs.CopyFileToDir("TopShelf.Specs.dll", bobPath);
 			DirectoryMonitor_Specs.CopyFileToDir("Magnum.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("Magnum.FileSystem.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("Ionic.Zip.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("Newtonsoft.Json.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("System.Threading.dll", bobPath);
 			DirectoryMonitor_Specs.CopyFileToDir("log4net.dll", bobPath);
 			DirectoryMonitor_Specs.CopyFileToDir("Stact.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("Stact.serverframework.dll", bobPath);
+			DirectoryMonitor_Specs.CopyFileToDir("Spark.dll", bobPath);
 		}
 
 		[TearDown]
