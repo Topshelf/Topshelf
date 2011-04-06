@@ -57,32 +57,33 @@
     <DocumentationFile>bin\Release\Topshelf.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip">
-      <HintPath>..\..\lib\Magnum\Ionic.Zip.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Magnum, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Magnum\Magnum.dll</HintPath>
+    <Reference Include="Magnum" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+      <HintPath>..\..\lib\Magnum\net-3.5\Magnum.dll</HintPath>
     </Reference>
-    <Reference Include="Magnum.FileSystem">
-      <HintPath>..\..\lib\Magnum\Magnum.FileSystem.dll</HintPath>
+    <Reference Include="Magnum" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+      <HintPath>..\..\lib\Magnum\net-4.0\Magnum.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=3.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Spark" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+      <HintPath>..\..\lib\Spark\NET35\Spark.dll</HintPath>
     </Reference>
-    <Reference Include="Spark">
-      <HintPath>..\..\lib\Spark\Spark.dll</HintPath>
+    <Reference Include="Spark" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+      <HintPath>..\..\lib\Spark\NET40\Spark.dll</HintPath>
     </Reference>
-    <Reference Include="Stact">
-      <HintPath>..\..\lib\Stact\Stact.dll</HintPath>
+    <Reference Include="Stact" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+      <HintPath>..\..\lib\Stact\net-3.5\Stact.dll</HintPath>
     </Reference>
-    <Reference Include="Stact.ServerFramework">
-      <HintPath>..\..\lib\Stact\Stact.ServerFramework.dll</HintPath>
+    <Reference Include="Stact" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+      <HintPath>..\..\lib\Stact\net-4.0\Stact.dll</HintPath>
+    </Reference>
+    <Reference Include="Stact.ServerFramework" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+      <HintPath>..\..\lib\Stact\net-3.5\Stact.ServerFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Stact.ServerFramework" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+      <HintPath>..\..\lib\Stact\net-4.0\Stact.ServerFramework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -97,9 +98,6 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Threading">
-      <HintPath>..\..\lib\Magnum\System.Threading.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
