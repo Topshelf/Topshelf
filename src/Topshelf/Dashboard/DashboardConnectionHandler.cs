@@ -63,7 +63,7 @@ namespace Topshelf.Dashboard
 								context.Complete();
 							}, 30.Seconds(), () =>
 								{
-									context.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
+									context.Response.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
 									context.Complete();
 								});
 					});
