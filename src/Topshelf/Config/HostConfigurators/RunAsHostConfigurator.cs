@@ -48,6 +48,9 @@ namespace Topshelf.HostConfigurators
 					"The service account must be a user account when a username and password are specified");
 			}
 
+            if (_username.IsEmpty() && _password.IsEmpty() &&  _accountType == ServiceAccount.User)
+                return; //interactive
+
 			if (_accountType == ServiceAccount.User && (_username.IsEmpty() || _password.IsEmpty()))
 				throw new HostConfigurationException("The username and password must be specified for a user account");
 		}
