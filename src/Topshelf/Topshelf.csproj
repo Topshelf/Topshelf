@@ -119,9 +119,12 @@
     <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
     <Compile Include="Config\HostConfigurators\StartConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\SudoConfigurator.cs" />
+    <Compile Include="Config\Options\DisplayNameOption.cs" />
     <Compile Include="Config\Options\HelpOption.cs" />
     <Compile Include="Config\Options\LocalServiceOption.cs" />
     <Compile Include="Config\Options\NetworkServiceOption.cs" />
+    <Compile Include="Config\Options\ServiceDescriptionOption.cs" />
+    <Compile Include="Config\Options\ServiceNameOption.cs" />
     <Compile Include="Config\Options\StartOption.cs" />
     <Compile Include="Config\Options\StopOption.cs" />
     <Compile Include="Config\Options\SudoOption.cs" />
