@@ -16,11 +16,20 @@ Command-Line Reference
       -password         The password for the specified username
       --localservice    Run the service with the local service account
       --networkservice  Run the service with the network service permission
+	  --interactive     The service will prompt the user at installation for 
+	                    the service credentials
       start             Start the service after it has been installed
       --sudo            Prompts for UAC if running on Vista/W7/2008
 
-    start               Starts the service if it is not already running
+	  -servicename      The name that the service should use when
+	                    installing
+      -description      The service description the service should use when
+	                    installing
+      -displayname      The display name the the service should use when
+	                    installing
 
+    start               Starts the service if it is not already running
+	  
     stop                Stops the service if it is running
 
     uninstall           Uninstalls the service

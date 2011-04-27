@@ -55,6 +55,8 @@ namespace Topshelf
 			      	    select (Option)new ServiceAccountOption(username.Value, password.Value))
 			      	.Or(from autostart in x.Switch("autostart")
 			      	    select (Option)new AutostartOption())
+                    .Or(from interactive in x.Switch("interactive")
+                        select (Option)new InteractiveOption())
 			      	.Or(from autostart in x.Switch("localservice")
 			      	    select (Option)new LocalServiceOption())
 			      	.Or(from autostart in x.Switch("networkservice")

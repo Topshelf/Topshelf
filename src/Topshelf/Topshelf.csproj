@@ -121,6 +121,7 @@
     <Compile Include="Config\HostConfigurators\SudoConfigurator.cs" />
     <Compile Include="Config\Options\DisplayNameOption.cs" />
     <Compile Include="Config\Options\HelpOption.cs" />
+    <Compile Include="Config\Options\InteractiveOption.cs" />
     <Compile Include="Config\Options\LocalServiceOption.cs" />
     <Compile Include="Config\Options\NetworkServiceOption.cs" />
     <Compile Include="Config\Options\ServiceDescriptionOption.cs" />

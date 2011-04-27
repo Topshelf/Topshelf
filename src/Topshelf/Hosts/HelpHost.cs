@@ -43,7 +43,6 @@ namespace Topshelf.Hosts
 			using (TextReader reader = new StreamReader(stream))
 			{
 				string text = reader.ReadToEnd();
-
 				Console.WriteLine(text);
 			}
 		}
