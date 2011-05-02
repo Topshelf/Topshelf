@@ -108,6 +108,12 @@ namespace Topshelf.Hosts
 			if (_description.InstanceName.IsNotEmpty())
 				arguments += " -instance:{0}".FormatWith(_description.InstanceName);
 
+            if (_description.DisplayName.IsNotEmpty())
+                arguments += " -displayname:{0}".FormatWith(_description.DisplayName);
+
+            if (_description.Name.IsNotEmpty())
+                arguments += " -servicename:{0}".FormatWith(_description.Name);
+
 			var installer = new HostInstaller(_description, arguments, installers);
 
 			return installer;
