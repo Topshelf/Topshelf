@@ -69,7 +69,8 @@ Get started in four simple steps!
 #### Editing in Visual Studio
 
  1. Run `rake global_version` in the root folder.
- 2. Double-click/open the .sln file.
+ 2. Set Visual Studio Tools -> Options -> Text Editor -> All Languages -> Tabs to use "Tab Size" = 4, "Indent Size" = 4, and "Insert Spaces"
+ 3. Double-click/open the .sln file.
  
  You can alternatively edit and build for .Net 3.5 instead of .Net 4.0 with this step:
  
