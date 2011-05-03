@@ -53,11 +53,12 @@ Get started in four simple steps!
  1. Clone the source down to your machine. 
    `git clone git://github.com/Topshelf/Topshelf.git`
  2. Download git, ruby and gems. Install – a tutorial is [here][gems]
- 3. **Important:** Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
+ 3. Install albacore. Run "gem install albacore"
+ 4. **Important:** Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
 	* You must have git on the path in order to do this. (Right click on `Computer` > `Advanced System Settings`, `Advanced` (tab) > `Environment Variables...` > Append the git executable's directory at the end of the PATH environment variable.
- 4. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.
- 5. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below.
- 6. In order to debug one of your services together with Topshelf:
+ 5. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.
+ 6. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below.
+ 7. In order to debug one of your services together with Topshelf:
 	a) set Topshelf.Host as the startup project
 	b) add "run" as parameters when Topshelf.Host starts (in the debug tab of properties)
 	c) Add your service to the 'Services' folder.
