@@ -1,6 +1,8 @@
 namespace Topshelf.Specs.ServiceTests
 {
-	using NUnit.Framework;
+    using System.Linq;
+    using System.ServiceProcess;
+    using NUnit.Framework;
 	using Topshelf.Configuration;
 	using Topshelf.Configuration.Dsl;
 
@@ -10,19 +12,25 @@ namespace Topshelf.Specs.ServiceTests
 	[TestFixture]
 	public class Bob
 	{
+	    private string serviceName = "TOPSHELF-TEST";
+
 		[Test]
 		public void Should_Install()
 		{
-			var commandline = new[] {"service", "-install"};
+            Assert.IsFalse(IsServiceInstalled(serviceName), serviceName + " was already installed. Can't install.");
+			var commandline = new[] {"service", "install"};
 			Runner.Host(_configuration, commandline);
+            Assert.IsTrue(IsServiceInstalled(serviceName), serviceName + " was not installed using Runner.Host.");
 
-			//assert the service installed
 		}
 
 		[Test]
 		public void Should_Uninstall()
 		{
-			var commandline = new[] {"service", "-uninstall"};
+            Assert.IsTrue(IsServiceInstalled(serviceName), serviceName + " was not already installed. Can't uninstall.");
+            var commandline = new[] { "service", "uninstall" };
+            Runner.Host(_configuration, commandline);
+            Assert.IsFalse(IsServiceInstalled(serviceName), serviceName + " was not uninstalled using Runner.Host");
 		}
 
 		RunConfiguration _configuration;
@@ -34,7 +42,7 @@ namespace Topshelf.Specs.ServiceTests
 				{
 					x.SetDescription("topshelf test installation");
 					x.SetDisplayName("TOPSHELF-TEST");
-					x.SetServiceName("TOPSHELF-TEST");
+                    x.SetServiceName(serviceName);
 
 					x.RunAsLocalSystem();
 
@@ -45,6 +53,13 @@ namespace Topshelf.Specs.ServiceTests
 						});
 				});
 		}
+
+        private bool IsServiceInstalled(string serviceName)
+        {
+            var services = ServiceController.GetServices().ToList();
+
+            return services.Where(x => x.ServiceName == serviceName).Count() > 0;
+        }
 	}
 
 
