@@ -53,7 +53,7 @@ Get started in four simple steps!
  1. Clone the source down to your machine. 
    `git clone git://github.com/Topshelf/Topshelf.git`
  2. Download git, ruby and gems. Install – a tutorial is [here][gems]
- 3. Install albacore. Run "gem install albacore"
+ 3. gem install rake albacore
  4. **Important:** Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing. 
 	* You must have git on the path in order to do this. (Right click on `Computer` > `Advanced System Settings`, `Advanced` (tab) > `Environment Variables...` > Append the git executable's directory at the end of the PATH environment variable.
  5. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.

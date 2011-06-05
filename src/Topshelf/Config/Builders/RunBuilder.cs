@@ -21,6 +21,7 @@ namespace Topshelf.Builders
 	using log4net;
 	using Magnum.Extensions;
 	using Model;
+	using OS;
 	using Stact;
 	using Windows;
 
@@ -68,7 +69,11 @@ namespace Topshelf.Builders
 
 			_serviceBuilders.Each(x => { _coordinator.CreateService(x.Name, x.Build); });
 
-			return CreateHost(_coordinator);
+            //TODO: feels like it should be a builder
+            var osCommands = OsDetector.DetectOs();
+            
+
+			return CreateHost(_coordinator, osCommands);
 		}
 
 		public void Match<T>([NotNull] Action<T> callback)
@@ -81,7 +86,7 @@ namespace Topshelf.Builders
 				callback(this as T);
 		}
 
-		Host CreateHost(IServiceCoordinator coordinator)
+		Host CreateHost(IServiceCoordinator coordinator, Os osCommands)
 		{
 			var process = Process.GetCurrentProcess().GetParent();
 			if (process != null && process.ProcessName == "services")
@@ -92,7 +97,7 @@ namespace Topshelf.Builders
 			}
 
 			_log.Debug("Running as a console application, using the console host");
-			return new ConsoleRunHost(_description, coordinator);
+			return new ConsoleRunHost(_description, coordinator, osCommands);
 		}
 
 		public void AddServiceBuilder(ServiceBuilder serviceBuilder)

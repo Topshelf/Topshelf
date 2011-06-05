@@ -21,33 +21,38 @@ namespace Topshelf.Hosts
 	using Internal;
 	using log4net;
 	using Model;
+	using OS;
 
 
-	public class ConsoleRunHost :
+    public class ConsoleRunHost :
 		Host, IDisposable
 	{
 		readonly ServiceDescription _description;
 		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.ConsoleRunHost");
 		IServiceCoordinator _coordinator;
 		ManualResetEvent _exit;
-		volatile bool _hasCancelled;
+        volatile bool _hasCancelled;
+        Os _osCommands;
 
-		public ConsoleRunHost([NotNull] ServiceDescription description, [NotNull] IServiceCoordinator coordinator)
+		public ConsoleRunHost([NotNull] ServiceDescription description, [NotNull] IServiceCoordinator coordinator, [NotNull]Os osCommands)
 		{
 			if (description == null)
 				throw new ArgumentNullException("description");
 			if (coordinator == null)
 				throw new ArgumentNullException("coordinator");
+            if(osCommands ==null)
+                throw new ArgumentNullException("osCommands");
 
 			_description = description;
 			_coordinator = coordinator;
+		    _osCommands = osCommands;
 		}
 
 		public void Run()
 		{
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-			CheckToSeeIfWinServiceRunning();
+			_osCommands.CheckToSeeIfServiceRunning(_description);
 
 			try
 			{
@@ -115,15 +120,11 @@ namespace Topshelf.Hosts
 			_hasCancelled = true;
 		}
 
-		void CheckToSeeIfWinServiceRunning()
-		{
-			if (ServiceController.GetServices().Where(s => s.ServiceName == _description.GetServiceName()).Any())
-				_log.WarnFormat("There is an instance of this {0} running as a windows service", _description);
-		}
+
 
 		bool _disposed;
 
-		public void Dispose()
+        public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);

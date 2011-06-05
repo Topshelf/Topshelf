@@ -12,7 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-	using HostConfigurators;
+    using System;
+    using HostConfigurators;
 	using Magnum.CommandLineParser;
 	using Magnum.Extensions;
 	using Magnum.Monads.Parser;
@@ -54,12 +55,20 @@ namespace Topshelf
 			      	    select (Option)new ServiceAccountOption(username.Value, password.Value))
 			      	.Or(from autostart in x.Switch("autostart")
 			      	    select (Option)new AutostartOption())
+                    .Or(from interactive in x.Switch("interactive")
+                        select (Option)new InteractiveOption())
 			      	.Or(from autostart in x.Switch("localservice")
 			      	    select (Option)new LocalServiceOption())
 			      	.Or(from autostart in x.Switch("networkservice")
 			      	    select (Option)new NetworkServiceOption())
 			      	.Or(from autostart in x.Switch("help")
 			      	    select (Option)new HelpOption())
+                    .Or(from svcname in x.Definition("servicename")
+                        select (Option)new ServiceNameOption(svcname.Value))
+                    .Or(from desc in x.Definition("description")
+                        select (Option)new ServiceDescriptionOption(desc.Value))
+                    .Or(from disp in x.Definition("displayname")
+                        select (Option)new DisplayNameOption(disp.Value))
 			      	.Or(from instance in x.Definition("instance")
 			      	    select (Option)new InstanceOption(instance.Value)));
 		}

@@ -119,9 +119,13 @@
     <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
     <Compile Include="Config\HostConfigurators\StartConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\SudoConfigurator.cs" />
+    <Compile Include="Config\Options\DisplayNameOption.cs" />
     <Compile Include="Config\Options\HelpOption.cs" />
+    <Compile Include="Config\Options\InteractiveOption.cs" />
     <Compile Include="Config\Options\LocalServiceOption.cs" />
     <Compile Include="Config\Options\NetworkServiceOption.cs" />
+    <Compile Include="Config\Options\ServiceDescriptionOption.cs" />
+    <Compile Include="Config\Options\ServiceNameOption.cs" />
     <Compile Include="Config\Options\StartOption.cs" />
     <Compile Include="Config\Options\StopOption.cs" />
     <Compile Include="Config\Options\SudoOption.cs" />
@@ -231,25 +235,26 @@
     <Compile Include="Model\PublishChannel.cs" />
     <Compile Include="Messages\ServiceInfo.cs" />
     <Compile Include="Messages\ServiceStatus.cs" />
+    <Compile Include="OS\OsDetector.cs" />
     <Compile Include="Shelving\ShelfConfiguration.cs" />
     <Compile Include="Model\ShelfReference.cs" />
     <Compile Include="Model\ShelfServiceController.cs" />
     <Compile Include="Model\ShelfType.cs" />
     <Compile Include="Internal\ReSharperStaticAnalysis.cs" />
-    <Compile Include="Windows\WindowsUserAccessControl.cs" />
-    <Compile Include="WindowsServiceCode\HostInstaller.cs">
+    <Compile Include="OS\Windows\WindowsUserAccessControl.cs" />
+    <Compile Include="OS\WindowsServiceCode\HostInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Windows\ServiceRecoveryAction.cs" />
-    <Compile Include="Windows\ServiceRecoveryOptions.cs" />
-    <Compile Include="Windows\WindowsServiceControlManager.cs" />
+    <Compile Include="OS\Windows\ServiceRecoveryAction.cs" />
+    <Compile Include="OS\Windows\ServiceRecoveryOptions.cs" />
+    <Compile Include="OS\Windows\WindowsServiceControlManager.cs" />
     <Compile Include="Exceptions\BuildServiceException.cs" />
     <Compile Include="Hosts\ConsoleRunHost.cs" />
     <Compile Include="Host.cs" />
-    <Compile Include="Windows\WindowsServiceHost.cs">
+    <Compile Include="OS\Windows\WindowsServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WindowsServiceCode\Kernel32.cs" />
+    <Compile Include="OS\WindowsServiceCode\Kernel32.cs" />
     <Compile Include="Model\ServiceFactory.cs" />
     <Compile Include="Extensions\ProcessExtensions.cs" />
     <Compile Include="Shelving\Bootstrapper.cs" />
@@ -300,6 +305,9 @@
     <EmbeddedResource Include="Dashboard\images\control_pause.png" />
     <EmbeddedResource Include="Dashboard\images\control_play.png" />
     <EmbeddedResource Include="Dashboard\images\control_stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="OS\Osx\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
