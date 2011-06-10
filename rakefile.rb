@@ -59,7 +59,7 @@ task :unclean => [:compile, :ilmerge, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
-  asm_version = BUILD_NUMBER_BASE + ".0"
+  asm_version = BUILD_NUMBER_BASE
   commit_data = get_commit_hash_and_date
   commit = commit_data[0]
   commit_date = commit_data[1]
