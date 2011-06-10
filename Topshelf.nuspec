@@ -6,7 +6,7 @@
     <authors>Chris Patterson, Dru Sellers, Travis Smith</authors>
     <description>Topshelf is a service library and hosting framework for .NET</description> 
     <language>en-US</language>
-	<iconUrl>http://topshelf-project.com/wp-content/themes/pandora/img/slide.1.png/iconUrl>
+	<iconUrl>http://topshelf-project.com/wp-content/themes/pandora/img/slide.1.png</iconUrl>
     <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
     <dependencies>
