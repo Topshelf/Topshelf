@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?> 
-<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"> 
-  <metadata> 
-    <id>Topshelf</id> 
-    <version>2.2.2.0</version> 
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Topshelf</id>
+    <version>2.2.3.0</version>
     <authors>Chris Patterson, Dru Sellers, Travis Smith</authors>
-    <description>Topshelf is a service library and hosting framework for .NET</description> 
+    <description>Topshelf is a service library and hosting framework for .NET</description>
     <language>en-US</language>
 	<iconUrl>http://topshelf-project.com/wp-content/themes/pandora/img/slide.1.png</iconUrl>
     <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
@@ -12,7 +12,7 @@
     <dependencies>
       <dependency id="log4net" version="1.2.10" />
     </dependencies>
-  </metadata> 
+  </metadata>
   <files>
     <file src="build_output\NET35\Topshelf.dll" target="lib\NET35" />
     <file src="build_output\NET35\Topshelf.xml" target="lib\NET35" />

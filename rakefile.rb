@@ -7,7 +7,7 @@ require 'albacore'
 require File.dirname(__FILE__) + "/build_support/ilmergeconfig.rb"
 require File.dirname(__FILE__) + "/build_support/ilmerge.rb"
 
-BUILD_NUMBER_BASE = '2.2.2.0'
+BUILD_NUMBER_BASE = '2.2.3'
 PRODUCT = 'Topshelf'
 CLR_TOOLS_VERSION = 'v4.0.30319'
 
@@ -18,7 +18,7 @@ TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
 MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
 OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'NET40' : 'NET35')
 
-props = { 
+props = {
   :src => File.expand_path("src"),
   :build_support => File.expand_path("build_support"),
   :stage => File.expand_path("build_output"),
@@ -29,18 +29,18 @@ props = {
 }
 
 puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION} in #{BUILD_CONFIG}-mode."
- 
+
 desc "Displays a list of tasks"
 task :help do
 
-  taskHash = Hash[*(`rake.bat -T`.split(/\n/).collect { |l| l.match(/rake (\S+)\s+\#\s(.+)/).to_a }.collect { |l| [l[1], l[2]] }).flatten] 
- 
+  taskHash = Hash[*(`rake.bat -T`.split(/\n/).collect { |l| l.match(/rake (\S+)\s+\#\s(.+)/).to_a }.collect { |l| [l[1], l[2]] }).flatten]
+
   indent = "                          "
-  
+
   puts "rake #{indent}#Runs the 'default' task"
-  
+
   taskHash.each_pair do |key, value|
-    if key.nil?  
+    if key.nil?
       next
     end
     puts "rake #{key}#{indent.slice(0, indent.length - key.length)}##{value}"
@@ -59,17 +59,17 @@ task :unclean => [:compile, :ilmerge, :tests, :prepare_examples]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
-  asm_version = BUILD_NUMBER_BASE
+  asm_version = BUILD_NUMBER_BASE + ".0"
   commit_data = get_commit_hash_and_date
   commit = commit_data[0]
   commit_date = commit_data[1]
   build_number = "#{BUILD_NUMBER_BASE}.#{Date.today.strftime('%y%j')}"
   tc_build_number = ENV["BUILD_NUMBER"]
-  puts "##teamcity[buildNumber '#{build_number}-#{tc_build_number}']" unless tc_build_number.nil?
-  
+  build_number = "#{BUILD_NUMBER_BASE}.#{tc_build_number}" unless tc_build_number.nil?
+
   # Assembly file config
   asm.product_name = PRODUCT
-  asm.description = "Git commit hash: #{commit} - #{commit_date} - Topshelf is an open source project for hosting services without friction. Either link Topshelf to your program and it *becomes* a service installer or use Topshelf.Host to shelf your services by placing them in subfolders of the 'Services' folder under the folder of Topshelf.Host.exe. github.com/Topshelf. topshelf-project.com. Original author company: CFT & ACM."
+  asm.description = "Topshelf is an open source project for hosting services without friction. Either link Topshelf to your program and it *becomes* a service installer or use Topshelf.Host to shelf your services by placing them in subfolders of the 'Services' folder under the folder of Topshelf.Host.exe. github.com/Topshelf. topshelf-project.com. Original author company: CFT & ACM."
   asm.version = asm_version
   asm.file_version = build_number
   asm.custom_attributes :AssemblyInformationalVersion => "#{asm_version}",
@@ -87,7 +87,7 @@ task :clean do
 	# work around latency issue where folder still exists for a short while after it is removed
 	waitfor { !exists?(props[:stage]) }
 	waitfor { !exists?(props[:artifacts]) }
-	
+
 	Dir.mkdir props[:stage]
 	Dir.mkdir props[:artifacts]
 end
@@ -134,7 +134,7 @@ end
 
 desc "INTERNAL: Compiles the app in x86 mode"
 msbuild :build_x86 do |msb|
-	msb.properties :Configuration => BUILD_CONFIG, 
+	msb.properties :Configuration => BUILD_CONFIG,
 	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
 		:Platform => 'x86'
@@ -145,7 +145,7 @@ end
 
 desc "Only compiles the application."
 msbuild :build do |msb|
-	msb.properties :Configuration => BUILD_CONFIG, 
+	msb.properties :Configuration => BUILD_CONFIG,
 	    :BuildConfigKey => BUILD_CONFIG_KEY,
 		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
 		:Platform => 'Any CPU'
@@ -176,7 +176,7 @@ task :unit_tests => [:compile] do
 end
 
 desc "Runs the integation tests"
-task :integration_tests => [:prepare_examples] do 
+task :integration_tests => [:prepare_examples] do
 	puts "TODO: Integration tests."
 end
 
@@ -226,17 +226,17 @@ def get_commit_hash_and_date
 	rescue
 		commit = "git unavailable"
 	end
-	
+
 	[commit, commit_date]
 end
 
 def waitfor(&block)
 	checks = 0
-	
-	until block.call || checks >10 
+
+	until block.call || checks >10
 		sleep 0.5
 		checks += 1
 	end
-	
+
 	raise 'Waitfor timeout expired. Make sure that you aren\'t running something from the build output folders, or that you have browsed to it through Explorer.' if checks > 10
 end
