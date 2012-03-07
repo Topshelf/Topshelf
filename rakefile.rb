@@ -237,6 +237,8 @@ desc "Builds the nuget package"
 task :nuget do
 	sh "lib/nuget pack topshelf.nuspec /OutputDirectory build_artifacts"
 	sh "lib/nuget pack topshelf.dashboard.nuspec /OutputDirectory build_artifacts"
+	sh "lib/nuget pack topshelf.log4net.nuspec /OutputDirectory build_artifacts"
+	sh "lib/nuget pack topshelf.nlog.nuspec /OutputDirectory build_artifacts"
 end
 
 def project_outputs(props)
