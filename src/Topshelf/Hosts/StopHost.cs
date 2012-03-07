@@ -1,13 +1,13 @@
 ﻿namespace Topshelf.Hosts
 {
-	using log4net;
+    using Logging;
 	using Windows;
 
 
 	public class StopHost :
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.StopHost");
+		readonly ILog _log = Logger.Get("Topshelf.Hosts.StopHost");
 
 		public StopHost(ServiceDescription description)
 		{

@@ -14,14 +14,14 @@ namespace Topshelf.WindowsServiceCode
 {
 	using System.Collections;
 	using System.Configuration.Install;
-	using log4net;
+	using Logging;
 	using Microsoft.Win32;
 
 
 	public class HostInstaller :
 		Installer
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.WindowsServiceCode.HostInstaller");
+		static readonly ILog _log = Logger.Get("Topshelf.WindowsServiceCode.HostInstaller");
 		readonly ServiceDescription _description;
 		readonly string _arguments;
 		readonly Installer[] _installers;

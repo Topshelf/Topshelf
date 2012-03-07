@@ -18,7 +18,7 @@ namespace Topshelf.Model
 	using System.Reflection;
 	using System.Runtime.Remoting;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 	using Stact;
 
@@ -26,7 +26,7 @@ namespace Topshelf.Model
 	public class ShelfReference :
 		IDisposable
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ShelfReference");
+		static readonly ILog _log = Logger.Get("Topshelf.Model.ShelfReference");
 		readonly UntypedChannel _controllerChannel;
 		readonly AppDomainSetup _domainSettings;
 

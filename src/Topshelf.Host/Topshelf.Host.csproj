@@ -93,11 +93,17 @@
     <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
       <HintPath>..\..\lib\log4net\net40-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Topshelf" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+     <Reference Include="Topshelf" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
       <HintPath>..\..\build_output\net35\Topshelf.dll</HintPath>
     </Reference>
     <Reference Include="Topshelf" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
       <HintPath>..\..\build_output\net40\Topshelf.dll</HintPath>
+    </Reference>
+    <Reference Include="Topshelf.Log4NetIntegration" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
+      <HintPath>..\..\build_output\net35\Topshelf.Log4NetIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="Topshelf.Log4NetIntegration" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
+      <HintPath>..\..\build_output\net40\Topshelf.Log4NetIntegration.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -128,7 +134,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

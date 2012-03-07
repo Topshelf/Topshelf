@@ -13,7 +13,7 @@
 namespace Topshelf.Model
 {
 	using System;
-	using log4net;
+	using Logging;
 	using Stact;
 	using Stact.Configuration;
 
@@ -21,7 +21,7 @@ namespace Topshelf.Model
 	public class OutboundChannel :
 		ServiceChannel
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.OutboundChannel");
+		static readonly ILog _log = Logger.Get("Topshelf.Model.OutboundChannel");
 
 		public OutboundChannel(Uri address, string pipeName, Action<ConnectionConfigurator> configurator)
 			: base(x =>

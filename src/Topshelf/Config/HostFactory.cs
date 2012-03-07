@@ -15,12 +15,12 @@ namespace Topshelf
 	using System;
 	using HostConfigurators;
 	using Internal;
-	using log4net;
+	using Logging;
 
 
 	public static class HostFactory
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf");
+		static readonly ILog _log = Logger.Get("Topshelf");
 
 		public static Host New([NotNull] Action<HostConfigurator> configure)
 		{

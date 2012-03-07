@@ -12,273 +12,276 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Diagnostics;
-	using System.IO;
-	using System.Linq;
-	using Builders;
-	using Configuration.Dsl;
-	using log4net;
-	using log4net.Config;
-	using Magnum.Extensions;
-	using Magnum.Reflection;
-	using Messages;
-	using Shelving;
-	using Stact;
-	using Stact.Configuration;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using Builders;
+    using Configuration.Dsl;
+    using Logging;
+    using Magnum.Extensions;
+    using Magnum.Reflection;
+    using Messages;
+    using Shelving;
+    using Stact;
+    using Stact.Configuration;
 
 
-	[DebuggerDisplay("Shelf[{ServiceName}]")]
-	public class Shelf :
-		IDisposable
-	{
-		readonly Type _bootstrapperType;
-		readonly Uri _controllerAddress;
-		readonly string _controllerPipeName;
-		readonly ILog _log;
-		readonly string _serviceName;
-		HostChannel _channel;
-		OutboundChannel _controllerChannel;
-		bool _disposed;
-		PoolFiber _fiber;
-		Host _host;
+    [DebuggerDisplay("Shelf[{ServiceName}]")]
+    public class Shelf :
+        IDisposable
+    {
+        readonly Type _bootstrapperType;
+        readonly Uri _controllerAddress;
+        readonly string _controllerPipeName;
+        readonly ILog _log;
+        readonly string _serviceName;
+        HostChannel _channel;
+        OutboundChannel _controllerChannel;
+        bool _disposed;
+        PoolFiber _fiber;
+        Host _host;
 
-		public Shelf(Type bootstrapperType, Uri controllerAddress, string controllerPipeName)
-		{
-			_bootstrapperType = bootstrapperType;
-			_controllerAddress = controllerAddress;
-			_controllerPipeName = controllerPipeName;
+        public Shelf(Type bootstrapperType, Uri controllerAddress, string controllerPipeName)
+        {
+            _bootstrapperType = bootstrapperType;
+            _controllerAddress = controllerAddress;
+            _controllerPipeName = controllerPipeName;
 
-			BootstrapLogger();
+            BootstrapLogger();
 
-			_serviceName = AppDomain.CurrentDomain.FriendlyName;
+            _serviceName = AppDomain.CurrentDomain.FriendlyName;
 
-			_log = LogManager.GetLogger("Topshelf.Shelf." + _serviceName);
+            _log = Logger.Get("Topshelf.Shelf." + _serviceName);
 
-			AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-			AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
 
-			Create();
-		}
+            Create();
+        }
 
-		void OnDomainUnload(object sender, EventArgs e)
-		{
-			LogManager.Shutdown();
-		}
+        void OnDomainUnload(object sender, EventArgs e)
+        {
+            Logger.Shutdown();
+        }
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-		void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-			if (disposing)
-			{
-				if (_channel != null)
-				{
-					_channel.Dispose();
-					_channel = null;
-				}
+        void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+            if (disposing)
+            {
+                if (_channel != null)
+                {
+                    _channel.Dispose();
+                    _channel = null;
+                }
 
-				if (_controllerChannel != null)
-				{
-					_controllerChannel.Dispose();
-					_controllerChannel = null;
-				}
+                if (_controllerChannel != null)
+                {
+                    _controllerChannel.Dispose();
+                    _controllerChannel = null;
+                }
 
-				LogManager.Shutdown();
-			}
+                Logger.Shutdown();
+            }
 
-			_disposed = true;
-		}
+            _disposed = true;
+        }
 
-		void Create()
-		{
-			try
-			{
-				_controllerChannel = new OutboundChannel(_controllerAddress, _controllerPipeName);
+        void Create()
+        {
+            try
+            {
+                _controllerChannel = new OutboundChannel(_controllerAddress, _controllerPipeName);
 
-				Type type = FindBootstrapperImplementationType(_bootstrapperType);
+                Type type = FindBootstrapperImplementationType(_bootstrapperType);
 
-				_log.DebugFormat("[{0}] Creating bootstrapper: {1}", _serviceName, type.ToShortTypeName());
+                _log.DebugFormat("[{0}] Creating bootstrapper: {1}", _serviceName, type.ToShortTypeName());
 
-				object bootstrapper = FastActivator.Create(type);
+                object bootstrapper = FastActivator.Create(type);
 
-				Type serviceType = bootstrapper.GetType()
-					.GetInterfaces()
-					.First()
-					.GetGenericArguments()
-					.First();
+                Type serviceType = bootstrapper.GetType()
+                    .GetInterfaces()
+                    .First()
+                    .GetGenericArguments()
+                    .First();
 
-				_log.DebugFormat("[{0}] Creating configurator for service type: {1}", _serviceName, serviceType.ToShortTypeName());
+                _log.DebugFormat("[{0}] Creating configurator for service type: {1}", _serviceName, serviceType.ToShortTypeName());
 
-				InitializeAndCreateService(serviceType, bootstrapper);
-			}
-			catch (Exception ex)
-			{
-				SendFault(ex);
-			}
-		}
+                InitializeAndCreateService(serviceType, bootstrapper);
+            }
+            catch (Exception ex)
+            {
+                SendFault(ex);
+            }
+        }
 
-		void InitializeAndCreateService(Type serviceType, object bootstrapper)
-		{
-			this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper);
-		}
+        void InitializeAndCreateService(Type serviceType, object bootstrapper)
+        {
+            this.FastInvoke(new[] {serviceType}, "InitializeAndCreateHostedService", bootstrapper);
+        }
 
-		// ReSharper disable UnusedMember.Local
-		void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper)
-			// ReSharper restore UnusedMember.Local
-			where T : class
-		{
-			_log.DebugFormat("[{0}] Creating service type: {1}", _serviceName, typeof(T).ToShortTypeName());
+        // ReSharper disable UnusedMember.Local
+        void InitializeAndCreateHostedService<T>(Bootstrapper<T> bootstrapper)
+            // ReSharper restore UnusedMember.Local
+            where T : class
+        {
+            _log.DebugFormat("[{0}] Creating service type: {1}", _serviceName, typeof(T).ToShortTypeName());
 
-			_fiber = new PoolFiber();
+            _fiber = new PoolFiber();
 
-			_channel = HostChannelFactory.CreateShelfHost(_serviceName, AddEventForwarders);
+            _channel = HostChannelFactory.CreateShelfHost(_serviceName, AddEventForwarders);
 
-			_controllerChannel.Send(new ShelfCreated(_serviceName, _channel.Address, _channel.PipeName));
+            _controllerChannel.Send(new ShelfCreated(_serviceName, _channel.Address, _channel.PipeName));
 
-			_host = HostFactory.New(x =>
-				{
-					x.SetServiceName(_serviceName);
-					x.UseBuilder(description => new ShelfBuilder(description, _channel));
+            _host = HostFactory.New(x =>
+                {
+                    x.SetServiceName(_serviceName);
+                    x.UseBuilder(description => new ShelfBuilder(description, _channel));
 
-					x.Service<T>(s =>
-						{
-							var serviceConfigurator = new ServiceConfiguratorImpl<T>(s);
+                    x.Service<T>(s =>
+                        {
+                            var serviceConfigurator = new ServiceConfiguratorImpl<T>(s);
 
-							bootstrapper.InitializeHostedService(serviceConfigurator);
+                            bootstrapper.InitializeHostedService(serviceConfigurator);
 
-							s.SetServiceName(_serviceName);
-						});
-				});
+                            s.SetServiceName(_serviceName);
+                        });
+                });
 
-			_host.Run();
-		}
+            _host.Run();
+        }
 
-		void AddEventForwarders(ConnectionConfigurator x)
-		{
-			// These are needed to ensure that events are updated in the shelf state machine
-			// as well as the service coordinator state machine. To handle this, the servicecontroller
-			// is given the shelf channel as the reporting channel for events, and the shelf forwards
-			// the events to the service coordinator
+        void AddEventForwarders(ConnectionConfigurator x)
+        {
+            // These are needed to ensure that events are updated in the shelf state machine
+            // as well as the service coordinator state machine. To handle this, the servicecontroller
+            // is given the shelf channel as the reporting channel for events, and the shelf forwards
+            // the events to the service coordinator
 
-			x.AddConsumerOf<ServiceEvent>()
-				.UsingConsumer(OnServiceEvent)
-				.HandleOnCallingThread();
+            x.AddConsumerOf<ServiceEvent>()
+                .UsingConsumer(OnServiceEvent)
+                .HandleOnCallingThread();
 
-			x.AddConsumerOf<ServiceCreated>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceFolderChanged>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceFolderRemoved>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceRunning>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceStopped>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServicePaused>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceUnloaded>()
-				.UsingConsumer(m =>
-					{
-						_log.InfoFormat("[{0}] Unloading Shelf and AppDomain", _serviceName);
-						_controllerChannel.Send(m);
-						Dispose();
-						AppDomain.Unload(AppDomain.CurrentDomain);
-					})
-				.HandleOnFiber(_fiber);
-			x.AddConsumerOf<ServiceFault>()
-				.UsingConsumer(m => _controllerChannel.Send(m))
-				.HandleOnFiber(_fiber);
-		}
+            x.AddConsumerOf<ServiceCreated>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServiceFolderChanged>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServiceFolderRemoved>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServiceRunning>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServiceStopped>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServicePaused>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServiceUnloaded>()
+                .UsingConsumer(m =>
+                    {
+                        _log.InfoFormat("[{0}] Unloading Shelf and AppDomain", _serviceName);
+                        _controllerChannel.Send(m);
+                        Dispose();
+                        AppDomain.Unload(AppDomain.CurrentDomain);
+                    })
+                .HandleOnFiber(_fiber);
+            x.AddConsumerOf<ServiceFault>()
+                .UsingConsumer(m => _controllerChannel.Send(m))
+                .HandleOnFiber(_fiber);
+        }
 
-		public static Type FindBootstrapperImplementationType(Type bootstrapper)
-		{
-			if (bootstrapper != null)
-			{
-				if (bootstrapper.GetInterfaces().Where(IsBootstrapperType).Count() > 0)
-					return bootstrapper;
+        public static Type FindBootstrapperImplementationType(Type bootstrapper)
+        {
+            if (bootstrapper != null)
+            {
+                if (bootstrapper.GetInterfaces().Where(IsBootstrapperType).Count() > 0)
+                    return bootstrapper;
 
-				throw new InvalidOperationException(
-					"Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
-			}
+                throw new InvalidOperationException(
+                    "Bootstrapper type, '{0}', is not a subclass of Bootstrapper.".FormatWith(bootstrapper.GetType().Name));
+            }
 
-			// check configuration first
-			ShelfConfiguration config = ShelfConfiguration.GetConfig();
-			if (config != null)
-				return config.BootstrapperType;
+            // check configuration first
+            ShelfConfiguration config = ShelfConfiguration.GetConfig();
+            if (config != null)
+                return config.BootstrapperType;
 
-			IEnumerable<Type> possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
-				.SelectMany(x => x.GetTypes())
-				.Where(x => x.IsInterface == false)
-				.Where(t => t.GetInterfaces().Any(IsBootstrapperType));
+            IEnumerable<Type> possibleTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => x.IsInterface == false)
+                .Where(t => t.GetInterfaces().Any(IsBootstrapperType));
 
-			if (possibleTypes.Count() > 1)
-				throw new InvalidOperationException("Unable to identify the bootstrapper, more than one found.");
+            if (possibleTypes.Count() > 1)
+                throw new InvalidOperationException("Unable to identify the bootstrapper, more than one found.");
 
-			if (possibleTypes.Count() == 0)
-				throw new InvalidOperationException("The bootstrapper was not found.");
+            if (possibleTypes.Count() == 0)
+                throw new InvalidOperationException("The bootstrapper was not found.");
 
-			return possibleTypes.Single();
-		}
+            return possibleTypes.Single();
+        }
 
-		static bool IsBootstrapperType(Type t)
-		{
-			if (t.IsGenericType)
-				return t.GetGenericTypeDefinition() == typeof(Bootstrapper<>);
-			return false;
-		}
+        static bool IsBootstrapperType(Type t)
+        {
+            if (t.IsGenericType)
+                return t.GetGenericTypeDefinition() == typeof(Bootstrapper<>);
+            return false;
+        }
 
-		void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
-		{
-			_log.ErrorFormat("Unhandled {0}exception in app domain {1}: {2}", e.IsTerminating ? "terminal " : "",
-			                 AppDomain.CurrentDomain.FriendlyName,
-			                 e.ExceptionObject);
+        void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _log.ErrorFormat("Unhandled {0}exception in app domain {1}: {2}", e.IsTerminating ? "terminal " : "",
+                             AppDomain.CurrentDomain.FriendlyName,
+                             e.ExceptionObject);
 
-			Dispose();
-		}
+            Dispose();
+        }
 
-		void SendFault(Exception ex)
-		{
-			try
-			{
-				_controllerChannel.Send(new ServiceFault(_serviceName, ex));
-			}
-			catch (Exception)
-			{
-				_log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
-			}
-		}
+        void SendFault(Exception ex)
+        {
+            try
+            {
+                _controllerChannel.Send(new ServiceFault(_serviceName, ex));
+            }
+            catch (Exception)
+            {
+                _log.Error("[{0}] Failed to send fault".FormatWith(_serviceName), ex);
+            }
+        }
 
-		void OnServiceEvent(ServiceEvent message)
-		{
-			_log.InfoFormat("<{0}> {1}", message.ServiceName, message.EventType);
-		}
+        void OnServiceEvent(ServiceEvent message)
+        {
+            _log.InfoFormat("<{0}> {1}", message.ServiceName, message.EventType);
+        }
 
-		static void BootstrapLogger()
-		{
-			string assemblyPath = Path.GetDirectoryName(typeof(Shelf).Assembly.Location);
+        static void BootstrapLogger()
+        {
+            // this doesn't seem like something we should do, since we need to let the shelf decide how it
+            // is going to log...
+//			string assemblyPath = Path.GetDirectoryName(typeof(Shelf).Assembly.Location);
+//
+//			string configurationFilePath = Path.Combine(assemblyPath, "log4net.config");
+//
+//			var configurationFile = new FileInfo(configurationFilePath);
+//
+//			XmlConfigurator.ConfigureAndWatch(configurationFile);
 
-			string configurationFilePath = Path.Combine(assemblyPath, "log4net.config");
+//			Logger.Get("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
+//			                                                  configurationFilePath);
 
-			var configurationFile = new FileInfo(configurationFilePath);
-
-			XmlConfigurator.ConfigureAndWatch(configurationFile);
-
-			LogManager.GetLogger("Topshelf.Host").DebugFormat("Logging configuration loaded for shelf: {0}",
-			                                                  configurationFilePath);
-		}
-	}
+            Logger.Get("Topshelf.Host").Warn("Not loading logger configuration, we aren't involved.");
+        }
+    }
 }

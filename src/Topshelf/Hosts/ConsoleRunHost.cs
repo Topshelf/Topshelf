@@ -19,7 +19,7 @@ namespace Topshelf.Hosts
 	using System.ServiceProcess;
 	using System.Threading;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Model;
 	using OS;
 
@@ -28,7 +28,7 @@ namespace Topshelf.Hosts
 		Host, IDisposable
 	{
 		readonly ServiceDescription _description;
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.ConsoleRunHost");
+		readonly ILog _log = Logger.Get("Topshelf.Hosts.ConsoleRunHost");
 		IServiceCoordinator _coordinator;
 		ManualResetEvent _exit;
         volatile bool _hasCancelled;

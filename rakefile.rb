@@ -100,11 +100,12 @@ end
 desc "Cleans, versions, compiles the application and generates build_output/."
 task :compile => [:global_version, :build] do
 	puts 'Copying unmerged dependencies to output folder'
-	copyOutputFiles File.join(props[:lib], "Magnum/#{OUTPUT_PATH}"), "Magnum.{dll,pdb,xml}", File.join(props[:src], "Topshelf/bin/#{BUILD_CONFIG}")
 	copyOutputFiles File.join(props[:src], "Topshelf.Dashboard/bin/#{BUILD_CONFIG}"), "Topshelf.Dashboard.{dll,pdb,xml,config}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Dashboard/bin/#{BUILD_CONFIG}"), "Spark.{dll,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "log4net.{dll,pdb,xml,config}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.{exe,pdb}", props[:output]
+	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.{dll,xml,pdb}", props[:output]
+	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.NLogIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.NLogIntegration.{dll,xml,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.exe.config", props[:output]
 	copy(File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe"), File.join(props[:output], 'Topshelf.Host-x86.exe'))
 	copy(File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.pdb"), File.join(props[:output], 'Topshelf.Host-x86.pdb'))
@@ -139,7 +140,12 @@ task :prepare_examples => [:compile] do
 	what_commit.close
 end
 
-task :build => [:build_ts, :ilmerge, :build_host, :build_x86]
+task :build => [:build_ts, :ilmerge, :copyloggers, :build_host, :build_x86]
+
+task :copyloggers do
+	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.{dll,xml,pdb}", props[:output]
+	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.NLogIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.NLogIntegration.{dll,xml,pdb}", props[:output]
+end
 
 desc "INTERNAL: Compiles the app in x86 mode"
 msbuild :build_x86 do |msb|

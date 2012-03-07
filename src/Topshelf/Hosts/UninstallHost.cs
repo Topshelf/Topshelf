@@ -17,7 +17,7 @@ namespace Topshelf.Hosts
 	using System.Configuration.Install;
 	using System.ServiceProcess;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Windows;
 
 
@@ -25,7 +25,7 @@ namespace Topshelf.Hosts
 		AbstractInstallerHost,
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.UninstallHost");
+		readonly ILog _log = Logger.Get("Topshelf.Hosts.UninstallHost");
 
 
 		public UninstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,

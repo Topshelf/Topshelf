@@ -4,12 +4,12 @@ namespace Topshelf.OS
     using System.IO;
     using System.Linq;
     using System.ServiceProcess;
-    using log4net;
+    using Logging;
 
 
     public static class OsDetector
     {
-        static ILog _log = LogManager.GetLogger("OsDetector");
+        static ILog _log = Logger.Get("OsDetector");
 
         public static Os DetectOs()
         {
@@ -26,7 +26,7 @@ namespace Topshelf.OS
     public class Windows :
         Os
     {
-        static ILog _log = LogManager.GetLogger("Windows");
+        static ILog _log = Logger.Get("Windows");
 
         public string Description
         {
@@ -43,7 +43,7 @@ namespace Topshelf.OS
     public class Nix :
         Os
     {
-        static ILog _log = LogManager.GetLogger("Windows");
+        static ILog _log = Logger.Get("Windows");
 
         public string Description
         {

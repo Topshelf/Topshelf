@@ -16,7 +16,7 @@ namespace Topshelf.Builders
 	using System.Linq;
 	using Hosts;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Messages;
 	using Model;
 	using Stact;
@@ -38,7 +38,7 @@ namespace Topshelf.Builders
 				throw new ArgumentNullException("channel");
 
 			_channel = channel;
-			_log = LogManager.GetLogger("Topshelf.Shelf." + description.Name);
+			_log = Logger.Get("Topshelf.Shelf." + description.Name);
 		}
 
 		public override Host Build()
@@ -60,7 +60,7 @@ namespace Topshelf.Builders
 					return service;
 				});
 
-			ActorInstance instance = factory.GetActor();
+			ActorRef instance = factory.GetActor();
 
 			_channel.Connect(x => x.AddChannel(instance));
 

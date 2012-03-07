@@ -12,14 +12,14 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
-	using log4net;
-	using Windows;
+    using Logging;
+    using Windows;
 
 
 	public class StartHost :
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.StartHost");
+		readonly ILog _log = Logger.Get("Topshelf.Hosts.StartHost");
 		readonly Host _wrappedHost;
 
 		public StartHost(ServiceDescription description, Host wrappedHost)

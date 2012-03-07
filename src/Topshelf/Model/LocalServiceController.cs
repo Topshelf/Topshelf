@@ -14,7 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using Exceptions;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 	using Messages;
 	using Stact;
@@ -56,7 +56,7 @@ namespace Topshelf.Model
 			_pauseAction = pauseAction;
 			_stopAction = stopAction;
 
-			_log = LogManager.GetLogger("Topshelf.Host.Service." + name);
+			_log = Logger.Get("Topshelf.Host.Service." + name);
 		}
 
 		public Type ServiceType

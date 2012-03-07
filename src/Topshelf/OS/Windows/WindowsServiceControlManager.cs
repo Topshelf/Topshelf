@@ -21,16 +21,15 @@ namespace Topshelf.Windows
 	using System.ServiceProcess;
 	using System.Threading;
 	using Internal;
-	using log4net;
-	using Magnum.Extensions;
+	using Logging;
 
 
-	/// <summary>
+    /// <summary>
 	/// Taken from http://code.google.com/p/daemoniq. Thanks guys!
 	/// </summary>
 	public static class WindowsServiceControlManager
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Windows.WindowsServiceControlManager");
+		static readonly ILog _log = Logger.Get("Topshelf.Windows.WindowsServiceControlManager");
 
 		const int SERVICE_CONFIG_FAILURE_ACTIONS = 2;
 		const int SE_PRIVILEGE_ENABLED = 2;

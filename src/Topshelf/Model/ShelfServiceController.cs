@@ -15,7 +15,7 @@ namespace Topshelf.Model
 	using System;
 	using System.Reflection;
 	using Exceptions;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 	using Messages;
 	using Stact;
@@ -25,7 +25,7 @@ namespace Topshelf.Model
 	public class ShelfServiceController :
 		IServiceController
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ShelfServiceController");
+		static readonly ILog _log = Logger.Get("Topshelf.Model.ShelfServiceController");
 
 		readonly AssemblyName[] _assemblyNames;
 		readonly Type _bootstrapperType;

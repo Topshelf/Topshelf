@@ -17,13 +17,13 @@ namespace Topshelf.Windows
 	using System.Diagnostics;
 	using System.Reflection;
 	using System.Security.Principal;
-	using log4net;
+	using Logging;
 	using Magnum.CommandLineParser;
 
 
 	public static class WindowsUserAccessControl
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Windows.WindowsUserAccessControl");
+		static readonly ILog _log = Logger.Get("Topshelf.Windows.WindowsUserAccessControl");
 
 		public static bool IsAdministrator
 		{
@@ -58,7 +58,7 @@ namespace Topshelf.Windows
 
 				try
 				{
-					LogManager.Shutdown();
+					Logger.Shutdown();
 
 					Process process = Process.Start(startInfo);
 					process.WaitForExit();

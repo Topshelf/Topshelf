@@ -16,7 +16,7 @@ namespace Topshelf.RecoveryConfigurators
 	using Builders;
 	using HostConfigurators;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Windows;
 
 
@@ -24,7 +24,7 @@ namespace Topshelf.RecoveryConfigurators
 		RecoveryConfigurator,
 		HostBuilderConfigurator
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.HostConfigurators.RecoveryHostConfigurator");
+		static readonly ILog _log = Logger.Get("Topshelf.HostConfigurators.RecoveryHostConfigurator");
 		ServiceRecoveryOptions _options;
 
 		public RecoveryHostConfigurator()

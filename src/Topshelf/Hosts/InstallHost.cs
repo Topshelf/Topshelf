@@ -18,7 +18,7 @@ namespace Topshelf.Hosts
 	using System.Configuration.Install;
 	using System.ServiceProcess;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Windows;
 
 
@@ -26,7 +26,7 @@ namespace Topshelf.Hosts
 		AbstractInstallerHost,
 		Host
 	{
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Hosts.InstallHost");
+		readonly ILog _log = Logger.Get("Topshelf.Hosts.InstallHost");
 
 		public InstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
 		                   Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)

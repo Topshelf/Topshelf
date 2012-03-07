@@ -18,7 +18,7 @@ namespace Topshelf.Builders
 	using Extensions;
 	using Hosts;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 	using Model;
 	using OS;
@@ -29,7 +29,7 @@ namespace Topshelf.Builders
 	public class RunBuilder :
 		HostBuilder, IDisposable
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Builders.RunBuilder");
+		static readonly ILog _log = Logger.Get("Topshelf.Builders.RunBuilder");
 
 		readonly IList<Action<IServiceCoordinator>> _postStartActions = new List<Action<IServiceCoordinator>>();
 		readonly IList<Action<IServiceCoordinator>> _postStopActions = new List<Action<IServiceCoordinator>>();

@@ -15,7 +15,7 @@ namespace Topshelf.Model
 	using System;
 	using System.Collections.Generic;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 	using Stact;
 	using Stact.Configuration;
@@ -27,7 +27,7 @@ namespace Topshelf.Model
 		IDisposable
 	{
 		readonly Uri _address;
-		readonly ILog _log = LogManager.GetLogger("Topshelf.Model.HostChannel");
+		readonly ILog _log = Logger.Get("Topshelf.Model.HostChannel");
 		readonly UntypedChannel _output;
 		readonly string _pipeName;
 		IList<ChannelConnection> _connections;

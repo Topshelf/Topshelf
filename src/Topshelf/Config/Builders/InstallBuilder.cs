@@ -18,7 +18,7 @@ namespace Topshelf.Builders
 	using System.Linq;
 	using System.ServiceProcess;
 	using Hosts;
-	using log4net;
+	using Logging;
 
 
 	public class InstallBuilder :
@@ -31,7 +31,7 @@ namespace Topshelf.Builders
 		Credentials _credentials;
 		ServiceStartMode _startMode;
 		bool _sudo;
-		static readonly ILog _logger = LogManager.GetLogger(typeof(InstallBuilder));
+		static readonly ILog _logger = Logger.Get(typeof(InstallBuilder));
 
 		public InstallBuilder(ServiceDescription description)
 		{

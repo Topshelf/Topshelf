@@ -57,12 +57,6 @@
     <DocumentationFile>bin\Release\Topshelf.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-	<Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
-      <HintPath>..\..\lib\log4net\net35-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
-      <HintPath>..\..\lib\log4net\net40-full\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="Magnum" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
       <HintPath>..\..\lib\Magnum\net-3.5\Magnum.dll</HintPath>
     </Reference>
@@ -86,13 +80,7 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core">
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Management.Instrumentation">
-    </Reference>
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionVersion.cs">
@@ -180,6 +168,13 @@
     <Compile Include="Hosts\StartHost.cs" />
     <Compile Include="Hosts\StopHost.cs" />
     <Compile Include="Hosts\UninstallHost.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Logging\LogOutputProvider.cs" />
+    <Compile Include="Logging\Tracing\TraceLog.cs" />
+    <Compile Include="Logging\Tracing\TraceLogger.cs" />
     <Compile Include="Messages\ContinueService.cs" />
     <Compile Include="Messages\CreateShelfService.cs" />
     <Compile Include="Messages\ExceptionDetail.cs" />

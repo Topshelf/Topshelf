@@ -132,6 +132,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Loggers\Topshelf.Log4NetIntegration\Topshelf.Log4NetIntegration.csproj">
+      <Project>{709D3896-BE22-423F-81E9-F557559E45F0}</Project>
+      <Name>Topshelf.Log4NetIntegration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">
       <Project>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</Project>
       <Name>Topshelf</Name>

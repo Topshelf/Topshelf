@@ -15,14 +15,14 @@ namespace Topshelf.HostConfigurators
 	using System;
 	using System.Collections.Generic;
 	using Builders;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 
 
 	public class HostConfiguratorImpl :
 		HostConfigurator
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf");
+		static readonly ILog _log = Logger.Get("Topshelf");
 
 		readonly IList<HostBuilderConfigurator> _configurators;
 		readonly WindowsServiceDescription _description;

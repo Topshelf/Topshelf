@@ -126,7 +126,7 @@ namespace Topshelf.Specs
 		TestChannel _hostChannel;
 		ServiceControllerFactory _controllerFactory;
 		ActorFactory<IServiceController> _factory;
-		ActorInstance _instance;
+        ActorRef _instance;
 		IServiceCoordinator _coordinator;
 		string _serviceName = "test";
 	}

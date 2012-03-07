@@ -18,9 +18,9 @@ namespace Topshelf.Hosts
 	public class ShelfHost :
 		Host
 	{
-		readonly ActorInstance _instance;
+		readonly ActorRef _instance;
 
-		public ShelfHost(ActorInstance instance)
+        public ShelfHost(ActorRef instance)
 		{
 			_instance = instance;
 		}

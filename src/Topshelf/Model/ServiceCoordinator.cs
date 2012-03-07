@@ -18,9 +18,9 @@ namespace Topshelf.Model
 	using System.Reflection;
 	using System.Threading;
 	using Exceptions;
-	using log4net;
+	using Logging;
+	using Magnum.Caching;
 	using Magnum;
-	using Magnum.Collections;
 	using Magnum.Extensions;
 	using Messages;
 	using Stact;
@@ -30,8 +30,8 @@ namespace Topshelf.Model
 	public class ServiceCoordinator :
 		IServiceCoordinator
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceCoordinator");
-		readonly Cache<string, ActorInstance> _actorCache;
+		static readonly ILog _log = Logger.Get("Topshelf.Model.ServiceCoordinator");
+        readonly Cache<string, ActorRef> _actorCache;
 		readonly Action<IServiceCoordinator> _afterStartingServices;
 		readonly Action<IServiceCoordinator> _afterStoppingServices;
 		readonly Action<IServiceCoordinator> _beforeStartingServices;
@@ -61,9 +61,9 @@ namespace Topshelf.Model
 
 			_controllerFactory = new ServiceControllerFactory();
 
-			_startupServices = new Cache<string, Func<Inbox, IServiceChannel, IServiceController>>();
-			_serviceCache = new Cache<string, IServiceController>();
-			_actorCache = new Cache<string, ActorInstance>();
+			_startupServices = new ConcurrentCache<string, Func<Inbox, IServiceChannel, IServiceController>>();
+			_serviceCache = new ConcurrentCache<string, IServiceController>();
+            _actorCache = new ConcurrentCache<string, ActorRef>();
 
 			EventChannel = new ChannelAdapter();
 		}
@@ -107,7 +107,7 @@ namespace Topshelf.Model
 							return controller;
 						});
 
-					ActorInstance instance = factory.GetActor();
+                    ActorRef instance = factory.GetActor();
 					_actorCache.Add(name, instance);
 
 					instance.Send(new CreateService(name));
@@ -242,7 +242,7 @@ namespace Topshelf.Model
 					return controller;
 				});
 
-			ActorInstance instance = factory.GetActor();
+            ActorRef instance = factory.GetActor();
 			_actorCache.Add(message.ServiceName, instance);
 
 			instance.Send(new CreateService(message.ServiceName));

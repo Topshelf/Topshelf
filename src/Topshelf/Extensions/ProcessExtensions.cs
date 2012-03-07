@@ -16,13 +16,13 @@ namespace Topshelf.Extensions
 	using System.Diagnostics;
 	using System.Runtime.InteropServices;
 	using Internal;
-	using log4net;
+	using Logging;
 	using WindowsServiceCode;
 
 
 	public static class ProcessExtensions
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Host");
+		static readonly ILog _log = Logger.Get("Topshelf.Host");
 
 		public static Process GetParent([NotNull] this Process child)
 		{

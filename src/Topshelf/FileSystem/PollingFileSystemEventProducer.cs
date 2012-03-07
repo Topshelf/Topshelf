@@ -18,7 +18,7 @@ namespace Topshelf.FileSystem
 	using System.Linq;
 	using System.Security.Cryptography;
 	using Internal;
-	using log4net;
+	using Logging;
 	using Magnum.Extensions;
 	using Magnum.FileSystem.Events;
 	using Magnum.FileSystem.Internal;
@@ -38,7 +38,7 @@ namespace Topshelf.FileSystem
 		readonly Scheduler _scheduler;
 		bool _disposed;
 		ScheduledOperation _scheduledAction;
-		static readonly ILog _logger = LogManager.GetLogger(typeof(PollingFileSystemEventProducer));
+		static readonly ILog _logger = Logger.Get(typeof(PollingFileSystemEventProducer));
 
 		/// <summary>
 		/// Creates a PollingFileSystemEventProducer

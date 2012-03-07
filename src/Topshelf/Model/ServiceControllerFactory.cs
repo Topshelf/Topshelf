@@ -14,7 +14,7 @@ namespace Topshelf.Model
 {
 	using System;
 	using Exceptions;
-	using log4net;
+	using Logging;
 	using Messages;
 	using Stact;
 	using Stact.Workflow;
@@ -206,7 +206,7 @@ namespace Topshelf.Model
 	/// </summary>
 	public static class ServiceWorkflowExtensions
 	{
-		static readonly ILog _log = LogManager.GetLogger("Topshelf.Model.ServiceWorkflow");
+		static readonly ILog _log = Logger.Get("Topshelf.Model.ServiceWorkflow");
 
 		public static ActivityConfigurator<IServiceWorkflow, IServiceController, StopService> AcceptStop(
 			this StateConfigurator<IServiceWorkflow, IServiceController> configurator)

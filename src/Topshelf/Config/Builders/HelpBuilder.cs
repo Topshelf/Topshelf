@@ -15,13 +15,13 @@ namespace Topshelf.Builders
 	using System;
 	using System.Diagnostics;
 	using Hosts;
-	using log4net;
+	using Logging;
 
 
 	public class HelpBuilder :
 		HostBuilder
 	{
-		static readonly ILog _logger = LogManager.GetLogger(typeof(HelpBuilder));
+		static readonly ILog _logger = Logger.Get(typeof(HelpBuilder));
 		readonly ServiceDescription _description;
 
 		public HelpBuilder(ServiceDescription description)
