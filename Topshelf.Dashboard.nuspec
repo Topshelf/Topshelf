@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Topshelf.Dashboard</id>
-    <version>2.3.0.0</version>
+    <version>2.3.1.0</version>
     <authors>Chris Patterson, Dru Sellers, Travis Smith</authors>
     <description>Topshelf is a service library and hosting framework for .NET</description>
     <language>en-US</language>
@@ -10,7 +10,7 @@
     <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
     <dependencies>
-      <dependency id="Topshelf" version="2.3.0.0" />
+      <dependency id="Topshelf" version="2.3.1.0" />
       <dependency id="Spark" version="1.6" />
     </dependencies>
   </metadata>
