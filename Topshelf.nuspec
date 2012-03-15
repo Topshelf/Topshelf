@@ -10,7 +10,6 @@
     <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
     <dependencies>
-      <dependency id="log4net" version="1.2.11" />
     </dependencies>
   </metadata>
   <files>
