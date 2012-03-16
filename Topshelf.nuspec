@@ -9,8 +9,6 @@
 	<iconUrl>http://topshelf-project.com/wp-content/themes/pandora/img/slide.1.png</iconUrl>
     <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
-    <dependencies>
-    </dependencies>
   </metadata>
   <files>
     <file src="build_output\NET35\Topshelf.dll" target="lib\NET35" />
