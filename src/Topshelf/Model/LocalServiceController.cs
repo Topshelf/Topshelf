@@ -81,7 +81,7 @@ namespace Topshelf.Model
 
 				if (_instance == null)
 				{
-					throw new ApplicationException("The service instance returned was null for service type "
+					throw new TopshelfException("The service instance returned was null for service type "
 					                                 + typeof(TService).ToShortTypeName());
 				}
 
