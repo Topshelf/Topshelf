@@ -1,7 +1,7 @@
-﻿// Copyright 2007-2011 The Apache Software Foundation.
+﻿// Copyright 2007-2012 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
-// this file except in compliance with the License. You may obtain a copy of the 
+// his file except in compliance with the License. You may obtain a copy of the 
 // License at 
 // 
 //     http://www.apache.org/licenses/LICENSE-2.0 
@@ -17,31 +17,28 @@ namespace Stuff
     using Topshelf;
     using log4net.Config;
 
-
     class Program
     {
         static void Main(string[] args)
         {
             XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
-
-            Host h = HostFactory.New(x =>
+            
+            HostFactory.Run(x =>
+            {
+                x.Service<TownCrier>(s =>
                 {
-                    x.Service<TownCrier>(s =>
-                        {
-                            s.SetServiceName("TownCrier");
-                            s.ConstructUsing(name => new TownCrier());
-                            s.WhenStarted(tc => tc.Start());
-                            s.WhenStopped(tc => tc.Stop());
-                        });
-
-                    x.RunAsLocalSystem();
-
-                    x.SetDescription("Sample Topshelf Host");
-                    x.SetDisplayName("Stuff");
-                    x.SetServiceName("stuff");
+                    s.SetServiceName("TownCrier");
+                    s.ConstructUsing(name => new TownCrier());
+                    s.WhenStarted(tc => tc.Start());
+                    s.WhenStopped(tc => tc.Stop());
                 });
 
-            h.Run();
+                x.RunAsLocalSystem();
+
+                x.SetDescription("Sample Topshelf Host");
+                x.SetDisplayName("Stuff");
+                x.SetServiceName("stuff");
+            });
         }
     }
 }
