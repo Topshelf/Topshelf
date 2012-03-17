@@ -20,7 +20,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 
 
 	[Scenario]
-	public class ServiceCoordinator_SpecsBase
+	public class InterationContext
 	{
 		public ServiceCoordinator Coordinator { get; set; }
 
@@ -45,7 +45,7 @@ namespace Topshelf.Specs.ServiceCoordinator
 		[Given]
 		public void A_service_coordinator()
 		{
-			Coordinator = new ServiceCoordinator(new PoolFiber(), Ignored, Ignored, Ignored, 10.Seconds());
+			Coordinator = new ServiceCoordinator(new PoolFiber(), Ignored, Ignored, Ignored, 10.Minutes());
 		}
 
 		[After]

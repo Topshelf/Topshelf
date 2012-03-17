@@ -438,5 +438,45 @@ namespace Topshelf.Model
 
 			_log.InfoFormat("[Topshelf] {0} complete", name);
 		}
+
+
+
+        //these methods should be evaluated for correctness
+        public void PauseService(string serviceName)
+        {
+            _serviceCache.Each((name, service) =>
+            {
+                if (name == serviceName)
+                {
+                    var message = new PauseService(name);
+
+                    _actorCache[name].Send(message);
+                }
+            });
+        }
+	    public void ContinueService(string serviceName)
+	    {
+            _serviceCache.Each((name, service) =>
+            {
+                if (name == serviceName)
+                {
+                    var message = new ContinueService(name);
+
+                    _actorCache[name].Send(message);
+                }
+            });
+	    }
+	    public void StopService(string serviceName)
+	    {
+            _serviceCache.Each((name, service) =>
+            {
+                if (name == serviceName)
+                {
+                    var message = new StopService(name);
+
+                    _actorCache[name].Send(message);
+                }
+            });   
+	    }
 	}
 }

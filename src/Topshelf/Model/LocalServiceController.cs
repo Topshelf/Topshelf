@@ -13,14 +13,16 @@
 namespace Topshelf.Model
 {
 	using System;
+	using System.Diagnostics;
 	using Exceptions;
+	using Internal;
 	using Logging;
 	using Magnum.Extensions;
 	using Messages;
 	using Stact;
 	using Stact.Workflow;
 
-
+    [DebuggerDisplay("{DebuggerDisplay()}")]
 	public class LocalServiceController<TService> :
 		IServiceController<TService>
 		where TService : class
@@ -130,13 +132,7 @@ namespace Topshelf.Model
 			_instance = null;
 		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		void CallAction<TBefore, TComplete>(string text, Action<TService> callback, Func<TBefore> before,
+	    void CallAction<TBefore, TComplete>(string text, Action<TService> callback, Func<TBefore> before,
 		                                    Func<TComplete> complete)
 			where TComplete : ServiceEvent
 			where TBefore : ServiceEvent
@@ -162,13 +158,25 @@ namespace Topshelf.Model
 			}
 		}
 
-		void Publish<T>(T message)
+
+	    void Publish<T>(T message)
 		{
 			_coordinatorChannel.Send(message);
 			_inbox.Send(message);
 		}
 
-		void Dispose(bool disposing)
+        [UsedImplicitly]
+        string DebuggerDisplay()
+        {
+            return "Local Service:{0}".FormatWith(_name);
+        }
+	    public void Dispose()
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);
+	    }
+
+	    void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;

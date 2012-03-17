@@ -83,7 +83,7 @@
     <Compile Include="ServiceCoordinator\ServiceCoordinator_Singles_Specs.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ServiceCoordinator\ServiceCoordinator_SpecsBase.cs">
+    <Compile Include="ServiceCoordinator\InterationContext.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ServiceTests\Bob.cs" />
