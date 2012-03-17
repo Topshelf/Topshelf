@@ -21,7 +21,6 @@ namespace Topshelf.Specs
 	using Messages;
 	using Model;
 	using NUnit.Framework;
-	using Shelving;
 	using Stact;
 
 

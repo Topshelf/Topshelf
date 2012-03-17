@@ -90,7 +90,6 @@
     <Compile Include="Bottles\BottleService.cs" />
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
-    <Compile Include="Configuration\Dsl\RunnerExtensions.cs" />
     <Compile Include="Config\Builders\HelpBuilder.cs" />
     <Compile Include="Config\Builders\ShelfBuilder.cs" />
     <Compile Include="Config\Builders\StartBuilder.cs" />
@@ -242,15 +241,12 @@
     <Compile Include="Model\Shelf.cs" />
     <Compile Include="Model\HostChannelFactory.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
-    <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
-    <Compile Include="Configuration\Dsl\IRunnerConfigurator.cs" />
     <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorImpl.cs" />
     <Compile Include="Config\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Runner.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

@@ -75,8 +75,6 @@
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />
     <Compile Include="Bottle\Bottle_Specs.cs" />
-    <Compile Include="Configuration\RunnerConfigurator_Specs.cs">
-    </Compile>
     <Compile Include="Config\EmptyConfigurator_Specs.cs" />
     <Compile Include="Config\Recovery_Specs.cs" />
     <Compile Include="ContextSetup.cs" />
@@ -140,6 +138,9 @@
       <Project>{1EEC6A0D-F213-4716-B5CC-33782BCE1908}</Project>
       <Name>Topshelf</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Configuration\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
