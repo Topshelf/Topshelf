@@ -37,17 +37,6 @@ namespace Topshelf.Model
 		void Pause();
 
 		void Continue();
-
-
-//		void Created(ServiceCreated message);
-//		void Running();
-//		void Stopped();
-//		void Restarted();
-//		void Paused();
-//		void Unloaded();
-//		void Completed();
-//		void Faulted(ServiceFault message);
-//		void HandleException<TBody>(TBody message);
 	}
 
 
