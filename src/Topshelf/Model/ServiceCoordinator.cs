@@ -465,6 +465,8 @@ namespace Topshelf.Model
 
         void OnServiceCommand(ServiceCommand msg)
         {
+            _log.InfoFormat("Sending command '{0}' to service '{1}'", msg.GetType().Name, msg.ServiceName);
+
             _serviceCache.Each((name, service) =>
             {
                 if (name == msg.ServiceName)

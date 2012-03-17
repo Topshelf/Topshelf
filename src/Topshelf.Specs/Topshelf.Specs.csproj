@@ -77,7 +77,6 @@
     <Compile Include="Config\Builder_Specs.cs" />
     <Compile Include="Config\EmptyConfigurator_Specs.cs" />
     <Compile Include="Config\Recovery_Specs.cs" />
-    <Compile Include="ContextSetup.cs" />
     <Compile Include="DirectoryMonitor_Specs.cs" />
     <Compile Include="ServiceController_Specs.cs" />
     <Compile Include="ServiceCoordinator\ServiceCoordinator_Singles_Specs.cs">
@@ -92,7 +91,7 @@
     <Compile Include="TestObject\TestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestObject\TestService2.cs" />
-    <Compile Include="TypeCoercionPlay.cs" />
+    <Compile Include="shelf_find_bootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -125,9 +124,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Bottle\sample.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Loggers\Topshelf.Log4NetIntegration\Topshelf.Log4NetIntegration.csproj">
@@ -139,9 +135,7 @@
       <Name>Topshelf</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

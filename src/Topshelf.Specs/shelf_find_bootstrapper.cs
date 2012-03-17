@@ -1,7 +1,7 @@
-// Copyright 2007-2010 The Apache Software Foundation.
-// 
+// Copyright 2007-2012 The Apache Software Foundation.
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
-// this file except in compliance with the License. You may obtain a copy of the 
+// his file except in compliance with the License. You may obtain a copy of the 
 // License at 
 // 
 //     http://www.apache.org/licenses/LICENSE-2.0 
@@ -10,28 +10,30 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+
 namespace Topshelf.Specs
 {
     using System;
+    using Magnum.TestFramework;
     using Model;
-    using ServiceConfigurators;
-    using Shelving;
+    using NUnit.Framework;
 
 
-    public class TypeCoercionPlay
+    [Scenario]
+    public class shelf_find_bootstrapper
     {
-        public void TestIt()
+        Type _foundType;
+
+        [When]
+        public void a_null_is_passed_into_find()
         {
-            Type t = Shelf.FindBootstrapperImplementationType(null);
-            Console.WriteLine(t);
+            _foundType = Shelf.FindBootstrapperImplementationType(null);
         }
-    }
 
-    public class BS : Bootstrapper<string>
-    {
-        public void InitializeHostedService(ServiceConfigurator<string> cfg)
+        [Test]
+        public void should_find_from_appconfig()
         {
-            throw new NotImplementedException();
+            _foundType.ShouldEqual(typeof(TestAppDomainBootsrapper));
         }
     }
 }

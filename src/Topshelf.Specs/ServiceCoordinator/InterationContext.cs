@@ -13,6 +13,8 @@
 namespace Topshelf.Specs.ServiceCoordinator
 {
 	using System;
+	using System.Diagnostics;
+	using Logging;
 	using Magnum.Extensions;
 	using Magnum.TestFramework;
 	using Model;
@@ -41,6 +43,14 @@ namespace Topshelf.Specs.ServiceCoordinator
 			                                                                                             continueAction,
 			                                                                                             serviceFactory));
 		}
+
+        [Given]
+        public void logging()
+        {
+            Trace.WriteLine("Loading Log4net");
+
+            Log4NetLogger.Use("test.log4net.xml");
+        }
 
 		[Given]
 		public void A_service_coordinator()
