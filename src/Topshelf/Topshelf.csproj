@@ -86,10 +86,6 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
-    <Compile Include="Bottles\BottleException.cs" />
-    <Compile Include="Bottles\BottleService.cs" />
-    <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
-    <Compile Include="Bottles\BottleWatcher.cs" />
     <Compile Include="Config\Builders\Builder.cs" />
     <Compile Include="Config\Builders\HelpBuilder.cs" />
     <Compile Include="Config\Builders\ShelfBuilder.cs" />
@@ -268,7 +264,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HelpText.txt" />
-    <Content Include="Bottles\_About Bottles.txt" />
     <Content Include="Messages\_About Messages.txt" />
   </ItemGroup>
   <ItemGroup>

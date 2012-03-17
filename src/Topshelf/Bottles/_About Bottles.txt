@@ -1,5 +1,0 @@
-﻿The messages are used by the service coordinators/controllers to control 
-the life-time. Messages are serializable (mostly).
-
-In general, if they use primitives, they are, otherwise they need to stay within this app domain in
-order not to cause cross-domain assembly loading. 

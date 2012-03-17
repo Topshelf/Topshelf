@@ -74,7 +74,6 @@
     <Compile Include="ArgParsing_Specs.cs" />
     <Compile Include="AppDomain_Specs.cs" />
     <Compile Include="BddExtensions.cs" />
-    <Compile Include="Bottle\Bottle_Specs.cs" />
     <Compile Include="Config\Builder_Specs.cs" />
     <Compile Include="Config\EmptyConfigurator_Specs.cs" />
     <Compile Include="Config\Recovery_Specs.cs" />
