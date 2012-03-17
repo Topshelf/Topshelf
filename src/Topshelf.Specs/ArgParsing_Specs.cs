@@ -12,12 +12,12 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Specs
 {
-	using Hosts;
+    using System;
+    using Hosts;
 	using Magnum.TestFramework;
 	using NUnit.Framework;
 
 
-    [Ignore("Failing")]
     [Scenario]
     public class Given_no_command_line
     {
@@ -27,12 +27,12 @@ namespace Topshelf.Specs
         public void An_empty_command_line()
     	{
     		_host = HostFactory.New(x =>
-    			{
+    		    {
+    		        CommonConfig.Register(x);
     				x.ApplyCommandLine("");
     			});
     	}
 
-        [Ignore("Failing")]
         [Then]
         public void Action_should_be_run()
     	{
@@ -41,7 +41,6 @@ namespace Topshelf.Specs
     }
 
 
-    [Ignore("Failing")]
     [Scenario]
     public class Given_a_dash_parameter
     {
@@ -51,12 +50,12 @@ namespace Topshelf.Specs
         public void Dash_something_or_other_command_line()
         {
 			_host = HostFactory.New(x =>
-			{
+			    {
+			        CommonConfig.Register(x);
 				x.ApplyCommandLine("-unknownArgument");
 			});
 		}
 
-        [Ignore("Failing")]
         [Then]
         public void Action_should_be_run()
         {
@@ -65,22 +64,21 @@ namespace Topshelf.Specs
     }
 
 
-    [Ignore("Failing")]
     [Scenario]
     public class Given_service_install_command_line
     {
     	Host _host;
 
-    	[Given]
+        [Given]
         public void Service_install_command_line()
         {
-			_host = HostFactory.New(x =>
-			{
-				x.ApplyCommandLine("install");
-			});
-		}
+            _host = HostFactory.New(x =>
+            {
+                CommonConfig.Register(x);
+                x.ApplyCommandLine("install");
+            });
+        }
 
-        [Ignore("Failing")]
         [Then]
         public void Action_should_be_install()
         {
@@ -115,5 +113,14 @@ namespace Topshelf.Specs
         {
         	((InstallHost)_host).Description.GetServiceName().ShouldEqual("test$bob");
         }
+    }
+
+
+    public class CommonConfig
+    {
+        public static Action<HostConfigurators.HostConfigurator> Register = x =>
+        {
+            x.SetServiceName("common");
+        };
     }
 }
