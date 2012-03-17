@@ -16,7 +16,6 @@ namespace Topshelf.Specs
     using System;
     using System.IO;
     using System.Threading;
-    using Configuration.Dsl;
     using Magnum.Extensions;
     using Messages;
     using Model;

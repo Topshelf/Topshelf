@@ -155,8 +155,8 @@
     <Compile Include="FileSystem\DirectoryMonitorBootstrapper.cs" />
     <Compile Include="FileSystem\FileSystemEventProducer.cs" />
     <Compile Include="FileSystem\PollingFileSystemEventProducer.cs" />
-    <Compile Include="HostConfigurationException.cs" />
-    <Compile Include="HostException.cs" />
+    <Compile Include="Exceptions\HostConfigurationException.cs" />
+    <Compile Include="Exceptions\HostException.cs" />
     <Compile Include="Hosts\HelpHost.cs" />
     <Compile Include="Hosts\InstallHost.cs" />
     <Compile Include="Hosts\AbstractInstallerHost.cs" />
@@ -238,7 +238,6 @@
     <Compile Include="Model\Shelf.cs" />
     <Compile Include="Model\HostChannelFactory.cs" />
     <Compile Include="Model\IServiceController.cs" />
-    <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
     <Compile Include="Config\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
