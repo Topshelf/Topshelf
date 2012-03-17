@@ -16,6 +16,7 @@ namespace Topshelf.Model
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
+	using System.Text;
 	using System.Threading;
 	using Exceptions;
 	using Logging;
@@ -46,6 +47,12 @@ namespace Topshelf.Model
 
 		volatile bool _disposed;
 		volatile bool _stopping;
+
+        public ServiceCoordinator(Fiber fiber, TimeSpan timeout) : this(fiber,
+            sc=> { }, sc=> { },sc=> { }, timeout)
+        {
+            
+        }
 
 		public ServiceCoordinator(Fiber fiber,
 		                          Action<IServiceCoordinator> beforeStartingServices,
@@ -198,7 +205,7 @@ namespace Topshelf.Model
 
 		void WaitUntilServicesAreRunning(IEnumerable<string> services, TimeSpan timeout)
 		{
-			DateTime stopTime = SystemUtil.Now + timeout;
+			var stopTime = SystemUtil.Now + timeout;
 
 			State running = _controllerFactory.Workflow.GetState(s => s.Running);
 
@@ -214,13 +221,19 @@ namespace Topshelf.Model
 				if (success)
 					return;
 
-				bool anyFailed = services
+				var faulted = services
 					.Where(key => _serviceCache.Has(key))
 					.Select(key => _serviceCache[key])
-					.Any(service => service.CurrentState == _controllerFactory.Workflow.GetState(s => s.Faulted));
+					.Where(service => service.CurrentState == _controllerFactory.Workflow.GetState(s => s.Faulted))
+                    .Select(s=>s.Name).ToList();
 
-				if (anyFailed)
-					throw new TopshelfException("At least one configured service failed to start");
+				if (faulted.Count > 0)
+				{
+				    var svcs = faulted.Aggregate((l, r) => ", ");
+				    var msg = new StringBuilder();
+				    msg.AppendFormat("'{0}' services are in a faulted state: {1}",faulted.Count, svcs );
+				    throw new TopshelfException("At least one configured service failed to start");
+				}
 			}
 
 			throw new TopshelfException("All services were not started within the specified timeout");
@@ -336,7 +349,7 @@ namespace Topshelf.Model
 
 		void Status(Request<ServiceStatus> request)
 		{
-			ServiceInfo[] serviceInfos = _serviceCache
+			var serviceInfos = _serviceCache
 				.Select(sc => new ServiceInfo(sc.Name, sc.CurrentState.Name, sc.ServiceType.Name))
 				.ToArray();
 
