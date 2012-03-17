@@ -1,0 +1,159 @@
+Using MassTransit with an IoC Container
+"""""""""""""""""""""""""""""""""""""""
+
+MassTransit has been built from the beginning with the concept of an IoC container
+being involved. Our support for using them is quite solid and mature and is most certainly
+recommended. However with everything else you are learning trying to figure out 
+just how to get the container involved might be overwhelming. Below you will find prototypical
+examples of container integration.
+
+
+StructureMap
+''''''''''''
+
+.. sourcecode:: csharp
+
+    public static void main(string[] args) 
+    {
+        var container = new Container(cfg =>
+        {
+            // register each consumer
+            
+            //or use StructureMap's excellent scanning capabilities
+        });
+        
+        var bus = ServiceBusFactory.New(sbc =>
+        {
+            //other configuration options
+            
+            //this will find all of the consumers in the container and 
+            //register them with the bus.
+            sbc.Subscribe(x => x.LoadFrom(container));
+        });
+        
+        //now we add the bus
+        container.Inject(bus);
+    }
+
+.. note::
+
+    We recommend that most of this type of code be placed in an StructureMap Registry
+    
+Windsor
+'''''''
+
+.. sourcecode:: csharp
+
+    public static void main(string[] args) 
+    {
+        var container = new WindsorContainer();
+        
+        // register each consumer manually
+        container.Register(Component.For<IConsumer>().ImplementedBy<YourConsumer>);
+        
+        //or use Windsor's excellent scanning capabilities
+        container.Register(AllTypes.FromThisAssembly().BasedOn<IConsumer>());
+        
+        var bus = ServiceBusFactory.New(sbc =>
+        {
+            //other configuration options
+            
+            //this will find all of the consumers in the container and 
+            //register them with the bus.
+            sbc.Subscribe(x => x.LoadFrom(container));
+        });
+        
+        //now we add the bus
+        container.Register(Component.For<IServiceBus>().Instance(bus));
+    }
+
+.. note::
+
+    We recommend that most of this type of code be placed in an IWindsorInstaller
+
+AutoFac
+'''''''
+
+.. sourcecode:: csharp
+
+    public static void main(string[] args)
+    {
+        var builder = new ContainerBuilder();
+
+        // register each consumer manually
+        builder.RegisterType<YourConsumer>().As<IConsumer>();
+
+        //or use Autofac's scanning capabilities -- SomeClass is any class in the correct assembly
+        builder.RegisterAssemblyTypes(typeof(SomeClass).Assembly).As<IConsumer>();
+
+        //now we add the bus
+        builder.Register(c => ServiceBusFactory.New(sbc =>
+        {
+            //other configuration options
+
+            //this will find all of the consumers in the container and
+            //register them with the bus.
+            sbc.Subscribe(x => x.LoadFrom(container));
+        })).As<IServiceBus>()
+            .SingleInstance();
+
+        var container = builder.Build();
+    }
+
+.. note::
+
+    We recommend that most of this type of code be placed in an Autofac Module
+
+
+Ninject
+'''''''
+
+.. sourcecode:: csharp
+
+    public static void main(string[] args) 
+    {
+        var kernel = new StandardKernel();
+        
+        // register each consumer manually
+        kernel.Bind<YourConsumer>().ToSelf();
+        
+        //Dru is currently unaware of any scanning capability
+        
+        var bus = ServiceBusFactory.New(sbc =>
+        {
+            //other configuration options
+            
+            //we have to explicitly configure the subscriptions because 
+            //the Ninject metadata model is not rich enough.
+            sbc.Subscribe(subs =>
+            {
+                subs.Consumer<YourConsumer>(kernel)
+            });
+        });
+        
+        //now we add the bus
+        kernel.Bind<IServiceBus>().To(bus);
+    }
+
+.. note::
+
+    We recommend that most of this type of code be placed in an Ninject Module
+
+.. warning::
+
+    The Ninject container doesn't currently support the workflow that we can use with
+    the other containers, and because of that the ``LoadFrom`` method that our other
+    container extensions use is not supported. We filed an issue with the Ninject
+    team, and the issue was closed with 'Not going to fix'. 
+    https://github.com/ninject/ninject/issues/35
+
+Unity
+'''''
+
+Coming soon. Feel free to write it up.
+
+Hey! Where's my container??
+'''''''''''''''''''''''''''
+
+Don't see your container here? Feel free to submit a pull request. You should easily be able to
+add support by following the other containers.

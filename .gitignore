@@ -25,3 +25,6 @@ submit.xml
 src/tests/*
 SolutionVersion.cs
 src/CommonAssemblyInfo.cs
+
+doc/build/*
+
