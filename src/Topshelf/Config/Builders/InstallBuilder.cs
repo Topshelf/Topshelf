@@ -1,7 +1,7 @@
-﻿// Copyright 2007-2011 The Apache Software Foundation.
+﻿// Copyright 2007-2012 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
-// this file except in compliance with the License. You may obtain a copy of the 
+// his file except in compliance with the License. You may obtain a copy of the 
 // License at 
 // 
 //     http://www.apache.org/licenses/LICENSE-2.0 
@@ -14,62 +14,33 @@ namespace Topshelf.Builders
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
 	using System.Linq;
 	using System.ServiceProcess;
 	using Hosts;
-	using Logging;
 
 
-	public class InstallBuilder :
-		HostBuilder
+    public class InstallBuilder :
+		Builder
 	{
 		readonly IList<string> _dependencies;
-		readonly ServiceDescription _description;
 		readonly IList<Action> _postActions;
 		readonly IList<Action> _preActions;
 		Credentials _credentials;
 		ServiceStartMode _startMode;
 		bool _sudo;
-		static readonly ILog _logger = Logger.Get(typeof(InstallBuilder));
 
-		public InstallBuilder(ServiceDescription description)
+		public InstallBuilder(ServiceDescription description) : base(description)
 		{
 			_preActions = new List<Action>();
 			_postActions = new List<Action>();
 			_dependencies = new List<string>();
 			_startMode = ServiceStartMode.Automatic;
 			_credentials = new Credentials("", "", ServiceAccount.LocalSystem);
-
-			_description = description;
 		}
 
-		public ServiceDescription Description
+		public override Host Build()
 		{
-			get { return _description; }
-		}
-
-		public Host Build()
-		{
-			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions, _sudo);
-		}
-
-		public void Match<T>(Action<T> callback)
-			where T : class, HostBuilder
-		{
-			if (callback != null)
-			{
-				if (typeof(T).IsAssignableFrom(GetType()))
-					callback(this as T);
-			}
-			else
-			{
-				_logger.Warn("Match{{T}} called with callback of null. If you are running the host " 
-					+ "in debug mode, the next log message will print a stack trace.");
-#if DEBUG
-				_logger.Warn(new StackTrace());
-#endif
-			}
+			return new InstallHost(Description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions, _sudo);
 		}
 
 		public void RunAs(string username, string password, ServiceAccount accountType)

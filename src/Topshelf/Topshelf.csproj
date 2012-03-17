@@ -90,6 +90,7 @@
     <Compile Include="Bottles\BottleService.cs" />
     <Compile Include="Bottles\BottleServiceBootstrapper.cs" />
     <Compile Include="Bottles\BottleWatcher.cs" />
+    <Compile Include="Config\Builders\Builder.cs" />
     <Compile Include="Config\Builders\HelpBuilder.cs" />
     <Compile Include="Config\Builders\ShelfBuilder.cs" />
     <Compile Include="Config\Builders\StartBuilder.cs" />

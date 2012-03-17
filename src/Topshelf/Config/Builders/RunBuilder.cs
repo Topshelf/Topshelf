@@ -27,7 +27,7 @@ namespace Topshelf.Builders
 
 
 	public class RunBuilder :
-		HostBuilder, IDisposable
+		Builder, IDisposable
 	{
 		static readonly ILog _log = Logger.Get("Topshelf.Builders.RunBuilder");
 
@@ -37,21 +37,12 @@ namespace Topshelf.Builders
 		readonly IList<Action<IServiceCoordinator>> _preStopActions = new List<Action<IServiceCoordinator>>();
 		readonly IList<ServiceBuilder> _serviceBuilders = new List<ServiceBuilder>();
 		IServiceCoordinator _coordinator;
-		readonly ServiceDescription _description;
-
-		public ServiceDescription Description
-		{
-			get { return _description; }
-		}
-
 		TimeSpan _timeout = 1.Minutes();
 
-		public RunBuilder([NotNull] ServiceDescription description)
+		public RunBuilder([NotNull] ServiceDescription description) : base(description)
 		{
-			if (description == null)
-				throw new ArgumentNullException("description");
+			
 
-			_description = description;
 		}
 
 		public IList<ServiceBuilder> ServiceBuilders
@@ -59,7 +50,7 @@ namespace Topshelf.Builders
 			get { return _serviceBuilders; }
 		}
 
-		public virtual Host Build()
+		public override Host Build()
 		{
 			_coordinator = new ServiceCoordinator(new PoolFiber(),
 			                                      ExecutePreStartActions,
@@ -76,16 +67,6 @@ namespace Topshelf.Builders
 			return CreateHost(_coordinator, osCommands);
 		}
 
-		public void Match<T>([NotNull] Action<T> callback)
-			where T : class, HostBuilder
-		{
-			if (callback == null)
-				throw new ArgumentNullException("callback");
-
-			if (typeof(T).IsAssignableFrom(GetType()))
-				callback(this as T);
-		}
-
 		Host CreateHost(IServiceCoordinator coordinator, Os osCommands)
 		{
 			var process = Process.GetCurrentProcess().GetParent();
@@ -93,11 +74,11 @@ namespace Topshelf.Builders
 			{
 				_log.Debug("Running as a Windows service, using the service host");
 
-				return new WindowsServiceHost(_description, coordinator);
+				return new WindowsServiceHost(Description, coordinator);
 			}
 
 			_log.Debug("Running as a console application, using the console host");
-			return new ConsoleRunHost(_description, coordinator, osCommands);
+			return new ConsoleRunHost(Description, coordinator, osCommands);
 		}
 
 		public void AddServiceBuilder(ServiceBuilder serviceBuilder)

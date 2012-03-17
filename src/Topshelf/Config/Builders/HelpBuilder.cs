@@ -12,49 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Builders
 {
-	using System;
-	using System.Diagnostics;
-	using Hosts;
-	using Logging;
+    using Hosts;
 
 
-	public class HelpBuilder :
-		HostBuilder
+    public class HelpBuilder :
+		Builder
 	{
-		static readonly ILog _logger = Logger.Get(typeof(HelpBuilder));
-		readonly ServiceDescription _description;
-
-		public HelpBuilder(ServiceDescription description)
+		public HelpBuilder(ServiceDescription description):base(description)
 		{
-			_description = description;
 		}
 
-		public ServiceDescription Description
+		public override Host Build()
 		{
-			get { return _description; }
-		}
-
-		public Host Build()
-		{
-			return new HelpHost(_description);
-		}
-
-		public void Match<T>(Action<T> callback)
-			where T : class, HostBuilder
-		{
-			if (callback != null)
-			{
-				if (typeof(T).IsAssignableFrom(GetType()))
-					callback(this as T);
-			}
-			else
-			{
-				_logger.Warn("Match{{T}} called with callback of null. If you are running the host "
-					+ "in debug mode, the next log message will print a stack trace.");
-#if DEBUG
-				_logger.Warn(new StackTrace());
-#endif
-			}
+			return new HelpHost(Description);
 		}
 	}
 }
