@@ -14,8 +14,9 @@ namespace Topshelf.Specs
 {
     using System;
     using Model;
+    using ServiceConfigurators;
     using Shelving;
-    using Topshelf.Configuration.Dsl;
+
 
     public class TypeCoercionPlay
     {
@@ -28,7 +29,7 @@ namespace Topshelf.Specs
 
     public class BS : Bootstrapper<string>
     {
-        public void InitializeHostedService(IServiceConfigurator<string> cfg)
+        public void InitializeHostedService(ServiceConfigurator<string> cfg)
         {
             throw new NotImplementedException();
         }

@@ -14,17 +14,19 @@ namespace StuffOnAShelf
 {
     using System;
     using System.IO;
+    using Topshelf.ServiceConfigurators;
     using log4net;
     using log4net.Config;
-    using Topshelf.Configuration.Dsl;
     using Topshelf.Shelving;
+    using Topshelf;
+
 
     public class AShelvedClock :
         Bootstrapper<TheClock>
     {
-        public void InitializeHostedService(IServiceConfigurator<TheClock> cfg)
+        public void InitializeHostedService(ServiceConfigurator<TheClock> cfg)
         {
-            cfg.HowToBuildService(n => new TheClock());
+            cfg.ConstructUsing(n => new TheClock());
             cfg.WhenStarted(s =>
             {
                 XmlConfigurator.Configure(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clock.log4net.config")));

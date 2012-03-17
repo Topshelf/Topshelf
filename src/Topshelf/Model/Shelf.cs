@@ -15,14 +15,13 @@ namespace Topshelf.Model
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
     using Builders;
-    using Configuration.Dsl;
     using Logging;
     using Magnum.Extensions;
     using Magnum.Reflection;
     using Messages;
+    using ServiceConfigurators;
     using Shelving;
     using Stact;
     using Stact.Configuration;
@@ -149,9 +148,7 @@ namespace Topshelf.Model
 
                     x.Service<T>(s =>
                         {
-                            var serviceConfigurator = new ServiceConfiguratorImpl<T>(s);
-
-                            bootstrapper.InitializeHostedService(serviceConfigurator);
+                            bootstrapper.InitializeHostedService(s);
 
                             s.SetServiceName(_serviceName);
                         });

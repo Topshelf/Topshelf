@@ -21,6 +21,7 @@ namespace Topshelf.Specs
     using Messages;
     using Model;
     using NUnit.Framework;
+    using ServiceConfigurators;
     using Shelving;
     using log4net;
 
@@ -107,9 +108,9 @@ namespace Topshelf.Specs
             }
         }
 
-        public void InitializeHostedService(IServiceConfigurator<object> cfg)
+        public void InitializeHostedService(ServiceConfigurator<object> cfg)
         {
-            cfg.HowToBuildService(serviceBuilder => new object());
+            cfg.ConstructUsing(s => new object());
 
             cfg.WhenStarted(a => { Started.Release(); });
             cfg.WhenStopped(a => { Stopped.Release(); });

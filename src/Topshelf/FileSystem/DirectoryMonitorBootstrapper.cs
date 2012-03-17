@@ -15,15 +15,15 @@ namespace Topshelf.FileSystem
 	using System;
 	using System.Configuration;
 	using System.IO;
-	using Configuration.Dsl;
 	using Internal;
+	using ServiceConfigurators;
 	using Shelving;
 
 
 	public class DirectoryMonitorBootstrapper :
 		Bootstrapper<DirectoryMonitor>
 	{
-		public void InitializeHostedService([NotNull] IServiceConfigurator<DirectoryMonitor> cfg)
+		public void InitializeHostedService([NotNull] ServiceConfigurator<DirectoryMonitor> cfg)
 		{
 			if (cfg == null)
 				throw new ArgumentNullException("cfg");

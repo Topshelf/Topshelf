@@ -237,10 +237,8 @@
     <Compile Include="Shelving\Bootstrapper.cs" />
     <Compile Include="Model\Shelf.cs" />
     <Compile Include="Model\HostChannelFactory.cs" />
-    <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Model\IServiceController.cs" />
     <Compile Include="Configuration\Dsl\IServiceConfigurator.cs" />
-    <Compile Include="Configuration\Dsl\ServiceConfiguratorImpl.cs" />
     <Compile Include="Config\Credentials.cs" />
     <Compile Include="Exceptions\ConfigurationException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
