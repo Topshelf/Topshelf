@@ -86,7 +86,7 @@
     <Compile Include="ServiceCoordinator\InterationContext.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ServiceTests\Bob.cs" />
+    <Compile Include="ServiceTests\ServiceInstallAndUninstallOnWindows.cs" />
     <Compile Include="ShelfConfiguration_Specs.cs" />
     <Compile Include="TestChannel.cs" />
     <Compile Include="TestObject\TestService.cs" />

@@ -21,7 +21,7 @@ namespace Topshelf.Specs.ServiceTests
     [Category("Integration")]
 	[Explicit] //don't just run these for shits and giggles yet
 	[TestFixture]
-	public class Bob
+	public class ServiceInstallAndUninstallOnWindows
 	{
 	    private string serviceName = "TOPSHELF-TEST";
 

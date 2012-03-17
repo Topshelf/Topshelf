@@ -200,6 +200,10 @@ namespace Topshelf.Model
 					x.AddConsumerOf<Request<ServiceStatus>>()
 						.UsingConsumer(Status)
 						.HandleOnFiber(_fiber);
+
+				    x.AddConsumerOf<ServiceCommand>()
+				        .UsingConsumer(OnServiceCommand)
+				        .HandleOnFiber(_fiber);
 				});
 		}
 
@@ -442,41 +446,32 @@ namespace Topshelf.Model
 
 
         //these methods should be evaluated for correctness
+        public void StartService(string serviceName)
+        {
+            Send(new StartService(serviceName));
+        }
         public void PauseService(string serviceName)
         {
-            _serviceCache.Each((name, service) =>
-            {
-                if (name == serviceName)
-                {
-                    var message = new PauseService(name);
-
-                    _actorCache[name].Send(message);
-                }
-            });
+            Send(new PauseService(serviceName));
         }
 	    public void ContinueService(string serviceName)
 	    {
-            _serviceCache.Each((name, service) =>
-            {
-                if (name == serviceName)
-                {
-                    var message = new ContinueService(name);
-
-                    _actorCache[name].Send(message);
-                }
-            });
+            Send(new ContinueService(serviceName));
 	    }
 	    public void StopService(string serviceName)
 	    {
+            Send(new StopService(serviceName)); 
+	    }
+
+        void OnServiceCommand(ServiceCommand msg)
+        {
             _serviceCache.Each((name, service) =>
             {
-                if (name == serviceName)
+                if (name == msg.ServiceName)
                 {
-                    var message = new StopService(name);
-
-                    _actorCache[name].Send(message);
+                    _actorCache[name].Send(msg);
                 }
-            });   
-	    }
+            });  
+        }
 	}
 }
