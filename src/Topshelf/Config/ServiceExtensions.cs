@@ -21,11 +21,11 @@ namespace Topshelf
 
 	public static class ServiceExtensions
 	{
-		public static HostConfigurator Service<TService>([NotNull] this HostConfigurator configurator, [NotNull] Action<ServiceConfigurator<TService>> callback)
+		public static HostConfigurator Service<TService>([NotNull] this HostConfigurator hostConfigurator, [NotNull] Action<ServiceConfigurator<TService>> callback)
 			where TService : class
 		{
-			if (configurator == null)
-				throw new ArgumentNullException("configurator");
+			if (hostConfigurator == null)
+				throw new ArgumentNullException("hostConfigurator");
 			if (callback == null)
 				throw new ArgumentNullException("callback");
 
@@ -33,9 +33,9 @@ namespace Topshelf
 
 			callback(serviceConfigurator);
 
-			configurator.AddConfigurator(serviceConfigurator);
+			hostConfigurator.AddConfigurator(serviceConfigurator);
 
-			return configurator;
+			return hostConfigurator;
 		}
 
 		public static ServiceConfigurator<T> ConstructUsing<T>([NotNull] this ServiceConfigurator<T> configurator, Func<T> factory)

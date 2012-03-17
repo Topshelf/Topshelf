@@ -31,7 +31,8 @@ namespace Topshelf.Builders
 		Host Build();
 
         /// <summary>
-        /// Should this 'builder' be run?
+        /// If the builder is of type 'T' then call the callback
+        /// passing itself in.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="callback"></param>
