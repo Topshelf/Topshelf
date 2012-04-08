@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Topshelf.NancyDashboard</id>
+    <version>2.3.0.0</version>
+    <authors>Igor Moochnick</authors>
+    <description>Topshelf is a service library and hosting framework for .NET</description>
+    <language>en-US</language>
+	<iconUrl>http://topshelf-project.com/wp-content/themes/pandora/img/slide.1.png</iconUrl>
+    <licenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Topshelf/Topshelf</projectUrl>
+    <dependencies>
+      <dependency id="log4net" version="1.2.11" />
+      <dependency id="Topshelf" version="2.3.0.0" />
+      <dependency id="Nancy" version="0.10.0" />
+	  <dependency id="Nancy.Hosting.Self" version="0.10.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="build_output\NET35\Topshelf.NancyDashboard.dll" target="lib\NET35" />
+    <file src="build_output\NET35\Topshelf.NancyDashboard.xml" target="lib\NET35" />
+    <file src="build_output\NET35\Topshelf.NancyDashboard.pdb" target="lib\NET35" />
+    <file src="build_output\NET40\Topshelf.NancyDashboard.dll" target="lib\NET40" />
+    <file src="build_output\NET40\Topshelf.NancyDashboard.xml" target="lib\NET40" />
+    <file src="build_output\NET40\Topshelf.NancyDashboard.pdb" target="lib\NET40" />
+  </files>
+</package>
+

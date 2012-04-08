@@ -14,7 +14,7 @@ namespace Topshelf.Host
 {
     using System;
     using System.IO;
-    using Dashboard;
+    using NancyDashboard;
     using log4net;
     using Logging;
 
@@ -39,7 +39,7 @@ namespace Topshelf.Host
 
                     x.RunAsLocalSystem();
 
-                    x.EnableDashboard();
+                    x.EnableDashboardWebServices();
 
                     x.Service<ShelfHost>(y =>
                         {

@@ -193,7 +193,19 @@ namespace Topshelf.Model
 					x.AddConsumerOf<Request<ServiceStatus>>()
 						.UsingConsumer(Status)
 						.HandleOnFiber(_fiber);
-				});
+
+				    x.AddConsumerOf<StopService>()
+				        .UsingConsumer(OnServiceStop)
+				        .HandleOnFiber(_fiber);
+
+                    x.AddConsumerOf<StartService>()
+                        .UsingConsumer(OnServiceStart)
+                        .HandleOnFiber(_fiber);
+
+                    x.AddConsumerOf<UnloadService>()
+                        .UsingConsumer(OnServiceUnload)
+                        .HandleOnFiber(_fiber);
+                });
 		}
 
 		void WaitUntilServicesAreRunning(IEnumerable<string> services, TimeSpan timeout)
@@ -258,9 +270,16 @@ namespace Topshelf.Model
 				OnCreateShelfService(new CreateShelfService(message.ServiceName, ShelfType.Folder, null, new AssemblyName[] {}));
 		}
 
-		void OnServiceFolderRemoved(ServiceFolderRemoved message)
+        void OnServiceFolderRemoved(ServiceFolderRemoved message)
+        {
+            _log.InfoFormat("[Topshelf] Folder Removed: {0}", message.ServiceName);
+
+            OnServiceUnload(new UnloadService(message.ServiceName));
+        }
+
+        void OnServiceUnload(UnloadService message)
 		{
-			_log.InfoFormat("[Topshelf] Folder Removed: {0}", message.ServiceName);
+            _log.InfoFormat("[Topshelf] Unloading service: {0}", message.ServiceName);
 
 			if (_actorCache.Has(message.ServiceName))
 			{
@@ -291,6 +310,26 @@ namespace Topshelf.Model
 				actor.Send(new StopService(message.ServiceName));
 			}
 		}
+
+        void OnServiceStop(StopService message)
+		{
+            _log.InfoFormat("[Topshelf] Stopping service: {0}", message.ServiceName);
+
+			if (_actorCache.Has(message.ServiceName))
+			{
+                _actorCache[message.ServiceName].Send(new StopService(message.ServiceName));
+            }
+        }
+
+        void OnServiceStart(StartService message)
+        {
+            _log.InfoFormat("[Topshelf] Starting service: {0}", message.ServiceName);
+
+            if (_actorCache.Has(message.ServiceName))
+            {
+                _actorCache[message.ServiceName].Send(new RestartService(message.ServiceName));
+            }
+        }
 
 		void OnServiceFault(ServiceFault message)
 		{

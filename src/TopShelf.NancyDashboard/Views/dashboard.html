@@ -1,0 +1,38 @@
+﻿<viewdata model="DashboardView" />
+<!doctype html>
+<html>
+	<head>
+		<title>@Model.Title Topshelf Dashboard</title>
+        <link rel="stylesheet" href="styles/screen.css" type="text/css" media="screen, projection">
+        <link rel="stylesheet" href="styles/print.css" type="text/css" media="print">	
+
+        <!--[if lt IE 8]><link rel="stylesheet" href="styles/ie.css" type="text/css" media="screen, projection"><![endif]-->
+	</head>
+	<body>
+        <div class="container">
+	        <table>
+                <thead>
+                    <tr>
+                        <th>Service Id (guid)</th>
+                        <th>Name</th>
+                        <th>State</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @Each.Services
+                    <tr>
+                        <td>@Current.Name</td>
+                        <td>@Current.ServiceType</td>
+                        <td>@Current.CurrentState</td>
+                        <td style="text-align: center">
+                            <a href="service/@Current.Name;/@Current.Action;"><img src="images/control_@Current.Action;.png" alt="Play" /></a>
+                            <a href="service/@Current.Name;/unload"><img src="images/control_unload.png" alt="Stop" /></a>
+                        </td>
+                    </tr>
+                    @EndEach;
+                </tbody>
+            </table>
+        </div>
+	</body>
+</html>
