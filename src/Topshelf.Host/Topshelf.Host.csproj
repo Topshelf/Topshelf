@@ -128,7 +128,7 @@
     <Content Include="tsicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TopShelf.NancyDashboard\TopShelf.NancyDashboard.csproj">
+    <ProjectReference Include="..\TopShelf.NancyDashboard\TopShelf.NancyDashboard.csproj" Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
       <Project>{3802253E-6CE8-427C-B267-1D5F609140C6}</Project>
       <Name>TopShelf.NancyDashboard</Name>
     </ProjectReference>
