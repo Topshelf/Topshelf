@@ -35,6 +35,16 @@ namespace Topshelf.Model
 		void Stop();
 
 		/// <summary>
+		/// Pauses the service coordinator and waits until service(s) are paused
+		/// </summary>
+			void Pause();
+
+		/// <summary>
+		/// Resumes from being paused and waits until service(s) are resumed
+		/// </summary>
+		void Continue();
+
+		/// <summary>
 		/// Create the service using the factory method specified and add it to the coordinator
 		/// </summary>
 		/// <param name="serviceName">The name of the service to be created</param>

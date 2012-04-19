@@ -39,6 +39,7 @@ namespace Topshelf.Windows
 
 			_coordinator = coordinator;
 			_description = description;
+			this.CanPauseAndContinue = description.CanPauseAndContinue;
 		}
 
 		public void Run()
@@ -97,6 +98,35 @@ namespace Topshelf.Windows
 				_coordinator = null;
 
 				_log.Info("[Topshelf] Stopped");
+			}
+		}
+
+		protected override void OnPause()
+		{
+			try
+			{
+				_log.Info("[Topshelf] Pausing");
+
+				_coordinator.Pause();
+			}
+			catch (Exception ex)
+			{
+				_log.Fatal(ex);
+				throw;
+			}
+		}
+		protected override void OnContinue()
+		{
+			try
+			{
+				_log.Info("[Topshelf] Pausing");
+
+				_coordinator.Continue();
+			}
+			catch (Exception ex)
+			{
+				_log.Fatal(ex);
+				throw;
 			}
 		}
 	}
