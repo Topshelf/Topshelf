@@ -72,6 +72,11 @@ namespace Topshelf.HostConfigurators
 			_description.InstanceName = instanceName;
 		}
 
+		public void SetPausable(bool canPauseandContinue)
+		{
+			_description.CanPauseAndContinue = canPauseandContinue;
+		}
+
 		public void UseBuilder(Func<ServiceDescription, HostBuilder> builderFactory)
 		{
 			_builderFactory = builderFactory;

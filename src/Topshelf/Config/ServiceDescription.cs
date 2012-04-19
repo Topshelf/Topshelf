@@ -35,6 +35,11 @@ namespace Topshelf
 		string InstanceName { get; }
 
 		/// <summary>
+		/// Does this service instance allow pausing
+		/// </summary>
+		bool CanPauseAndContinue { get; set; }
+
+		/// <summary>
 		/// Returns the Windows service name, including the instance name, which is registered with the SCM
 		/// Example: myservice$bob
 		/// </summary>

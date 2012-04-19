@@ -134,6 +134,21 @@ namespace Topshelf.Model
 			AfterStoppingServices();
 		}
 
+		public void Pause()
+		{
+			SendPauseCommandToServices();
+
+			//WaitUntilAllServicesAre(_controllerFactory.Workflow.GetState(x=>x.Paused), _timeout);
+		}
+
+		public void Continue()
+		{
+
+			SendContinueCommandToServices();
+
+			//WaitUntilServicesAreRunning(_startupServices.GetAllKeys(), _timeout);
+		}
+
 		void UnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			var originatingAppDomain = sender as AppDomain;
@@ -398,6 +413,26 @@ namespace Topshelf.Model
 
 					_actorCache[name].Send(message);
 				});
+		}
+
+		void SendPauseCommandToServices()
+		{
+			_serviceCache.Each((name, service) =>
+				{
+					var message = new PauseService(name);
+
+					_actorCache[name].Send(message);
+				});
+		}
+
+		void SendContinueCommandToServices()
+		{
+			_serviceCache.Each((name, service) =>
+			{
+				var message = new ContinueService(name);
+
+				_actorCache[name].Send(message);
+			});
 		}
 
 

@@ -49,6 +49,7 @@ namespace Topshelf.HostConfigurators
 
 			Name = name;
 			InstanceName = instanceName;
+			CanPauseAndContinue = false;
 
 			_displayName = "";
 			_description = "";
@@ -81,6 +82,8 @@ namespace Topshelf.HostConfigurators
 
 		[NotNull]
 		public string InstanceName { get; set; }
+
+	    public bool CanPauseAndContinue { get; set; }
 
 #if NET40
 		[Pure]
