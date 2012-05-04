@@ -13,23 +13,34 @@
 
 namespace Topshelf.Logging
 {
-    using NLog;
+	using NLog;
 
 
-    public class NLogLogger :
-        ILogger
-    {
-        readonly LogFactory _factory = new LogFactory();
+	public class NLogLogger :
+		ILogger
+	{
+		readonly LogFactory _factory;
 
-        public ILog Get(string name)
-        {
-            return new NLogLog(_factory.GetLogger(name), name);
-        }
+		public NLogLogger(LogFactory factory)
+		{
+			_factory = factory;
+		}
 
-        public void Shutdown()
-        {
-            LogManager.Flush();
-            LogManager.DisableLogging();
-        }
-    }
+		public NLogLogger()
+			: this(new LogFactory())
+		{
+
+		}
+
+		public ILog Get(string name)
+		{
+			return new NLogLog(_factory.GetLogger(name), name);
+		}
+
+		public void Shutdown()
+		{
+			LogManager.Flush();
+			LogManager.DisableLogging();
+		}
+	}
 }

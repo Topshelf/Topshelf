@@ -13,23 +13,34 @@
 
 namespace Topshelf
 {
-    using HostConfigurators;
-    using Internal;
-    using Logging;
+	using HostConfigurators;
+	using Internal;
+	using Logging;
+	using NLog;
 
 
-    /// <summary>
-    /// Extensions for configuring NLog with MassTransit
-    /// </summary>
-    public static class NLogConfiguratorExtensions
-    {
-        /// <summary>
-        /// Specify that you want to use the NLog logging framework with MassTransit.
-        /// </summary>
-        /// <param name="configrator">Optional service bus configurator</param>
-        public static void UseNLog([CanBeNull] this HostConfigurator configrator)
-        {
-            Logger.UseLogger(new NLogLogger());
-        }
-    }
+	/// <summary>
+	/// Extensions for configuring NLog with MassTransit
+	/// </summary>
+	public static class NLogConfiguratorExtensions
+	{
+		/// <summary>
+		/// Specify that you want to use the NLog logging framework with MassTransit.
+		/// </summary>
+		/// <param name="configurator">Optional service bus configurator</param>
+		public static void UseNLog([CanBeNull] this HostConfigurator configurator)
+		{
+			Logging.Logger.UseLogger(new NLogLogger());
+		}
+
+		/// <summary>
+		/// Specify that you want to use the NLog logging framework with MassTransit.
+		/// </summary>
+		/// <param name="configurator">Optional service bus configurator</param>
+		/// <param name="factory">Required NLog logger factory</param>
+		public static void UseNLog([CanBeNull] this HostConfigurator configurator, [NotNull] LogFactory factory)
+		{
+			Logging.Logger.UseLogger(new NLogLogger(factory));
+		}
+	}
 }
