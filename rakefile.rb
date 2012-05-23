@@ -7,7 +7,7 @@ require 'albacore'
 require File.dirname(__FILE__) + "/build_support/ilmergeconfig.rb"
 require File.dirname(__FILE__) + "/build_support/ilmerge.rb"
 
-BUILD_NUMBER_BASE = '2.2.3'
+BUILD_NUMBER_BASE = '2.3.0'
 PRODUCT = 'Topshelf'
 CLR_TOOLS_VERSION = 'v4.0.30319'
 
@@ -237,6 +237,8 @@ desc "Builds the nuget package"
 task :nuget do
 	sh "lib/nuget pack topshelf.nuspec /OutputDirectory build_artifacts"
 	sh "lib/nuget pack topshelf.dashboard.nuspec /OutputDirectory build_artifacts"
+	sh "lib/nuget pack topshelf.log4net.nuspec /OutputDirectory build_artifacts"
+	sh "lib/nuget pack topshelf.nlog.nuspec /OutputDirectory build_artifacts"
 end
 
 def project_outputs(props)
