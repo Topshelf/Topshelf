@@ -105,6 +105,7 @@ task :compile => [:global_version, :build] do
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "log4net.{dll,pdb,xml,config}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.{exe,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.{dll,xml,pdb}", props[:output]
+	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration.1.2.10/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.1.2.10.{dll,xml,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.NLogIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.NLogIntegration.{dll,xml,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}"), "Topshelf.Host.exe.config", props[:output]
 	copy(File.join(props[:src], "Topshelf.Host/bin/#{BUILD_CONFIG}-x86/Topshelf.Host.exe"), File.join(props[:output], 'Topshelf.Host-x86.exe'))
@@ -144,6 +145,7 @@ task :build => [:build_ts, :ilmerge, :copyloggers, :build_host, :build_x86]
 
 task :copyloggers do
 	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.{dll,xml,pdb}", props[:output]
+	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration.1.2.10/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.1.2.10.{dll,xml,pdb}", props[:output]
 	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.NLogIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.NLogIntegration.{dll,xml,pdb}", props[:output]
 end
 
@@ -238,6 +240,7 @@ task :nuget do
 	sh "lib/nuget pack topshelf.nuspec /OutputDirectory build_artifacts"
 	sh "lib/nuget pack topshelf.dashboard.nuspec /OutputDirectory build_artifacts"
 	sh "lib/nuget pack topshelf.log4net.nuspec /OutputDirectory build_artifacts"
+	sh "lib/nuget pack topshelf.log4net.1.2.10.nuspec /OutputDirectory build_artifacts"
 	sh "lib/nuget pack topshelf.nlog.nuspec /OutputDirectory build_artifacts"
 end
 

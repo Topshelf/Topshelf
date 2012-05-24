@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Log4NetIntegration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.NLogIntegration", "Loggers\Topshelf.NLogIntegration\Topshelf.NLogIntegration.csproj", "{48948BF0-56FB-4139-839C-0F0143DF38C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Log4NetIntegration.1.2.10", "Loggers\Topshelf.Log4NetIntegration.1.2.10\Topshelf.Log4NetIntegration.1.2.10.csproj", "{F6B84B21-F881-4491-BD3F-DF7E55E0D609}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,16 @@ Global
 		{48948BF0-56FB-4139-839C-0F0143DF38C8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{48948BF0-56FB-4139-839C-0F0143DF38C8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{48948BF0-56FB-4139-839C-0F0143DF38C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,5 +114,6 @@ Global
 		{6C0B10B8-259E-4A1B-8415-4343F0B77054} = {4D6049C9-10B8-45D6-8E60-3A6DDBFF4E08}
 		{709D3896-BE22-423F-81E9-F557559E45F0} = {2B508B0F-88FB-4E29-82A4-3B6C84FB3425}
 		{48948BF0-56FB-4139-839C-0F0143DF38C8} = {2B508B0F-88FB-4E29-82A4-3B6C84FB3425}
+		{F6B84B21-F881-4491-BD3F-DF7E55E0D609} = {2B508B0F-88FB-4E29-82A4-3B6C84FB3425}
 	EndGlobalSection
 EndGlobal
