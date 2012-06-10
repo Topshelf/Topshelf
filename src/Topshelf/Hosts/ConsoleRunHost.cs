@@ -14,16 +14,16 @@ namespace Topshelf.Hosts
 {
 	using System;
 	using System.IO;
-	using System.Linq;
 	using System.Runtime.CompilerServices;
-	using System.ServiceProcess;
 	using System.Threading;
 	using Internal;
 	using Logging;
 	using Model;
 	using OS;
 
-
+    /// <summary>
+    /// Runs the code as a 'console' daemon
+    /// </summary>
     public class ConsoleRunHost :
 		Host, IDisposable
 	{

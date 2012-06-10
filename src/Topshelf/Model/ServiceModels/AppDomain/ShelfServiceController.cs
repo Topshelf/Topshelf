@@ -13,6 +13,7 @@
 namespace Topshelf.Model
 {
 	using System;
+	using System.Diagnostics;
 	using System.Reflection;
 	using Exceptions;
 	using Logging;
@@ -21,7 +22,10 @@ namespace Topshelf.Model
 	using Stact;
 	using Stact.Workflow;
 
-
+    /// <summary>
+    /// Controls a service on a 'shelf'
+    /// </summary>
+    [DebuggerDisplay("SHELF:{Name}")]
 	public class ShelfServiceController :
 		IServiceController
 	{
@@ -95,7 +99,7 @@ namespace Topshelf.Model
 			{
 				// Henrik: remove this line in favor of the other exception handling mechanism 
 				// handling the faulted state, but right now I want the binding information.
-				_log.Error("cannot create shelf", ex);
+				_log.Error("[Shelf:{0}] Cannot create shelf".FormatWith(_name), ex);
 
 				var buildServiceException = 
 					_bootstrapperType == null 

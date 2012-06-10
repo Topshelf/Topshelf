@@ -17,7 +17,7 @@ namespace Topshelf.Model
 
 
 	/// <summary>
-	///   Interface to the service controller
+	///   Interface to the service coordinator
 	/// </summary>
 	public interface IServiceCoordinator :
 		IServiceChannel,

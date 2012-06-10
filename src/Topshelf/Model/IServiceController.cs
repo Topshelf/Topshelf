@@ -16,7 +16,9 @@ namespace Topshelf.Model
 	using Stact;
 	using Stact.Workflow;
 
-
+    /// <summary>
+    /// Controls a given a service
+    /// </summary>
 	public interface IServiceController :
 		Actor,
 		IDisposable

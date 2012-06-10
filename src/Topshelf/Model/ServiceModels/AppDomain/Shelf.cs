@@ -21,7 +21,6 @@ namespace Topshelf.Model
     using Magnum.Extensions;
     using Magnum.Reflection;
     using Messages;
-    using ServiceConfigurators;
     using Shelving;
     using Stact;
     using Stact.Configuration;

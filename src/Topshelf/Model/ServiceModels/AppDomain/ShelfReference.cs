@@ -119,7 +119,6 @@ namespace Topshelf.Model
 			AppDomainSetup domainSettings = AppDomain.CurrentDomain.SetupInformation;
 			if (shelfType == ShelfType.Internal)
 			{
-				//_domainSettings.LoaderOptimization = LoaderOptimization.MultiDomain;
 				return domainSettings;
 			}
 

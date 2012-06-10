@@ -22,6 +22,10 @@ namespace Topshelf.Model
 	using Stact;
 	using Stact.Workflow;
 
+    /// <summary>
+    /// Control a service resident in 'this' domain.
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
     [DebuggerDisplay("{DebuggerDisplay()}")]
 	public class LocalServiceController<TService> :
 		IServiceController<TService>

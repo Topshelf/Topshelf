@@ -22,7 +22,9 @@ namespace Topshelf.Hosts
 	using Magnum.Extensions;
 	using WindowsServiceCode;
 
-
+    /// <summary>
+    /// Used by the 'install' and 'uninstall' hosts
+    /// </summary>
 	public abstract class AbstractInstallerHost
 	{
 		readonly Credentials _credentials;

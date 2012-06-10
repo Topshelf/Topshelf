@@ -15,7 +15,9 @@ namespace Topshelf.Hosts
     using Logging;
     using Windows;
 
-
+    /// <summary>
+    /// Starts a windows service
+    /// </summary>
 	public class StartHost :
 		Host
 	{

@@ -12,14 +12,15 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
+    //Func<string, TService>
 	public delegate TService ServiceFactory<TService>(string name)
 		where TService : class;
 
-
+    //Func<string, IServiceChannel, TService>
 	public delegate TService InternalServiceFactory<TService>(string name, IServiceChannel coordinatorChannel)
 		where TService : class;
 
-
+    //Func<ServiceDescription, string, IServiceChannel, TService>
 	public delegate TService DescriptionServiceFactory<TService>(
 		ServiceDescription description, string name, IServiceChannel coordinatorChannel)
 		where TService : class;

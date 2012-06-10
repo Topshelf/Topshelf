@@ -12,6 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    /// <summary>
+    /// The interface marking a run
+    /// </summary>
 	public interface Host
 	{
 		void Run();
