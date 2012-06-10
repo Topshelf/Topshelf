@@ -49,14 +49,7 @@ namespace Topshelf.Model
 			_domain = AppDomain.CreateDomain(serviceName, null, _domainSettings);
 		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-
-		public void Send<T>(T message)
+	    public void Send<T>(T message)
 		{
 			if (_channel == null)
 			{
@@ -68,17 +61,17 @@ namespace Topshelf.Model
 			_channel.Send(message);
 		}
 
-		public void LoadAssembly(AssemblyName assemblyName)
+	    public void LoadAssembly(AssemblyName assemblyName)
 		{
 			_domain.Load(assemblyName);
 		}
 
-		public void Create()
+	    public void Create()
 		{
 			CreateShelfInstance(null);
 		}
 
-		public void Create([NotNull] Type bootstrapperType)
+	    public void Create([NotNull] Type bootstrapperType)
 		{
 			if (bootstrapperType == null)
 				throw new ArgumentNullException("bootstrapperType");
@@ -90,7 +83,7 @@ namespace Topshelf.Model
 			CreateShelfInstance(bootstrapperType);
 		}
 
-		void CreateShelfInstance(Type bootstrapperType)
+	    void CreateShelfInstance(Type bootstrapperType)
 		{
 			_log.DebugFormat("[{0}] Creating Host Channel", _serviceName);
 
@@ -114,7 +107,7 @@ namespace Topshelf.Model
 
 		}
 
-		static AppDomainSetup ConfigureAppDomainSettings(string serviceName, ShelfType shelfType)
+	    static AppDomainSetup ConfigureAppDomainSettings(string serviceName, ShelfType shelfType)
 		{
 			AppDomainSetup domainSettings = AppDomain.CurrentDomain.SetupInformation;
 			if (shelfType == ShelfType.Internal)
@@ -139,14 +132,29 @@ namespace Topshelf.Model
 			return domainSettings;
 		}
 
-		public void CreateShelfChannel(Uri uri, string pipeName)
+	    public void CreateShelfChannel(Uri uri, string pipeName)
 		{
 			_log.DebugFormat("[{0}] Creating shelf proxy: {1} ({2})", _serviceName, uri, pipeName);
 
 			_channel = new OutboundChannel(uri, pipeName);
 		}
 
-		void Dispose(bool disposing)
+	    public void Unload()
+	    {
+	        if (_channel != null)
+	        {
+	            _channel.Dispose();
+	            _channel = null;
+	        }
+	    }
+
+	    public void Dispose()
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);
+	    }
+
+	    void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;
@@ -169,15 +177,6 @@ namespace Topshelf.Model
 			}
 
 			_disposed = true;
-		}
-
-		public void Unload()
-		{
-			if (_channel != null)
-			{
-				_channel.Dispose();
-				_channel = null;
-			}
 		}
 	}
 }

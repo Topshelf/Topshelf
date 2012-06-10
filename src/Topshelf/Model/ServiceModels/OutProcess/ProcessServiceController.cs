@@ -17,6 +17,7 @@ namespace Topshelf.Model
     using Logging;
     using Magnum.Extensions;
     using Messages;
+    using Stact;
     using Stact.Workflow;
 
 
@@ -26,8 +27,37 @@ namespace Topshelf.Model
         static readonly ILog _log = Logger.Get("Topshelf.Model.ProcessServiceController");
 
         readonly string _name;
-        ProcessReference _reference;
+        readonly Inbox _inbox;
         readonly PublishChannel _publish;
+        ProcessReference _reference;
+
+        //assembly name / type / shelf type
+        //but for a process
+
+        bool _disposed;
+
+        public ProcessServiceController(Inbox inbox, string name, IServiceChannel coordinatorChannel)
+        {
+            _inbox = inbox;
+            _name = name;
+            _publish = new PublishChannel(coordinatorChannel, inbox);
+          
+            _inbox.Loop(loop =>
+            {
+                loop.Receive<ShelfCreated>(x =>
+                {
+                    ProcessCreated(x);
+                    loop.Continue();
+                });
+
+                loop.Receive<ServiceUnloaded>(x =>
+                {
+                    ProcessUnloaded(x);
+                    loop.Continue();
+                });
+            });
+
+        }
 
         public Type ServiceType
         {
@@ -39,11 +69,6 @@ namespace Topshelf.Model
         public string Name
         {
             get { return _name; }
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
         }
 
         public void Create()
@@ -131,6 +156,46 @@ namespace Topshelf.Model
 
                 _publish.Send(new ServiceUnloaded(_name));
             }
+        }
+
+        void ProcessCreated(ShelfCreated message)
+        {
+            _log.DebugFormat("[Process:{0}] Shelf created at {1} ({2})", _name, message.Address, message.PipeName);
+
+            _reference.CreateShelfChannel(message.Address, message.PipeName);
+        }
+
+        void ProcessUnloaded(ServiceUnloaded message)
+        {
+            _reference.Dispose();
+            _reference = null;
+
+            _log.DebugFormat("[Process:{0}] {1}", _name, "Unloaded");
+
+            _publish.Send(message);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+            
+            if(disposing)
+            {
+                if(_reference != null)
+                {
+                    _reference.Dispose();
+                    _reference = null;
+                }
+            }
+
+            _disposed = true;
         }
     }
 }

@@ -31,16 +31,18 @@ namespace Topshelf.Model
 	{
 		static readonly ILog _log = Logger.Get("Topshelf.Model.ShelfServiceController");
 
-		readonly AssemblyName[] _assemblyNames;
-		readonly Type _bootstrapperType;
-		readonly Inbox _inbox;
-		readonly string _name;
-		readonly PublishChannel _publish;
-		readonly ShelfType _shelfType;
-		bool _disposed;
-		ShelfReference _reference;
+        readonly string _name;
+        readonly Inbox _inbox;
+        readonly PublishChannel _publish;
+        ShelfReference _reference;
 
-		public ShelfServiceController(Inbox inbox, string name, IServiceChannel coordinatorChannel, ShelfType shelfType,
+        readonly AssemblyName[] _assemblyNames;
+        readonly Type _bootstrapperType;
+        readonly ShelfType _shelfType;
+
+        bool _disposed;
+
+        public ShelfServiceController(Inbox inbox, string name, IServiceChannel coordinatorChannel, ShelfType shelfType,
 		                              Type bootstrapperType, AssemblyName[] assemblyNames)
 		{
 			_inbox = inbox;
@@ -155,13 +157,7 @@ namespace Topshelf.Model
 			}
 		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		void Send<T>(T message)
+        void Send<T>(T message)
 		{
 			if (_reference == null)
 			{
@@ -183,14 +179,14 @@ namespace Topshelf.Model
 			}
 		}
 
-		void ShelfCreated(ShelfCreated message)
+        void ShelfCreated(ShelfCreated message)
 		{
 			_log.DebugFormat("[Shelf:{0}] Shelf created at {1} ({2})", _name, message.Address, message.PipeName);
 
 			_reference.CreateShelfChannel(message.Address, message.PipeName);
 		}
 
-		void ShelfUnloaded(ServiceUnloaded message)
+        void ShelfUnloaded(ServiceUnloaded message)
 		{
 			_reference.Dispose();
 			_reference = null;
@@ -200,7 +196,13 @@ namespace Topshelf.Model
 			_publish.Send(message);
 		}
 
-		void Dispose(bool disposing)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;

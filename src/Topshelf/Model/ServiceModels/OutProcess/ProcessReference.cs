@@ -36,18 +36,13 @@ namespace Topshelf.Model
             _channel.Send(message);
         }
 
-        public void Dispose()
-        {
-            
-        }
-
-        public void Start(ProcessStartInfo psi)
-        {
-        }
-
         public void Unload()
         {
-            
+            if(_channel != null)
+            {
+                _channel.Dispose();
+                _channel = null;
+            }
         }
 
         public void Create()
@@ -55,6 +50,45 @@ namespace Topshelf.Model
             var psi = new ProcessStartInfo("name", "shelf -port:22?");
             _processHandle = Process.Start(psi);
         
+        }
+
+        public void CreateShelfChannel(Uri uri, string pipeName)
+        {
+            _log.DebugFormat("[{0}] Creating shelf proxy: {1} ({2})", _serviceName, uri, pipeName);
+
+            _channel = new OutboundChannel(uri, pipeName);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if(disposing)
+            {
+                if(_hostChannel != null)
+                {
+                    _hostChannel.Dispose();
+                    _hostChannel = null;
+                }
+
+                if(_channel != null)
+                {
+                    _channel.Dispose();
+                    _channel = null;
+                }
+
+                _processHandle.Kill();
+                _processHandle = null;
+            }
+
+            _disposed = true;
         }
     }
 }
