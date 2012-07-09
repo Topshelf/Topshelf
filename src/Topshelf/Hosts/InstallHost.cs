@@ -29,8 +29,9 @@ namespace Topshelf.Hosts
 		readonly ILog _log = Logger.Get("Topshelf.Hosts.InstallHost");
 
 		public InstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
-		                   Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
-			: base(description, startMode, dependencies, credentials, preActions, postActions, sudo)
+		                   Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions,
+                           bool sudo, bool delayedAutoStart)
+            : base(description, startMode, dependencies, credentials, preActions, postActions, sudo, delayedAutoStart)
 		{
 		}
 

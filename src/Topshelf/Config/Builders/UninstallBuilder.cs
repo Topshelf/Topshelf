@@ -27,9 +27,10 @@ namespace Topshelf.Builders
 		readonly ServiceDescription _description;
 		readonly IList<Action> _postActions;
 		readonly IList<Action> _preActions;
-		Credentials _credentials;
-		ServiceStartMode _startMode;
-		bool _sudo;
+	    readonly Credentials _credentials;
+	    readonly ServiceStartMode _startMode;
+        readonly bool _delayedAutoStart;
+	    private bool _sudo;
 
 		public UninstallBuilder(ServiceDescription description)
 		{
@@ -38,7 +39,7 @@ namespace Topshelf.Builders
 			_dependencies = new List<string>();
 			_startMode = ServiceStartMode.Automatic;
 			_credentials = new Credentials("", "", ServiceAccount.LocalSystem);
-
+		    _delayedAutoStart = false;
 			_description = description;
 		}
 
@@ -50,7 +51,7 @@ namespace Topshelf.Builders
 		public Host Build()
 		{
 			return new UninstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions,
-			                         _sudo);
+			                         _sudo, _delayedAutoStart);
 		}
 
 		public void Match<T>([NotNull] Action<T> callback)

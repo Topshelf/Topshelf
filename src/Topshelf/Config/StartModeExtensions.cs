@@ -30,6 +30,16 @@ namespace Topshelf
 			return configurator;
 		}
 
+        public static HostConfigurator DelayedAutoStart([NotNull] this HostConfigurator configurator)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new DelayedAutoStartConfigurator(true));
+
+            return configurator;
+        }
+
 		public static HostConfigurator StartManually([NotNull] this HostConfigurator configurator)
 		{
 			if (configurator == null)

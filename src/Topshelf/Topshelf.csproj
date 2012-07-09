@@ -97,10 +97,12 @@
     <Compile Include="Config\Builders\StopBuilder.cs" />
     <Compile Include="Config\CommandLineConfigurator.cs" />
     <Compile Include="Config\DependencyExtensions.cs" />
+    <Compile Include="Config\HostConfigurators\DelayedAutoStartConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\DependencyHostConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\KnownServiceNames.cs" />
     <Compile Include="Config\HostConfigurators\StartConfigurator.cs" />
     <Compile Include="Config\HostConfigurators\SudoConfigurator.cs" />
+    <Compile Include="Config\Options\DelaystartOption.cs" />
     <Compile Include="Config\Options\DisplayNameOption.cs" />
     <Compile Include="Config\Options\HelpOption.cs" />
     <Compile Include="Config\Options\InteractiveOption.cs" />

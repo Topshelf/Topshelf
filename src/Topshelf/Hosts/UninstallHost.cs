@@ -30,8 +30,8 @@ namespace Topshelf.Hosts
 
 		public UninstallHost(ServiceDescription description, ServiceStartMode startMode, IEnumerable<string> dependencies,
 		                     Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions,
-		                     bool sudo)
-			: base(description, startMode, dependencies, credentials, preActions, postActions, sudo)
+		                     bool sudo, bool delayedAutoStart)
+            : base(description, startMode, dependencies, credentials, preActions, postActions, sudo, delayedAutoStart)
 		{
 		}
 

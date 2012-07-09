@@ -30,6 +30,7 @@ namespace Topshelf.Builders
 		readonly IList<Action> _preActions;
 		Credentials _credentials;
 		ServiceStartMode _startMode;
+	    bool _delayedAutoStart;
 		bool _sudo;
 		static readonly ILog _logger = Logger.Get(typeof(InstallBuilder));
 
@@ -51,7 +52,7 @@ namespace Topshelf.Builders
 
 		public Host Build()
 		{
-			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions, _sudo);
+			return new InstallHost(_description, _startMode, _dependencies.ToArray(), _credentials, _preActions, _postActions, _sudo, _delayedAutoStart);
 		}
 
 		public void Match<T>(Action<T> callback)
@@ -86,6 +87,11 @@ namespace Topshelf.Builders
 		{
 			_startMode = startMode;
 		}
+
+        public void SetDelayedAutoStart(bool delayedAutoStart)
+        {
+            _delayedAutoStart = delayedAutoStart;
+        }
 
 		public void BeforeInstall(Action callback)
 		{

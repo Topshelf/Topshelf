@@ -31,10 +31,12 @@ namespace Topshelf.Hosts
 		readonly IEnumerable<Action> _postActions;
 		readonly IEnumerable<Action> _preActions;
 		readonly ServiceStartMode _startMode;
+	    readonly bool _delayedAutoStart;
 
 		protected AbstractInstallerHost(ServiceDescription description, ServiceStartMode startMode,
 		                                IEnumerable<string> dependencies, Credentials credentials,
-		                                IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
+		                                IEnumerable<Action> preActions, IEnumerable<Action> postActions,
+                                        bool sudo, bool delayedAutoStart)
 		{
 			_startMode = startMode;
 			_postActions = postActions;
@@ -42,12 +44,13 @@ namespace Topshelf.Hosts
 			_credentials = credentials;
 			_dependencies = dependencies;
 			_description = description;
+            _delayedAutoStart = delayedAutoStart;
 			Sudo = sudo;
 		}
 
 		protected bool Sudo { get; private set; }
 
-		public ServiceDescription Description
+	    public ServiceDescription Description
 		{
 			get { return _description; }
 		}
@@ -128,6 +131,7 @@ namespace Topshelf.Hosts
 					DisplayName = _description.DisplayName,
 					ServicesDependedOn = _dependencies.ToArray(),
 					StartType = _startMode,
+                    DelayedAutoStart = _delayedAutoStart
 				};
 
 			CustomizeInstaller(installer);
