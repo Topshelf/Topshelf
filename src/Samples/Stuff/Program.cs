@@ -24,7 +24,7 @@ namespace Stuff
         {
             XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
 
-            Host h = HostFactory.New(x =>
+            HostFactory.Run(x =>
                 {
                     x.Service<TownCrier>(s =>
                         {
@@ -36,12 +36,12 @@ namespace Stuff
 
                     x.RunAsLocalSystem();
 
+                    x.DelayedAutoStart();
+
                     x.SetDescription("Sample Topshelf Host");
                     x.SetDisplayName("Stuff");
                     x.SetServiceName("stuff");
                 });
-
-            h.Run();
         }
     }
 }

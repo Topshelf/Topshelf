@@ -88,9 +88,9 @@ namespace Topshelf.Builders
 			_startMode = startMode;
 		}
 
-        public void SetDelayedAutoStart(bool delayedAutoStart)
+        public void SetDelayedAutoStart()
         {
-            _delayedAutoStart = delayedAutoStart;
+            _delayedAutoStart = true;
         }
 
 		public void BeforeInstall(Action callback)

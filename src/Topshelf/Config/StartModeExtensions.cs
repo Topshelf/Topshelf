@@ -30,12 +30,17 @@ namespace Topshelf
 			return configurator;
 		}
 
+        /// <summary>
+        /// Indicates the service should be delayed from starting until other automatically started services are running.
+        /// </summary>
+        /// <param name="configurator"></param>
+        /// <returns></returns>
         public static HostConfigurator DelayedAutoStart([NotNull] this HostConfigurator configurator)
         {
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            configurator.AddConfigurator(new DelayedAutoStartConfigurator(true));
+            configurator.AddConfigurator(new DelayedAutoStartConfigurator());
 
             return configurator;
         }

@@ -13,7 +13,6 @@
 namespace Topshelf.HostConfigurators
 {
 	using System;
-	using System.ServiceProcess;
 	using Builders;
 	using Internal;
 
@@ -21,13 +20,6 @@ namespace Topshelf.HostConfigurators
 	public class DelayedAutoStartConfigurator :
 		HostBuilderConfigurator
 	{
-	    private readonly bool _delayedAutoStart;
-
-	    public DelayedAutoStartConfigurator(bool delayedAutoStart)
-        {
-            _delayedAutoStart = delayedAutoStart;
-        }
-
 	    public void Validate()
 		{
 		}
@@ -37,7 +29,7 @@ namespace Topshelf.HostConfigurators
 			if (builder == null)
 				throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.SetDelayedAutoStart(_delayedAutoStart));
+            builder.Match<InstallBuilder>(x => x.SetDelayedAutoStart());
 
 			return builder;
 		}
