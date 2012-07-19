@@ -1,0 +1,21 @@
+build_output/*
+build_artifacts/*
+
+*.suo
+*.user
+packages
+*.dotCover
+
+bin
+obj
+_ReSharper*
+
+*.ReSharper
+*.cache
+*~
+*.swp
+*.bak
+*.orig
+
+# osx noise
+.DS_Store
