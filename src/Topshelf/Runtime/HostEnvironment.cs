@@ -21,11 +21,6 @@ namespace Topshelf.Runtime
     public interface HostEnvironment
     {
         /// <summary>
-        /// The command line with which the process was started
-        /// </summary>
-        string CommandLine { get; }
-
-        /// <summary>
         /// Determines if the service is running as an administrator
         /// </summary>
         bool IsAdministrator { get; }

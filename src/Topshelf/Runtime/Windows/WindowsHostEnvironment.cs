@@ -22,6 +22,7 @@ namespace Topshelf.Runtime.Windows
     using System.Security.Principal;
     using System.ServiceProcess;
     using System.Threading;
+    using CommandLineParser;
     using Logging;
     using Topshelf.Windows;
 
@@ -86,11 +87,6 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
-        public string CommandLine
-        {
-            get { return Environment.CommandLine; }
-        }
-
         public bool IsAdministrator
         {
             get
@@ -127,13 +123,13 @@ namespace Topshelf.Runtime.Windows
         {
             if (Environment.OSVersion.Version.Major == 6)
             {
-                string commandLine = CommandLine.Replace("--sudo", "");
+                string commandLine = CommandLine.GetUnparsedCommandLine().Replace("--sudo", "");
 
                 var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, commandLine)
                     {
                         Verb = "runas",
                         UseShellExecute = true,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
                     };
 
                 try

@@ -72,7 +72,7 @@ namespace Topshelf.Runtime.Windows
 
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-            _transactedInstaller.Install(new Hashtable());
+            _transactedInstaller.Uninstall(null);
         }
 
         static Installer CreateInstaller(InstallServiceSettings settings)
