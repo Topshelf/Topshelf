@@ -20,6 +20,8 @@ namespace Topshelf.Runtime
     /// </summary>
     public interface HostEnvironment
     {
+        string CommandLine { get; }
+
         /// <summary>
         /// Determines if the service is running as an administrator
         /// </summary>

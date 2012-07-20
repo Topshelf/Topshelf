@@ -26,14 +26,6 @@ namespace Topshelf
             }
         }
 
-        public static void ApplyCommandLine(this HostConfigurator configurator, string commandLine)
-        {
-            foreach (Option option in CommandLine.Parse<Option>(commandLine, InitializeCommandLineParser))
-            {
-                option.ApplyTo(configurator);
-            }
-        }
-
         static void InitializeCommandLineParser(ICommandLineElementParser<Option> x)
         {
             x.Add((from arg in x.Argument("install")

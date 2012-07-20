@@ -19,7 +19,7 @@ namespace Topshelf.CommandLineParser
     /// <summary>
     ///   Tools for parsing the command line
     /// </summary>
-    public class CommandLine
+    public static class CommandLine
     {
         static readonly StringCommandLineParser _parser = new StringCommandLineParser();
 
