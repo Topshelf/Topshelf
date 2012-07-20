@@ -10,10 +10,19 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.CommandLineParser
 {
-    using Builders;
-    using Runtime;
-
-    public delegate HostBuilder HostBuilderFactory(HostEnvironment environment, HostSettings settings);
+    public class StringCommandLineParser :
+        TextCommandLineParser<string>
+    {
+        public override Parser<string, char> AnyChar
+        {
+            get
+            {
+                return input => input.Length > 0
+                                    ? new Result<string, char>(input[0], input.Substring(1))
+                                    : null;
+            }
+        }
+    }
 }

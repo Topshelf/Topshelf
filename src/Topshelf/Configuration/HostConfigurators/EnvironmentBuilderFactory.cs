@@ -13,7 +13,6 @@
 namespace Topshelf.HostConfigurators
 {
     using Builders;
-    using Runtime;
 
-    public delegate HostBuilder HostBuilderFactory(HostEnvironment environment, HostSettings settings);
+    public delegate EnvironmentBuilder EnvironmentBuilderFactory();
 }

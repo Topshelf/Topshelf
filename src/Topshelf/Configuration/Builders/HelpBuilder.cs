@@ -38,7 +38,7 @@ namespace Topshelf.Builders
             get { return _settings; }
         }
 
-        public Host Build()
+        public Host Build(ServiceBuilder serviceBuilder)
         {
             return new HelpHost();
         }

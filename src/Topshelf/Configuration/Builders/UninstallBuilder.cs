@@ -45,7 +45,7 @@ namespace Topshelf.Builders
             get { return _settings; }
         }
 
-        public Host Build()
+        public Host Build(ServiceBuilder serviceBuilder)
         {
             return new UninstallHost(_environment, _settings, _preActions, _postActions, _sudo);
         }

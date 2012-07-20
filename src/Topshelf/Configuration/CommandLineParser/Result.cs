@@ -10,10 +10,17 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.CommandLineParser
 {
-    using Builders;
-    using Runtime;
+    public class Result<TInput, TValue>
+    {
+        public Result(TValue value, TInput rest)
+        {
+            Value = value;
+            Rest = rest;
+        }
 
-    public delegate HostBuilder HostBuilderFactory(HostEnvironment environment, HostSettings settings);
+        public TValue Value { get; private set; }
+        public TInput Rest { get; private set; }
+    }
 }

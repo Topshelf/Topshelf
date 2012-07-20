@@ -30,13 +30,15 @@ namespace Topshelf.HostConfigurators
         readonly WindowsHostSettings _settings;
         HostBuilderFactory _hostBuilderFactory;
         ServiceBuilderFactory _serviceBuilderFactory;
+        EnvironmentBuilderFactory _environmentBuilderFactory;
 
         public HostConfiguratorImpl()
         {
             _configurators = new List<HostBuilderConfigurator>();
             _settings = new WindowsHostSettings();
 
-            _hostBuilderFactory = DefaultBuilderFactory;
+            _environmentBuilderFactory = DefaultEnvironmentBuilderFactory;
+            _hostBuilderFactory = DefaultHostBuilderFactory;
         }
 
         public IEnumerable<ValidateResult> Validate()
@@ -46,6 +48,9 @@ namespace Topshelf.HostConfigurators
 
             if (_serviceBuilderFactory == null)
                 yield return this.Failure("ServiceBuilderFactory", "must not be null");
+
+            if (_environmentBuilderFactory == null)
+                yield return this.Failure("EnvironmentBuilderFactory", "must not be null");
 
             if (string.IsNullOrEmpty(_settings.DisplayName) && string.IsNullOrEmpty(_settings.Name))
                 yield return this.Failure("DisplayName", "must be specified and not empty");
@@ -65,14 +70,14 @@ namespace Topshelf.HostConfigurators
             }
 
             yield return this.Success("Name", _settings.Name);
-            
-            if(_settings.Name != _settings.DisplayName)
+
+            if (_settings.Name != _settings.DisplayName)
                 yield return this.Success("DisplayName", _settings.DisplayName);
 
-            if(_settings.Name != _settings.Description)
+            if (_settings.Name != _settings.Description)
                 yield return this.Success("Description", _settings.Description);
 
-            if(!string.IsNullOrEmpty(_settings.InstanceName))
+            if (!string.IsNullOrEmpty(_settings.InstanceName))
                 yield return this.Success("InstanceName", _settings.InstanceName);
 
             yield return this.Success("ServiceName", _settings.ServiceName);
@@ -108,6 +113,11 @@ namespace Topshelf.HostConfigurators
             _serviceBuilderFactory = serviceBuilderFactory;
         }
 
+        public void UseEnvironmentBuilder(EnvironmentBuilderFactory environmentBuilderFactory)
+        {
+            _environmentBuilderFactory = environmentBuilderFactory;
+        }
+
         public void AddConfigurator(HostBuilderConfigurator configurator)
         {
             _configurators.Add(configurator);
@@ -119,21 +129,30 @@ namespace Topshelf.HostConfigurators
             _log.InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
                 Environment.Version);
 
+            EnvironmentBuilder environmentBuilder = _environmentBuilderFactory();
+
+            HostEnvironment environment = environmentBuilder.Build();
+
             ServiceBuilder serviceBuilder = _serviceBuilderFactory(_settings);
 
-            HostBuilder builder = _hostBuilderFactory(_settings, serviceBuilder);
+            HostBuilder builder = _hostBuilderFactory(environment, _settings);
 
             foreach (HostBuilderConfigurator configurator in _configurators)
             {
                 builder = configurator.Configure(builder);
             }
 
-            return builder.Build();
+            return builder.Build(serviceBuilder);
         }
 
-        static HostBuilder DefaultBuilderFactory(HostSettings settings, ServiceBuilder serviceBuilder)
+        static HostBuilder DefaultHostBuilderFactory(HostEnvironment environment, HostSettings settings)
         {
-            return new RunBuilder(new WindowsHostEnvironment(), settings, serviceBuilder);
+            return new RunBuilder(environment, settings);
+        }
+
+        static EnvironmentBuilder DefaultEnvironmentBuilderFactory()
+        {
+            return new WindowsHostEnvironmentBuilder();
         }
     }
 }

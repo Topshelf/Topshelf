@@ -10,10 +10,24 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.HostConfigurators
+namespace Topshelf.CommandLineParser
 {
-    using Builders;
-    using Runtime;
+    using System.Collections.Generic;
 
-    public delegate HostBuilder HostBuilderFactory(HostEnvironment environment, HostSettings settings);
+    public class MonadicCommandLineParser :
+        ICommandLineParser
+    {
+        public IEnumerable<ICommandLineElement> Parse(string commandLine)
+        {
+            var parser = new StringCommandLineParser();
+
+            Result<string, ICommandLineElement> result = parser.All(commandLine);
+            while (result != null)
+            {
+                yield return result.Value;
+
+                result = parser.All(result.Rest);
+            }
+        }
+    }
 }

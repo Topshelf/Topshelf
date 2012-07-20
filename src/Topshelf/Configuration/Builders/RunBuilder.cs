@@ -26,19 +26,21 @@ namespace Topshelf.Builders
         readonly EventCallbackList<HostStoppedContext> _afterStop;
         readonly EventCallbackList<HostStartContext> _beforeStart;
         readonly EventCallbackList<HostStopContext> _beforeStop;
-        ServiceBuilder _serviceBuilder;
         readonly HostSettings _settings;
-        HostEnvironment _environment;
+        readonly HostEnvironment _environment;
 
-        public RunBuilder(HostEnvironment environment, HostSettings settings, ServiceBuilder serviceBuilder)
+        public RunBuilder(HostEnvironment environment, HostSettings settings)
         {
             if (settings == null)
                 throw new ArgumentNullException("settings");
 
             _environment = environment;
-
             _settings = settings;
-            _serviceBuilder = serviceBuilder;
+
+            _afterStart = new EventCallbackList<HostStartedContext>();
+            _afterStop = new EventCallbackList<HostStoppedContext>();
+            _beforeStart = new EventCallbackList<HostStartContext>();
+            _beforeStop = new EventCallbackList<HostStopContext>();
         }
 
         public HostEnvironment Environment
@@ -51,9 +53,9 @@ namespace Topshelf.Builders
             get { return _settings; }
         }
 
-        public virtual Host Build()
+        public virtual Host Build(ServiceBuilder serviceBuilder)
         {
-            var serviceHandle = _serviceBuilder.Build(_settings);
+            ServiceHandle serviceHandle = serviceBuilder.Build(_settings);
 
             return CreateHost(serviceHandle);
         }

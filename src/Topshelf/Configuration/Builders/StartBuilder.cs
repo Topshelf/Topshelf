@@ -40,11 +40,11 @@ namespace Topshelf.Builders
             get { return _settings; }
         }
 
-        public Host Build()
+        public Host Build(ServiceBuilder serviceBuilder)
         {
             if (_builder != null)
             {
-                Host parentHost = _builder.Build();
+                Host parentHost = _builder.Build(serviceBuilder);
 
                 return new StartHost(_environment, _settings, parentHost);
             }

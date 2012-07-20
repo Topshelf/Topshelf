@@ -53,11 +53,10 @@ namespace Topshelf.Builders
             get { return _settings; }
         }
 
-        public Host Build()
+        public Host Build(ServiceBuilder serviceBuilder)
         {
             return new InstallHost(_environment, _settings, _startMode, _dependencies.ToArray(), _credentials,
-                _preActions,
-                _postActions, _sudo);
+                _preActions, _postActions, _sudo);
         }
 
         public void Match<T>(Action<T> callback)

@@ -10,23 +10,25 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Builders
+namespace Topshelf.Options
 {
-    using System;
-    using Runtime;
+    using HostConfigurators;
 
-    /// <summary>
-    /// Using the service configuration, the host builder will create the host
-    /// that will be ran by the service console.
-    /// </summary>
-    public interface HostBuilder
+    public class ServiceAccountOption :
+        Option
     {
-        HostEnvironment Environment { get; }
-        HostSettings Settings { get; }
+        readonly string _password;
+        readonly string _username;
 
-        Host Build(ServiceBuilder serviceBuilder);
+        public ServiceAccountOption(string username, string password)
+        {
+            _username = username;
+            _password = password;
+        }
 
-        void Match<T>(Action<T> callback)
-            where T : class, HostBuilder;
+        public void ApplyTo(HostConfigurator configurator)
+        {
+            configurator.RunAs(_username, _password);
+        }
     }
 }
