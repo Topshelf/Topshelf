@@ -17,7 +17,7 @@ namespace Topshelf.CommandLineParser
     using System.IO;
     using System.Linq;
 
-    public class CommandLineElementParser<TResult> :
+    class CommandLineElementParser<TResult> :
         AbstractParser<IEnumerable<ICommandLineElement>>,
         ICommandLineElementParser<TResult>
     {

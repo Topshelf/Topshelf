@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.CommandLineParser
 {
-    public class TokenElement :
+    class TokenElement :
         ITokenElement
     {
         public TokenElement(string token)

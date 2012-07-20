@@ -19,7 +19,7 @@ namespace Topshelf.CommandLineParser
     ///   Used to configure the command line element parser
     /// </summary>
     /// <typeparam name="TResult"> The type of object returned as a result of the parse </typeparam>
-    public interface ICommandLineElementParser<TResult>
+    interface ICommandLineElementParser<TResult>
     {
         /// <summary>
         ///   Adds a new pattern to the parser

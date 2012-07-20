@@ -62,7 +62,7 @@ namespace Topshelf.Hosts
 
                 _serviceHandle.Start(this);
 
-                _log.InfoFormat("[Topshelf] Running, press Control+C to exit.");
+                _log.InfoFormat("The {0} service is now running, press Control+C to exit.", _settings.ServiceName);
 
                 _exit.WaitOne();
             }
@@ -103,9 +103,12 @@ namespace Topshelf.Hosts
         {
             try
             {
-                _log.Info("[Topshelf] Stopping service");
+                if(_hasCancelled == false)
+                {
+                _log.InfoFormat("Stopping the {0} service", _settings.ServiceName);
 
                 _serviceHandle.Stop(this);
+                }
             }
             catch (Exception ex)
             {
@@ -115,7 +118,7 @@ namespace Topshelf.Hosts
             {
                 _serviceHandle.Dispose();
 
-                _log.Info("[Topshelf] Stopped");
+                _log.InfoFormat("The {0} service has stopped.", _settings.ServiceName);
             }
         }
 

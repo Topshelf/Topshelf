@@ -19,7 +19,7 @@ namespace Topshelf.CommandLineParser
     /// <summary>
     ///   Tools for parsing the command line
     /// </summary>
-    public static class CommandLine
+    static class CommandLine
     {
         static readonly StringCommandLineParser _parser = new StringCommandLineParser();
 
@@ -50,18 +50,9 @@ namespace Topshelf.CommandLineParser
         /// <summary>
         ///   Parses the command line
         /// </summary>
-        /// <returns> The command line elements that were found </returns>
-        public static IEnumerable<ICommandLineElement> Parse()
-        {
-            return Parse(GetUnparsedCommandLine());
-        }
-
-        /// <summary>
-        ///   Parses the command line
-        /// </summary>
         /// <param name="commandLine"> The command line to parse </param>
         /// <returns> The command line elements that were found </returns>
-        public static IEnumerable<ICommandLineElement> Parse(string commandLine)
+        static IEnumerable<ICommandLineElement> Parse(string commandLine)
         {
             Result<string, ICommandLineElement> result = _parser.All(commandLine);
             while (result != null)
@@ -84,7 +75,7 @@ namespace Topshelf.CommandLineParser
         /// <param name="commandLine"> The command line text </param>
         /// <param name="initializer"> Used by the caller to add patterns and object generators </param>
         /// <returns> The elements that were found on the command line </returns>
-        public static IEnumerable<T> Parse<T>(string commandLine, Action<ICommandLineElementParser<T>> initializer)
+        static IEnumerable<T> Parse<T>(string commandLine, Action<ICommandLineElementParser<T>> initializer)
         {
             var elementParser = new CommandLineElementParser<T>();
 

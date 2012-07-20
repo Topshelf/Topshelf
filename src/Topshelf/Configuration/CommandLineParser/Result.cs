@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.CommandLineParser
 {
-    public class Result<TInput, TValue>
+    class Result<TInput, TValue>
     {
         public Result(TValue value, TInput rest)
         {

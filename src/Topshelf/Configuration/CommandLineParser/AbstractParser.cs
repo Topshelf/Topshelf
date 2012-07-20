@@ -14,7 +14,7 @@ namespace Topshelf.CommandLineParser
 {
     using System.Linq;
 
-    public abstract class AbstractParser<TInput>
+    abstract class AbstractParser<TInput>
     {
         public Parser<TInput, TValue> Succeed<TValue>(TValue value)
         {

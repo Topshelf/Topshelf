@@ -17,10 +17,18 @@ namespace Topshelf
     using HostConfigurators;
     using Logging;
 
+    /// <summary>
+    /// Configure and run a service host using the HostFactory
+    /// </summary>
     public static class HostFactory
     {
         static readonly Log _log = Logger.Get(typeof(HostFactory));
 
+        /// <summary>
+        /// Configures a new service host
+        /// </summary>
+        /// <param name="configureCallback">Configuration method to call</param>
+        /// <returns>A Topshelf service host, ready to run</returns>
         public static Host New(Action<HostConfigurator> configureCallback)
         {
             if (configureCallback == null)
@@ -43,16 +51,21 @@ namespace Topshelf
             ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
 
             if (result.Message.Length > 0)
-                _log.InfoFormat("Configuration Result:\n{0}", result.Message);
+                _log.DebugFormat("Configuration Result:\n{0}", result.Message);
 
             return configurator.CreateHost();
         }
 
-        public static void Run(Action<HostConfigurator> configure)
+        /// <summary>
+        /// Configures and runs a new service host, handling any exceptions and writing
+        /// them to the log.
+        /// </summary>
+        /// <param name="configureCallback">Configuration method to call</param>
+        public static void Run(Action<HostConfigurator> configureCallback)
         {
             try
             {
-                New(configure)
+                New(configureCallback)
                     .Run();
             }
             catch (Exception ex)

@@ -21,35 +21,20 @@ namespace Topshelf.Logging
     {
         readonly Cache<string, TraceLog> _logs;
         readonly Cache<string, TraceSource> _sources;
-        ConsoleTraceListener _listener;
+        TraceListener _listener;
+        readonly TraceSource _rootSource;
         TraceSource _defaultSource;
-        SourceSwitch _defaultSwitch;
-        int _listenerIndex;
 
         public TraceLogger()
         {
             _logs = new ConcurrentCache<string, TraceLog>(CreateTraceLog);
             _sources = new ConcurrentCache<string, TraceSource>(CreateTraceSource);
 
-            _defaultSwitch = new SourceSwitch("Topshelf");
-            _defaultSwitch.Level = SourceLevels.All;
+            _defaultSource = new TraceSource("Default", SourceLevels.Information);
+            
+            _listener = AddDefaultConsoleTraceListener(_defaultSource);
 
-            _defaultSource = new TraceSource("Topshelf");
-            _defaultSource.Switch = _defaultSwitch;
-
-            _listener = AddDefaultConsoleTraceListener();
-
-            _defaultSource.TraceEvent(TraceEventType.Information, 1, "Logging initialized");
-        }
-
-        ConsoleTraceListener AddDefaultConsoleTraceListener()
-        {
-            var listener = new ConsoleTraceListener();
-            listener.Name = "Topshelf";
-
-            _listenerIndex = _defaultSource.Listeners.Add(listener);
-
-            return listener;
+            _rootSource = _sources.Get("Topshelf");
         }
 
         public Log Get(string name)
@@ -71,6 +56,16 @@ namespace Topshelf.Logging
             }
         }
 
+        static TraceListener AddDefaultConsoleTraceListener(TraceSource source)
+        {
+            var listener = new TopshelfConsoleTraceListener();
+            listener.Name = "Topshelf";
+
+            source.Listeners.Add(listener);
+
+            return listener;
+        }
+
         TraceLog CreateTraceLog(string name)
         {
             return new TraceLog(_sources[name]);
@@ -78,7 +73,6 @@ namespace Topshelf.Logging
 
         TraceSource CreateTraceSource(string name)
         {
-            return _defaultSource;
             LogLevel logLevel = LogLevel.Info;
             SourceLevels sourceLevel = logLevel.SourceLevel;
             var source = new TraceSource(name, sourceLevel);
@@ -95,11 +89,12 @@ namespace Topshelf.Logging
         void ConfigureTraceSource(TraceSource source, string name, SourceLevels sourceLevel)
         {
             var defaultSource = _defaultSource;
+
             for (string parentName = ShortenName(name);
                  !string.IsNullOrEmpty(parentName);
                  parentName = ShortenName(parentName))
             {
-                var parentSource = new TraceSource(parentName, sourceLevel);
+                var parentSource = _sources.Get(parentName, key => new TraceSource(key, sourceLevel));
                 if (IsSourceConfigured(parentSource))
                 {
                     defaultSource = parentSource;
@@ -117,7 +112,7 @@ namespace Topshelf.Logging
         {
             return source.Listeners.Count != 1
                    || !(source.Listeners[0] is DefaultTraceListener)
-                   || source.Listeners[0].Name != "Topshelf";
+                   || source.Listeners[0].Name != "Default";
         }
 
         static string ShortenName(string name)

@@ -12,8 +12,14 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    /// <summary>
+    /// A Host can be a number of configured service hosts, from installers to service runners
+    /// </summary>
     public interface Host
     {
+        /// <summary>
+        /// Runs the configured host
+        /// </summary>
         void Run();
     }
 }

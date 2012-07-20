@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.CommandLineParser
 {
-    public interface IDefinitionElement :
+    interface IDefinitionElement :
         ICommandLineElement
     {
         string Key { get; }

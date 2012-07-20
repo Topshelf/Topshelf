@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.CommandLineParser
 {
-    public class SwitchElement :
+    class SwitchElement :
         ISwitchElement
     {
         public SwitchElement(char key)

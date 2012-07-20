@@ -15,7 +15,7 @@ namespace Topshelf.CommandLineParser
     using System.Collections.Generic;
     using System.Linq;
 
-    public static class ExtensionForCommandLineElementParsers
+    static class ExtensionForCommandLineElementParsers
     {
         public static Parser<IEnumerable<ICommandLineElement>, ISwitchElement> Optional(
             this Parser<IEnumerable<ICommandLineElement>, ISwitchElement> source, string key, bool defaultValue)

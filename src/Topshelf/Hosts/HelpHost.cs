@@ -14,8 +14,10 @@ namespace Topshelf.Hosts
 {
     using System;
     using System.IO;
-    using System.Reflection;
 
+    /// <summary>
+    ///   Displays the Topshelf command line reference
+    /// </summary>
     public class HelpHost :
         Host
     {
@@ -23,7 +25,7 @@ namespace Topshelf.Hosts
         {
             const string helpText = "Topshelf.HelpText.txt";
 
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(helpText);
+            Stream stream = typeof(HelpHost).Assembly.GetManifestResourceStream(helpText);
             if (stream == null)
             {
                 Console.WriteLine("Unable to load help text");

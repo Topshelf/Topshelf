@@ -16,7 +16,7 @@ namespace Topshelf.CommandLineParser
     using System.Collections.Generic;
     using System.Linq;
 
-    public static class MonadParserExtensions
+    static class MonadParserExtensions
     {
         public static Parser<TInput, TValue> Where<TInput, TValue>(this Parser<TInput, TValue> parser,
             Func<TValue, bool> pred)
