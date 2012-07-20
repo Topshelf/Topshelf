@@ -38,7 +38,7 @@ namespace Topshelf
 
             configureCallback(configurator);
 
-//            configurator.ApplyCommandLine();
+            configurator.ApplyCommandLine();
 
             ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
 
