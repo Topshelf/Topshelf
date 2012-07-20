@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Logging
 {
+    using System;
     using System.Diagnostics;
     using Internals.Caching;
 
@@ -20,11 +21,35 @@ namespace Topshelf.Logging
     {
         readonly Cache<string, TraceLog> _logs;
         readonly Cache<string, TraceSource> _sources;
+        ConsoleTraceListener _listener;
+        TraceSource _defaultSource;
+        SourceSwitch _defaultSwitch;
+        int _listenerIndex;
 
         public TraceLogger()
         {
             _logs = new ConcurrentCache<string, TraceLog>(CreateTraceLog);
             _sources = new ConcurrentCache<string, TraceSource>(CreateTraceSource);
+
+            _defaultSwitch = new SourceSwitch("Topshelf");
+            _defaultSwitch.Level = SourceLevels.All;
+
+            _defaultSource = new TraceSource("Topshelf");
+            _defaultSource.Switch = _defaultSwitch;
+
+            _listener = AddDefaultConsoleTraceListener();
+
+            _defaultSource.TraceEvent(TraceEventType.Information, 1, "Logging initialized");
+        }
+
+        ConsoleTraceListener AddDefaultConsoleTraceListener()
+        {
+            var listener = new ConsoleTraceListener();
+            listener.Name = "Topshelf";
+
+            _listenerIndex = _defaultSource.Listeners.Add(listener);
+
+            return listener;
         }
 
         public Log Get(string name)
@@ -34,6 +59,16 @@ namespace Topshelf.Logging
 
         public void Shutdown()
         {
+            Trace.Flush();
+
+            if (_listener != null)
+            {
+                Trace.Listeners.Remove(_listener);
+
+                _listener.Close();
+                (_listener as IDisposable).Dispose();
+                _listener = null;
+            }
         }
 
         TraceLog CreateTraceLog(string name)
@@ -43,7 +78,8 @@ namespace Topshelf.Logging
 
         TraceSource CreateTraceSource(string name)
         {
-            LogLevel logLevel = LogLevel.None;
+            return _defaultSource;
+            LogLevel logLevel = LogLevel.Info;
             SourceLevels sourceLevel = logLevel.SourceLevel;
             var source = new TraceSource(name, sourceLevel);
             if (IsSourceConfigured(source))
@@ -56,9 +92,9 @@ namespace Topshelf.Logging
             return source;
         }
 
-        static void ConfigureTraceSource(TraceSource source, string name, SourceLevels sourceLevel)
+        void ConfigureTraceSource(TraceSource source, string name, SourceLevels sourceLevel)
         {
-            var defaultSource = new TraceSource("Default", sourceLevel);
+            var defaultSource = _defaultSource;
             for (string parentName = ShortenName(name);
                  !string.IsNullOrEmpty(parentName);
                  parentName = ShortenName(parentName))
@@ -81,7 +117,7 @@ namespace Topshelf.Logging
         {
             return source.Listeners.Count != 1
                    || !(source.Listeners[0] is DefaultTraceListener)
-                   || source.Listeners[0].Name != "Default";
+                   || source.Listeners[0].Name != "Topshelf";
         }
 
         static string ShortenName(string name)

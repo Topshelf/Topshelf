@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 The Apache Software Foundation.
+﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,10 +12,22 @@
 // specific language governing permissions and limitations under the License.
 namespace SampleTopshelfService
 {
+    using System.Diagnostics;
+    using Topshelf;
+
+    [Switch("Topshelf", typeof(SourceSwitch))]
     class Program
     {
         static void Main()
         {
+            HostFactory.Run(x =>
+                {
+                    x.SetServiceName("SampleTopshelfService");
+                    x.SetDisplayName("SampleTopshelfService");
+                    x.SetDescription("A sample Topshelf service");
+
+                    x.Service<SampleService>();
+                });
         }
     }
 }

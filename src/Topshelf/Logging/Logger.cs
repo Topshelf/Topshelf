@@ -17,11 +17,26 @@ namespace Topshelf.Logging
 
     public static class Logger
     {
+        static readonly object _locker = new object();
         static ILogger _logger;
 
         public static ILogger Current
         {
-            get { return _logger ?? (_logger = new TraceLogger()); }
+            get
+            {
+                lock (_locker)
+                {
+                    return _logger ?? CreateTraceLogger();
+                }
+            }
+        }
+
+        static ILogger CreateTraceLogger()
+        {
+            _logger = new TraceLogger();
+
+
+            return _logger;
         }
 
         public static Log Get<T>()
@@ -42,7 +57,14 @@ namespace Topshelf.Logging
 
         public static void UseLogger(ILogger logger)
         {
-            _logger = logger;
+            lock (_locker)
+            {
+                if (_logger != null)
+                    _logger.Shutdown();
+                _logger = null;
+
+                _logger = logger;
+            }
         }
 
         public static string GetCleanTypeName<T>()
@@ -57,7 +79,14 @@ namespace Topshelf.Logging
 
         public static void Shutdown()
         {
-            Current.Shutdown();
+            lock (_locker)
+            {
+                if (_logger != null)
+                {
+                    _logger.Shutdown();
+                    _logger = null;
+                }
+            }
         }
 
         static string GetCleanTypeName(StringBuilder sb, Type type, string scope)

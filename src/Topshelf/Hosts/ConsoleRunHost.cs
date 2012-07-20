@@ -60,6 +60,8 @@ namespace Topshelf.Hosts
 
                 Console.CancelKeyPress += HandleCancelKeyPress;
 
+                _serviceHandle.Start(this);
+
                 _log.InfoFormat("[Topshelf] Running, press Control+C to exit.");
 
                 _exit.WaitOne();
@@ -73,7 +75,9 @@ namespace Topshelf.Hosts
                 StopService();
 
                 _exit.Close();
-                _exit.Dispose();
+                (_exit as IDisposable).Dispose();
+
+                Logger.Shutdown();
             }
         }
 
@@ -122,7 +126,7 @@ namespace Topshelf.Hosts
                 _log.Error("Control+Break detected, terminating service (not cleanly, use Control+C to exit cleanly)");
                 return;
             }
-
+ 
             consoleCancelEventArgs.Cancel = true;
 
             if (_hasCancelled)
@@ -135,7 +139,10 @@ namespace Topshelf.Hosts
                 _hasCancelled = true;
             }
             else
+            {
+                _hasCancelled = false;
                 _log.Error("The service is not in a state where it can be stopped.");
+            }
         }
     }
 }
