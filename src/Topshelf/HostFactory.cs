@@ -13,6 +13,7 @@
 namespace Topshelf
 {
     using System;
+    using Configurators;
     using HostConfigurators;
     using Logging;
 
@@ -20,18 +21,29 @@ namespace Topshelf
     {
         static readonly Log _log = Logger.Get(typeof(HostFactory));
 
-        public static Host New(Action<HostConfigurator> configure)
+        public static Host New(Action<HostConfigurator> configureCallback)
         {
-            if (configure == null)
-                throw new ArgumentNullException("configure");
+            if (configureCallback == null)
+                throw new ArgumentNullException("configureCallback");
 
             var configurator = new HostConfiguratorImpl();
 
-            configure(configurator);
+            Type declaringType = configureCallback.Method.DeclaringType;
+            if (declaringType != null)
+            {
+                string defaultServiceName = declaringType.Namespace;
+                if (!string.IsNullOrEmpty(defaultServiceName))
+                    configurator.SetServiceName(defaultServiceName);
+            }
+
+            configureCallback(configurator);
 
 //            configurator.ApplyCommandLine();
 
-            configurator.Validate();
+            ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
+
+            if (result.Message.Length > 0)
+                _log.InfoFormat("Configuration Result:\n{0}", result.Message);
 
             return configurator.CreateHost();
         }
@@ -45,7 +57,7 @@ namespace Topshelf
             }
             catch (Exception ex)
             {
-                _log.Error("The service exited abnormally with an exception", ex);
+                _log.Error("The service terminated abnormally", ex);
             }
         }
     }

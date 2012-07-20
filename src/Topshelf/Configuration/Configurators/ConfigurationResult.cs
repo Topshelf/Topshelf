@@ -17,5 +17,7 @@ namespace Topshelf.Configurators
     public interface ConfigurationResult
     {
         IEnumerable<ValidateResult> Results { get; }
+
+        string Message { get; }
     }
 }

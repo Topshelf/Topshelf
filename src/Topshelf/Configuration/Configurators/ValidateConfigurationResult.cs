@@ -18,12 +18,12 @@ namespace Topshelf.Configurators
     using System.Linq;
 
     [Serializable, DebuggerDisplay("{DebuggerString()}")]
-    public class ConfigurationResultImpl :
+    public class ValidateConfigurationResult :
         ConfigurationResult
     {
         readonly IList<ValidateResult> _results;
 
-        ConfigurationResultImpl(IEnumerable<ValidateResult> results)
+        ValidateConfigurationResult(IEnumerable<ValidateResult> results)
         {
             _results = results.ToList();
         }
@@ -38,30 +38,33 @@ namespace Topshelf.Configurators
             get { return _results; }
         }
 
-        string Message()
+        public string Message
         {
+            get
+            {
 #if NET40
             var debuggerString = string.Join(", ", _results);
 #else
-            string debuggerString = string.Join(", ", _results.Select(x => x.ToString()).ToArray());
+                string debuggerString = string.Join(Environment.NewLine, _results.Select(x => x.ToString()).ToArray());
 #endif
 
 #if NET40
             return string.IsNullOrWhiteSpace(debuggerString)
 #else
-            return string.IsNullOrEmpty(debuggerString)
+                return string.IsNullOrEmpty(debuggerString)
 #endif
-                       ? "No Obvious Problems says ConfigurationResult"
-                       : debuggerString;
+                           ? ""
+                           : debuggerString;
+            }
         }
 
         public static ConfigurationResult CompileResults(IEnumerable<ValidateResult> results)
         {
-            var result = new ConfigurationResultImpl(results);
+            var result = new ValidateConfigurationResult(results);
 
             if (result.ContainsFailure)
             {
-                string message = "The service bus was not properly configured: " + result.Message();
+                string message = "The service was not properly configured: " + result.Message;
 
                 throw new HostConfigurationException(message);
             }

@@ -53,7 +53,7 @@
     <Compile Include="Configuration\Builders\StopBuilder.cs" />
     <Compile Include="Configuration\Builders\UninstallBuilder.cs" />
     <Compile Include="Configuration\Configurators\ConfigurationResult.cs" />
-    <Compile Include="Configuration\Configurators\ConfigurationResultImpl.cs" />
+    <Compile Include="Configuration\Configurators\ValidateConfigurationResult.cs" />
     <Compile Include="Configuration\Configurators\Configurator.cs" />
     <Compile Include="Configuration\Configurators\ValidateResult.cs" />
     <Compile Include="Configuration\Configurators\ValidationResultDisposition.cs" />

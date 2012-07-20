@@ -79,7 +79,7 @@ namespace Topshelf
             configurator.UseServiceBuilder(x =>
                 {
                     ConfigurationResult configurationResult =
-                        ConfigurationResultImpl.CompileResults(serviceConfigurator.Validate());
+                        ValidateConfigurationResult.CompileResults(serviceConfigurator.Validate());
                     if (configurationResult.Results.Any())
                         throw new HostConfigurationException("The service was not properly configured");
 

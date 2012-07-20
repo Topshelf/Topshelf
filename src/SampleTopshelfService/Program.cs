@@ -12,22 +12,13 @@
 // specific language governing permissions and limitations under the License.
 namespace SampleTopshelfService
 {
-    using System.Diagnostics;
     using Topshelf;
 
-    [Switch("Topshelf", typeof(SourceSwitch))]
     class Program
     {
         static void Main()
         {
-            HostFactory.Run(x =>
-                {
-                    x.SetServiceName("SampleTopshelfService");
-                    x.SetDisplayName("SampleTopshelfService");
-                    x.SetDescription("A sample Topshelf service");
-
-                    x.Service<SampleService>();
-                });
+            HostFactory.Run(x => x.Service<SampleService>());
         }
     }
 }

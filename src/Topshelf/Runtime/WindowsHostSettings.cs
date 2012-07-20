@@ -22,8 +22,7 @@ namespace Topshelf.Runtime
         string _displayName;
 
         /// <summary>
-        /// Creates a new WindowsServiceDescription using empty strings for the properties.
-        /// The class is required to have names by the consumers.
+        ///   Creates a new WindowsServiceDescription using empty strings for the properties. The class is required to have names by the consumers.
         /// </summary>
         public WindowsHostSettings()
             : this(string.Empty, string.Empty)
@@ -31,11 +30,10 @@ namespace Topshelf.Runtime
         }
 
         /// <summary>
-        /// Creates a new WindowsServiceDescription instance using the
-        /// passed parameters.
+        ///   Creates a new WindowsServiceDescription instance using the passed parameters.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="instanceName"></param>
+        /// <param name="name"> </param>
+        /// <param name="instanceName"> </param>
         public WindowsHostSettings(string name, string instanceName)
         {
             if (name == null)
@@ -56,9 +54,9 @@ namespace Topshelf.Runtime
         {
             get
             {
-                string displayName = !string.IsNullOrEmpty(_displayName)
-                                         ? _displayName
-                                         : Name;
+                string displayName = string.IsNullOrEmpty(_displayName)
+                                         ? Name
+                                         : _displayName;
 
                 if (!string.IsNullOrEmpty(InstanceName))
                     return string.Format("{0} (Instance: {1})", displayName, InstanceName);

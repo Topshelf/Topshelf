@@ -63,6 +63,19 @@ namespace Topshelf.HostConfigurators
             {
                 yield return result;
             }
+
+            yield return this.Success("Name", _settings.Name);
+            
+            if(_settings.Name != _settings.DisplayName)
+                yield return this.Success("DisplayName", _settings.DisplayName);
+
+            if(_settings.Name != _settings.Description)
+                yield return this.Success("Description", _settings.Description);
+
+            if(!string.IsNullOrEmpty(_settings.InstanceName))
+                yield return this.Success("InstanceName", _settings.InstanceName);
+
+            yield return this.Success("ServiceName", _settings.ServiceName);
         }
 
         public void SetDisplayName(string name)
