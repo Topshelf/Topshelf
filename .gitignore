@@ -5,6 +5,7 @@ build_artifacts/*
 *.user
 packages
 *.dotCover
+*.dotSettings
 
 bin
 obj

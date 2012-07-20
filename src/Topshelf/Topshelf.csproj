@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A52AD64D-6455-4A22-8CCF-581851086578}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Topshelf</RootNamespace>
+    <AssemblyName>Topshelf</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configuration\Builders\ControlServiceBuilder.cs" />
+    <Compile Include="Configuration\Builders\DelegateServiceBuilder.cs" />
+    <Compile Include="Configuration\Builders\EventCallbackList.cs" />
+    <Compile Include="Configuration\Builders\HelpBuilder.cs" />
+    <Compile Include="Configuration\Builders\HostBuilder.cs" />
+    <Compile Include="Configuration\Builders\HostStartContext.cs" />
+    <Compile Include="Configuration\Builders\HostStartedContext.cs" />
+    <Compile Include="Configuration\Builders\HostStopContext.cs" />
+    <Compile Include="Configuration\Builders\HostStoppedContext.cs" />
+    <Compile Include="Configuration\Builders\InstallBuilder.cs" />
+    <Compile Include="Configuration\Builders\RunBuilder.cs" />
+    <Compile Include="Configuration\Builders\ServiceBuilder.cs" />
+    <Compile Include="Configuration\Builders\StartBuilder.cs" />
+    <Compile Include="Configuration\Builders\StopBuilder.cs" />
+    <Compile Include="Configuration\Builders\UninstallBuilder.cs" />
+    <Compile Include="Configuration\Configurators\ConfigurationResult.cs" />
+    <Compile Include="Configuration\Configurators\ConfigurationResultImpl.cs" />
+    <Compile Include="Configuration\Configurators\Configurator.cs" />
+    <Compile Include="Configuration\Configurators\ValidateResult.cs" />
+    <Compile Include="Configuration\Configurators\ValidationResultDisposition.cs" />
+    <Compile Include="Configuration\Configurators\ValidationResultExtensions.cs" />
+    <Compile Include="Configuration\Configurators\ValidateResultImpl.cs" />
+    <Compile Include="Configuration\Constants\KnownServiceNames.cs" />
+    <Compile Include="Configuration\Credentials.cs" />
+    <Compile Include="Configuration\DependencyExtensions.cs" />
+    <Compile Include="Configuration\HostConfigurators\DependencyHostConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\HostBuilderConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\HostBuilderFactory.cs" />
+    <Compile Include="Configuration\HostConfigurators\HostConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\HostConfiguratorImpl.cs" />
+    <Compile Include="Configuration\HostConfigurators\InstallHostConfiguratorAction.cs" />
+    <Compile Include="Configuration\HostConfigurators\RunAsUserHostConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\RunAsServiceAccountHostConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\RunHostConfiguratorAction.cs" />
+    <Compile Include="Configuration\HostConfigurators\ServiceBuilderFactory.cs" />
+    <Compile Include="Configuration\HostConfigurators\StartConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\StartModeHostConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\SudoConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\UninstallHostConfiguratorAction.cs" />
+    <Compile Include="Configuration\ServiceConfiguratorExtensions.cs" />
+    <Compile Include="Exceptions\ServiceBuilderException.cs" />
+    <Compile Include="Exceptions\ServiceControlException.cs" />
+    <Compile Include="HostFactory.cs" />
+    <Compile Include="Configuration\RunHostConfiguratorExtensions.cs" />
+    <Compile Include="Configuration\InstallHostConfiguratorExtensions.cs" />
+    <Compile Include="Configuration\RunAsExtensions.cs" />
+    <Compile Include="Configuration\ServiceConfigurators\ServiceConfigurator.cs" />
+    <Compile Include="Configuration\ServiceConfigurators\DelegateServiceConfigurator.cs" />
+    <Compile Include="Configuration\ServiceExtensions.cs" />
+    <Compile Include="Configuration\StartModeExtensions.cs" />
+    <Compile Include="Configuration\UninstallHostConfiguratorExtensions.cs" />
+    <Compile Include="Exceptions\HostConfigurationException.cs" />
+    <Compile Include="Exceptions\TopshelfException.cs" />
+    <Compile Include="Host.cs" />
+    <Compile Include="HostControl.cs" />
+    <Compile Include="Hosts\ConsoleRunHost.cs" />
+    <Compile Include="Hosts\HelpHost.cs" />
+    <Compile Include="Hosts\InstallHost.cs" />
+    <Compile Include="Hosts\StartHost.cs" />
+    <Compile Include="Hosts\StopHost.cs" />
+    <Compile Include="Hosts\UninstallHost.cs" />
+    <Compile Include="Logging\Log.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Logging\LogOutputProvider.cs" />
+    <Compile Include="Logging\TraceLog.cs" />
+    <Compile Include="Logging\TraceLogger.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runtime\HostEnvironment.cs" />
+    <Compile Include="Runtime\InstallServiceSettings.cs" />
+    <Compile Include="Runtime\HostSettings.cs" />
+    <Compile Include="Runtime\ServiceFactory.cs" />
+    <Compile Include="Runtime\ServiceHandle.cs" />
+    <Compile Include="Runtime\WindowsHostSettings.cs" />
+    <Compile Include="Runtime\Windows\HostInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Runtime\Windows\HostServiceInstaller.cs" />
+    <Compile Include="Runtime\Windows\Kernel32.cs" />
+    <Compile Include="Runtime\Windows\ServiceRecoveryAction.cs" />
+    <Compile Include="Runtime\Windows\ServiceRecoveryOptions.cs" />
+    <Compile Include="Runtime\Windows\WindowsHostEnvironment.cs" />
+    <Compile Include="Runtime\Windows\WindowsServiceControlManager.cs" />
+    <Compile Include="Runtime\Windows\WindowsServiceHost.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Runtime\Windows\WindowsUserAccessControl.cs" />
+    <Compile Include="ServiceControl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Internals\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
