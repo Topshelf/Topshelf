@@ -65,5 +65,16 @@ namespace Topshelf.HostConfigurators
         /// </summary>
         /// <param name="configurator"> </param>
         void AddConfigurator(HostBuilderConfigurator configurator);
+
+        /// <summary>
+        /// Parses the command line options and applies them to the host configurator
+        /// </summary>
+        void ApplyCommandLine();
+
+        /// <summary>
+        /// Parses the command line options from the specified command line and applies them to the host configurator
+        /// </summary>
+        /// <param name="commandLine"></param>
+        void ApplyCommandLine(string commandLine);
     }
 }

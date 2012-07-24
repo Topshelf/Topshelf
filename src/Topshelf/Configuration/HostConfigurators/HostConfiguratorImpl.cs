@@ -16,8 +16,10 @@ namespace Topshelf.HostConfigurators
     using System.Collections.Generic;
     using System.Linq;
     using Builders;
+    using CommandLineParser;
     using Configurators;
     using Logging;
+    using Options;
     using Runtime;
     using Runtime.Windows;
 
@@ -31,6 +33,7 @@ namespace Topshelf.HostConfigurators
         HostBuilderFactory _hostBuilderFactory;
         ServiceBuilderFactory _serviceBuilderFactory;
         EnvironmentBuilderFactory _environmentBuilderFactory;
+        bool _commandLineApplied;
 
         public HostConfiguratorImpl()
         {
@@ -121,6 +124,27 @@ namespace Topshelf.HostConfigurators
         public void AddConfigurator(HostBuilderConfigurator configurator)
         {
             _configurators.Add(configurator);
+        }
+
+        public  void ApplyCommandLine()
+        {
+            if (_commandLineApplied)
+                return;
+
+            foreach (Option option in CommandLine.Parse<Option>(CommandLineParserOptions.InitializeCommandLineParser))
+            {
+                option.ApplyTo(this);
+            }
+        }
+
+        public  void ApplyCommandLine(string commandLine)
+        {
+            foreach (Option option in CommandLine.Parse<Option>(CommandLineParserOptions.InitializeCommandLineParser, commandLine))
+            {
+                option.ApplyTo(this);
+            }
+
+            _commandLineApplied = true;
         }
 
         public Host CreateHost()

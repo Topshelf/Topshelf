@@ -78,7 +78,7 @@
     <Compile Include="Configuration\CommandLineParser\StringCommandLineParser.cs" />
     <Compile Include="Configuration\CommandLineParser\SwitchElement.cs" />
     <Compile Include="Configuration\CommandLineParser\TokenElement.cs" />
-    <Compile Include="Configuration\HostConfigurators\CommandLineConfigurator.cs" />
+    <Compile Include="Configuration\HostConfigurators\CommandLineParserOptions.cs" />
     <Compile Include="Configuration\Configurators\ConfigurationResult.cs" />
     <Compile Include="Configuration\Configurators\ValidateConfigurationResult.cs" />
     <Compile Include="Configuration\Configurators\Configurator.cs" />
@@ -104,6 +104,7 @@
     <Compile Include="Configuration\HostConfigurators\StartModeHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\SudoConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\UninstallHostConfiguratorAction.cs" />
+    <Compile Include="Configuration\HostConfigurators\UnknownCommandLineOptionHostConfigurator.cs" />
     <Compile Include="Configuration\Options\AutostartOption.cs" />
     <Compile Include="Configuration\Options\DelayedOption.cs" />
     <Compile Include="Configuration\Options\DisabledOption.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Configuration\Options\StopOption.cs" />
     <Compile Include="Configuration\Options\SudoOption.cs" />
     <Compile Include="Configuration\Options\UninstallOption.cs" />
+    <Compile Include="Configuration\Options\UnknownOption.cs" />
     <Compile Include="Configuration\ServiceConfiguratorExtensions.cs" />
     <Compile Include="Exceptions\ServiceBuilderException.cs" />
     <Compile Include="Exceptions\ServiceControlException.cs" />

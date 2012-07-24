@@ -26,7 +26,7 @@ namespace Topshelf.CommandLineParser
         /// </summary>
         /// <param name="parser"> The pattern to match and return the resulting object </param>
         void Add(Parser<IEnumerable<ICommandLineElement>, TResult> parser);
-
+        
         Parser<IEnumerable<ICommandLineElement>, IArgumentElement> Argument();
         Parser<IEnumerable<ICommandLineElement>, IArgumentElement> Argument(string value);
         Parser<IEnumerable<ICommandLineElement>, IArgumentElement> Argument(Predicate<IArgumentElement> pred);

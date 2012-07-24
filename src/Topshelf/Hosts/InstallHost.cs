@@ -45,6 +45,16 @@ namespace Topshelf.Hosts
             _sudo = sudo;
         }
 
+        public InstallHostSettings InstallSettings
+        {
+            get { return _installSettings; }
+        }
+
+        public HostSettings Settings
+        {
+            get { return _settings; }
+        }
+
         public void Run()
         {
             if (_environment.IsServiceInstalled(_settings.ServiceName))

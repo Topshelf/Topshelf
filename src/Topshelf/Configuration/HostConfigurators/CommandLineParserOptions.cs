@@ -10,23 +10,14 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.HostConfigurators
 {
     using CommandLineParser;
-    using HostConfigurators;
     using Options;
 
-    public static class CommandLineConfigurator
+     static class CommandLineParserOptions
     {
-        public static void ApplyCommandLine(this HostConfigurator configurator)
-        {
-            foreach (Option option in CommandLine.Parse<Option>(InitializeCommandLineParser))
-            {
-                option.ApplyTo(configurator);
-            }
-        }
-
-        static void InitializeCommandLineParser(ICommandLineElementParser<Option> x)
+         internal static void InitializeCommandLineParser(ICommandLineElementParser<Option> x)
         {
             x.Add((from arg in x.Argument("install")
                    select (Option)new InstallOption())
@@ -68,7 +59,13 @@ namespace Topshelf
                 .Or(from disp in x.Definition("displayname")
                     select (Option)new DisplayNameOption(disp.Value))
                 .Or(from instance in x.Definition("instance")
-                    select (Option)new InstanceOption(instance.Value)));
+                    select (Option)new InstanceOption(instance.Value))
+                .Or(from unknown in x.Definition()
+                    select (Option)new UnknownOption(unknown.ToString()))
+                .Or(from unknown in x.Switch()
+                    select (Option)new UnknownOption(unknown.ToString()))
+                .Or(from unknown in x.Argument()
+                    select (Option)new UnknownOption(unknown.ToString())));
         }
     }
 }

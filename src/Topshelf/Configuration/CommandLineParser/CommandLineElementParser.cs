@@ -41,7 +41,7 @@ namespace Topshelf.CommandLineParser
             }
         }
 
-        public Parser<IEnumerable<ICommandLineElement>, TResult> All { get; protected set; }
+        public Parser<IEnumerable<ICommandLineElement>, TResult> All { get; set; }
 
         public void Add(Parser<IEnumerable<ICommandLineElement>, TResult> parser)
         {
