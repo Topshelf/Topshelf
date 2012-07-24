@@ -159,7 +159,7 @@ namespace Topshelf.Runtime.Windows
             return new WindowsServiceHost(this, settings, serviceHandle);
         }
 
-        public void InstallService(InstallServiceSettings settings, Action beforeInstall, Action afterInstall)
+        public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall)
         {
             using (var installer = new HostServiceInstaller(settings))
             {

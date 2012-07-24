@@ -28,7 +28,7 @@ namespace Topshelf.Builders
         readonly IList<Action> _preActions;
         readonly HostSettings _settings;
         Credentials _credentials;
-        ServiceStartMode _startMode;
+        HostStartMode _startMode;
         bool _sudo;
 
         public InstallBuilder(HostEnvironment environment, HostSettings settings)
@@ -36,7 +36,7 @@ namespace Topshelf.Builders
             _preActions = new List<Action>();
             _postActions = new List<Action>();
             _dependencies = new List<string>();
-            _startMode = ServiceStartMode.Automatic;
+            _startMode = HostStartMode.Automatic;
             _credentials = new Credentials("", "", ServiceAccount.LocalSystem);
 
             _environment = environment;
@@ -82,7 +82,7 @@ namespace Topshelf.Builders
             _sudo = true;
         }
 
-        public void SetStartMode(ServiceStartMode startMode)
+        public void SetStartMode(HostStartMode startMode)
         {
             _startMode = startMode;
         }

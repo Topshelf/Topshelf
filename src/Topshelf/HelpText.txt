@@ -9,8 +9,11 @@ Command-Line Reference
 
     install             Installs the service
 
-      --autostart       Specifies that the service should start automatically
-      -instance         Specifies an instance name if registering the service
+      --autostart       The service should start automatically (default)
+      --disabled        The service should be set to disabled
+      --manual          The service should be started manually
+      --delayed         The service should start automatically (delayed)
+      -instance         An instance name if registering the service
                         multiple times
       -username         The username to run the service
       -password         The password for the specified username
@@ -34,7 +37,7 @@ Command-Line Reference
 
     uninstall           Uninstalls the service
 
-      -instance         Specifies an instance name if registering the service
+      -instance         An instance name if registering the service
                         multiple times
       --sudo            Prompts for UAC if running on Vista/W7/2008
 

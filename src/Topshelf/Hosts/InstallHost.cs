@@ -25,13 +25,13 @@ namespace Topshelf.Hosts
         static readonly Log _log = Logger.Get<InstallHost>();
 
         readonly HostEnvironment _environment;
-        readonly InstallServiceSettings _installSettings;
+        readonly InstallHostSettings _installSettings;
         readonly IEnumerable<Action> _postActions;
         readonly IEnumerable<Action> _preActions;
         readonly HostSettings _settings;
         readonly bool _sudo;
 
-        public InstallHost(HostEnvironment environment, HostSettings settings, ServiceStartMode startMode,
+        public InstallHost(HostEnvironment environment, HostSettings settings, HostStartMode startMode,
             IEnumerable<string> dependencies,
             Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
         {
@@ -88,14 +88,14 @@ namespace Topshelf.Hosts
         }
 
         class InstallServiceSettingsImpl :
-            InstallServiceSettings
+            InstallHostSettings
         {
-            Credentials _credentials;
-            string[] _dependencies;
-            HostSettings _settings;
-            ServiceStartMode _startMode;
+            readonly Credentials _credentials;
+            readonly string[] _dependencies;
+            readonly HostSettings _settings;
+            readonly HostStartMode _startMode;
 
-            public InstallServiceSettingsImpl(HostSettings settings, Credentials credentials, ServiceStartMode startMode,
+            public InstallServiceSettingsImpl(HostSettings settings, Credentials credentials, HostStartMode startMode,
                 string[] dependencies)
             {
                 _credentials = credentials;
@@ -134,7 +134,7 @@ namespace Topshelf.Hosts
                 get { return _dependencies; }
             }
 
-            public ServiceStartMode StartMode
+            public HostStartMode StartMode
             {
                 get { return _startMode; }
             }

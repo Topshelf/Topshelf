@@ -10,20 +10,16 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Runtime
+namespace Topshelf.Options
 {
-    using System.ServiceProcess;
+    using HostConfigurators;
 
-    public interface InstallServiceSettings :
-        HostSettings
+    public class ManualStartOption :
+        Option
     {
-        ServiceAccount Account { get; }
-        
-        string Username { get; }
-        string Password { get;}
-
-        string[] Dependencies { get; }
-        
-        ServiceStartMode StartMode { get; }
+        public void ApplyTo(HostConfigurator configurator)
+        {
+            configurator.StartManually();
+        }
     }
 }

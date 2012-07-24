@@ -13,8 +13,8 @@
 namespace Topshelf
 {
     using System;
-    using System.ServiceProcess;
     using HostConfigurators;
+    using Runtime;
 
     public static class StartModeExtensions
     {
@@ -23,7 +23,17 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            configurator.AddConfigurator(new StartModeHostConfigurator(ServiceStartMode.Automatic));
+            configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.Automatic));
+
+            return configurator;
+        }
+
+        public static HostConfigurator StartAutomaticallyDelayed(this HostConfigurator configurator)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.AutomaticDelayed));
 
             return configurator;
         }
@@ -33,7 +43,7 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            configurator.AddConfigurator(new StartModeHostConfigurator(ServiceStartMode.Manual));
+            configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.Manual));
 
             return configurator;
         }
@@ -43,7 +53,7 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            configurator.AddConfigurator(new StartModeHostConfigurator(ServiceStartMode.Disabled));
+            configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.Disabled));
 
             return configurator;
         }

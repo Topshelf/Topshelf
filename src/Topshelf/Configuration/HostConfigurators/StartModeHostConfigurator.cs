@@ -14,22 +14,26 @@ namespace Topshelf.HostConfigurators
 {
     using System;
     using System.Collections.Generic;
-    using System.ServiceProcess;
     using Builders;
     using Configurators;
+    using Runtime;
 
     public class StartModeHostConfigurator :
         HostBuilderConfigurator
     {
-        readonly ServiceStartMode _startMode;
+        readonly HostStartMode _startMode;
 
-        public StartModeHostConfigurator(ServiceStartMode startMode)
+        public StartModeHostConfigurator(HostStartMode startMode)
         {
             _startMode = startMode;
         }
 
         public IEnumerable<ValidateResult> Validate()
         {
+#if NET35
+            if (_startMode == HostStartMode.AutomaticDelayed)
+                yield return this.Failure("StartMode", "Automatic (Delayed) is only available on .NET 4.0 or later");
+#endif
             yield break;
         }
 

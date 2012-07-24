@@ -105,12 +105,15 @@
     <Compile Include="Configuration\HostConfigurators\SudoConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\UninstallHostConfiguratorAction.cs" />
     <Compile Include="Configuration\Options\AutostartOption.cs" />
+    <Compile Include="Configuration\Options\DelayedOption.cs" />
+    <Compile Include="Configuration\Options\DisabledOption.cs" />
     <Compile Include="Configuration\Options\DisplayNameOption.cs" />
     <Compile Include="Configuration\Options\HelpOption.cs" />
     <Compile Include="Configuration\Options\InstallOption.cs" />
     <Compile Include="Configuration\Options\InstanceOption.cs" />
     <Compile Include="Configuration\Options\InteractiveOption.cs" />
     <Compile Include="Configuration\Options\LocalServiceOption.cs" />
+    <Compile Include="Configuration\Options\ManualStartOption.cs" />
     <Compile Include="Configuration\Options\NetworkServiceOption.cs" />
     <Compile Include="Configuration\Options\Option.cs" />
     <Compile Include="Configuration\Options\RunOption.cs" />
@@ -152,7 +155,8 @@
     <Compile Include="Logging\TraceLog.cs" />
     <Compile Include="Logging\TraceLogger.cs" />
     <Compile Include="Runtime\HostEnvironment.cs" />
-    <Compile Include="Runtime\InstallServiceSettings.cs" />
+    <Compile Include="Runtime\HostStartMode.cs" />
+    <Compile Include="Runtime\InstallHostSettings.cs" />
     <Compile Include="Runtime\HostSettings.cs" />
     <Compile Include="Runtime\ServiceFactory.cs" />
     <Compile Include="Runtime\ServiceHandle.cs" />
