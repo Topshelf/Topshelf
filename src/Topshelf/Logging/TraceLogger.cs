@@ -27,8 +27,8 @@ namespace Topshelf.Logging
 
         public TraceLogger()
         {
-            _logs = new ConcurrentCache<string, TraceLog>(CreateTraceLog);
-            _sources = new ConcurrentCache<string, TraceSource>(CreateTraceSource);
+            _logs = new DictionaryCache<string, TraceLog>(CreateTraceLog);
+            _sources = new DictionaryCache<string, TraceSource>(CreateTraceSource);
 
             _defaultSource = new TraceSource("Default", SourceLevels.Information);
             

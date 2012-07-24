@@ -30,6 +30,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="  '$(TargetFrameworkVersion)' == 'v3.5' ">
+    <DefineConstants>NET35</DefineConstants>
+    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
@@ -37,6 +41,9 @@
     <Reference Include="System.ServiceProcess" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SolutionVersion.cs">
+      <Link>SolutionVersion.cs</Link>
+    </Compile>
     <Compile Include="Configuration\Builders\ControlServiceBuilder.cs" />
     <Compile Include="Configuration\Builders\DelegateServiceBuilder.cs" />
     <Compile Include="Configuration\Builders\EnvironmentBuilder.cs" />
@@ -144,7 +151,6 @@
     <Compile Include="Logging\TopshelfConsoleTraceListener.cs" />
     <Compile Include="Logging\TraceLog.cs" />
     <Compile Include="Logging\TraceLogger.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\HostEnvironment.cs" />
     <Compile Include="Runtime\InstallServiceSettings.cs" />
     <Compile Include="Runtime\HostSettings.cs" />
@@ -173,8 +179,11 @@
   <ItemGroup>
     <EmbeddedResource Include="HelpText.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

@@ -1,118 +1,81 @@
-COPYRIGHT = "Copyright 2007-2011 Travis Smith, Chris Patterson, Dru Sellers, Henrik Feldt et al. All rights reserved."
+COPYRIGHT = "Copyright 2012 Chris Patterson, Dru Sellers, Travis Smith, All rights reserved."
 
 require File.dirname(__FILE__) + "/build_support/BuildUtils.rb"
+require File.dirname(__FILE__) + "/build_support/util.rb"
 include FileTest
 require 'albacore'
+require File.dirname(__FILE__) + "/build_support/versioning.rb"
 
-BUILD_NUMBER_BASE = '3.0.0'
 PRODUCT = 'Topshelf'
 CLR_TOOLS_VERSION = 'v4.0.30319'
-
-BUILD_CONFIG = ENV['BUILD_CONFIG'] || "Release"
-BUILD_CONFIG_KEY = ENV['BUILD_CONFIG_KEY'] || 'NET40'
-BUILD_PLATFORM = ENV['BUILD_PLATFORM'] || 'Any CPU' # we might want to vary this a little
-TARGET_FRAMEWORK_VERSION = (BUILD_CONFIG_KEY == "NET40" ? "v4.0" : "v3.5")
-MSB_USE = (BUILD_CONFIG_KEY == "NET40" ? :net4 : :net35)
-OUTPUT_PATH = (BUILD_CONFIG_KEY == "NET40" ? 'NET40' : 'NET35')
+OUTPUT_PATH = 'bin/Release'
 
 props = {
   :src => File.expand_path("src"),
-  :build_support => File.expand_path("build_support"),
-  :stage => File.expand_path("build_output"),
-  :output => File.join( File.expand_path("build_output"), OUTPUT_PATH ),
+  :output => File.expand_path("build_output"),
   :artifacts => File.expand_path("build_artifacts"),
   :projects => ["Topshelf"]
 }
 
-puts "Building for .NET Framework #{TARGET_FRAMEWORK_VERSION} in #{BUILD_CONFIG}-mode."
-
-desc "Displays a list of tasks"
-task :help do
-
-  taskHash = Hash[*(`rake.bat -T`.split(/\n/).collect { |l| l.match(/rake (\S+)\s+\#\s(.+)/).to_a }.collect { |l| [l[1], l[2]] }).flatten]
-
-  indent = "                          "
-
-  puts "rake #{indent}#Runs the 'default' task"
-
-  taskHash.each_pair do |key, value|
-    if key.nil?
-      next
-    end
-    puts "rake #{key}#{indent.slice(0, indent.length - key.length)}##{value}"
-  end
-end
-
-
-desc "Cleans, compiles, il-merges, unit tests, prepares examples, packages zip and runs MoMA"
-task :all => [:default, :package, :moma]
+desc "Cleans, compiles, il-merges, unit tests, prepares examples, packages zip"
+task :all => [:default, :package]
 
 desc "**Default**, compiles and runs tests"
-task :default => [:clean, :compile, :tests, :prepare_examples]
-
-desc "**DOOES NOT CLEAR OUTPUT FOLDER**, compiles and runs tests"
-task :unclean => [:prepare, :compile, :tests, :prepare_examples]
+task :default => [:clean, :nuget_restore, :compile, :package]
 
 desc "Update the common version information for the build. You can call this task without building."
 assemblyinfo :global_version do |asm|
-  asm_version = BUILD_NUMBER_BASE + ".0"
-  commit_data = get_commit_hash_and_date
-  commit = commit_data[0]
-  commit_date = commit_data[1]
-  build_number = "#{BUILD_NUMBER_BASE}.#{Date.today.strftime('%y%j')}"
-  tc_build_number = ENV["BUILD_NUMBER"]
-  build_number = "#{BUILD_NUMBER_BASE}.#{tc_build_number}" unless tc_build_number.nil?
-
   # Assembly file config
   asm.product_name = PRODUCT
-  asm.description = "Topshelf is an open source project for hosting services without friction. Either link Topshelf to your program and it *becomes* a service installer or use Topshelf.Host to shelf your services by placing them in subfolders of the 'Services' folder under the folder of Topshelf.Host.exe. github.com/Topshelf. topshelf-project.com. Original author company: CFT & ACM."
-  asm.version = asm_version
-  asm.file_version = build_number
-  asm.custom_attributes :AssemblyInformationalVersion => "#{asm_version}",
+  asm.description = "Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service."
+  asm.version = FORMAL_VERSION
+  asm.file_version = FORMAL_VERSION
+  asm.custom_attributes :AssemblyInformationalVersion => "#{BUILD_VERSION}",
 	:ComVisibleAttribute => false,
-	:CLSCompliantAttribute => false # Henrik: at the moment the project isn't CLS compliant due to dependencies.
+	:CLSCompliantAttribute => true
   asm.copyright = COPYRIGHT
   asm.output_file = 'src/SolutionVersion.cs'
-  asm.namespaces "System", "System.Reflection", "System.Runtime.InteropServices", "System.Security"
+  asm.namespaces "System", "System.Reflection", "System.Runtime.InteropServices"
 end
 
 desc "Prepares the working directory for a new build"
 task :clean do
+	FileUtils.rm_rf props[:output]
+	waitfor { !exists?(props[:output]) }
+
 	FileUtils.rm_rf props[:artifacts]
-	FileUtils.rm_rf props[:stage]
-	# work around latency issue where folder still exists for a short while after it is removed
-	waitfor { !exists?(props[:stage]) }
 	waitfor { !exists?(props[:artifacts]) }
 
-	Dir.mkdir props[:stage]
+	Dir.mkdir props[:output]
 	Dir.mkdir props[:artifacts]
-        Dir.mkdir props[:output]
-end
-
-task :prepare do
-        Dir.mkdir props[:output]
 end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
-task :compile => [:global_version, :build] do
-	puts 'Copying unmerged dependencies to output folder'
-	copyOutputFiles File.join(props[:src], "Topshelf/bin/#{BUILD_CONFIG}/Topshelf.{dll,pdb,xml}"), props[:output]
+task :compile => [:versioning, :global_version, :build4, :tests4, :copy4, :build35, :tests35, :copy35]
+
+task :copy35 => [:build35] do
+	copyOutputFiles File.join(props[:src], "Topshelf/bin/Release/v3.5"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
 end
 
-task :build => [:build_ts, :ilmerge, :copyloggers, :build_host, :build_x86]
-
-task :copyloggers do
-	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.Log4NetIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.Log4NetIntegration.{dll,xml,pdb}", props[:output]
-	copyOutputFiles File.join(props[:src], "Loggers/Topshelf.NLogIntegration/bin/#{BUILD_CONFIG}"), "Topshelf.NLogIntegration.{dll,xml,pdb}", props[:output]
+task :copy4 => [:build4] do
+	copyOutputFiles File.join(props[:src], "Topshelf/bin/Release"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
 end
 
 desc "Only compiles the application."
-msbuild :build_ts do |msb|
-	msb.properties :Configuration => BUILD_CONFIG,
-	    :BuildConfigKey => BUILD_CONFIG_KEY,
-		:TargetFrameworkVersion => TARGET_FRAMEWORK_VERSION,
+msbuild :build35 do |msb|
+	msb.properties :Configuration => "Release",
+		:Platform => 'Any CPU',
+                :TargetFrameworkVersion => "v3.5"
+	msb.use :net35
+	msb.targets :Clean, :Build
+	msb.solution = 'src/Topshelf.sln'
+end
+
+desc "Only compiles the application."
+msbuild :build4 do |msb|
+	msb.properties :Configuration => "Release",
 		:Platform => 'Any CPU'
-	msb.use MSB_USE
+	msb.use :net4
 	msb.targets :Clean, :Build
 	msb.solution = 'src/Topshelf.sln'
 end
@@ -124,32 +87,56 @@ def copyOutputFiles(fromDir, filePattern, outDir)
 	}
 end
 
-task :tests => [:unit_tests, :integration_tests, :perf_tests]
-
-desc "Runs unit tests (integration tests?, acceptance-tests?) etc."
-task :unit_tests => [:compile] do
-	Dir.mkdir props[:artifacts] unless exists?(props[:artifacts])
-
-	runner = NUnitRunner.new(File.join('lib', 'nunit', 'net-2.0',  "nunit-console#{(BUILD_PLATFORM.empty? ? '' : "-#{BUILD_PLATFORM}")}.exe"),
-		'tests',
-		TARGET_FRAMEWORK_VERSION,
-		['/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results.xml')}\""])
-
-	runner.run ['Topshelf.Specs'].map{ |assem| "#{assem}.dll" }
+desc "Runs unit tests"
+nunit :tests35 => [:build35] do |nunit|
+          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.0.12051', 'tools', 'nunit-console.exe')
+          nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-3.5.xml')}\""
+          nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
 
-task :package => [:zip_output, :nuget]
+desc "Runs unit tests"
+nunit :tests4 => [:build4] do |nunit|
+          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.0.12051', 'tools', 'nunit-console.exe')
+          nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-4.0.xml')}\""
+          nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
+end
 
-desc "ZIPs up the build results and runs the MoMA analyzer."
-zip :zip_output do |zip|
-	zip.directories_to_zip = [props[:stage]]
-	zip.output_file = "Topshelf-#{BUILD_NUMBER_BASE}.zip"
-	zip.output_path = [props[:artifacts]]
+task :package => [:nuget, :zip_output]
+
+desc "ZIPs up the build results."
+zip :zip_output => [:versioning] do |zip|
+	zip.directories_to_zip = [props[:output]]
+	zip.output_file = "Topshelf-#{NUGET_VERSION}.zip"
+	zip.output_path = props[:artifacts]
+end
+
+desc "Restore NuGet Packages"
+task :nuget_restore do
+  sh "src/.nuget/nuget install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -o #{File.join(props[:src],"packages")}"
+  sh "src/.nuget/nuget install #{File.join(props[:src],".nuget","packages.config")} -o #{File.join(props[:src],"packages")}"
 end
 
 desc "Builds the nuget package"
-task :nuget do
-	sh "lib/nuget pack topshelf.nuspec /OutputDirectory build_artifacts"
+task :nuget => [:versioning, :create_nuspec] do
+	sh "src/.nuget/nuget pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+end
+
+task :create_nuspec => [:main_nuspec]
+
+nuspec :main_nuspec do |nuspec|
+  nuspec.id = 'Topshelf'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.description = 'Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf'
+  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
+  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.requireLicenseAcceptance = "false"
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.nuspec')
+  add_files props[:output], 'Topshelf.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf\\**\\*.cs").gsub("/","\\"), "src")
 end
 
 def project_outputs(props)
@@ -168,6 +155,15 @@ def get_commit_hash_and_date
 	end
 
 	[commit, commit_date]
+end
+
+def add_files stage, what_dlls, nuspec
+  [['net35', 'net-3.5'], ['net40', 'net-4.0'], ['net40-full', 'net-4.0-full']].each{|fw|
+    takeFrom = File.join(stage, fw[1], what_dlls)
+    Dir.glob(takeFrom).each do |f|
+      nuspec.file(f.gsub("/", "\\"), "lib\\#{fw[0]}")
+    end
+  }
 end
 
 def waitfor(&block)
