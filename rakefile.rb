@@ -14,6 +14,7 @@ props = {
   :src => File.expand_path("src"),
   :output => File.expand_path("build_output"),
   :artifacts => File.expand_path("build_artifacts"),
+  :lib => File.expand_path("lib"),
   :projects => ["Topshelf"]
 }
 
@@ -112,13 +113,13 @@ end
 
 desc "Restore NuGet Packages"
 task :nuget_restore do
-  sh "#{File.join(props[:src], 'lib', 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
-  sh "#{File.join(props[:src], 'lib', 'nuget.exe')} install #{File.join(props[:src],".nuget","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
+  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
+  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],".nuget","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
 end
 
 desc "Builds the nuget package"
 task :nuget => [:versioning, :create_nuspec] do
-	sh "#{File.join(props[:src], '.nuget', 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+	sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 end
 
 task :create_nuspec => [:main_nuspec]
