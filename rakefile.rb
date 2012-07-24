@@ -112,8 +112,8 @@ end
 
 desc "Restore NuGet Packages"
 task :nuget_restore do
-  sh "#{File.join(props[:src], '.nuget', 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
-  sh "#{File.join(props[:src], '.nuget', 'nuget.exe')} install #{File.join(props[:src],".nuget","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
+  sh "#{File.join(props[:src], 'lib', 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
+  sh "#{File.join(props[:src], 'lib', 'nuget.exe')} install #{File.join(props[:src],".nuget","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
 end
 
 desc "Builds the nuget package"
