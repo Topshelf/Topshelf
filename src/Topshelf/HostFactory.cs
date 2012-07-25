@@ -51,7 +51,7 @@ namespace Topshelf
             ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
 
             if (result.Message.Length > 0)
-                _log.DebugFormat("Configuration Result:\n{0}", result.Message);
+                _log.InfoFormat("Configuration Result:\n{0}", result.Message);
 
             return configurator.CreateHost();
         }

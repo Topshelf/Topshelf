@@ -22,8 +22,7 @@ namespace Topshelf.Logging
         readonly Cache<string, TraceLog> _logs;
         readonly Cache<string, TraceSource> _sources;
         TraceListener _listener;
-        readonly TraceSource _rootSource;
-        TraceSource _defaultSource;
+        readonly TraceSource _defaultSource;
 
         public TraceLogger()
         {
@@ -34,7 +33,7 @@ namespace Topshelf.Logging
             
             _listener = AddDefaultConsoleTraceListener(_defaultSource);
 
-            _rootSource = _sources.Get("Topshelf");
+            _sources.Get("Topshelf");
         }
 
         public Log Get(string name)
