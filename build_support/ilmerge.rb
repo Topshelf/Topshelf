@@ -25,9 +25,9 @@ class ILMerge
 
   def execute
     params = []
-    params << "/out:#{@output}" unless @output.nil?
-	params << "/log:#{@log}" unless @log.nil?
-	params << "/internalize:#{@internalize}" unless @internalize.nil?
+    params << "/out:\"#{@output}\"" unless @output.nil?
+    params << "/log:\"#{@log}\"" unless @log.nil?
+    params << "/internalize:\"#{@internalize}\"" unless @internalize.nil?
     params << "/target:#{@target}" unless @target.nil?
     params << "/allowDup" if @allow_dupes
     params << "/xmldocs" unless @no_docs
