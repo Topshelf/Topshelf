@@ -15,9 +15,9 @@ namespace Topshelf.Rehab
     using System;
     using System.Security;
     using System.Security.Permissions;
-    using Topshelf.Builders;
-    using Topshelf.HostConfigurators;
-    using Topshelf.Runtime;
+    using Builders;
+    using HostConfigurators;
+    using Runtime;
 
     public class RehabServiceBuilder<T> :
         ServiceBuilder
@@ -51,7 +51,7 @@ namespace Topshelf.Rehab
                     ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
                     ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
                     ApplicationName = AppDomain.CurrentDomain.SetupInformation.ApplicationName,
-                    LoaderOptimization = LoaderOptimization.MultiDomainHost
+                    LoaderOptimization = LoaderOptimization.MultiDomainHost,
                 };
 
             var permissionSet = new PermissionSet(PermissionState.Unrestricted);
@@ -90,9 +90,11 @@ namespace Topshelf.Rehab
             string typeName = type.FullName ?? typeof(AppDomainServiceHandle).Name;
             var loader = (AppDomainServiceHandle)appDomain.CreateInstanceAndUnwrap(assemblyName, typeName);
 
-            loader.Create(_serviceBuilderFactory, settings);
+            var serviceHandle = new RehabServiceHandle<T>(appDomain, loader);
 
-            return new RehabServiceHandle<T>(appDomain, loader);
+            loader.Create(_serviceBuilderFactory, settings);
+            
+            return serviceHandle;
         }
     }
 }

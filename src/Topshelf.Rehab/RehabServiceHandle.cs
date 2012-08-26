@@ -13,16 +13,19 @@
 namespace Topshelf.Rehab
 {
     using System;
-    using Topshelf.Runtime;
+    using Logging;
+    using Runtime;
 
     public class RehabServiceHandle<T> :
         ServiceHandle
         where T : class
     {
+        static readonly LogWriter _log = HostLogger.Get<RehabServiceHandle<T>>();
+
         readonly AppDomain _appDomain;
         readonly ServiceHandle _service;
 
-        public RehabServiceHandle(AppDomain appDomain, AppDomainServiceHandle handle)
+        public RehabServiceHandle(AppDomain appDomain, ServiceHandle handle)
         {
             _appDomain = appDomain;
             _service = handle;
@@ -36,7 +39,14 @@ namespace Topshelf.Rehab
             }
             finally
             {
-                AppDomain.Unload(_appDomain);
+                try
+                {
+                    AppDomain.Unload(_appDomain);
+                }
+                catch (Exception ex)
+                {
+                    _log.Error("Failed to unload AppDomain", ex);
+                }
             }
         }
 

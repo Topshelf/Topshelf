@@ -8,8 +8,8 @@
     <ProjectGuid>{C4838A12-9DFE-4CAE-894A-9845898AFDB2}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SampleTopshelfUpdaterService</RootNamespace>
-    <AssemblyName>SampleTopshelfUpdaterService</AssemblyName>
+    <RootNamespace>SampleTopshelfRehabService</RootNamespace>
+    <AssemblyName>SampleTopshelfRehabService</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

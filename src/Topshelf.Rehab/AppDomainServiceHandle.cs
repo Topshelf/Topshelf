@@ -13,14 +13,17 @@
 namespace Topshelf.Rehab
 {
     using System;
-    using Topshelf.Builders;
-    using Topshelf.HostConfigurators;
-    using Topshelf.Runtime;
+    using Builders;
+    using HostConfigurators;
+    using Logging;
+    using Runtime;
 
     public class AppDomainServiceHandle :
         MarshalByRefObject,
         ServiceHandle
     {
+        static readonly LogWriter _log = HostLogger.Get<AppDomainServiceHandle>();
+
         ServiceHandle _serviceHandle;
 
         public bool Start(HostControl hostControl)
@@ -50,9 +53,16 @@ namespace Topshelf.Rehab
 
         public void Create(ServiceBuilderFactory serviceBuilderFactory, HostSettings settings)
         {
+            AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
+
             ServiceBuilder serviceBuilder = serviceBuilderFactory(settings);
 
             _serviceHandle = serviceBuilder.Build(settings);
+        }
+
+        void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
         }
     }
 }

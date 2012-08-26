@@ -26,6 +26,7 @@ namespace Topshelf.Hosts
         readonly HostEnvironment _environment;
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;
+        int _deadThread;
 
         ManualResetEvent _exit;
         volatile bool _hasCancelled;
@@ -45,6 +46,8 @@ namespace Topshelf.Hosts
         public void Run()
         {
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+            AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
             if (_environment.IsServiceInstalled(_settings.ServiceName))
             {
@@ -99,15 +102,33 @@ namespace Topshelf.Hosts
             _exit.Set();
         }
 
+        void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _log.Error("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+
+            if (e.IsTerminating)
+            {
+                _exit.Set();
+
+                // this is evil, but perhaps a good thing to let us clean up properly.
+
+                int deadThreadId = Interlocked.Increment(ref _deadThread);
+                Thread.CurrentThread.IsBackground = true;
+                Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
+                while (true)
+                    Thread.Sleep(TimeSpan.FromHours(1));
+            }
+        }
+
         void StopService()
         {
             try
             {
-                if(_hasCancelled == false)
+                if (_hasCancelled == false)
                 {
-                _log.InfoFormat("Stopping the {0} service", _settings.ServiceName);
+                    _log.InfoFormat("Stopping the {0} service", _settings.ServiceName);
 
-                _serviceHandle.Stop(this);
+                    _serviceHandle.Stop(this);
                 }
             }
             catch (Exception ex)
@@ -129,7 +150,7 @@ namespace Topshelf.Hosts
                 _log.Error("Control+Break detected, terminating service (not cleanly, use Control+C to exit cleanly)");
                 return;
             }
- 
+
             consoleCancelEventArgs.Cancel = true;
 
             if (_hasCancelled)
