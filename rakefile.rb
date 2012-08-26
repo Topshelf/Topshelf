@@ -57,13 +57,15 @@ task :compile => [:versioning, :global_version, :build4, :tests4, :copy4, :build
 task :copy35 => [:build35] do
   copyOutputFiles File.join(props[:src], "Topshelf/bin/Release/v3.5"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
   copyOutputFiles File.join(props[:src], "Topshelf.Log4Net/bin/Release/v3.5"), "Topshelf.Log4Net.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
-	copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release/v3.5"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
+  copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release/v3.5"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
+	copyOutputFiles File.join(props[:src], "Topshelf.Rehab/bin/Release/v3.5"), "Topshelf.Rehab.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
 end
 
 task :copy4 => [:build4] do
   copyOutputFiles File.join(props[:src], "Topshelf/bin/Release"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
   copyOutputFiles File.join(props[:src], "Topshelf.Log4Net/bin/Release"), "Topshelf.Log4Net.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
-	copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+  copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+	copyOutputFiles File.join(props[:src], "Topshelf.Rehab/bin/Release"), "Topshelf.Rehab.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
 end
 
 desc "Only compiles the application."
@@ -126,7 +128,8 @@ desc "Builds the nuget package"
 task :nuget => [:versioning, :create_nuspec] do
   sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.Log4Net.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
-	sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+	sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.Rehab.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 end
 
 nuspec :create_nuspec do |nuspec|
@@ -182,6 +185,24 @@ nuspec :create_nuspec do |nuspec|
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
+end
+
+nuspec :create_nuspec do |nuspec|
+  nuspec.id = 'Topshelf.Rehab'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.summary = 'Topshelf, Friction-free Windows Services'
+  nuspec.description = 'Rehab provides automatic updates to services. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf.Rehab'
+  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
+  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.requireLicenseAcceptance = "false"
+  nuspec.dependency "Topshelf", NUGET_VERSION
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Rehab.nuspec')
+  add_files props[:output], 'Topshelf.Rehab.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf.Rehab\\**\\*.cs").gsub("/","\\"), "src")
 end
 
 def project_outputs(props)

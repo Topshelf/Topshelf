@@ -14,6 +14,7 @@ namespace Topshelf.Runtime
 {
     using System;
 
+    [Serializable]
     public class WindowsHostSettings :
         HostSettings
     {
