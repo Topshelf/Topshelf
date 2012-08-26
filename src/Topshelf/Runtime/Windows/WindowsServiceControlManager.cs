@@ -27,7 +27,7 @@ namespace Topshelf.Runtime.Windows
     /// </summary>
     public static class WindowsServiceControlManager
     {
-        static readonly Log _log = Logger.Get(typeof(WindowsServiceControlManager));
+        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsServiceControlManager));
 
         const int SERVICE_CONFIG_FAILURE_ACTIONS = 2;
         const int SE_PRIVILEGE_ENABLED = 2;

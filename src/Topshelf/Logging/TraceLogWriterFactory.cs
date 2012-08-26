@@ -16,17 +16,17 @@ namespace Topshelf.Logging
     using System.Diagnostics;
     using Internals.Caching;
 
-    public class TraceLogger :
-        ILogger
+    public class TraceLogWriterFactory :
+        LogWriterFactory
     {
-        readonly Cache<string, TraceLog> _logs;
+        readonly Cache<string, TraceLogWriter> _logs;
         readonly Cache<string, TraceSource> _sources;
         TraceListener _listener;
         readonly TraceSource _defaultSource;
 
-        public TraceLogger()
+        public TraceLogWriterFactory()
         {
-            _logs = new DictionaryCache<string, TraceLog>(CreateTraceLog);
+            _logs = new DictionaryCache<string, TraceLogWriter>(CreateTraceLog);
             _sources = new DictionaryCache<string, TraceSource>(CreateTraceSource);
 
             _defaultSource = new TraceSource("Default", SourceLevels.Information);
@@ -36,7 +36,7 @@ namespace Topshelf.Logging
             _sources.Get("Topshelf");
         }
 
-        public Log Get(string name)
+        public LogWriter Get(string name)
         {
             return _logs[name];
         }
@@ -65,14 +65,14 @@ namespace Topshelf.Logging
             return listener;
         }
 
-        TraceLog CreateTraceLog(string name)
+        TraceLogWriter CreateTraceLog(string name)
         {
-            return new TraceLog(_sources[name]);
+            return new TraceLogWriter(_sources[name]);
         }
 
         TraceSource CreateTraceSource(string name)
         {
-            LogLevel logLevel = LogLevel.Info;
+            LoggingLevel logLevel = LoggingLevel.Info;
             SourceLevels sourceLevel = logLevel.SourceLevel;
             var source = new TraceSource(name, sourceLevel);
             if (IsSourceConfigured(source))

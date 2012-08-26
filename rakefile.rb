@@ -55,11 +55,15 @@ desc "Cleans, versions, compiles the application and generates build_output/."
 task :compile => [:versioning, :global_version, :build4, :tests4, :copy4, :build35, :tests35, :copy35]
 
 task :copy35 => [:build35] do
-	copyOutputFiles File.join(props[:src], "Topshelf/bin/Release/v3.5"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
+  copyOutputFiles File.join(props[:src], "Topshelf/bin/Release/v3.5"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
+  copyOutputFiles File.join(props[:src], "Topshelf.Log4Net/bin/Release/v3.5"), "Topshelf.Log4Net.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
+	copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release/v3.5"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
 end
 
 task :copy4 => [:build4] do
-	copyOutputFiles File.join(props[:src], "Topshelf/bin/Release"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+  copyOutputFiles File.join(props[:src], "Topshelf/bin/Release"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+  copyOutputFiles File.join(props[:src], "Topshelf.Log4Net/bin/Release"), "Topshelf.Log4Net.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+	copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
 end
 
 desc "Only compiles the application."
@@ -90,14 +94,14 @@ end
 
 desc "Runs unit tests"
 nunit :tests35 => [:build35] do |nunit|
-          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.0.12051', 'tools', 'nunit-console.exe')
+          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.1', 'tools', 'nunit-console.exe')
           nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-3.5.xml')}\""
           nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
 
 desc "Runs unit tests"
 nunit :tests4 => [:build4] do |nunit|
-          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.0.12051', 'tools', 'nunit-console.exe')
+          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.1', 'tools', 'nunit-console.exe')
           nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-4.0.xml')}\""
           nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
@@ -113,21 +117,23 @@ end
 
 desc "Restore NuGet Packages"
 task :nuget_restore do
+  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Log4Net","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
+  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.NLog","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
   sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
-  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],".nuget","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
 end
 
 desc "Builds the nuget package"
 task :nuget => [:versioning, :create_nuspec] do
-	sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.Log4Net.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+	sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 end
 
-task :create_nuspec => [:main_nuspec]
-
-nuspec :main_nuspec do |nuspec|
+nuspec :create_nuspec do |nuspec|
   nuspec.id = 'Topshelf'
   nuspec.version = NUGET_VERSION
   nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.summary = 'Topshelf, Friction-free Windows Services'
   nuspec.description = 'Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
   nuspec.title = 'Topshelf'
   nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
@@ -138,6 +144,44 @@ nuspec :main_nuspec do |nuspec|
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.nuspec')
   add_files props[:output], 'Topshelf.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf\\**\\*.cs").gsub("/","\\"), "src")
+end
+
+nuspec :create_nuspec do |nuspec|
+  nuspec.id = 'Topshelf.Log4Net'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.summary = 'Topshelf, Friction-free Windows Services'
+  nuspec.description = 'Log4Net Logging Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf.Log4Net'
+  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
+  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.requireLicenseAcceptance = "false"
+  nuspec.dependency "Topshelf", NUGET_VERSION
+  nuspec.dependency "Log4Net", "2.0.0"
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Log4Net.nuspec')
+  add_files props[:output], 'Topshelf.Log4Net.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf.Log4Net\\**\\*.cs").gsub("/","\\"), "src")
+end
+
+nuspec :create_nuspec do |nuspec|
+  nuspec.id = 'Topshelf.NLog'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.summary = 'Topshelf, Friction-free Windows Services'
+  nuspec.description = 'NLog Logging Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf.NLog'
+  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
+  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.requireLicenseAcceptance = "false"
+  nuspec.dependency "Topshelf", NUGET_VERSION
+  nuspec.dependency "NLog", "2.0"
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
+  add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
 end
 
 def project_outputs(props)

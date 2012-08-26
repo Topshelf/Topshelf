@@ -26,7 +26,7 @@ namespace Topshelf.HostConfigurators
     public class HostConfiguratorImpl :
         HostConfigurator
     {
-        static readonly Log _log = Logger.Get(typeof(HostConfiguratorImpl));
+        static readonly LogWriter _log = HostLogger.Get(typeof(HostConfiguratorImpl));
 
         readonly IList<HostBuilderConfigurator> _configurators;
         readonly WindowsHostSettings _settings;

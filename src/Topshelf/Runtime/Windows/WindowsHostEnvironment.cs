@@ -28,7 +28,7 @@ namespace Topshelf.Runtime.Windows
     public class WindowsHostEnvironment :
         HostEnvironment
     {
-        static readonly Log _log = Logger.Get(typeof(WindowsHostEnvironment));
+        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsHostEnvironment));
 
         public bool IsServiceInstalled(string serviceName)
         {
@@ -138,7 +138,7 @@ namespace Topshelf.Runtime.Windows
 
                 try
                 {
-                    Logger.Shutdown();
+                    HostLogger.Shutdown();
 
                     Process process = Process.Start(startInfo);
                     process.WaitForExit();

@@ -9,13 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTopshelfService", "Sa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Tests", "Topshelf.Tests\Topshelf.Tests.csproj", "{508C7AAB-03DD-40C6-947D-6A8D22AAA941}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{9AAB3240-AD6F-4A20-BD03-B612D652B49C}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\nuget.exe = .nuget\nuget.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Log4Net", "Topshelf.Log4Net\Topshelf.Log4Net.csproj", "{0EE64D46-5728-45DB-8D0E-044CE2677FD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.NLog", "Topshelf.NLog\Topshelf.NLog.csproj", "{55FC6F5C-778F-4E77-8C55-C62216858CE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +55,26 @@ Global
 		{508C7AAB-03DD-40C6-947D-6A8D22AAA941}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{508C7AAB-03DD-40C6-947D-6A8D22AAA941}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{508C7AAB-03DD-40C6-947D-6A8D22AAA941}.Release|x86.ActiveCfg = Release|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0EE64D46-5728-45DB-8D0E-044CE2677FD8}.Release|x86.ActiveCfg = Release|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{55FC6F5C-778F-4E77-8C55-C62216858CE7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

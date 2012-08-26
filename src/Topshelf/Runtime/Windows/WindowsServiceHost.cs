@@ -24,11 +24,10 @@ namespace Topshelf.Windows
         Host,
         HostControl
     {
-        static readonly Log _log = Logger.Get<WindowsServiceHost>();
+        static readonly LogWriter _log = HostLogger.Get<WindowsServiceHost>();
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;
         HostEnvironment _environment;
-        HostControl _hostControl;
 
         public WindowsServiceHost(HostEnvironment environment, HostSettings settings, ServiceHandle serviceHandle)
         {
@@ -64,12 +63,30 @@ namespace Topshelf.Windows
 
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
         {
+            _log.DebugFormat("Requesting additional time: {0}", timeRemaining);
+
             RequestAdditionalTime((int)timeRemaining.TotalMilliseconds);
         }
 
         void HostControl.Restart()
         {
+            _log.Fatal("Restart is not yet implemented");
+            
             throw new NotImplementedException("This is not done yet, so I'm trying");
+        }
+
+        void HostControl.Stop()
+        {
+            if(CanStop)
+            {
+                _log.Debug("Stop requested by hosted service");
+                Stop();
+            }
+            else
+            {
+                _log.Debug("Stop requested by hosted service, but service cannot be stopped at this time");
+                throw new ServiceControlException("The service cannot be stopped at this time");
+            }
         }
 
         protected override void OnStart(string[] args)
@@ -80,7 +97,7 @@ namespace Topshelf.Windows
 
                 _log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
 
-                _serviceHandle.Start(_hostControl);
+                _serviceHandle.Start(this);
             }
             catch (Exception ex)
             {
@@ -95,7 +112,7 @@ namespace Topshelf.Windows
             {
                 _log.Info("[Topshelf] Stopping");
 
-                _serviceHandle.Stop(_hostControl);
+                _serviceHandle.Stop(this);
             }
             catch (Exception ex)
             {
@@ -114,7 +131,7 @@ namespace Topshelf.Windows
             {
                 _log.Info("[Topshelf] Pausing service");
 
-                _serviceHandle.Pause(_hostControl);
+                _serviceHandle.Pause(this);
             }
             catch (Exception ex)
             {
@@ -133,7 +150,7 @@ namespace Topshelf.Windows
             {
                 _log.Info("[Topshelf] Pausing service");
 
-                _serviceHandle.Continue(_hostControl);
+                _serviceHandle.Continue(this);
             }
             catch (Exception ex)
             {

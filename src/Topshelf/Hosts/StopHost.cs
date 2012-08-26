@@ -18,7 +18,7 @@ namespace Topshelf.Hosts
     public class StopHost :
         Host
     {
-        static readonly Log _log = Logger.Get<StopHost>();
+        static readonly LogWriter _log = HostLogger.Get<StopHost>();
         readonly HostEnvironment _environment;
         readonly HostSettings _settings;
 

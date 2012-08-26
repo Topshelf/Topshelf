@@ -20,7 +20,7 @@ namespace Topshelf.Builders
     public class RunBuilder :
         HostBuilder
     {
-        static readonly Log _log = Logger.Get<RunBuilder>();
+        static readonly LogWriter _log = HostLogger.Get<RunBuilder>();
 
         readonly EventCallbackList<HostStartedContext> _afterStart;
         readonly EventCallbackList<HostStoppedContext> _afterStop;

@@ -20,7 +20,7 @@ namespace Topshelf.Hosts
         Host
     {
         readonly HostEnvironment _environment;
-        readonly Log _log = Logger.Get<StartHost>();
+        readonly LogWriter _log = HostLogger.Get<StartHost>();
         readonly Host _parentHost;
         HostSettings _settings;
 

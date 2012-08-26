@@ -22,7 +22,7 @@ namespace Topshelf
     /// </summary>
     public static class HostFactory
     {
-        static readonly Log _log = Logger.Get(typeof(HostFactory));
+        static readonly LogWriter _log = HostLogger.Get(typeof(HostFactory));
 
         /// <summary>
         /// Configures a new service host

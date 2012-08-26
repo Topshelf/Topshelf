@@ -22,7 +22,7 @@ namespace Topshelf.Hosts
     public class InstallHost :
         Host
     {
-        static readonly Log _log = Logger.Get<InstallHost>();
+        static readonly LogWriter _log = HostLogger.Get<InstallHost>();
 
         readonly HostEnvironment _environment;
         readonly InstallHostSettings _installSettings;

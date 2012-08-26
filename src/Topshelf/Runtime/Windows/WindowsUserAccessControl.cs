@@ -21,7 +21,7 @@ namespace Topshelf.Runtime.Windows
 
     public static class WindowsUserAccessControl
     {
-        static readonly Log _log = Logger.Get(typeof(WindowsUserAccessControl));
+        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsUserAccessControl));
 
        
 

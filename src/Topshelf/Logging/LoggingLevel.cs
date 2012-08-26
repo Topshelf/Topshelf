@@ -15,25 +15,25 @@ namespace Topshelf.Logging
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    public class LogLevel
+    public class LoggingLevel
     {
-        public static readonly LogLevel All = new LogLevel("All", 6, SourceLevels.All, TraceEventType.Verbose);
-        public static readonly LogLevel Debug = new LogLevel("Debug", 5, SourceLevels.Verbose, TraceEventType.Verbose);
-        public static readonly LogLevel Error = new LogLevel("Error", 2, SourceLevels.Error, TraceEventType.Error);
-        public static readonly LogLevel Fatal = new LogLevel("Fatal", 1, SourceLevels.Critical, TraceEventType.Critical);
+        public static readonly LoggingLevel All = new LoggingLevel("All", 6, SourceLevels.All, TraceEventType.Verbose);
+        public static readonly LoggingLevel Debug = new LoggingLevel("Debug", 5, SourceLevels.Verbose, TraceEventType.Verbose);
+        public static readonly LoggingLevel Error = new LoggingLevel("Error", 2, SourceLevels.Error, TraceEventType.Error);
+        public static readonly LoggingLevel Fatal = new LoggingLevel("Fatal", 1, SourceLevels.Critical, TraceEventType.Critical);
 
-        public static readonly LogLevel Info = new LogLevel("Info", 4, SourceLevels.Information,
+        public static readonly LoggingLevel Info = new LoggingLevel("Info", 4, SourceLevels.Information,
             TraceEventType.Information);
 
-        public static readonly LogLevel None = new LogLevel("None", 0, SourceLevels.Off, TraceEventType.Critical);
-        public static readonly LogLevel Warn = new LogLevel("Warn", 3, SourceLevels.Warning, TraceEventType.Warning);
+        public static readonly LoggingLevel None = new LoggingLevel("None", 0, SourceLevels.Off, TraceEventType.Critical);
+        public static readonly LoggingLevel Warn = new LoggingLevel("Warn", 3, SourceLevels.Warning, TraceEventType.Warning);
 
         readonly int _index;
         readonly string _name;
         readonly SourceLevels _sourceLevel;
         readonly TraceEventType _traceEventType;
 
-        LogLevel(string name, int index, SourceLevels sourceLevel, TraceEventType traceEventType)
+        LoggingLevel(string name, int index, SourceLevels sourceLevel, TraceEventType traceEventType)
         {
             _name = name;
             _index = index;
@@ -41,7 +41,7 @@ namespace Topshelf.Logging
             _traceEventType = traceEventType;
         }
 
-        public static IEnumerable<LogLevel> Values
+        public static IEnumerable<LoggingLevel> Values
         {
             get
             {
@@ -75,27 +75,27 @@ namespace Topshelf.Logging
             return _name;
         }
 
-        public static bool operator >(LogLevel left, LogLevel right)
+        public static bool operator >(LoggingLevel left, LoggingLevel right)
         {
             return right != null && (left != null && left._index > right._index);
         }
 
-        public static bool operator <(LogLevel left, LogLevel right)
+        public static bool operator <(LoggingLevel left, LoggingLevel right)
         {
             return right != null && (left != null && left._index < right._index);
         }
 
-        public static bool operator >=(LogLevel left, LogLevel right)
+        public static bool operator >=(LoggingLevel left, LoggingLevel right)
         {
             return right != null && (left != null && left._index >= right._index);
         }
 
-        public static bool operator <=(LogLevel left, LogLevel right)
+        public static bool operator <=(LoggingLevel left, LoggingLevel right)
         {
             return right != null && (left != null && left._index <= right._index);
         }
 
-        public static LogLevel FromSourceLevels(SourceLevels level)
+        public static LoggingLevel FromSourceLevels(SourceLevels level)
         {
             switch (level)
             {

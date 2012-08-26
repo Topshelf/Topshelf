@@ -20,7 +20,7 @@ namespace Topshelf.Runtime.Windows
     public class HostInstaller :
         Installer
     {
-        static readonly Log _log = Logger.Get<HostInstaller>();
+        static readonly LogWriter _log = HostLogger.Get<HostInstaller>();
 
         readonly string _arguments;
         readonly Installer[] _installers;

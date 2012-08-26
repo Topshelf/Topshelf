@@ -16,44 +16,44 @@ namespace Topshelf.Logging
     using System.Diagnostics;
     using System.Globalization;
 
-    public class TraceLog :
-        Log
+    public class TraceLogWriter :
+        LogWriter
     {
-        readonly LogLevel _level;
+        readonly LoggingLevel _level;
         readonly TraceSource _source;
 
-        public TraceLog(TraceSource source)
+        public TraceLogWriter(TraceSource source)
         {
             _source = source;
-            _level = LogLevel.FromSourceLevels(source.Switch.Level);
+            _level = LoggingLevel.FromSourceLevels(source.Switch.Level);
         }
 
         public bool IsDebugEnabled
         {
-            get { return _level >= LogLevel.Debug; }
+            get { return _level >= LoggingLevel.Debug; }
         }
 
         public bool IsInfoEnabled
         {
-            get { return _level >= LogLevel.Info; }
+            get { return _level >= LoggingLevel.Info; }
         }
 
         public bool IsWarnEnabled
         {
-            get { return _level >= LogLevel.Warn; }
+            get { return _level >= LoggingLevel.Warn; }
         }
 
         public bool IsErrorEnabled
         {
-            get { return _level >= LogLevel.Error; }
+            get { return _level >= LoggingLevel.Error; }
         }
 
         public bool IsFatalEnabled
         {
-            get { return _level >= LogLevel.Fatal; }
+            get { return _level >= LoggingLevel.Fatal; }
         }
 
-        public void LogFormat(LogLevel level, string format, params object[] args)
+        public void LogFormat(LoggingLevel level, string format, params object[] args)
         {
             if (_level < level)
                 return;
@@ -70,7 +70,7 @@ namespace Topshelf.Logging
         {
             if (!IsDebugEnabled)
                 return;
-            Log(LogLevel.Debug, message, null);
+            Log(LoggingLevel.Debug, message, null);
         }
 
         /// <summary>
@@ -83,17 +83,17 @@ namespace Topshelf.Logging
         {
             if (!IsDebugEnabled)
                 return;
-            Log(LogLevel.Debug, message, exception);
+            Log(LoggingLevel.Debug, message, exception);
         }
 
-        public void Debug(LogOutputProvider messageProvider)
+        public void Debug(LogWriterOutputProvider messageProvider)
         {
             if (!IsDebugEnabled)
                 return;
 
             object obj = messageProvider();
 
-            LogInternal(LogLevel.Debug, obj, null);
+            LogInternal(LoggingLevel.Debug, obj, null);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Topshelf.Logging
         {
             if (!IsDebugEnabled)
                 return;
-            LogInternal(LogLevel.Debug, string.Format(CultureInfo.CurrentCulture, format, args), null);
+            LogInternal(LoggingLevel.Debug, string.Format(CultureInfo.CurrentCulture, format, args), null);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Topshelf.Logging
         {
             if (!IsDebugEnabled)
                 return;
-            LogInternal(LogLevel.Debug, string.Format(formatProvider, format, args), null);
+            LogInternal(LoggingLevel.Debug, string.Format(formatProvider, format, args), null);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Topshelf.Logging
         {
             if (!IsInfoEnabled)
                 return;
-            Log(LogLevel.Info, message, null);
+            Log(LoggingLevel.Info, message, null);
         }
 
         /// <summary>
@@ -145,17 +145,17 @@ namespace Topshelf.Logging
         {
             if (!IsInfoEnabled)
                 return;
-            Log(LogLevel.Info, message, exception);
+            Log(LoggingLevel.Info, message, exception);
         }
 
-        public void Info(LogOutputProvider messageProvider)
+        public void Info(LogWriterOutputProvider messageProvider)
         {
             if (!IsInfoEnabled)
                 return;
 
             object obj = messageProvider();
 
-            LogInternal(LogLevel.Info, obj, null);
+            LogInternal(LoggingLevel.Info, obj, null);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Topshelf.Logging
         {
             if (!IsInfoEnabled)
                 return;
-            LogInternal(LogLevel.Info, string.Format(CultureInfo.CurrentCulture, format, args), null);
+            LogInternal(LoggingLevel.Info, string.Format(CultureInfo.CurrentCulture, format, args), null);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Topshelf.Logging
         {
             if (!IsInfoEnabled)
                 return;
-            LogInternal(LogLevel.Info, string.Format(formatProvider, format, args), null);
+            LogInternal(LoggingLevel.Info, string.Format(formatProvider, format, args), null);
         }
 
         /// <summary>
@@ -194,7 +194,7 @@ namespace Topshelf.Logging
         {
             if (!IsWarnEnabled)
                 return;
-            Log(LogLevel.Warn, message, null);
+            Log(LoggingLevel.Warn, message, null);
         }
 
         /// <summary>
@@ -207,17 +207,17 @@ namespace Topshelf.Logging
         {
             if (!IsWarnEnabled)
                 return;
-            Log(LogLevel.Warn, message, exception);
+            Log(LoggingLevel.Warn, message, exception);
         }
 
-        public void Warn(LogOutputProvider messageProvider)
+        public void Warn(LogWriterOutputProvider messageProvider)
         {
             if (!IsWarnEnabled)
                 return;
 
             object obj = messageProvider();
 
-            LogInternal(LogLevel.Warn, obj, null);
+            LogInternal(LoggingLevel.Warn, obj, null);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace Topshelf.Logging
         {
             if (!IsWarnEnabled)
                 return;
-            LogInternal(LogLevel.Warn, string.Format(CultureInfo.CurrentCulture, format, args), null);
+            LogInternal(LoggingLevel.Warn, string.Format(CultureInfo.CurrentCulture, format, args), null);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Topshelf.Logging
         {
             if (!IsWarnEnabled)
                 return;
-            LogInternal(LogLevel.Warn, string.Format(formatProvider, format, args), null);
+            LogInternal(LoggingLevel.Warn, string.Format(formatProvider, format, args), null);
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace Topshelf.Logging
         {
             if (!IsErrorEnabled)
                 return;
-            Log(LogLevel.Error, message, null);
+            Log(LoggingLevel.Error, message, null);
         }
 
         /// <summary>
@@ -269,17 +269,17 @@ namespace Topshelf.Logging
         {
             if (!IsErrorEnabled)
                 return;
-            Log(LogLevel.Error, message, exception);
+            Log(LoggingLevel.Error, message, exception);
         }
 
-        public void Error(LogOutputProvider messageProvider)
+        public void Error(LogWriterOutputProvider messageProvider)
         {
             if (!IsErrorEnabled)
                 return;
 
             object obj = messageProvider();
 
-            LogInternal(LogLevel.Error, obj, null);
+            LogInternal(LoggingLevel.Error, obj, null);
         }
 
         /// <summary>
@@ -292,7 +292,7 @@ namespace Topshelf.Logging
         {
             if (!IsErrorEnabled)
                 return;
-            LogInternal(LogLevel.Error, string.Format(CultureInfo.CurrentCulture, format, args), null);
+            LogInternal(LoggingLevel.Error, string.Format(CultureInfo.CurrentCulture, format, args), null);
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace Topshelf.Logging
         {
             if (!IsErrorEnabled)
                 return;
-            LogInternal(LogLevel.Error, string.Format(formatProvider, format, args), null);
+            LogInternal(LoggingLevel.Error, string.Format(formatProvider, format, args), null);
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace Topshelf.Logging
         {
             if (!IsFatalEnabled)
                 return;
-            Log(LogLevel.Fatal, message, null);
+            Log(LoggingLevel.Fatal, message, null);
         }
 
         /// <summary>
@@ -331,17 +331,17 @@ namespace Topshelf.Logging
         {
             if (!IsFatalEnabled)
                 return;
-            Log(LogLevel.Fatal, message, exception);
+            Log(LoggingLevel.Fatal, message, exception);
         }
 
-        public void Fatal(LogOutputProvider messageProvider)
+        public void Fatal(LogWriterOutputProvider messageProvider)
         {
             if (!IsFatalEnabled)
                 return;
 
             object obj = messageProvider();
 
-            LogInternal(LogLevel.Fatal, obj, null);
+            LogInternal(LoggingLevel.Fatal, obj, null);
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace Topshelf.Logging
         {
             if (!IsFatalEnabled)
                 return;
-            LogInternal(LogLevel.Fatal, string.Format(CultureInfo.CurrentCulture, format, args), null);
+            LogInternal(LoggingLevel.Fatal, string.Format(CultureInfo.CurrentCulture, format, args), null);
         }
 
         /// <summary>
@@ -368,10 +368,10 @@ namespace Topshelf.Logging
         {
             if (!IsFatalEnabled)
                 return;
-            LogInternal(LogLevel.Fatal, string.Format(formatProvider, format, args), null);
+            LogInternal(LoggingLevel.Fatal, string.Format(formatProvider, format, args), null);
         }
 
-        public void Log(LogLevel level, object obj)
+        public void Log(LoggingLevel level, object obj)
         {
             if (_level < level)
                 return;
@@ -379,7 +379,7 @@ namespace Topshelf.Logging
             LogInternal(level, obj, null);
         }
 
-        public void Log(LogLevel level, object obj, Exception exception)
+        public void Log(LoggingLevel level, object obj, Exception exception)
         {
             if (_level < level)
                 return;
@@ -387,7 +387,7 @@ namespace Topshelf.Logging
             LogInternal(level, obj, exception);
         }
 
-        public void Log(LogLevel level, LogOutputProvider messageProvider)
+        public void Log(LoggingLevel level, LogWriterOutputProvider messageProvider)
         {
             if (_level < level)
                 return;
@@ -397,7 +397,7 @@ namespace Topshelf.Logging
             LogInternal(level, obj, null);
         }
 
-        public void LogFormat(LogLevel level, IFormatProvider formatProvider, string format, params object[] args)
+        public void LogFormat(LoggingLevel level, IFormatProvider formatProvider, string format, params object[] args)
         {
             if (_level < level)
                 return;
@@ -416,7 +416,7 @@ namespace Topshelf.Logging
         {
             if (!IsDebugEnabled)
                 return;
-            LogInternal(LogLevel.Debug, string.Format(CultureInfo.CurrentCulture, format, args), exception);
+            LogInternal(LoggingLevel.Debug, string.Format(CultureInfo.CurrentCulture, format, args), exception);
         }
 
         /// <summary>
@@ -431,7 +431,7 @@ namespace Topshelf.Logging
         {
             if (!IsDebugEnabled)
                 return;
-            LogInternal(LogLevel.Debug, string.Format(formatProvider, format, args), exception);
+            LogInternal(LoggingLevel.Debug, string.Format(formatProvider, format, args), exception);
         }
 
         /// <summary>
@@ -445,7 +445,7 @@ namespace Topshelf.Logging
         {
             if (!IsInfoEnabled)
                 return;
-            LogInternal(LogLevel.Info, string.Format(CultureInfo.CurrentCulture, format, args), exception);
+            LogInternal(LoggingLevel.Info, string.Format(CultureInfo.CurrentCulture, format, args), exception);
         }
 
         /// <summary>
@@ -460,7 +460,7 @@ namespace Topshelf.Logging
         {
             if (!IsInfoEnabled)
                 return;
-            LogInternal(LogLevel.Info, string.Format(formatProvider, format, args), exception);
+            LogInternal(LoggingLevel.Info, string.Format(formatProvider, format, args), exception);
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace Topshelf.Logging
         {
             if (!IsWarnEnabled)
                 return;
-            LogInternal(LogLevel.Warn, string.Format(CultureInfo.CurrentCulture, format, args), exception);
+            LogInternal(LoggingLevel.Warn, string.Format(CultureInfo.CurrentCulture, format, args), exception);
         }
 
         /// <summary>
@@ -489,7 +489,7 @@ namespace Topshelf.Logging
         {
             if (!IsWarnEnabled)
                 return;
-            LogInternal(LogLevel.Warn, string.Format(formatProvider, format, args), exception);
+            LogInternal(LoggingLevel.Warn, string.Format(formatProvider, format, args), exception);
         }
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace Topshelf.Logging
         {
             if (!IsErrorEnabled)
                 return;
-            LogInternal(LogLevel.Error, string.Format(CultureInfo.CurrentCulture, format, args), exception);
+            LogInternal(LoggingLevel.Error, string.Format(CultureInfo.CurrentCulture, format, args), exception);
         }
 
         /// <summary>
@@ -518,7 +518,7 @@ namespace Topshelf.Logging
         {
             if (!IsErrorEnabled)
                 return;
-            LogInternal(LogLevel.Error, string.Format(formatProvider, format, args), exception);
+            LogInternal(LoggingLevel.Error, string.Format(formatProvider, format, args), exception);
         }
 
         /// <summary>
@@ -532,7 +532,7 @@ namespace Topshelf.Logging
         {
             if (!IsFatalEnabled)
                 return;
-            LogInternal(LogLevel.Fatal, string.Format(CultureInfo.CurrentCulture, format, args), exception);
+            LogInternal(LoggingLevel.Fatal, string.Format(CultureInfo.CurrentCulture, format, args), exception);
         }
 
         /// <summary>
@@ -547,10 +547,10 @@ namespace Topshelf.Logging
         {
             if (!IsFatalEnabled)
                 return;
-            LogInternal(LogLevel.Fatal, string.Format(formatProvider, format, args), exception);
+            LogInternal(LoggingLevel.Fatal, string.Format(formatProvider, format, args), exception);
         }
 
-        void LogInternal(LogLevel level, object obj, Exception exception)
+        void LogInternal(LoggingLevel level, object obj, Exception exception)
         {
             string message = obj == null
                                  ? ""

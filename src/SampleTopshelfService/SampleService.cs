@@ -20,7 +20,7 @@ namespace SampleTopshelfService
     class SampleService :
         ServiceControl
     {
-        static readonly Log _log = Logger.Get<SampleService>();
+        static readonly LogWriter _log = HostLogger.Get<SampleService>();
 
         public bool Start(HostControl hostControl)
         {
@@ -30,6 +30,14 @@ namespace SampleTopshelfService
 
             Thread.Sleep(1000);
 
+            ThreadPool.QueueUserWorkItem(x =>
+                {
+                    Thread.Sleep(3000);
+
+                    _log.Info("Requesting stop");
+
+                    hostControl.Stop();
+                });
             _log.Info("SampleService Started");
 
             return true;

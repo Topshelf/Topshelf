@@ -64,7 +64,9 @@ namespace Topshelf.Configurators
 
             if (result.ContainsFailure)
             {
-                string message = "The service was not properly configured: " + result.Message;
+                string message = "The service was not properly configured: " 
+                    + Environment.NewLine
+                    + result.Message;
 
                 throw new HostConfigurationException(message);
             }

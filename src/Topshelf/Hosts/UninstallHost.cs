@@ -20,7 +20,7 @@ namespace Topshelf.Hosts
     public class UninstallHost :
         Host
     {
-        static readonly Log _log = Logger.Get<UninstallHost>();
+        static readonly LogWriter _log = HostLogger.Get<UninstallHost>();
 
         readonly HostEnvironment _environment;
         readonly IEnumerable<Action> _postActions;
