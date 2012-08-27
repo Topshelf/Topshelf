@@ -13,11 +13,8 @@
 namespace Topshelf.Rehab
 {
     using System;
-    using System.Security;
-    using System.Security.Permissions;
     using Builders;
     using HostConfigurators;
-    using Logging;
     using Runtime;
 
     public class RehabServiceBuilder<T> :
@@ -35,7 +32,8 @@ namespace Topshelf.Rehab
         {
             try
             {
-                ServiceHandle handle = CreateServiceInAppDomain(settings);
+                ServiceHandle handle = new RehabServiceHandle<T>(settings, _serviceBuilderFactory);
+
 
                 return handle;
             }
@@ -43,59 +41,6 @@ namespace Topshelf.Rehab
             {
                 throw new ServiceBuilderException("An exception occurred creating the service: " + typeof(T).Name, ex);
             }
-        }
-
-        ServiceHandle CreateServiceInAppDomain(HostSettings settings)
-        {
-            var appDomainSetup = new AppDomainSetup
-                {
-                    ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                    ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
-                    ApplicationName = AppDomain.CurrentDomain.SetupInformation.ApplicationName,
-                    LoaderOptimization = LoaderOptimization.MultiDomainHost,
-                };
-
-            var permissionSet = new PermissionSet(PermissionState.Unrestricted);
-            permissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
-
-            AppDomain appDomain = null;
-            try
-            {
-                appDomain = AppDomain.CreateDomain(
-                    "Topshelf." + settings.Name,
-                    null,
-                    appDomainSetup,
-                    permissionSet,
-                    null);
-
-                ServiceHandle appDomainServiceLoader = CreateServiceHandle(appDomain, settings);
-
-                return appDomainServiceLoader;
-            }
-            catch (Exception ex)
-            {
-                if (appDomain != null)
-                {
-                    AppDomain.Unload(appDomain);
-                }
-
-                throw;
-            }
-        }
-
-
-        ServiceHandle CreateServiceHandle(AppDomain appDomain, HostSettings settings)
-        {
-            Type type = typeof(AppDomainServiceHandle);
-            string assemblyName = type.Assembly.FullName;
-            string typeName = type.FullName ?? typeof(AppDomainServiceHandle).Name;
-            var loader = (AppDomainServiceHandle)appDomain.CreateInstanceAndUnwrap(assemblyName, typeName);
-
-            var serviceHandle = new RehabServiceHandle<T>(appDomain, loader);
-
-            loader.Create(_serviceBuilderFactory, settings, HostLogger.CurrentHostLoggerConfigurator);
-
-            return serviceHandle;
         }
     }
 }

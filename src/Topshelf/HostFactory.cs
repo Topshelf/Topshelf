@@ -18,15 +18,15 @@ namespace Topshelf
     using Logging;
 
     /// <summary>
-    /// Configure and run a service host using the HostFactory
+    ///   Configure and run a service host using the HostFactory
     /// </summary>
     public static class HostFactory
     {
         /// <summary>
-        /// Configures a new service host
+        ///   Configures a new service host
         /// </summary>
-        /// <param name="configureCallback">Configuration method to call</param>
-        /// <returns>A Topshelf service host, ready to run</returns>
+        /// <param name="configureCallback"> Configuration method to call </param>
+        /// <returns> A Topshelf service host, ready to run </returns>
         public static Host New(Action<HostConfigurator> configureCallback)
         {
             if (configureCallback == null)
@@ -56,21 +56,23 @@ namespace Topshelf
         }
 
         /// <summary>
-        /// Configures and runs a new service host, handling any exceptions and writing
-        /// them to the log.
+        ///   Configures and runs a new service host, handling any exceptions and writing them to the log.
         /// </summary>
-        /// <param name="configureCallback">Configuration method to call</param>
-        public static void Run(Action<HostConfigurator> configureCallback)
+        /// <param name="configureCallback"> Configuration method to call </param>
+        /// <returns> Returns the exit code of the process that should be returned by your applicaton's main method </returns>
+        public static TopshelfExitCode Run(Action<HostConfigurator> configureCallback)
         {
             try
             {
-                New(configureCallback)
+                return New(configureCallback)
                     .Run();
             }
             catch (Exception ex)
             {
                 HostLogger.Get(typeof(HostFactory))
                     .Error("The service terminated abnormally", ex);
+
+                return TopshelfExitCode.AbnormalExit;
             }
         }
     }

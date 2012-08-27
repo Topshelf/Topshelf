@@ -12,14 +12,14 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    /// <summary>
-    ///   A Host can be a number of configured service hosts, from installers to service runners
-    /// </summary>
-    public interface Host
+    public enum TopshelfExitCode
     {
-        /// <summary>
-        ///   Runs the configured host
-        /// </summary>
-        TopshelfExitCode Run();
+        Ok = 0,
+        AbnormalExit = 1,
+        SudoRequired = 2,
+        ServiceAlreadyInstalled = 3,
+        ServiceNotInstalled = 4,
+        StartServiceFailed = 5,
+        StopServiceFailed = 6
     }
 }

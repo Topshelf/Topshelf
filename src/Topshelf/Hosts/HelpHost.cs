@@ -21,7 +21,7 @@ namespace Topshelf.Hosts
     public class HelpHost :
         Host
     {
-        public void Run()
+        public TopshelfExitCode Run()
         {
             const string helpText = "Topshelf.HelpText.txt";
 
@@ -29,7 +29,7 @@ namespace Topshelf.Hosts
             if (stream == null)
             {
                 Console.WriteLine("Unable to load help text");
-                return;
+                return TopshelfExitCode.AbnormalExit;
             }
 
             using (TextReader reader = new StreamReader(stream))
@@ -37,6 +37,8 @@ namespace Topshelf.Hosts
                 string text = reader.ReadToEnd();
                 Console.WriteLine(text);
             }
+
+            return TopshelfExitCode.Ok;
         }
     }
 }

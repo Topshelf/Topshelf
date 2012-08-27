@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Hosts
 {
+    using System;
     using Logging;
     using Runtime;
 
@@ -28,28 +29,38 @@ namespace Topshelf.Hosts
             _settings = settings;
         }
 
-        public void Run()
+        public TopshelfExitCode Run()
         {
             if (!_environment.IsServiceInstalled(_settings.ServiceName))
             {
                 string message = string.Format("The {0} service is not installed.", _settings.ServiceName);
                 _log.Error(message);
 
-                return;
+                return TopshelfExitCode.ServiceNotInstalled;
             }
 
             if (!_environment.IsAdministrator)
             {
                 if (!_environment.RunAsAdministrator())
                     _log.ErrorFormat("The {0} service can only be stopped by an administrator", _settings.ServiceName);
-                return;
+
+                return TopshelfExitCode.SudoRequired;
             }
 
             _log.DebugFormat("Stopping {0}", _settings.ServiceName);
 
-            _environment.StopService(_settings.ServiceName);
+            try
+            {
+                _environment.StopService(_settings.ServiceName);
 
-            _log.InfoFormat("The {0} service was stopped.", _settings.ServiceName);
+                _log.InfoFormat("The {0} service was stopped.", _settings.ServiceName);
+                return TopshelfExitCode.Ok;
+            }
+            catch (Exception ex)
+            {
+                _log.Error("The service failed to stop.", ex);
+                return TopshelfExitCode.StopServiceFailed;
+            }
         }
     }
 }

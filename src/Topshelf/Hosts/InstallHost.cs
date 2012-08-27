@@ -14,6 +14,7 @@ namespace Topshelf.Hosts
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.ServiceProcess;
     using Logging;
@@ -55,12 +56,12 @@ namespace Topshelf.Hosts
             get { return _settings; }
         }
 
-        public void Run()
+        public TopshelfExitCode Run()
         {
             if (_environment.IsServiceInstalled(_settings.ServiceName))
             {
                 _log.ErrorFormat("The {0} service is already installed.", _settings.ServiceName);
-                return;
+                return TopshelfExitCode.ServiceAlreadyInstalled;
             }
 
             if (!_environment.IsAdministrator)
@@ -68,18 +69,19 @@ namespace Topshelf.Hosts
                 if (_sudo)
                 {
                     if (_environment.RunAsAdministrator())
-                        return;
+                        return TopshelfExitCode.Ok;
                 }
 
                 _log.ErrorFormat("The {0} service can only be installed as an administrator", _settings.ServiceName);
-                return;
+                return TopshelfExitCode.SudoRequired;
             }
 
             _log.DebugFormat("Attempting to install '{0}'", _settings.ServiceName);
 
             _environment.InstallService(_installSettings, ExecutePreActions, ExecutePostActions);
-        }
 
+            return TopshelfExitCode.Ok;
+        }
 
         void ExecutePreActions()
         {

@@ -15,26 +15,22 @@ namespace Topshelf.Runtime.Windows
     using System;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security.Permissions;
     using System.ServiceProcess;
-    using System.Threading;
     using Logging;
 
     /// <summary>
-    /// Taken from http://code.google.com/p/daemoniq. Thanks guys!
+    ///   Taken from http://code.google.com/p/daemoniq. Thanks guys!
     /// </summary>
     public static class WindowsServiceControlManager
     {
-        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsServiceControlManager));
-
         const int SERVICE_CONFIG_FAILURE_ACTIONS = 2;
         const int SE_PRIVILEGE_ENABLED = 2;
         const string SE_SHUTDOWN_NAME = "SeShutdownPrivilege";
         const int TOKEN_ADJUST_PRIVILEGES = 32;
         const int TOKEN_QUERY = 8;
-
+        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsServiceControlManager));
 
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -56,8 +52,8 @@ namespace Topshelf.Runtime.Windows
         [DllImport("advapi32.dll")]
         static extern bool
             AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges,
-                                  [MarshalAs(UnmanagedType.Struct)] ref TOKEN_PRIVILEGES NewState, int BufferLength,
-                                  IntPtr PreviousState, ref int ReturnLength);
+                [MarshalAs(UnmanagedType.Struct)] ref TOKEN_PRIVILEGES NewState, int BufferLength,
+                IntPtr PreviousState, ref int ReturnLength);
 
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
@@ -84,7 +80,7 @@ namespace Topshelf.Runtime.Windows
 
             int actionCount = 3;
             var restartServiceAfter = (uint)TimeSpan.FromMinutes(
-                                                                 recoveryOptions.RestartServiceWaitMinutes).TotalMilliseconds;
+                recoveryOptions.RestartServiceWaitMinutes).TotalMilliseconds;
 
             IntPtr failureActionsPointer = IntPtr.Zero;
             IntPtr actionPointer = IntPtr.Zero;
@@ -97,22 +93,24 @@ namespace Topshelf.Runtime.Windows
 
                 // Set up the failure actions
                 var failureActions = new SERVICE_FAILURE_ACTIONS();
-                failureActions.dwResetPeriod = (int)TimeSpan.FromDays(recoveryOptions.ResetFailureCountWaitDays).TotalSeconds;
+                failureActions.dwResetPeriod =
+                    (int)TimeSpan.FromDays(recoveryOptions.ResetFailureCountWaitDays).TotalSeconds;
                 failureActions.cActions = (uint)actionCount;
                 failureActions.lpRebootMsg = recoveryOptions.RestartSystemMessage;
 
                 // allocate memory for the individual actions
-                actionPointer = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(SC_ACTION)) * actionCount);
+                actionPointer = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(SC_ACTION))*actionCount);
                 ServiceRecoveryAction[] actions = {
-                                                    recoveryOptions.FirstFailureAction,
-                                                    recoveryOptions.SecondFailureAction,
-                                                    recoveryOptions.SubsequentFailureAction
+                                                      recoveryOptions.FirstFailureAction,
+                                                      recoveryOptions.SecondFailureAction,
+                                                      recoveryOptions.SubsequentFailureAction
                                                   };
                 for (int i = 0; i < actions.Length; i++)
                 {
                     ServiceRecoveryAction action = actions[i];
                     SC_ACTION scAction = GetScAction(action, restartServiceAfter);
-                    Marshal.StructureToPtr(scAction, (IntPtr)((Int64)actionPointer + (Marshal.SizeOf(typeof(SC_ACTION))) * i), false);
+                    Marshal.StructureToPtr(scAction,
+                        (IntPtr)((Int64)actionPointer + (Marshal.SizeOf(typeof(SC_ACTION)))*i), false);
                 }
                 failureActions.lpsaActions = actionPointer;
 
@@ -125,8 +123,8 @@ namespace Topshelf.Runtime.Windows
 
                 // Make the change
                 bool success = ChangeServiceConfig2(controller.ServiceHandle.DangerousGetHandle(),
-                                                    SERVICE_CONFIG_FAILURE_ACTIONS,
-                                                    failureActionsPointer);
+                    SERVICE_CONFIG_FAILURE_ACTIONS,
+                    failureActionsPointer);
 
                 // Check that the change occurred
                 if (!success)
@@ -187,7 +185,7 @@ namespace Topshelf.Runtime.Windows
         }
 
         static SC_ACTION GetScAction(ServiceRecoveryAction action,
-                                     uint restartServiceAfter)
+            uint restartServiceAfter)
         {
             var scAction = new SC_ACTION();
             SC_ACTION_TYPE actionType = default(SC_ACTION_TYPE);
@@ -215,8 +213,7 @@ namespace Topshelf.Runtime.Windows
         [StructLayout(LayoutKind.Sequential)]
         struct LUID_AND_ATTRIBUTES
         {
-            [MarshalAs(UnmanagedType.U4)]
-            public UInt32 Attributes;
+            [MarshalAs(UnmanagedType.U4)] public UInt32 Attributes;
             public long Luid;
         }
 
@@ -224,10 +221,8 @@ namespace Topshelf.Runtime.Windows
         [StructLayout(LayoutKind.Sequential)]
         struct SC_ACTION
         {
-            [MarshalAs(UnmanagedType.U4)]
-            public uint Delay;
-            [MarshalAs(UnmanagedType.U4)]
-            public SC_ACTION_TYPE Type;
+            [MarshalAs(UnmanagedType.U4)] public uint Delay;
+            [MarshalAs(UnmanagedType.U4)] public SC_ACTION_TYPE Type;
         }
 
 
@@ -243,17 +238,11 @@ namespace Topshelf.Runtime.Windows
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         struct SERVICE_FAILURE_ACTIONS
         {
-            [MarshalAs(UnmanagedType.U4)]
-            public int dwResetPeriod;
+            [MarshalAs(UnmanagedType.U4)] public UInt32 cActions;
+            [MarshalAs(UnmanagedType.U4)] public int dwResetPeriod;
 
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string lpRebootMsg;
-
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string lpCommand;
-
-            [MarshalAs(UnmanagedType.U4)]
-            public UInt32 cActions;
+            [MarshalAs(UnmanagedType.LPWStr)] public string lpCommand;
+            [MarshalAs(UnmanagedType.LPWStr)] public string lpRebootMsg;
 
             public IntPtr lpsaActions;
         }
@@ -265,9 +254,5 @@ namespace Topshelf.Runtime.Windows
             public int PrivilegeCount;
             public LUID_AND_ATTRIBUTES Privileges;
         }
-
-
-    
     }
-
 }

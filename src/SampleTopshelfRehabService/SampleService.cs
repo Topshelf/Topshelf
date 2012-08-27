@@ -36,9 +36,13 @@ namespace SampleTopshelfRehabService
             {
                 Thread.Sleep(3000);
 
-                _log.Info("Dying an ungraceful death");
+                _log.Info("Requesting a restart!!!");
 
-                throw new InvalidOperationException("Oh, what a world.");
+                hostControl.Restart();
+
+//                _log.Info("Dying an ungraceful death");
+//
+//                throw new InvalidOperationException("Oh, what a world.");
             });
             _log.Info("SampleService Started");
 

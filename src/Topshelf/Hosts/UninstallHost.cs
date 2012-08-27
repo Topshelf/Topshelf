@@ -40,12 +40,12 @@ namespace Topshelf.Hosts
             _sudo = sudo;
         }
 
-        public void Run()
+        public TopshelfExitCode Run()
         {
             if (!_environment.IsServiceInstalled(_settings.ServiceName))
             {
                 _log.ErrorFormat("The {0} service is not installed.", _settings.ServiceName);
-                return;
+                return TopshelfExitCode.ServiceNotInstalled;
             }
 
             if (!_environment.IsAdministrator)
@@ -53,18 +53,18 @@ namespace Topshelf.Hosts
                 if (_sudo)
                 {
                     if (_environment.RunAsAdministrator())
-                    {
-                        return;
-                    }
+                        return TopshelfExitCode.Ok;
                 }
 
                 _log.ErrorFormat("The {0} service can only be uninstalled as an administrator", _settings.ServiceName);
-                return;
+                return TopshelfExitCode.SudoRequired;
             }
 
             _log.DebugFormat("Uninstalling {0}", _settings.ServiceName);
 
             _environment.UninstallService(_settings, ExecutePreActions, ExecutePostActions);
+
+            return TopshelfExitCode.Ok;
         }
 
         void ExecutePreActions()

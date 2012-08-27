@@ -36,14 +36,14 @@ namespace Topshelf.Hosts
         {
         }
 
-        public void Run()
+        public TopshelfExitCode Run()
         {
             if (!_environment.IsAdministrator)
             {
                 if (!_environment.RunAsAdministrator())
                     _log.ErrorFormat("The {0} service can only be started by an administrator", _settings.ServiceName);
 
-                return;
+                return TopshelfExitCode.SudoRequired;
             }
 
             if (_parentHost != null)
@@ -52,7 +52,7 @@ namespace Topshelf.Hosts
             if (!_environment.IsServiceInstalled(_settings.ServiceName))
             {
                 _log.ErrorFormat("The {0} service is not installed.", _settings.ServiceName);
-                return;
+                return TopshelfExitCode.ServiceNotInstalled;
             }
 
             _log.DebugFormat("Starting {0}", _settings.ServiceName);
@@ -62,10 +62,12 @@ namespace Topshelf.Hosts
                 _environment.StartService(_settings.ServiceName);
 
                 _log.InfoFormat("The {0} service was started.", _settings.ServiceName);
+                return TopshelfExitCode.Ok;
             }
             catch (Exception ex)
             {
                 _log.Error("The service failed to start.", ex);
+                return TopshelfExitCode.StartServiceFailed;
             }
         }
     }

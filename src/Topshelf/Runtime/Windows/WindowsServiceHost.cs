@@ -13,7 +13,6 @@
 namespace Topshelf.Windows
 {
     using System;
-    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.ServiceProcess;
@@ -44,7 +43,7 @@ namespace Topshelf.Windows
             _environment = environment;
         }
 
-        public void Run()
+        public TopshelfExitCode Run()
         {
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
@@ -64,6 +63,8 @@ namespace Topshelf.Windows
             _log.Debug("[Topshelf] Starting up as a windows service application");
 
             Run(this);
+
+            return TopshelfExitCode.Ok;
         }
 
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)

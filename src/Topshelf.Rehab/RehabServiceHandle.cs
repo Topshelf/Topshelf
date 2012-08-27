@@ -13,25 +13,113 @@
 namespace Topshelf.Rehab
 {
     using System;
+    using System.Security;
+    using System.Security.Permissions;
+    using System.Threading;
+    using HostConfigurators;
     using Logging;
     using Runtime;
 
     public class RehabServiceHandle<T> :
-        ServiceHandle
+        ServiceHandle,
+        HostControl
         where T : class
     {
-        static readonly LogWriter _log = HostLogger.Get<RehabServiceHandle<T>>();
+        readonly LogWriter _log = HostLogger.Get<RehabServiceHandle<T>>();
+        readonly ServiceBuilderFactory _serviceBuilderFactory;
+        readonly HostSettings _settings;
+        AppDomain _appDomain;
+        HostControl _hostControl;
+        ServiceHandle _service;
 
-        readonly AppDomain _appDomain;
-        readonly ServiceHandle _service;
-
-        public RehabServiceHandle(AppDomain appDomain, ServiceHandle handle)
+        public RehabServiceHandle(HostSettings settings, ServiceBuilderFactory serviceBuilderFactory)
         {
-            _appDomain = appDomain;
-            _service = handle;
+            _settings = settings;
+            _serviceBuilderFactory = serviceBuilderFactory;
+
+            _service = CreateServiceInAppDomain();
         }
 
-        public void Dispose()
+        void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
+        {
+            if (_hostControl == null)
+                throw new InvalidOperationException("The HostControl reference has not been set, this is invalid");
+
+            _hostControl.RequestAdditionalTime(timeRemaining);
+        }
+
+        void HostControl.Stop()
+        {
+            if (_hostControl == null)
+                throw new InvalidOperationException("The HostControl reference has not been set, this is invalid");
+
+            _hostControl.Stop();
+        }
+
+        void HostControl.Restart()
+        {
+            ThreadPool.QueueUserWorkItem(RestartService);
+        }
+
+        void IDisposable.Dispose()
+        {
+            UnloadServiceAppDomain();
+        }
+
+        bool ServiceHandle.Start(HostControl hostControl)
+        {
+            _hostControl = hostControl;
+            var control = new AppDomainHostControl(this);
+            return _service.Start(control);
+        }
+
+        bool ServiceHandle.Pause(HostControl hostControl)
+        {
+            var control = new AppDomainHostControl(this);
+            return _service.Pause(control);
+        }
+
+        bool ServiceHandle.Continue(HostControl hostControl)
+        {
+            var control = new AppDomainHostControl(this);
+            return _service.Continue(control);
+        }
+
+        bool ServiceHandle.Stop(HostControl hostControl)
+        {
+            var control = new AppDomainHostControl(this);
+            return _service.Stop(control);
+        }
+
+        void RestartService(object state)
+        {
+            try
+            {
+                _log.InfoFormat("Restarting service: {0}", _settings.ServiceName);
+
+                var control = new AppDomainHostControl(this);
+                _service.Stop(control);
+
+                UnloadServiceAppDomain();
+
+                _log.DebugFormat("Service AppDomain unloaded: {0}", _settings.ServiceName);
+
+                _service = CreateServiceInAppDomain();
+
+                _log.DebugFormat("Service created in new AppDomain: {0}", _settings.ServiceName);
+
+                _service.Start(control);
+
+                _log.InfoFormat("The service has been restarted: {0}", _settings.ServiceName);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Failed to restart service", ex);
+                _hostControl.Stop();
+            }
+        }
+
+        void UnloadServiceAppDomain()
         {
             try
             {
@@ -50,28 +138,59 @@ namespace Topshelf.Rehab
             }
         }
 
-        public bool Start(HostControl hostControl)
+        ServiceHandle CreateServiceInAppDomain()
         {
-            var control = new AppDomainHostControl(hostControl);
-            return _service.Start(control);
+            var appDomainSetup = new AppDomainSetup
+                {
+                    ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
+                    ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile,
+                    ApplicationName = AppDomain.CurrentDomain.SetupInformation.ApplicationName,
+                    LoaderOptimization = LoaderOptimization.MultiDomainHost,
+                };
+
+            var permissionSet = new PermissionSet(PermissionState.Unrestricted);
+            permissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.Execution));
+
+            AppDomain appDomain = null;
+            try
+            {
+                appDomain = AppDomain.CreateDomain(
+                    "Topshelf." + _settings.Name,
+                    null,
+                    appDomainSetup,
+                    permissionSet,
+                    null);
+
+                return CreateServiceHandle(appDomain);
+            }
+            catch (Exception)
+            {
+                if (appDomain != null)
+                {
+                    AppDomain.Unload(appDomain);
+                    appDomain = null;
+                }
+
+                throw;
+            }
+            finally
+            {
+                if (appDomain != null)
+                    _appDomain = appDomain;
+            }
         }
 
-        public bool Pause(HostControl hostControl)
+        ServiceHandle CreateServiceHandle(AppDomain appDomain)
         {
-            var control = new AppDomainHostControl(hostControl);
-            return _service.Pause(control);
-        }
+            Type type = typeof(AppDomainServiceHandle);
+            string assemblyName = type.Assembly.FullName;
+            string typeName = type.FullName ?? typeof(AppDomainServiceHandle).Name;
 
-        public bool Continue(HostControl hostControl)
-        {
-            var control = new AppDomainHostControl(hostControl);
-            return _service.Continue(control);
-        }
+            var serviceHandle = (AppDomainServiceHandle)appDomain.CreateInstanceAndUnwrap(assemblyName, typeName);
 
-        public bool Stop(HostControl hostControl)
-        {
-            var control = new AppDomainHostControl(hostControl);
-            return _service.Stop(control);
+            serviceHandle.Create(_serviceBuilderFactory, _settings, HostLogger.CurrentHostLoggerConfigurator);
+
+            return serviceHandle;
         }
     }
 }

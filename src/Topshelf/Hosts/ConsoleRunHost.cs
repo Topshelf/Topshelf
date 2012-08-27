@@ -43,7 +43,7 @@ namespace Topshelf.Hosts
             _serviceHandle = serviceHandle;
         }
 
-        public void Run()
+        public TopshelfExitCode Run()
         {
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
@@ -52,7 +52,7 @@ namespace Topshelf.Hosts
             if (_environment.IsServiceInstalled(_settings.ServiceName))
             {
                 _log.ErrorFormat("The {0} service is installed as a service", _settings.ServiceName);
-                return;
+                return TopshelfExitCode.ServiceAlreadyInstalled;
             }
 
             try
@@ -72,6 +72,8 @@ namespace Topshelf.Hosts
             catch (Exception ex)
             {
                 _log.Error("An exception occurred", ex);
+
+                return TopshelfExitCode.AbnormalExit;
             }
             finally
             {
@@ -82,6 +84,8 @@ namespace Topshelf.Hosts
 
                 HostLogger.Shutdown();
             }
+
+            return TopshelfExitCode.Ok;
         }
 
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
