@@ -37,7 +37,7 @@ namespace Topshelf
         /// <param name="factory"> Required log-producing factory from NLog </param>
         public static void UseNLog(this HostConfigurator configurator, LogFactory factory)
         {
-            HostLogger.UseLogger(new NLogLogWriterFactory(factory));
+            NLogLogWriterFactory.Use(factory);
         }
     }
 }

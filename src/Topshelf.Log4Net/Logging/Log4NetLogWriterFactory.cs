@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2011 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -14,7 +14,6 @@ namespace Topshelf.Logging
 {
     using System;
     using System.IO;
-    using Topshelf.Logging;
     using log4net;
     using log4net.Config;
 
@@ -33,16 +32,39 @@ namespace Topshelf.Logging
 
         public static void Use()
         {
-            HostLogger.UseLogger(new Log4NetLogWriterFactory());
+            HostLogger.UseLogger(new Log4NetLoggerConfigurator(null));
         }
 
         public static void Use(string file)
         {
-            HostLogger.UseLogger(new Log4NetLogWriterFactory());
+            HostLogger.UseLogger(new Log4NetLoggerConfigurator(file));
+        }
 
-            file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file);
-            var configFile = new FileInfo(file);
-            XmlConfigurator.Configure(configFile);
+        [Serializable]
+        public class Log4NetLoggerConfigurator :
+            HostLoggerConfigurator
+        {
+            readonly string _file;
+
+            public Log4NetLoggerConfigurator(string file)
+            {
+                _file = file;
+            }
+
+            public LogWriterFactory CreateLogWriterFactory()
+            {
+                if (!string.IsNullOrEmpty(_file))
+                {
+                    string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _file);
+                    var configFile = new FileInfo(file);
+                    if (configFile.Exists)
+                    {
+                        XmlConfigurator.Configure(configFile);
+                    }
+                }
+
+                return new Log4NetLogWriterFactory();
+            }
         }
     }
 }

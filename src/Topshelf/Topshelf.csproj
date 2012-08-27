@@ -148,12 +148,14 @@
     <Compile Include="Hosts\StartHost.cs" />
     <Compile Include="Hosts\StopHost.cs" />
     <Compile Include="Hosts\UninstallHost.cs" />
+    <Compile Include="Logging\HostLoggerConfigurator.cs" />
     <Compile Include="Logging\LogWriter.cs" />
     <Compile Include="Logging\LogWriterFactory.cs" />
     <Compile Include="Logging\HostLogger.cs" />
     <Compile Include="Logging\LoggingLevel.cs" />
     <Compile Include="Logging\LogWriterOutputProvider.cs" />
     <Compile Include="Logging\TopshelfConsoleTraceListener.cs" />
+    <Compile Include="Logging\TraceHostLoggerConfigurator.cs" />
     <Compile Include="Logging\TraceLogWriter.cs" />
     <Compile Include="Logging\TraceLogWriterFactory.cs" />
     <Compile Include="Runtime\HostEnvironment.cs" />

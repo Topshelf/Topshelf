@@ -10,19 +10,14 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace SampleTopshelfRehabService
+namespace Topshelf.Logging
 {
-    using Topshelf;
-
-    class Program
+    public class TraceHostLoggerConfigurator :
+        HostLoggerConfigurator
     {
-        static void Main()
+        public LogWriterFactory CreateLogWriterFactory()
         {
-            HostFactory.Run(x =>
-                {
-                    x.UseLog4Net("log4net.config");
-                    x.RehabService<SampleService>();
-                });
+            return new TraceLogWriterFactory();
         }
     }
 }

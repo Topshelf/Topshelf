@@ -26,8 +26,6 @@ namespace Topshelf.HostConfigurators
     public class HostConfiguratorImpl :
         HostConfigurator
     {
-        static readonly LogWriter _log = HostLogger.Get(typeof(HostConfiguratorImpl));
-
         readonly IList<HostBuilderConfigurator> _configurators;
         readonly WindowsHostSettings _settings;
         HostBuilderFactory _hostBuilderFactory;
@@ -150,7 +148,8 @@ namespace Topshelf.HostConfigurators
         public Host CreateHost()
         {
             Type type = typeof(HostFactory);
-            _log.InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
+            HostLogger.Get<HostConfiguratorImpl>()
+                .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
                 Environment.Version);
 
             EnvironmentBuilder environmentBuilder = _environmentBuilderFactory();

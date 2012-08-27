@@ -20,10 +20,12 @@ namespace SampleTopshelfRehabService
     class SampleService :
         ServiceControl
     {
-        static readonly LogWriter _log = HostLogger.Get<SampleService>();
+        LogWriter _log;
 
         public bool Start(HostControl hostControl)
         {
+            _log = HostLogger.Get<SampleService>();
+
             _log.Info("SampleService Starting...");
 
             hostControl.RequestAdditionalTime(TimeSpan.FromSeconds(10));

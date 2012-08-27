@@ -22,7 +22,7 @@ namespace Topshelf.Hosts
         Host,
         HostControl
     {
-        static readonly LogWriter _log = HostLogger.Get<ConsoleRunHost>();
+        readonly LogWriter _log = HostLogger.Get<ConsoleRunHost>();
         readonly HostEnvironment _environment;
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;

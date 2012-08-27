@@ -13,9 +13,11 @@
 namespace Topshelf.Windows
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.ServiceProcess;
+    using System.Threading;
     using Logging;
     using Runtime;
 
@@ -25,9 +27,10 @@ namespace Topshelf.Windows
         HostControl
     {
         static readonly LogWriter _log = HostLogger.Get<WindowsServiceHost>();
+        readonly HostEnvironment _environment;
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;
-        HostEnvironment _environment;
+        int _deadThread;
 
         public WindowsServiceHost(HostEnvironment environment, HostSettings settings, ServiceHandle serviceHandle)
         {
@@ -44,6 +47,8 @@ namespace Topshelf.Windows
         public void Run()
         {
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+            AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
             _log.Info("Starting as a Windows service");
 
@@ -71,13 +76,13 @@ namespace Topshelf.Windows
         void HostControl.Restart()
         {
             _log.Fatal("Restart is not yet implemented");
-            
+
             throw new NotImplementedException("This is not done yet, so I'm trying");
         }
 
         void HostControl.Stop()
         {
-            if(CanStop)
+            if (CanStop)
             {
                 _log.Debug("Stop requested by hosted service");
                 Stop();
@@ -161,6 +166,19 @@ namespace Topshelf.Windows
             {
                 _log.Info("[Topshelf] Paused");
             }
+        }
+
+        void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            _log.Error("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+
+            Stop();
+
+            int deadThreadId = Interlocked.Increment(ref _deadThread);
+            Thread.CurrentThread.IsBackground = true;
+            Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
+            while (true)
+                Thread.Sleep(TimeSpan.FromHours(1));
         }
     }
 }

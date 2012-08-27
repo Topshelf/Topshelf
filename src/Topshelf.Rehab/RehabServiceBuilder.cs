@@ -17,6 +17,7 @@ namespace Topshelf.Rehab
     using System.Security.Permissions;
     using Builders;
     using HostConfigurators;
+    using Logging;
     using Runtime;
 
     public class RehabServiceBuilder<T> :
@@ -92,8 +93,8 @@ namespace Topshelf.Rehab
 
             var serviceHandle = new RehabServiceHandle<T>(appDomain, loader);
 
-            loader.Create(_serviceBuilderFactory, settings);
-            
+            loader.Create(_serviceBuilderFactory, settings, HostLogger.CurrentHostLoggerConfigurator);
+
             return serviceHandle;
         }
     }

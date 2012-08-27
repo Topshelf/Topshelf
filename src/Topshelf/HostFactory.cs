@@ -22,8 +22,6 @@ namespace Topshelf
     /// </summary>
     public static class HostFactory
     {
-        static readonly LogWriter _log = HostLogger.Get(typeof(HostFactory));
-
         /// <summary>
         /// Configures a new service host
         /// </summary>
@@ -51,7 +49,8 @@ namespace Topshelf
             ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
 
             if (result.Message.Length > 0)
-                _log.InfoFormat("Configuration Result:\n{0}", result.Message);
+                HostLogger.Get(typeof(HostFactory))
+                    .InfoFormat("Configuration Result:\n{0}", result.Message);
 
             return configurator.CreateHost();
         }
@@ -70,7 +69,8 @@ namespace Topshelf
             }
             catch (Exception ex)
             {
-                _log.Error("The service terminated abnormally", ex);
+                HostLogger.Get(typeof(HostFactory))
+                    .Error("The service terminated abnormally", ex);
             }
         }
     }

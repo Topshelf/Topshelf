@@ -12,8 +12,6 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    using System;
-    using System.IO;
     using HostConfigurators;
     using Logging;
 
@@ -38,17 +36,7 @@ namespace Topshelf
         /// <param name="configFileName"> The name of the log4net xml configuration file </param>
         public static void UseLog4Net(this HostConfigurator configurator, string configFileName)
         {
-            Log4NetLogWriterFactory.Use();
-
-            string path = AppDomain.CurrentDomain.BaseDirectory;
-
-            string file = Path.Combine(path, configFileName);
-
-            var configFile = new FileInfo(file);
-            if (configFile.Exists)
-            {
-                Log4NetLogWriterFactory.Use(file);
-            }
+            Log4NetLogWriterFactory.Use(configFileName);
         }
     }
 }

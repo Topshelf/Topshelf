@@ -51,9 +51,12 @@ namespace Topshelf.Rehab
             _serviceHandle.Dispose();
         }
 
-        public void Create(ServiceBuilderFactory serviceBuilderFactory, HostSettings settings)
+        public void Create(ServiceBuilderFactory serviceBuilderFactory, HostSettings settings,
+            HostLoggerConfigurator loggerConfigurator)
         {
             AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
+
+            HostLogger.UseLogger(loggerConfigurator);
 
             ServiceBuilder serviceBuilder = serviceBuilderFactory(settings);
 

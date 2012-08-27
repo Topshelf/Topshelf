@@ -18,7 +18,8 @@ namespace Topshelf.Logging
     public static class HostLogger
     {
         static readonly object _locker = new object();
-        static LogWriterFactory _logger;
+        static HostLoggerConfigurator _configurator;
+        static LogWriterFactory _logWriterFactory;
 
         public static LogWriterFactory Current
         {
@@ -26,17 +27,21 @@ namespace Topshelf.Logging
             {
                 lock (_locker)
                 {
-                    return _logger ?? CreateTraceLogger();
+                    return _logWriterFactory ?? CreateLogWriterFactory();
                 }
             }
         }
 
-        static LogWriterFactory CreateTraceLogger()
+        public static HostLoggerConfigurator CurrentHostLoggerConfigurator
         {
-            _logger = new TraceLogWriterFactory();
+            get { return _configurator ?? (_configurator = new TraceHostLoggerConfigurator()); }
+        }
 
+        static LogWriterFactory CreateLogWriterFactory()
+        {
+            _logWriterFactory = CurrentHostLoggerConfigurator.CreateLogWriterFactory();
 
-            return _logger;
+            return _logWriterFactory;
         }
 
         public static LogWriter Get<T>()
@@ -55,15 +60,19 @@ namespace Topshelf.Logging
             return Current.Get(name);
         }
 
-        public static void UseLogger(LogWriterFactory logger)
+        public static void UseLogger(HostLoggerConfigurator configurator)
         {
             lock (_locker)
             {
-                if (_logger != null)
-                    _logger.Shutdown();
-                _logger = null;
+                _configurator = configurator;
 
-                _logger = logger;
+                LogWriterFactory logger = _configurator.CreateLogWriterFactory();
+
+                if (_logWriterFactory != null)
+                    _logWriterFactory.Shutdown();
+                _logWriterFactory = null;
+
+                _logWriterFactory = logger;
             }
         }
 
@@ -71,10 +80,10 @@ namespace Topshelf.Logging
         {
             lock (_locker)
             {
-                if (_logger != null)
+                if (_logWriterFactory != null)
                 {
-                    _logger.Shutdown();
-                    _logger = null;
+                    _logWriterFactory.Shutdown();
+                    _logWriterFactory = null;
                 }
             }
         }

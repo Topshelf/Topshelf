@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-client\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -44,6 +47,10 @@
     <Compile Include="SampleService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Topshelf.Log4Net\Topshelf.Log4Net.csproj">
+      <Project>{0EE64D46-5728-45DB-8D0E-044CE2677FD8}</Project>
+      <Name>Topshelf.Log4Net</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Topshelf.Rehab\Topshelf.Rehab.csproj">
       <Project>{26B9ADA3-4CF1-423C-B1FB-A5F982876E39}</Project>
       <Name>Topshelf.Rehab</Name>
@@ -52,6 +59,12 @@
       <Project>{A52AD64D-6455-4A22-8CCF-581851086578}</Project>
       <Name>Topshelf</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Logging
 {
+    using System;
     using NLog;
 
     public class NLogLogWriterFactory :
@@ -41,7 +42,37 @@ namespace Topshelf.Logging
 
         public static void Use()
         {
-            HostLogger.UseLogger(new NLogLogWriterFactory());
+            HostLogger.UseLogger(new NLogHostLoggerConfigurator());
+        }
+
+        public static void Use(LogFactory factory)
+        {
+            HostLogger.UseLogger(new NLogHostLoggerConfigurator(factory));
+        }
+
+
+        [Serializable]
+        public class NLogHostLoggerConfigurator :
+            HostLoggerConfigurator
+        {
+            readonly LogFactory _factory;
+
+            public NLogHostLoggerConfigurator(LogFactory factory)
+            {
+                _factory = factory;
+            }
+
+            public NLogHostLoggerConfigurator()
+            {
+            }
+
+            public LogWriterFactory CreateLogWriterFactory()
+            {
+                if (_factory != null)
+                    return new NLogLogWriterFactory(_factory);
+
+                return new NLogLogWriterFactory();
+            }
         }
     }
 }

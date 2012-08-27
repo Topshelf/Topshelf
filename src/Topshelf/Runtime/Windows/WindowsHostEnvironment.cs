@@ -28,7 +28,7 @@ namespace Topshelf.Runtime.Windows
     public class WindowsHostEnvironment :
         HostEnvironment
     {
-        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsHostEnvironment));
+        readonly LogWriter _log = HostLogger.Get(typeof(WindowsHostEnvironment));
 
         public bool IsServiceInstalled(string serviceName)
         {
