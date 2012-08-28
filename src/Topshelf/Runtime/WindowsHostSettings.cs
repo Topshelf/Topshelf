@@ -91,5 +91,7 @@ namespace Topshelf.Runtime
                            : Name + InstanceSeparator + InstanceName;
             }
         }
+
+        public bool CanPauseAndContinue { get; set; }
     }
 }

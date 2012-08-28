@@ -13,35 +13,39 @@
 namespace Topshelf.Runtime
 {
     /// <summary>
-    /// The settings that have been configured for the operating system service
+    ///   The settings that have been configured for the operating system service
     /// </summary>
     public interface HostSettings
     {
         /// <summary>
-        /// The name of the service
+        ///   The name of the service
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// The name of the service as it should be displayed in the service control manager
+        ///   The name of the service as it should be displayed in the service control manager
         /// </summary>
         string DisplayName { get; }
 
         /// <summary>
-        /// The description of the service that is displayed in the service control manager
+        ///   The description of the service that is displayed in the service control manager
         /// </summary>
         string Description { get; }
 
         /// <summary>
-        /// The service instance name that should be used when the service is registered
+        ///   The service instance name that should be used when the service is registered
         /// </summary>
         string InstanceName { get; }
 
         /// <summary>
-        /// Returns the Windows service name, including the instance name, which is registered with the SCM
-        /// Example: myservice$bob
+        ///   Returns the Windows service name, including the instance name, which is registered with the SCM Example: myservice$bob
         /// </summary>
-        /// <returns></returns>
+        /// <returns> </returns>
         string ServiceName { get; }
+
+        /// <summary>
+        ///   True if the service supports pause and continue
+        /// </summary>
+        bool CanPauseAndContinue { get; }
     }
 }

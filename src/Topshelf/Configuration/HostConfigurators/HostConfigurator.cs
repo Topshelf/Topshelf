@@ -42,6 +42,11 @@ namespace Topshelf.HostConfigurators
         void SetInstanceName(string instanceName);
 
         /// <summary>
+        /// Enable pause and continue support for the service (default is disabled)
+        /// </summary>
+        void EnablePauseAndContinue();
+
+        /// <summary>
         ///   Specifies the builder factory to use when the service is invoked
         /// </summary>
         /// <param name="hostBuilderFactory"> </param>

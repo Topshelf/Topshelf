@@ -104,6 +104,11 @@ namespace Topshelf.HostConfigurators
             _settings.InstanceName = instanceName;
         }
 
+        public void EnablePauseAndContinue()
+        {
+            _settings.CanPauseAndContinue = true;
+        }
+
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
         {
             _hostBuilderFactory = hostBuilderFactory;

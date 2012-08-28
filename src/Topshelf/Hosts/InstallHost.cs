@@ -14,7 +14,6 @@ namespace Topshelf.Hosts
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.ServiceProcess;
     using Logging;
@@ -136,6 +135,26 @@ namespace Topshelf.Hosts
                 get { return _settings.InstanceName; }
             }
 
+            public string ServiceName
+            {
+                get { return _settings.ServiceName; }
+            }
+
+            public bool CanPauseAndContinue
+            {
+                get { return _settings.CanPauseAndContinue; }
+            }
+
+            public ServiceAccount Account
+            {
+                get { return _credentials.Account; }
+            }
+
+            public string Username
+            {
+                get { return _credentials.Username; }
+            }
+
             public string Password
             {
                 get { return _credentials.Password; }
@@ -149,21 +168,6 @@ namespace Topshelf.Hosts
             public HostStartMode StartMode
             {
                 get { return _startMode; }
-            }
-
-            public string Username
-            {
-                get { return _credentials.Username; }
-            }
-
-            public string ServiceName
-            {
-                get { return _settings.ServiceName; }
-            }
-
-            public ServiceAccount Account
-            {
-                get { return _credentials.Account; }
             }
         }
     }

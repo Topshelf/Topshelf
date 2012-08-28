@@ -41,6 +41,8 @@ namespace Topshelf.Windows
             _settings = settings;
             _serviceHandle = serviceHandle;
             _environment = environment;
+
+            CanPauseAndContinue = settings.CanPauseAndContinue;
         }
 
         public TopshelfExitCode Run()
@@ -57,6 +59,7 @@ namespace Topshelf.Windows
                     _settings, Assembly.GetEntryAssembly().GetName());
                 _log.Fatal(message);
 
+                ExitCode = (int)TopshelfExitCode.ServiceNotInstalled;
                 throw new TopshelfException(message);
             }
 
@@ -64,6 +67,7 @@ namespace Topshelf.Windows
 
             Run(this);
 
+            ExitCode = (int)TopshelfExitCode.Ok;
             return TopshelfExitCode.Ok;
         }
 
