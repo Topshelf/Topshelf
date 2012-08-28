@@ -109,6 +109,11 @@ namespace Topshelf.HostConfigurators
             _settings.CanPauseAndContinue = true;
         }
 
+        public void EnableShutdown()
+        {
+            _settings.CanShutdown = true;
+        }
+
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
         {
             _hostBuilderFactory = hostBuilderFactory;

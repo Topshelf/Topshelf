@@ -36,6 +36,11 @@ namespace Topshelf.Rehab
             return _serviceHandle.Stop(hostControl);
         }
 
+        public void Shutdown(HostControl hostControl)
+        {
+            _serviceHandle.Shutdown(hostControl);
+        }
+
         public bool Pause(HostControl hostControl)
         {
             return _serviceHandle.Pause(hostControl);

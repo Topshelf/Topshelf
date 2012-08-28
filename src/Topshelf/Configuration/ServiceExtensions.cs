@@ -72,7 +72,7 @@ namespace Topshelf
             if (callback == null)
                 throw new ArgumentNullException("callback");
 
-            var serviceConfigurator = new DelegateServiceConfigurator<TService>();
+            var serviceConfigurator = new DelegateServiceConfigurator<TService>(configurator);
 
             callback(serviceConfigurator);
 

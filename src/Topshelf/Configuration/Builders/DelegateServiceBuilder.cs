@@ -19,20 +19,23 @@ namespace Topshelf.Builders
         ServiceBuilder
         where T : class
     {
+        readonly Func<T, HostControl, bool> _continue;
+        readonly Func<T, HostControl, bool> _pause;
         readonly ServiceFactory<T> _serviceFactory;
-        Func<T, HostControl, bool> _continue;
-        Func<T, HostControl, bool> _pause;
-        Func<T, HostControl, bool> _start;
-        Func<T, HostControl, bool> _stop;
+        readonly Action<T, HostControl> _shutdown;
+        readonly Func<T, HostControl, bool> _start;
+        readonly Func<T, HostControl, bool> _stop;
 
         public DelegateServiceBuilder(ServiceFactory<T> serviceFactory, Func<T, HostControl, bool> start,
-            Func<T, HostControl, bool> stop, Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue)
+            Func<T, HostControl, bool> stop, Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue,
+            Action<T, HostControl> shutdown)
         {
             _serviceFactory = serviceFactory;
             _start = start;
             _stop = stop;
             _pause = pause;
             _continue = @continue;
+            _shutdown = shutdown;
         }
 
         public ServiceHandle Build(HostSettings settings)
@@ -41,7 +44,7 @@ namespace Topshelf.Builders
             {
                 T service = _serviceFactory(settings);
 
-                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue);
+                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown);
             }
             catch (Exception ex)
             {
@@ -55,17 +58,19 @@ namespace Topshelf.Builders
             readonly Func<T, HostControl, bool> _continue;
             readonly Func<T, HostControl, bool> _pause;
             readonly T _service;
+            readonly Action<T, HostControl> _shutdown;
             readonly Func<T, HostControl, bool> _start;
             readonly Func<T, HostControl, bool> _stop;
 
             public DelegateServiceHandle(T service, Func<T, HostControl, bool> start, Func<T, HostControl, bool> stop,
-                Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue)
+                Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue, Action<T, HostControl> shutdown)
             {
                 _service = service;
                 _start = start;
                 _stop = stop;
                 _pause = pause;
                 _continue = @continue;
+                _shutdown = shutdown;
             }
 
             public void Dispose()
@@ -93,6 +98,11 @@ namespace Topshelf.Builders
             public bool Stop(HostControl hostControl)
             {
                 return _stop(_service, hostControl);
+            }
+
+            public void Shutdown(HostControl hostControl)
+            {
+                _shutdown(_service, hostControl);
             }
         }
     }

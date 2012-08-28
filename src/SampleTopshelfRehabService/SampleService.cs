@@ -18,7 +18,8 @@ namespace SampleTopshelfRehabService
     using Topshelf.Logging;
 
     class SampleService :
-        ServiceControl
+        ServiceControl,
+        ServiceShutdown
     {
         LogWriter _log;
 
@@ -68,6 +69,11 @@ namespace SampleTopshelfRehabService
             _log.Info("SampleService Continued");
 
             return true;
+        }
+
+        public void Shutdown(HostControl hostControl)
+        {
+            _log.Info("Service is being shutdown, bye!");
         }
     }
 }

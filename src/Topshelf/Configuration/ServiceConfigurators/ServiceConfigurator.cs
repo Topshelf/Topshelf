@@ -25,5 +25,6 @@ namespace Topshelf.ServiceConfigurators
         void WhenStopped(Func<T, HostControl, bool> stop);
         void WhenPaused(Func<T, HostControl, bool> pause);
         void WhenContinued(Func<T, HostControl, bool> @continue);
+        void WhenShutdown(Action<T, HostControl> shutdown);
     }
 }

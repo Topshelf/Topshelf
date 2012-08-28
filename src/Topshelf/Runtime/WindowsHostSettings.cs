@@ -93,5 +93,7 @@ namespace Topshelf.Runtime
         }
 
         public bool CanPauseAndContinue { get; set; }
+
+        public bool CanShutdown { get; set; }
     }
 }

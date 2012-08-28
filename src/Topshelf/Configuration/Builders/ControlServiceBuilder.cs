@@ -76,6 +76,15 @@ namespace Topshelf.Builders
             {
                 return _service.Stop(hostControl);
             }
+
+            public void Shutdown(HostControl hostControl)
+            {
+                var serviceShutdown = _service as ServiceShutdown;
+                if (serviceShutdown != null)
+                {
+                    serviceShutdown.Shutdown(hostControl);
+                }
+            }
         }
     }
 }

@@ -47,6 +47,11 @@ namespace Topshelf.HostConfigurators
         void EnablePauseAndContinue();
 
         /// <summary>
+        /// Enable support for service shutdown (signaled by the host OS)
+        /// </summary>
+        void EnableShutdown();
+
+        /// <summary>
         ///   Specifies the builder factory to use when the service is invoked
         /// </summary>
         /// <param name="hostBuilderFactory"> </param>

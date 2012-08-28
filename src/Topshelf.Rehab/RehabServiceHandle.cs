@@ -91,6 +91,12 @@ namespace Topshelf.Rehab
             return _service.Stop(control);
         }
 
+        public void Shutdown(HostControl hostControl)
+        {
+            var control = new AppDomainHostControl(this);
+            _service.Shutdown(control);
+        }
+
         void RestartService(object state)
         {
             try

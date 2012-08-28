@@ -23,7 +23,6 @@ namespace Topshelf.Runtime.Windows
     using System.ServiceProcess;
     using System.Threading;
     using Logging;
-    using Topshelf.Windows;
 
     public class WindowsHostEnvironment :
         HostEnvironment

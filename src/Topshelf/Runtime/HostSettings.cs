@@ -47,5 +47,10 @@ namespace Topshelf.Runtime
         ///   True if the service supports pause and continue
         /// </summary>
         bool CanPauseAndContinue { get; }
+
+        /// <summary>
+        ///   True if the service can handle the shutdown event
+        /// </summary>
+        bool CanShutdown { get; }
     }
 }

@@ -47,5 +47,11 @@ namespace Topshelf.Runtime
         /// <param name="hostControl"></param>
         /// <returns>True if the service was stopped, or false if the service cannot be stopped at this time</returns>
         bool Stop(HostControl hostControl);
+
+        /// <summary>
+        /// Handle the shutdown event
+        /// </summary>
+        /// <param name="hostControl"></param>
+        void Shutdown(HostControl hostControl);
     }
 }

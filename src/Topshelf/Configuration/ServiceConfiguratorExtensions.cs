@@ -104,5 +104,20 @@ namespace Topshelf
 
             return configurator;
         }
+
+        public static ServiceConfigurator<T> WhenShutdown<T>(this ServiceConfigurator<T> configurator,
+            Action<T> callback)
+            where T : class
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.WhenShutdown((service, control) =>
+                {
+                    callback(service);
+                });
+
+            return configurator;
+        }
     }
 }

@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Windows
+namespace Topshelf.Runtime.Windows
 {
     using System;
     using System.IO;
@@ -18,7 +18,6 @@ namespace Topshelf.Windows
     using System.ServiceProcess;
     using System.Threading;
     using Logging;
-    using Runtime;
 
     public class WindowsServiceHost :
         ServiceBase,
@@ -43,6 +42,7 @@ namespace Topshelf.Windows
             _environment = environment;
 
             CanPauseAndContinue = settings.CanPauseAndContinue;
+            CanShutdown = settings.CanShutdown;
         }
 
         public TopshelfExitCode Run()
@@ -161,6 +161,25 @@ namespace Topshelf.Windows
                 _log.Info("[Topshelf] Pausing service");
 
                 _serviceHandle.Continue(this);
+            }
+            catch (Exception ex)
+            {
+                _log.Fatal("The service did not shut down gracefully", ex);
+                throw;
+            }
+            finally
+            {
+                _log.Info("[Topshelf] Paused");
+            }
+        }
+
+        protected override void OnShutdown()
+        {
+            try
+            {
+                _log.Info("[Topshelf] Service is being shutdown");
+
+                _serviceHandle.Shutdown(this);
             }
             catch (Exception ex)
             {
