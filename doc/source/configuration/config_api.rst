@@ -1,155 +1,319 @@
-Common Configuration Options
-""""""""""""""""""""""""""""
+Topshelf Configuration
+======================
 
-Trying to get multiple applications to talk to each other is not a simple
-problem. The biggest difficulty seems to be just getting everything configured
-correctly. With over three years of experience in setting up message based systems
-the developers on MassTransit have tried their darndest to make sure that the
-MassTransit's defaults cover the majority of the decisions you will have to make
-while minimizing the configuration code you have to deal with. We hope that the options
-are clear and make sense why you need to select them. Below are some of the options you
-have:
+While the Quickstart gives you enough to get going, there are many more features available in Topshelf. The following details the configuration options available, and how to use them in Topshelf services.
 
 
-Transport Factory Options
-'''''''''''''''''''''''''
+Service Name
+------------
+
+Specify the base name of the service, as it is registered in the services control manager. This setting is optional and by default uses the namespace of the Program.cs file (well, basically, the calling assembly type namespace).
 
 .. sourcecode:: csharp
 
-    ServiceBusFactory.New(sbc =>
+    HostFactory.New(x =>
     {
-        sbc.UseMsmq();
-        sbc.UseRabbitMq();
-        
-        //if you would like to implement your own.
-        sbc.AddTransportFactory<TTransportFactory>();
+        x.SetServiceName("MyService");
     });
 
-The first decision is what transport are you going to use? RabbitMQ or MSMQ? If you don't know
-which one to choose I suggest reading up on the two and see which one works better for
-your environment.
-
-Basic Options
-'''''''''''''
-
-.. sourcecode:: csharp
-
-    ServiceBusFactory.New(sbc =>
-    {
-        //transport choice
-        
-        sbc.ReceiveFrom("address");
-        sbc.UseControlBus();
-    });
-
-The next decision we have to make is what address are we going to listen on? Addresses are in the
-form of a URL and will look like ``msmq://localhost/queue_name`` or for RabbitMQ 
-``rabbitmq://localhost/queue_name``.
+It is recommended that service names not contains spaces or other whitespace characters.
 
 .. warning:: 
 
-    Each instance must have its own address. For more information see 'gotchas'
+Each service on the system must have a unique name. If you need to run multiple instances of the same service,
+consider using the InstanceName command-line option when registering the service.
 
-The last concern is, do you want to use a control bus or not. ``Control Bus``
+
+Service Description
+-------------------
+
+Specify the description of the service in the services control manager. This is optional and defaults to the service name.
 
 .. sourcecode:: csharp
 
-    ServiceBusFactory.New(sbc =>
+    HostFactory.New(x =>
     {
-        //transport choice
-        //address
-
-        sbc.UseControlBus();
+        x.SetDescription("My First Topshelf Service");
     });
 
-Serializer Options
-''''''''''''''''''
+
+Display Name
+------------
+
+Specify the display name of the service in the services control manager. This is optional and defaults to the service name.
 
 .. sourcecode:: csharp
 
-    ServiceBusFactory.New(sbc =>
+    HostFactory.New(x =>
     {
-        //transport choice
-        //address
-        //control bus
-        
-        sbc.UseBinarySerializer();
-        sbc.UseBsonSerializer();
-        sbc.UseJsonSerializer();
-        sbc.UseVersionOneXmlSerializer();
-        sbc.UseXmlSerializer();
-        
-        //if you would like to implement your own.
-        sbc.SetDefaultSerializer<TSerializer>();
+        x.SetDisplayName("MyService");
     });
 
-This is mostly optional, because the transports will set their preferred defaults, but if you
-need to override the default you can using these methods. With the ``SetDefaultSerializer`` you can
-provide a custom serializer that you created.
 
-    
-Bus Tuning Options
-''''''''''''''''''
+Instance Name
+-------------
+
+Specify the instance name of the service, which is combined with the base service name and separated by a $. This is optional, and is only added if specified.
 
 .. sourcecode:: csharp
 
-  ServiceBusFactory.New(sbc =>
-  {
-    sbc.SetConcurrentConsumerLimit(2);
-    sbc.SetDefaultTransactionTimeout(5.Minutes());
+    HostFactory.New(x =>
+    {
+        x.SetInstanceName("MyService");
+    });
 
-    sbc.AfterConsumingMessage(()=>{});
-    sbc.BeforeConsumingMessage(()=>{}):
+This option is typically set using the command-line argument, but it allowed here for completeness.
 
-    sbc.ConfigureEndpoint();
-  });
 
-These options, aren't usually needed until you get into production and need to tune the 
-behavior of the bus.
+Service Configuration
+=====================
 
-Turning on Diagnostics
-''''''''''''''''''''''
+The service can be configured in multiple ways, each with different goals. For services that can handle a depedency on Topshelf, the ``ServiceControl`` interface provides a lot of value for implementing the service control methods. Additionally, a zero-dependency solution is also available when lambda methods can be used to call methods in the service class.
 
-If you want to get a snapshot of how your service bus is configured, you can get 
-a pretty good picture of it by using the method.
 
-.. sourcecode:: csharp
+Simple Service
+--------------
 
-	var bus = ServiceBusFactory.New(sbc => { /* usual stuff */ });
-	var probe = bus.Probe();
-	//you can now inspect the probe
-	
-	//for your convience we also have added a few helper methods.
-	bus.WriteIntrospectionToFile("a_file.txt"); //great to send with support requests :)
-	bus.WriteIntrospectionToConsole();
-
-You may also want to inspect a running bus instance remotely. For that you just need to enable
-remote introspection like so.
+To configure a simple service, the easiest configuration method is available.
 
 .. sourcecode:: csharp
 
-	ServiceBusFactory.New(sbc =>
-	{
-	    //the usual options
-		
-		sbc.EnableRemoteInstrospection();
-	});
+    HostFactory.New(x =>
+    {
+        x.Service<MyService>();
+    });
 
-You can then use the ``busdriver`` to query the status. using:
+    // Service implements the ServiceControl methods directly and has a default constructor
+    class MyService : ServiceControl
+    {}
 
-	busdriver status -uri:<address to control bus>
-
-Low Lever Config Api
-''''''''''''''''''''
+If the service does not have a default constructor, the constructor can be specified, allowing the service to be creating by the application, such as when a container needs to be used.
 
 .. sourcecode:: csharp
 
-  ServiceBusFactory.New(sbc =>
-  {
-    sbc.AddBusConfigurator
-    sbc.AddService<TService>();
-  });
+    HostFactory.New(x =>
+    {
+        x.Service<MyService>(() => ObjectFactory.GetInstance<MyService>());
+    });
 
-If you are using these, then we probably need to talk. This usually means that there is a low
-level feature we are not supplying to you. Its totally ok to use these, but they tend to 
-need a lot of parameters and require intimate knowledge of MassTransit.
+    // Service implements the ServiceControl methods directly and has a default constructor
+    class MyService : ServiceControl
+    {
+        public MyService(SomeDependency dependency)
+        {}
+    }
+
+If the service needs access to the HostSettings during construction, they are also available as an overload.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.Service<MyService>(hostSettings => new MyService(hostSettings));
+    });
+
+    // Service implements the ServiceControl methods directly and has a default constructor
+    class MyService : ServiceControl
+    {
+        public MyService(HostSettings settings)
+        {}
+    }
+
+
+Custom Service
+--------------
+
+To configure a completely custom service, such as one that has no dependencies on Topshelf, the following configuration is available.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.Service<MyService>(sc =>
+        {
+            sc.ConstructUsing(() => new MyService());
+
+            // the start and stop methods for the service
+            sc.WhenStarted(s => s.Start());
+            sc.WhenStopped(s => s.Stop());
+
+            // optional pause/continue methods if used
+            sc.WhenPaused(s => s.Pause());
+            sc.WhenContinued(s => s.Continue());
+
+            // optional, when shutdown is supported
+            sc.WhenShutdown(s => s.Shutdown());
+        });
+    });
+
+Each of the WhenXxx methods can also take an argument of the ``HostControl`` interface, which can be used to request the service be stopped, request additional start/stop time, etc.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.Service<MyService>(sc =>
+        {
+            sc.WhenStarted((s, hostControl) => s.Start(hostControl));
+        }
+    }
+
+The ``HostControl`` interface can be retained and used as the service is running to Stop the service.
+
+
+Service Start Modes
+===================
+
+There are multiple service start modes, each of which can be specified by the configuration. This option is only used by the service is being installed.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.StartAutomatically(); // Start the service automatically
+        x.StartAutomaticallyDelayed(); // Automatic (Delayed) -- only available on .NET 4.0 or later
+        x.StartManually(); // Start the service manually
+        x.Disabled(); // install the service as disabled
+    });
+
+
+Custom Install Actions
+======================
+
+These settings allow user-specified code to be executed during the service install/uninstall process.
+
+Before Install Actions
+----------------------
+
+Topshelf allows actions to be specified that are executed before the service is installed. Note that this action is only executed if the service is being installed.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.BeforeInstall(() => { ... });
+    });
+
+
+After Install Actions
+---------------------
+
+Topshelf allows actions to be specified that are executed after the service is installed. Note that this action is only executed if the service is being installed.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.AfterInstall(() => { ... });
+    });
+
+Before Uninstall Actions
+------------------------
+
+Topshelf allows actions to be specified that are executed before the service is uninstalled. Note that this action is only executed if the service is being uninstalled.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.BeforeUninstall(() => { ... });
+    });
+
+
+After Uninstall Actions
+-----------------------
+
+Topshelf allows actions to be specified that are executed after the service is uninstalled. Note that this action is only executed if the service is being uninstalled.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.AfterUninstall(() => { ... });
+    });
+
+
+Service Dependencies
+====================
+
+Service dependencies can be specified such that the service does not start until the dependent services are started. This is managed by the windows services control manager, and not by Topshelf itself.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.DependsOn("SomeOtherService");
+    });
+
+There are a number of built-in extension methods for well-known services, including:
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.DependsOnMsmq(); // Microsoft Message Queueing
+        x.DependsOnSql(); // Microsoft SQL Server
+        x.DependsOnEventLog(); // Windows Event Log
+        x.DependsOnIis(); // Internet Information Server
+    });
+
+
+Advanced Settings
+=================
+
+EnablePauseAndContinue
+----------------------
+
+
+Specifies that the service supports pause and continue, allowing the services control manager to pass pause and continue commands to the service.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.EnablePauseAndContinue();
+    });
+
+
+EnableShutdown
+--------------
+
+Specifies that the service supports the shutdown service command, allowing the services control manager to quickly shutdown the service.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.EnableShutdown();
+    });
+
+
+Service Recovery
+================
+
+To configure the service recovery options, a configurator is available to specify one or more service recovery actions. The recovery options are only used when installing the service, and are set once the service has been successfully installed.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.EnableServiceRecovery(rc =>
+        {
+            rc.RestartService(1); // restart the service after 1 minute
+            rc.RestartSystem(1, "System is restarting!"); // restart the system after 1 minute
+            rc.RunProgram(1, "notepad.exe"); // run a program 
+            rc.SetResetPeriod(1); // set the reset interval to one day
+        })
+    });
+
+The recovery actions are executed in the order specified, with the next action being executed after the previous action was run and the service failed again. There is a limit (based on the OS) of how many actions can be executed, and is typically 2-3 actions.
+
+
+
+
+
+
+
+
+
+
