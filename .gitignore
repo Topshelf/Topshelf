@@ -20,3 +20,4 @@ _ReSharper*
 
 # osx noise
 .DS_Store
+Gemfile.lock
