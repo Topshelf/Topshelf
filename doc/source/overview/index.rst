@@ -6,3 +6,4 @@ Topshelf is a framework for hosting services written using the .NET framework. T
 .. toctree::
 
     keyideas.rst
+    commandline.rst
