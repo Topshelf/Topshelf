@@ -111,13 +111,19 @@ namespace Topshelf.Runtime.Windows
         {
             get
             {
-                Process process = GetParent(Process.GetCurrentProcess());
-                if (process != null && process.ProcessName == "services")
+                try
                 {
-                    _log.Debug("Started by the Windows services process");
-                    return true;
+                    Process process = GetParent(Process.GetCurrentProcess());
+                    if (process != null && process.ProcessName == "services")
+                    {
+                        _log.Debug("Started by the Windows services process");
+                        return true;
+                    }
                 }
-
+                catch (InvalidOperationException)
+                {
+                    // again, mono seems to fail with this, let's just return false okay?
+                }
                 return false;
             }
         }

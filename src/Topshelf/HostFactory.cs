@@ -59,7 +59,7 @@ namespace Topshelf
         ///   Configures and runs a new service host, handling any exceptions and writing them to the log.
         /// </summary>
         /// <param name="configureCallback"> Configuration method to call </param>
-        /// <returns> Returns the exit code of the process that should be returned by your applicaton's main method </returns>
+        /// <returns> Returns the exit code of the process that should be returned by your application's main method </returns>
         public static TopshelfExitCode Run(Action<HostConfigurator> configureCallback)
         {
             try
