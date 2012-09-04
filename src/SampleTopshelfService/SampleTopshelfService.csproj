@@ -76,6 +76,7 @@
       <Link>SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="SampleSansInterfaceService.cs" />
     <Compile Include="SampleService.cs" />
   </ItemGroup>
   <ItemGroup>

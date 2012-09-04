@@ -20,5 +20,20 @@ namespace SampleTopshelfService
         {
             HostFactory.Run(x => x.Service<SampleService>());
         }
+
+        void SansInterface()
+        {
+            HostFactory.New(x =>
+                {
+                    // can define services without the interface dependency as well, this is just for
+                    // show and not used in this sample.
+                    x.Service<SampleSansInterfaceService>(s =>
+                        {
+                            s.ConstructUsing(() => new SampleSansInterfaceService());
+                            s.WhenStarted(v => v.Start());
+                            s.WhenStarted(v => v.Stop());
+                        });
+                });
+        }
     }
 }

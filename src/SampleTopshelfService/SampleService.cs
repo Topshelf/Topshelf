@@ -17,6 +17,7 @@ namespace SampleTopshelfService
     using Topshelf;
     using Topshelf.Logging;
 
+
     class SampleService :
         ServiceControl
     {
