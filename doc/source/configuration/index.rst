@@ -1,11 +1,10 @@
 Configuring Topshelf
-""""""""""""""""""""""""
+""""""""""""""""""""
 
-Now that you have MassTransit installed into your project, we need to get it
-configured so that you can start bringing the awesome! First we have a quickstart
-which will be followed up with a few configuration examples.
+Once Topshelf has been added to your service, you can configure the service using the Topshelf configuration API. Topshelf uses an internal domain specific language (DSL) for configuration, along with a series of fluent builders.
 
 .. toctree::
 
     quickstart.rst
     config_api.rst
+    logging.rst

@@ -176,6 +176,56 @@ There are multiple service start modes, each of which can be specified by the co
         x.Disabled(); // install the service as disabled
     });
 
+Service Identity
+================
+
+Services can be configured to run as a number of different identities, using the configuration option that is most appropriate.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.RunAs("username", "password");
+    });
+
+Runs the service using the specified username and password. This can also be configured using the command-line.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.RunAsPrompt();
+    });
+
+When the service is installed, the installer will prompt for the username/password combination used to launch the service.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.RunAsNetworkService();
+    });
+
+Runs the service using the NETWORK_SERVICE built-in account.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.RunAsLocalSystem();
+    });
+
+Runs the service using the local system account.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.RunAsLocalService();
+    });
+
+Runs the service using the local service account.
+
 
 Custom Install Actions
 ======================

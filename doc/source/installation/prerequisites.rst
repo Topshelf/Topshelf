@@ -11,4 +11,4 @@ long as .Net 3.5 sp1 is installed.
 .Net Framework
 """"""""""""""
 
-Currently Topshelf is tested on .Net 3.5 sp1 and .Net 4.0.
+Currently Topshelf is tested on .NET 3.5 Service Pack 1 and .NET 4.0.
