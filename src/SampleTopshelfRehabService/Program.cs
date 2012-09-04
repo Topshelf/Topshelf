@@ -26,6 +26,11 @@ namespace SampleTopshelfRehabService
                     // this will enable Pause and Continue, may break this out into a separate interface to 
                     // reduce the footprint on the service code if pause and continue are not supported.
                     x.EnablePauseAndContinue();
+
+                    x.EnableServiceRecovery(r =>
+                        {
+                            r.RestartService(1);
+                        });
                 });
         }
     }

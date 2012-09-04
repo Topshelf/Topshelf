@@ -12,11 +12,15 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime.Windows
 {
-    public enum ServiceRecoveryAction
+    public abstract class ServiceRecoveryAction
     {
-        TakeNoAction,
-        RestartService,
-        RestartComputer,
-        RunProgram
+        protected ServiceRecoveryAction(int delay)
+        {
+            Delay = delay;
+        }
+
+        public int Delay { get; private set; }
+
+        public abstract NativeMethods.SC_ACTION GetAction();
     }
 }

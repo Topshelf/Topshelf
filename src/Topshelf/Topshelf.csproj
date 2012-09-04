@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -100,6 +101,7 @@
     <Compile Include="Configuration\HostConfigurators\RunAsServiceAccountHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\RunHostConfiguratorAction.cs" />
     <Compile Include="Configuration\HostConfigurators\ServiceBuilderFactory.cs" />
+    <Compile Include="Configuration\HostConfigurators\ServiceRecoveryHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\StartConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\StartModeHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\SudoConfigurator.cs" />
@@ -127,6 +129,8 @@
     <Compile Include="Configuration\Options\UninstallOption.cs" />
     <Compile Include="Configuration\Options\UnknownOption.cs" />
     <Compile Include="Configuration\ServiceConfiguratorExtensions.cs" />
+    <Compile Include="Configuration\ServiceRecoveryConfigurator.cs" />
+    <Compile Include="Configuration\ServiceRecoveryConfiguratorExtensions.cs" />
     <Compile Include="Exceptions\ServiceBuilderException.cs" />
     <Compile Include="Exceptions\ServiceControlException.cs" />
     <Compile Include="HostFactory.cs" />
@@ -164,17 +168,21 @@
     <Compile Include="Runtime\HostSettings.cs" />
     <Compile Include="Runtime\ServiceFactory.cs" />
     <Compile Include="Runtime\ServiceHandle.cs" />
-    <Compile Include="Runtime\WindowsHostSettings.cs" />
     <Compile Include="Runtime\Windows\HostInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Runtime\Windows\HostServiceInstaller.cs" />
     <Compile Include="Runtime\Windows\Kernel32.cs" />
+    <Compile Include="Runtime\Windows\NativeMethods.cs" />
+    <Compile Include="Runtime\Windows\RestartServiceRecoveryAction.cs" />
+    <Compile Include="Runtime\Windows\RestartSystemRecoveryAction.cs" />
+    <Compile Include="Runtime\Windows\RunProgramRecoveryAction.cs" />
     <Compile Include="Runtime\Windows\ServiceRecoveryAction.cs" />
     <Compile Include="Runtime\Windows\ServiceRecoveryOptions.cs" />
     <Compile Include="Runtime\Windows\WindowsHostEnvironment.cs" />
     <Compile Include="Runtime\Windows\WindowsHostEnvironmentBuilder.cs" />
-    <Compile Include="Runtime\Windows\WindowsServiceControlManager.cs" />
+    <Compile Include="Runtime\Windows\WindowsHostSettings.cs" />
+    <Compile Include="Runtime\Windows\WindowsServiceRecoveryController.cs" />
     <Compile Include="Runtime\Windows\WindowsServiceHost.cs">
       <SubType>Component</SubType>
     </Compile>

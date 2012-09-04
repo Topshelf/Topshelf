@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,27 +12,24 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime.Windows
 {
-    using System.Collections.Generic;
-
-    public class ServiceRecoveryOptions
+    public class RestartSystemRecoveryAction :
+        ServiceRecoveryAction
     {
-        readonly IList<ServiceRecoveryAction> _actions;
-
-        public ServiceRecoveryOptions()
+        public RestartSystemRecoveryAction(int delay, string restartMessage)
+            : base(delay)
         {
-            _actions = new List<ServiceRecoveryAction>();
+            RestartMessage = restartMessage;
         }
 
-        public int ResetPeriod { get; set; }
+        public string RestartMessage { get; private set; }
 
-        public IEnumerable<ServiceRecoveryAction> Actions
+        public override NativeMethods.SC_ACTION GetAction()
         {
-            get { return _actions; }
-        }
-
-        public void AddAction(ServiceRecoveryAction serviceRecoveryAction)
-        {
-            _actions.Add(serviceRecoveryAction);
+            return new NativeMethods.SC_ACTION
+                {
+                    Delay = Delay,
+                    Type = (int)NativeMethods.SC_ACTION_TYPE.RebootComputer,
+                };
         }
     }
 }
