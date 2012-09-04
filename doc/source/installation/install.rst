@@ -1,5 +1,5 @@
-How to install
-""""""""""""""
+Installing Topshelf
+===================
 
 NuGet
 '''''
