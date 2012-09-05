@@ -18,7 +18,11 @@ namespace Topshelf.HostConfigurators
     using Builders;
     using Configurators;
     using Runtime;
+#if !LINUX
     using Runtime.Windows;
+#else
+	using Runtime.Linux;
+#endif
 
     public class ServiceRecoveryHostConfigurator :
         ServiceRecoveryConfigurator,

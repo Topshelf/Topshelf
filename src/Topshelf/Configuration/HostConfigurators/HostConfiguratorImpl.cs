@@ -22,7 +22,11 @@ namespace Topshelf.HostConfigurators
     using Logging;
     using Options;
     using Runtime;
+#if !LINUX
     using Runtime.Windows;
+#else
+	using Runtime.Linux;
+#endif
 
     public class HostConfiguratorImpl :
         HostConfigurator,

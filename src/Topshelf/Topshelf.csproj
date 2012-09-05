@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Topshelf</RootNamespace>
     <AssemblyName>Topshelf</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -18,7 +17,8 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants Condition=" '$(OS)' != 'Windows_NT' ">DEBUG;TRACE;LINUX</DefineConstants>
+    <DefineConstants Condition=" '$(OS)' == 'Windows_NT' ">DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -28,6 +28,8 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants Condition=" '$(OS)' != 'Windows_NT' ">TRACE;LINUX</DefineConstants>
+    <DefineConstants Condition=" '$(OS)' == 'Windows_NT' ">TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -40,6 +42,7 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="Mono.Posix" Condition=" '$(OS)' != 'Windows_NT' " />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionVersion.cs">
@@ -182,29 +185,32 @@
     <Compile Include="Runtime\ServiceEventsImpl.cs" />
     <Compile Include="Runtime\ServiceFactory.cs" />
     <Compile Include="Runtime\ServiceHandle.cs" />
-    <Compile Include="Runtime\Windows\HostInstaller.cs">
+    <Compile Include="Runtime\Windows\HostInstaller.cs" Condition=" '$(OS)' == 'Windows_NT' ">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Runtime\Windows\HostServiceInstaller.cs" />
-    <Compile Include="Runtime\Windows\Kernel32.cs" />
-    <Compile Include="Runtime\Windows\NativeMethods.cs" />
-    <Compile Include="Runtime\Windows\RestartServiceRecoveryAction.cs" />
-    <Compile Include="Runtime\Windows\RestartSystemRecoveryAction.cs" />
-    <Compile Include="Runtime\Windows\RunProgramRecoveryAction.cs" />
-    <Compile Include="Runtime\Windows\ServiceRecoveryAction.cs" />
-    <Compile Include="Runtime\Windows\ServiceRecoveryOptions.cs" />
-    <Compile Include="Runtime\Windows\WindowsHostEnvironment.cs" />
-    <Compile Include="Runtime\Windows\WindowsHostEnvironmentBuilder.cs" />
-    <Compile Include="Runtime\Windows\WindowsHostSettings.cs" />
-    <Compile Include="Runtime\Windows\WindowsServiceRecoveryController.cs" />
-    <Compile Include="Runtime\Windows\WindowsServiceHost.cs">
+    <Compile Include="Runtime\Windows\HostServiceInstaller.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\Kernel32.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\NativeMethods.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\RestartServiceRecoveryAction.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\RestartSystemRecoveryAction.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\RunProgramRecoveryAction.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\ServiceRecoveryAction.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\ServiceRecoveryOptions.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\WindowsHostEnvironment.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\WindowsHostEnvironmentBuilder.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\WindowsHostSettings.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\WindowsServiceRecoveryController.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\WindowsServiceHost.cs" Condition=" '$(OS)' == 'Windows_NT' ">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Runtime\Windows\WindowsUserAccessControl.cs" />
+    <Compile Include="Runtime\Windows\WindowsUserAccessControl.cs" Condition=" '$(OS)' == 'Windows_NT' " />
     <Compile Include="ServiceControl.cs" />
     <Compile Include="ServiceShutdown.cs" />
     <Compile Include="ServiceSuspend.cs" />
     <Compile Include="TopshelfExitCode.cs" />
+    <Compile Include="Runtime\Linux\ServiceRecoveryOptions.cs" />
+    <Compile Include="Runtime\Linux\ServiceRecoveryAction.cs" />
+    <Compile Include="Runtime\Linux\WindowsHostSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Internals\**\*.cs" />
@@ -214,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Runtime\Linux\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

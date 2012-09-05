@@ -44,7 +44,7 @@ namespace Topshelf.Hosts
             _preActions = preActions;
             _postActions = postActions;
             _sudo = sudo;
-        }
+		}
 
         public InstallHostSettings InstallSettings
         {
