@@ -34,7 +34,7 @@ Make a pull request towards the `develop` branch.
 
    ```
    git clone git://github.com/Topshelf/Topshelf.git
-   git submodule init --update
+   git submodule update --init
    ```
 
  1. Install latest JRuby or RMI/Ruby version.
