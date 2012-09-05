@@ -1,6 +1,8 @@
 Topshelf - An easy service hosting framework for building Windows services using .NET
 =======
 
+![TopShelf](http://www.phatboyg.com/top-shelf-3-small.png "Topshelf")
+
 # LICENSE
 Apache 2.0 - see LICENSE
 
