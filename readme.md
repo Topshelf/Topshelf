@@ -27,8 +27,7 @@ Get started in four simple steps!
 
 ### Contributing
 
-1. `git config --global core.autoclrf false`
-3. Make a pull request
+Make a pull request towards the `develop` branch.
 
 ### Source
 
