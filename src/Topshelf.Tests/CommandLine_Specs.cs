@@ -200,7 +200,6 @@ namespace Topshelf.Tests
             Assert.IsInstanceOf<StopHost>(host);
         }
 
-
         class MyService : ServiceControl
         {
             public bool Start(HostControl hostControl)

@@ -57,6 +57,7 @@
       <Link>SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="CommandLine_Specs.cs" />
+    <Compile Include="Help_Specs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -79,6 +79,8 @@
     <Compile Include="Configuration\CommandLineParser\StringCommandLineParser.cs" />
     <Compile Include="Configuration\CommandLineParser\SwitchElement.cs" />
     <Compile Include="Configuration\CommandLineParser\TokenElement.cs" />
+    <Compile Include="Configuration\HelpHostConfiguratorExtensions.cs" />
+    <Compile Include="Configuration\HostConfigurators\PrefixHelpTextHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineParserOptions.cs" />
     <Compile Include="Configuration\Configurators\ConfigurationResult.cs" />
     <Compile Include="Configuration\Configurators\ValidateConfigurationResult.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="Configuration\DependencyExtensions.cs" />
     <Compile Include="Configuration\HostConfigurators\DependencyHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\EnvironmentBuilderFactory.cs" />
+    <Compile Include="Configuration\HostConfigurators\SystemOnlyHelpHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\HostBuilderConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\HostBuilderFactory.cs" />
     <Compile Include="Configuration\HostConfigurators\HostConfigurator.cs" />
@@ -122,6 +125,7 @@
     <Compile Include="Configuration\Options\RunOption.cs" />
     <Compile Include="Configuration\Options\ServiceAccountOption.cs" />
     <Compile Include="Configuration\Options\ServiceDescriptionOption.cs" />
+    <Compile Include="Configuration\Options\SystemOnlyHelpOption.cs" />
     <Compile Include="Configuration\Options\ServiceNameOption.cs" />
     <Compile Include="Configuration\Options\StartOption.cs" />
     <Compile Include="Configuration\Options\StopOption.cs" />

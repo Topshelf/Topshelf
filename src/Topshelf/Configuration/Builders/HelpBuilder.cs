@@ -21,6 +21,8 @@ namespace Topshelf.Builders
     {
         readonly HostEnvironment _environment;
         readonly HostSettings _settings;
+        string _prefixText;
+        bool _systemHelpTextOnly;
 
         public HelpBuilder(HostEnvironment environment, HostSettings settings)
         {
@@ -40,7 +42,11 @@ namespace Topshelf.Builders
 
         public Host Build(ServiceBuilder serviceBuilder)
         {
-            return new HelpHost();
+            string prefixText = _systemHelpTextOnly
+                                    ? null
+                                    : _prefixText;
+
+            return new HelpHost(prefixText);
         }
 
         public void Match<T>(Action<T> callback)
@@ -54,6 +60,16 @@ namespace Topshelf.Builders
             {
                 callback(self);
             }
+        }
+
+        public void SetAdditionalHelpText(string prefixText)
+        {
+            _prefixText = prefixText;
+        }
+
+        public void SystemHelpTextOnly()
+        {
+            _systemHelpTextOnly = true;
         }
     }
 }

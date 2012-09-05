@@ -21,8 +21,23 @@ namespace Topshelf.Hosts
     public class HelpHost :
         Host
     {
+        readonly string _prefixText;
+
+        public HelpHost(string prefixText)
+        {
+            _prefixText = prefixText;
+        }
+
+        public string PrefixText
+        {
+            get { return _prefixText; }
+        }
+
         public TopshelfExitCode Run()
         {
+            if (!string.IsNullOrEmpty(_prefixText))
+                Console.WriteLine(_prefixText);
+
             const string helpText = "Topshelf.HelpText.txt";
 
             Stream stream = typeof(HelpHost).Assembly.GetManifestResourceStream(helpText);

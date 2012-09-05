@@ -15,9 +15,9 @@ namespace Topshelf.HostConfigurators
     using CommandLineParser;
     using Options;
 
-     static class CommandLineParserOptions
+    static class CommandLineParserOptions
     {
-         internal static void InitializeCommandLineParser(ICommandLineElementParser<Option> x)
+        internal static void InitializeCommandLineParser(ICommandLineElementParser<Option> x)
         {
             x.Add((from arg in x.Argument("install")
                    select (Option)new InstallOption())
@@ -50,8 +50,10 @@ namespace Topshelf.HostConfigurators
                     select (Option)new LocalServiceOption())
                 .Or(from autostart in x.Switch("networkservice")
                     select (Option)new NetworkServiceOption())
-                .Or(from autostart in x.Switch("help")
+                .Or(from help in x.Switch("help")
                     select (Option)new HelpOption())
+                .Or(from systemHelp in x.Switch("systemonly")
+                    select (Option)new SystemOnlyHelpOption())
                 .Or(from name in x.Definition("servicename")
                     select (Option)new ServiceNameOption(name.Value))
                 .Or(from desc in x.Definition("description")

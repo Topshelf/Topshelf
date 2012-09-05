@@ -46,7 +46,7 @@ Examples:
     service install
         Installs the service into the service control manager
 
-    service install -username:joe -password:bob -autostart
+    service install -username:joe -password:bob --autostart
         Installs the service using the specified username/password and
         configures the service to start automatically at machine startup
 
@@ -57,11 +57,3 @@ Examples:
         Installs the service, appending the instance name to the service name
         so that the service can be installed multiple times. You may need to
         tweak the log4net.config to make this play nicely with the log files.
-
-    Topshelf.Host install
-        If you are trying to use the Shelving feature, this will install
-        the host service. The host is a service in itself and hosts your
-        services in different AppDomains.
-
-        When it's installed run:
-        Topshelf.Host start
