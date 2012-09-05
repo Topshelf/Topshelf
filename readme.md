@@ -30,22 +30,20 @@ Make a pull request towards the `develop` branch.
 
 ### Source
 
- 1. Clone the source down to your machine.
+ 1. Clone the source down to your machine. The buildscripts assume you have git on your PATH.
 
    ```
    git clone git://github.com/Topshelf/Topshelf.git
    git submodule init --update
    ```
 
- 1. Install the build environment – a tutorial is [here][gems]
+ 1. Install latest JRuby or RMI/Ruby version.
  1. `gem install bundler`
  1. `bundle`
  1. **Important:** Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing.
 	* You must have git on the path in order to do this. (Right click on `Computer` > `Advanced System Settings`, `Advanced` (tab) > `Environment Variables...` > Append the git executable's directory at the end of the PATH environment variable.
  1. Edit with Visual Studio 2010 or alternatively edit and run `rake`. `rake help` displays all possible tasks that you can run. The `package` task, is what the build server does.
  1. The default is .Net 4.0. At the moment, editing the solution file for .Net 3.5 requires the "fix" below.
-
-[gems]: http://guides.rubyonrails.org/command_line.html  "How to use ruby/gems"
 
 #### Editing in Visual Studio
 
