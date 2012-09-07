@@ -10,32 +10,38 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise
+namespace Topshelf.Supervise.Commands
 {
     using System;
-    using System.Linq;
-    using Commands;
 
-    public class DispatchCommandHandler :
-        CommandHandler
+    public interface CommandScriptStep
     {
-        readonly CommandHandler[] _handlers;
-        readonly WorkList _workList;
+        CommandScript CommandScript { get; set; }
+        CommandScriptStepArguments Arguments { get; }
+        Type ActivityType { get; }
+    }
 
-        public DispatchCommandHandler(WorkList workList, params Func<CommandHandler, CommandHandler>[] handlers)
+    public class CommandScriptStep<T> :
+        CommandScriptStep
+        where T : Command
+    {
+        public CommandScriptStep()
         {
-            _workList = workList;
-            _handlers = handlers.Select(x => x(this)).ToArray();
+            Arguments = new CommandScriptStepArguments();
         }
 
-        public bool Handle(Guid commandId, WorkList workList)
+        public CommandScriptStep(CommandScriptStepArguments arguments)
         {
-            return _handlers.Any(handler => handler.Handle(commandId, workList));
+            Arguments = arguments;
         }
 
-        public bool Execute()
+        public CommandScript CommandScript { get; set; }
+
+        public CommandScriptStepArguments Arguments { get; private set; }
+
+        public Type ActivityType
         {
-            return Handle(_workList.NextCommandId, _workList);
+            get { return typeof(T); }
         }
     }
 }

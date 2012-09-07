@@ -10,33 +10,25 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise
 {
     using System;
+    using System.IO;
 
-    public interface CommandTask
+    public class ServiceAvailabilityImpl :
+        ServiceAvailability
     {
-        WorkList WorkList { get; }
-        CommandTaskArguments Arguments { get; }
-        Type ActivityType { get; }
-    }
+        const string DownFilename = ".down";
 
-    public class CommandTask<T> :
-        CommandTask
-        where T : Command
-    {
-        public CommandTask(CommandTaskArguments arguments)
+        public bool CanStart()
         {
-            Arguments = arguments;
-        }
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string filename = Path.Combine(baseDirectory, DownFilename);
 
-        public WorkList WorkList { get; set; }
+            if (File.Exists(filename))
+                return false;
 
-        public CommandTaskArguments Arguments { get; private set; }
-
-        public Type ActivityType
-        {
-            get { return typeof(T); }
+            return true;
         }
     }
 }

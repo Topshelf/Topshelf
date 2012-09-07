@@ -13,20 +13,19 @@
 namespace Topshelf.Supervise.Commands
 {
     using System;
-    using System.Collections.Generic;
 
-    public class CommandAudit
+    public class CommandScriptStepAudit
     {
-        readonly CommandResult _result;
+        readonly CommandScriptStepResult _result;
         readonly Type _type;
 
-        public CommandAudit(Command command, CommandResult result)
+        public CommandScriptStepAudit(Command command, CommandScriptStepResult result)
         {
             _result = result;
             _type = command.GetType();
         }
 
-        public CommandResult Result
+        public CommandScriptStepResult Result
         {
             get { return _result; }
         }
@@ -34,24 +33,6 @@ namespace Topshelf.Supervise.Commands
         public Type CommandType
         {
             get { return _type; }
-        }
-
-        public T Get<T>(string key)
-        {
-            object value;
-            if (_result.TryGetValue(key, out value))
-            {
-                return (T)value;
-            }
-
-            throw new KeyNotFoundException("The result key was not found: " + key);
-        }
-
-        public T Get<T>()
-        {
-            string key = typeof(T).FullName ?? typeof(T).Name;
-
-            return Get<T>(key);
         }
     }
 }

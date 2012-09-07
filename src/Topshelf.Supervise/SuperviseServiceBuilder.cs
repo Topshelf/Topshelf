@@ -31,8 +31,11 @@ namespace Topshelf.Supervise
         {
             try
             {
-                var builder =
-                    new ControlServiceBuilder<SuperviseService>(x => new SuperviseService(x, _serviceBuilderFactory));
+                ServiceAvailability serviceAvailability = new ServiceAvailabilityImpl();
+
+
+                var builder = new ControlServiceBuilder<SuperviseService>(
+                    x => new SuperviseService(x, serviceAvailability, _serviceBuilderFactory));
 
                 ServiceHandle serviceHandle = builder.Build(settings);
 

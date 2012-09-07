@@ -19,36 +19,58 @@ namespace Topshelf.Supervise.Commands
     /// </summary>
     public interface CommandHandler
     {
-        bool Handle(Guid commandId, WorkList workList);
+        bool Handle(Guid commandId, CommandScript commandScript);
     }
 
 
     /// <summary>
-    /// The generic command handler will build a command and determine
-    /// if it can handle the command. If it can, rock on, otherwise, it skips
+    ///   The generic command handler will build a command and determine if it can handle the command. If it can, rock on, otherwise, it skips
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T"> </typeparam>
     public class CommandHandler<T> :
-        CommandHandlerBase,
         CommandHandler
         where T : Command, new()
     {
+        readonly CommandHandler _nextHandler;
+
         public CommandHandler(CommandHandler commandHandler)
-            : base(commandHandler)
         {
+            _nextHandler = commandHandler;
         }
 
-        public bool Handle(Guid commandId, WorkList workList)
+        public bool Handle(Guid commandId, CommandScript commandScript)
         {
             var command = new T();
 
             if (command.CompensateId.Equals(commandId))
-                return HandleCompensation(workList);
-            
+                return HandleCompensation(commandScript);
+
             if (command.ExecuteId.Equals(commandId))
-                return HandleCommand(workList);
+                return HandleCommand(commandScript);
 
             return false;
+        }
+
+        protected bool HandleCommand(CommandScript commandScript)
+        {
+            if (commandScript.IsCompleted)
+                return false;
+
+            if (commandScript.ExecuteNext())
+                return _nextHandler.Handle(commandScript.NextCommandId, commandScript);
+
+            return _nextHandler.Handle(commandScript.CompensationId, commandScript);
+        }
+
+        protected bool HandleCompensation(CommandScript commandScript)
+        {
+            if (!commandScript.IsInProgress)
+                return false;
+
+            if (commandScript.UndoLast())
+                return _nextHandler.Handle(commandScript.CompensationId, commandScript);
+
+            return _nextHandler.Handle(commandScript.NextCommandId, commandScript);
         }
     }
 }

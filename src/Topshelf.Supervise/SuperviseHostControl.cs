@@ -10,16 +10,15 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise
 {
-    using System;
-
-    public interface Command
+    public interface SuperviseHostControl :
+        HostControl
     {
-        Guid ExecuteId { get; }
-        Guid CompensateId { get; }
+        void Start();
 
-        CommandScriptStepAudit Execute(CommandScriptStep task);
-        bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript);
+        void Create();
+
+        void Unload();
     }
 }

@@ -13,23 +13,26 @@
 namespace Topshelf.Supervise
 {
     using System;
-    using Builders;
+    using System.Linq;
     using Commands;
     using HostConfigurators;
     using Runtime;
 
     public class SuperviseHost :
-        HostControl
+        SuperviseHostControl,
+        CommandHandler
     {
         readonly HostControl _hostControl;
-        readonly ServiceBuilderFactory _serviceBuilder;
+        readonly ServiceBuilderFactory _serviceBuilderFactory;
         readonly HostSettings _settings;
 
-        public SuperviseHost(HostControl hostControl, HostSettings settings, ServiceBuilderFactory serviceBuilder)
+        public SuperviseHost(HostControl hostControl, HostSettings settings, ServiceBuilderFactory serviceBuilderFactory)
         {
             _hostControl = hostControl;
             _settings = settings;
-            _serviceBuilder = serviceBuilder;
+            _serviceBuilderFactory = serviceBuilderFactory;
+
+            _commandHandlers = CreateCommandHandlers();
         }
 
         public void RequestAdditionalTime(TimeSpan timeRemaining)
@@ -47,17 +50,55 @@ namespace Topshelf.Supervise
         }
 
 
-        public void StartService()
+        public void Start()
         {
-            var arguments = new CommandTaskArguments {_hostControl, _settings, _serviceBuilder};
+            var arguments = new CommandScriptStepArguments {_hostControl, _settings, _serviceBuilderFactory};
 
-            var workList = new WorkList(new CommandTask[]
-                {
-                    new CommandTask<StartServiceCommand>(arguments),
-                });
+            var script = new CommandScript();
+            {
+                new CommandScriptStep<CreateServiceCommand>();
+                new CommandScriptStep<StartServiceCommand>(arguments);
+            };
 
-            var handler = new DispatchCommandHandler(workList, x => new CommandHandler<StartServiceCommand>(x));
-            handler.Execute();
+            script.Variables.Add(_serviceHandle);
+
+            if (Execute(script))
+            {
+                _serviceHandle = script.Variables.Get<ServiceHandle>();
+            }
         }
+
+        public void Create()
+        {
+        }
+
+        public void Unload()
+        {
+            throw new NotImplementedException();
+        }
+
+        readonly CommandHandler[] _commandHandlers;
+        ServiceHandle _serviceHandle;
+
+        CommandHandler[] CreateCommandHandlers()
+        {
+            return new CommandHandler[]
+                {
+                    new CommandHandler<CreateServiceCommand>(this),
+                    new CommandHandler<StartServiceCommand>(this),
+                    new CommandHandler<StopServiceCommand>(this),
+                };
+        }
+
+        bool CommandHandler.Handle(Guid commandId, CommandScript commandScript)
+        {
+            return _commandHandlers.Any(handler => handler.Handle(commandId, commandScript));
+        }
+
+        bool Execute(CommandScript commandScript)
+        {
+            return ((CommandHandler)this).Handle(commandScript.NextCommandId, commandScript);
+        }
+
     }
 }

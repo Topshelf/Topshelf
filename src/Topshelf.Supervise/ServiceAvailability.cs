@@ -10,16 +10,13 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise
 {
-    using System;
-
-    public interface Command
+    /// <summary>
+    ///   Used to determine if the service is available for the specific operation
+    /// </summary>
+    public interface ServiceAvailability
     {
-        Guid ExecuteId { get; }
-        Guid CompensateId { get; }
-
-        CommandScriptStepAudit Execute(CommandScriptStep task);
-        bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript);
+        bool CanStart();
     }
 }

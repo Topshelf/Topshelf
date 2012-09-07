@@ -13,24 +13,39 @@
 namespace Topshelf.Supervise.Commands
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using Logging;
 
-    public class WorkList
+    public class CommandScript :
+        IEnumerable<CommandScriptStep>
     {
-        readonly Stack<CommandAudit> _completedTasks;
+        readonly Stack<CommandScriptStepAudit> _completedTasks;
         readonly IList<Exception> _exceptions;
-        readonly LogWriter _log = HostLogger.Get<WorkList>();
-        readonly Queue<CommandTask> _nextTask;
+        readonly LogWriter _log = HostLogger.Get<CommandScript>();
+        readonly Queue<CommandScriptStep> _nextTask;
+        readonly CommandScriptDictionary _variables;
 
-        public WorkList(params CommandTask[] tasks)
+        public CommandScript(params CommandScriptStep[] steps)
         {
-            _nextTask = new Queue<CommandTask>();
-            _completedTasks = new Stack<CommandAudit>();
+            _nextTask = new Queue<CommandScriptStep>();
+            _completedTasks = new Stack<CommandScriptStepAudit>();
             _exceptions = new List<Exception>();
+            _variables = new CommandScriptDictionary();
 
-            foreach (CommandTask task in tasks)
-                _nextTask.Enqueue(task);
+            foreach (CommandScriptStep step in steps)
+                Add(step);
+        }
+
+        public CommandScriptDictionary Variables
+        {
+            get { return _variables; }
+        }
+
+        public void Add(CommandScriptStep step)
+        {
+            step.CommandScript = this;
+            _nextTask.Enqueue(step);
         }
 
         public bool IsCompleted
@@ -72,11 +87,11 @@ namespace Topshelf.Supervise.Commands
                 throw new InvalidOperationException();
             }
 
-            CommandTask currentItem = _nextTask.Dequeue();
+            CommandScriptStep currentItem = _nextTask.Dequeue();
             var command = (Command)Activator.CreateInstance(currentItem.ActivityType);
             try
             {
-                CommandAudit audit = command.Execute(currentItem);
+                CommandScriptStepAudit audit = command.Execute(currentItem);
                 if (audit != null)
                 {
                     _completedTasks.Push(audit);
@@ -85,7 +100,7 @@ namespace Topshelf.Supervise.Commands
             }
             catch (Exception ex)
             {
-                _log.Error("WorkList Exception", ex);
+                _log.Error("CommandScript Exception", ex);
                 _exceptions.Add(ex);
             }
             return false;
@@ -98,7 +113,7 @@ namespace Topshelf.Supervise.Commands
                 throw new InvalidOperationException();
             }
 
-            CommandAudit currentItem = _completedTasks.Pop();
+            CommandScriptStepAudit currentItem = _completedTasks.Pop();
             var activity = (Command)Activator.CreateInstance(currentItem.CommandType);
             try
             {
@@ -106,9 +121,19 @@ namespace Topshelf.Supervise.Commands
             }
             catch (Exception ex)
             {
-                _log.Error("WorkList Compensation Exception", ex);
+                _log.Error("CommandScript Compensation Exception", ex);
                 throw;
             }
+        }
+
+        public IEnumerator<CommandScriptStep> GetEnumerator()
+        {
+            yield break;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

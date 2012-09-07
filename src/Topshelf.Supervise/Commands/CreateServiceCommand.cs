@@ -13,40 +13,48 @@
 namespace Topshelf.Supervise.Commands
 {
     using System;
+    using HostConfigurators;
     using Runtime;
 
-    public class StopServiceCommand :
+    public class CreateServiceCommand :
         Command
     {
         readonly Guid _compensateId;
         readonly Guid _executeId;
 
-        public StopServiceCommand()
+        public CreateServiceCommand()
         {
-            _executeId = new Guid("A7E5B54C-D695-4C9C-96CB-AB0D68F2A0F6");
-            _compensateId = new Guid("7AA08166-F419-4B69-8672-DA116813E148");
+            _executeId = new Guid("A141E945-0A05-4833-B496-EA0630AC052A");
+            _compensateId = new Guid("03419435-7128-4ECE-9643-BFBC78A0175D");
         }
 
         public CommandScriptStepAudit Execute(CommandScriptStep task)
         {
-            var serviceHandle = task.Arguments.Get<ServiceHandle>();
-            var hostControl = task.Arguments.Get<HostControl>();
+            ServiceHandle serviceHandle;
+            task.CommandScript.Variables.TryGetValue(out serviceHandle);
 
-            bool stopped = serviceHandle.Stop(hostControl);
+            var result = new CommandScriptStepResult();
 
-            return new CommandScriptStepAudit(this, new CommandScriptStepResult {stopped});
+            if (serviceHandle == null)
+            {
+                var settings = task.Arguments.Get<HostSettings>();
+                var hostControl = task.Arguments.Get<HostControl>();
+                var serviceBuilderFactory = task.Arguments.Get<ServiceBuilderFactory>();
+
+                serviceHandle = new ServiceHandleProxy(settings, hostControl, serviceBuilderFactory);
+
+                result.Add(serviceHandle);
+            }
+
+            return new CommandScriptStepAudit(this, result);
         }
 
         public bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript)
         {
-            bool stopped;
-            if(audit.Result.TryGetValue(out stopped))
+            ServiceHandle serviceHandle;
+            if (audit.Result.TryGetValue(out serviceHandle))
             {
-                if(stopped)
-                {
-                    // we should probably restart the service, yes?
-                    
-                }
+                serviceHandle.Dispose();
             }
 
             return true;

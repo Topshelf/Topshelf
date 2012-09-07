@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C4838A12-9DFE-4CAE-894A-9845898AFDB2}</ProjectGuid>
+    <ProjectGuid>{7EE5892C-6754-4DC4-95B6-123C9C86C740}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SampleTopshelfRehabService</RootNamespace>
-    <AssemblyName>SampleTopshelfRehabService</AssemblyName>
+    <RootNamespace>SampleTopshelfSuperviseService</RootNamespace>
+    <AssemblyName>SampleTopshelfSuperviseService</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -33,11 +33,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-   <PropertyGroup Condition="  '$(TargetFrameworkVersion)' == 'v3.5' ">
+  <PropertyGroup Condition="  '$(TargetFrameworkVersion)' == 'v3.5' ">
     <DefineConstants>NET35</DefineConstants>
     <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)</OutputPath>
   </PropertyGroup>
-  <ItemGroup>
+   <ItemGroup>
     <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
       <HintPath>..\packages\log4net.2.0.0\lib\net35-full\log4net.dll</HintPath>
     </Reference>
@@ -46,23 +46,22 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="PoorlyBehavedService.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="SampleService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Topshelf.Log4Net\Topshelf.Log4Net.csproj">
       <Project>{0EE64D46-5728-45DB-8D0E-044CE2677FD8}</Project>
       <Name>Topshelf.Log4Net</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Topshelf.Rehab\Topshelf.Rehab.csproj">
-      <Project>{26B9ADA3-4CF1-423C-B1FB-A5F982876E39}</Project>
-      <Name>Topshelf.Rehab</Name>
+    <ProjectReference Include="..\Topshelf.Supervise\Topshelf.Supervise.csproj">
+      <Project>{BA8491EF-EFF1-4DFB-BEE6-FE5393E715D4}</Project>
+      <Name>Topshelf.Supervise</Name>
     </ProjectReference>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">
       <Project>{A52AD64D-6455-4A22-8CCF-581851086578}</Project>

@@ -14,20 +14,40 @@ namespace Topshelf.Supervise.Commands
 {
     using System.Collections.Generic;
 
-    public class CommandTaskArguments :
+    public class CommandScriptDictionary :
         Dictionary<string, object>
     {
-        public T Get<T>()
+        public T Get<T>(string key)
         {
-            string key = typeof(T).FullName ?? typeof(T).Name;
-
             object value;
             if (TryGetValue(key, out value))
             {
                 return (T)value;
             }
 
-            throw new KeyNotFoundException("The type was not found: " + typeof(T).FullName);
+            throw new KeyNotFoundException("The result key was not found: " + key);
+        }
+
+        public bool TryGetValue<T>(out T value)
+        {
+            string key = typeof(T).FullName ?? typeof(T).Name;
+
+            object val;
+            if (TryGetValue(key, out val))
+            {
+                value = (T)val;
+                return true;
+            }
+
+            value = default(T);
+            return false;
+        }
+
+        public T Get<T>()
+        {
+            string key = typeof(T).FullName ?? typeof(T).Name;
+
+            return Get<T>(key);
         }
 
         public void Add<T>(T value)

@@ -37,16 +37,18 @@
   <ItemGroup>
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\CommandHandler.cs" />
-    <Compile Include="Commands\CommandHandlerBase.cs" />
-    <Compile Include="Commands\CommandAudit.cs" />
-    <Compile Include="Commands\CommandResult.cs" />
+    <Compile Include="Commands\CommandScriptStepAudit.cs" />
+    <Compile Include="Commands\CommandScriptDictionary.cs" />
+    <Compile Include="Commands\CommandScriptStepResult.cs" />
+    <Compile Include="Commands\CreateServiceCommand.cs" />
     <Compile Include="Commands\RestartCommand.cs" />
     <Compile Include="Commands\StartServiceCommand.cs" />
-    <Compile Include="Commands\WorkList.cs" />
-    <Compile Include="Commands\CommandTask.cs" />
-    <Compile Include="Commands\CommandTaskArguments.cs" />
+    <Compile Include="Commands\CommandScript.cs" />
+    <Compile Include="Commands\CommandScriptStep.cs" />
+    <Compile Include="Commands\CommandScriptStepArguments.cs" />
     <Compile Include="Commands\StopServiceCommand.cs" />
-    <Compile Include="DispatchCommandHandler.cs" />
+    <Compile Include="ServiceAvailability.cs" />
+    <Compile Include="ServiceAvailabilityImpl.cs" />
     <Compile Include="HostControlProxy.cs" />
     <Compile Include="ServiceHandleProxy.cs" />
     <Compile Include="ServiceHandleStub.cs" />
@@ -55,6 +57,7 @@
     <Compile Include="SuperviseConfigurator.cs" />
     <Compile Include="SuperviseConfiguratorExtensions.cs" />
     <Compile Include="SuperviseHost.cs" />
+    <Compile Include="SuperviseHostControl.cs" />
     <Compile Include="SuperviseService.cs" />
     <Compile Include="SuperviseServiceBuilder.cs" />
     <Compile Include="SuperviseServiceConfigurator.cs" />

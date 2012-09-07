@@ -12,14 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Supervise.Commands
 {
-    using System;
-
-    public interface Command
+    public class CommandScriptStepArguments :
+        CommandScriptDictionary
     {
-        Guid ExecuteId { get; }
-        Guid CompensateId { get; }
-
-        CommandScriptStepAudit Execute(CommandScriptStep task);
-        bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript);
     }
 }

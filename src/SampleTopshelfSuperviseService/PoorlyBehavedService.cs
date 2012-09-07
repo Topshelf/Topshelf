@@ -10,39 +10,24 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise
+namespace SampleTopshelfSuperviseService
 {
-    using HostConfigurators;
-    using Runtime;
+    using System;
+    using Topshelf;
 
-    public class SuperviseService :
+    public class PoorlyBehavedService :
         ServiceControl
     {
-        readonly ServiceBuilderFactory _serviceBuilderFactory;
-        readonly HostSettings _settings;
-        readonly ServiceAvailability _serviceAvailability;
-        SuperviseHost _host;
-
-        public SuperviseService(HostSettings settings, ServiceAvailability serviceAvailability, ServiceBuilderFactory serviceBuilderFactory)
-        {
-            _settings = settings;
-            _serviceAvailability = serviceAvailability;
-            _serviceBuilderFactory = serviceBuilderFactory;
-        }
-
         public bool Start(HostControl hostControl)
         {
-            _host = new SuperviseHost(hostControl, _settings, _serviceBuilderFactory);
-
-            if(_serviceAvailability.CanStart())
-                _host.Start();
+            Console.WriteLine("I exhibit bad behavior, but I started on command.");
 
             return true;
         }
 
         public bool Stop(HostControl hostControl)
         {
-            _host.Stop();
+            Console.WriteLine("I'm not bad, I'm just coded that way. So I'm stopped.");
 
             return true;
         }
