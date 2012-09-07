@@ -10,11 +10,33 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Supervise.Commands
 {
-    public interface ServiceControl
+    using System;
+
+    public interface CommandTask
     {
-        bool Start(HostControl hostControl);
-        bool Stop(HostControl hostControl);
+        WorkList WorkList { get; }
+        CommandTaskArguments Arguments { get; }
+        Type ActivityType { get; }
+    }
+
+    public class CommandTask<T> :
+        CommandTask
+        where T : Command
+    {
+        public CommandTask(CommandTaskArguments arguments)
+        {
+            Arguments = arguments;
+        }
+
+        public WorkList WorkList { get; set; }
+
+        public CommandTaskArguments Arguments { get; private set; }
+
+        public Type ActivityType
+        {
+            get { return typeof(T); }
+        }
     }
 }

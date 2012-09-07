@@ -13,11 +13,9 @@
 namespace Topshelf.ServiceConfigurators
 {
     using System;
-    using Configurators;
     using Runtime;
 
-    public interface ServiceConfigurator<T> :
-        Configurator
+    public interface ServiceConfigurator<T>
         where T : class
     {
         void ConstructUsing(ServiceFactory<T> serviceFactory);

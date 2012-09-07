@@ -12,9 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    public interface ServiceControl
+    using HostConfigurators;
+
+    /// <summary>
+    /// Configures the service that is to be supervised, including any of the parameters
+    /// of the supervision service
+    /// </summary>
+    public interface SuperviseConfigurator
     {
-        bool Start(HostControl hostControl);
-        bool Stop(HostControl hostControl);
+        /// <summary>
+        ///   Sets the service builder to use for creating the service
+        /// </summary>
+        /// <typeparam name="T"> </typeparam>
+        /// <param name="serviceBuilderFactory"> </param>
+        void UseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory);
     }
 }

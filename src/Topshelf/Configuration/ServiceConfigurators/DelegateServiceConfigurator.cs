@@ -20,10 +20,10 @@ namespace Topshelf.ServiceConfigurators
     using Runtime;
 
     public class DelegateServiceConfigurator<T> :
-        ServiceConfigurator<T>
+        ServiceConfigurator<T>,
+        Configurator
         where T : class
     {
-        readonly HostConfigurator _configurator;
         Func<T, HostControl, bool> _continue;
         ServiceFactory<T> _factory;
         Func<T, HostControl, bool> _pause;
@@ -31,9 +31,18 @@ namespace Topshelf.ServiceConfigurators
         Func<T, HostControl, bool> _stop;
         Action<T, HostControl> _shutdown;
 
-        public DelegateServiceConfigurator(HostConfigurator configurator)
+
+        bool _canPauseAndContinue;
+        bool _canShutdown;
+
+        public bool CanPauseAndContinue
         {
-            _configurator = configurator;
+            get { return _canPauseAndContinue; }
+        }
+
+        public bool CanShutdown
+        {
+            get { return _canShutdown; }
         }
 
         public IEnumerable<ValidateResult> Validate()
@@ -68,19 +77,19 @@ namespace Topshelf.ServiceConfigurators
 
         public void WhenPaused(Func<T, HostControl, bool> pause)
         {
-            _configurator.EnablePauseAndContinue();
+            _canPauseAndContinue = true;
             _pause = pause;
         }
 
         public void WhenContinued(Func<T, HostControl, bool> @continue)
         {
-            _configurator.EnablePauseAndContinue();
+            _canPauseAndContinue = true;
             _continue = @continue;
         }
 
         public void WhenShutdown(Action<T,HostControl> shutdown)
         {
-            _configurator.EnableShutdown();
+            _canShutdown = true;
             _shutdown = shutdown;
         }
 

@@ -193,6 +193,7 @@
     <Compile Include="Runtime\Windows\WindowsUserAccessControl.cs" />
     <Compile Include="ServiceControl.cs" />
     <Compile Include="ServiceShutdown.cs" />
+    <Compile Include="ServiceSuspend.cs" />
     <Compile Include="TopshelfExitCode.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -20,9 +20,9 @@ namespace Topshelf
     using Runtime;
     using ServiceConfigurators;
 
-    public static class ServiceExtensions
+    public static class SuperviseServiceExtensions
     {
-        public static HostConfigurator Service<T>(this HostConfigurator configurator)
+        public static SuperviseConfigurator Service<T>(this SuperviseConfigurator configurator)
             where T : class, ServiceControl, new()
         {
             if (configurator == null)
@@ -35,7 +35,7 @@ namespace Topshelf
             return configurator;
         }
 
-        public static HostConfigurator Service<T>(this HostConfigurator configurator, Func<T> serviceFactory)
+        public static SuperviseConfigurator Service<T>(this SuperviseConfigurator configurator, Func<T> serviceFactory)
             where T : class, ServiceControl
         {
             if (configurator == null)
@@ -48,7 +48,7 @@ namespace Topshelf
             return configurator;
         }
 
-        public static HostConfigurator Service<T>(this HostConfigurator configurator,
+        public static SuperviseConfigurator Service<T>(this SuperviseConfigurator configurator,
             Func<HostSettings, T> serviceFactory)
             where T : class, ServiceControl
         {
@@ -63,7 +63,7 @@ namespace Topshelf
         }
 
 
-        public static HostConfigurator Service<TService>(this HostConfigurator configurator,
+        public static SuperviseConfigurator Service<TService>(this SuperviseConfigurator configurator,
             Action<ServiceConfigurator<TService>> callback)
             where TService : class
         {
@@ -75,12 +75,6 @@ namespace Topshelf
             var serviceConfigurator = new DelegateServiceConfigurator<TService>();
 
             callback(serviceConfigurator);
-
-            if (serviceConfigurator.CanPauseAndContinue)
-                configurator.EnablePauseAndContinue();
-
-            if (serviceConfigurator.CanShutdown)
-                configurator.EnableShutdown();
 
             configurator.UseServiceBuilder(x =>
                 {

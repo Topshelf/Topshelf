@@ -62,19 +62,23 @@ namespace Topshelf.Builders
                 return _service.Start(hostControl);
             }
 
+            public bool Stop(HostControl hostControl)
+            {
+                return _service.Stop(hostControl);
+            }
+
             public bool Pause(HostControl hostControl)
             {
-                return _service.Pause(hostControl);
+                var service = _service as ServiceSuspend;
+
+                return service != null && service.Pause(hostControl);
             }
 
             public bool Continue(HostControl hostControl)
             {
-                return _service.Continue(hostControl);
-            }
+                var service = _service as ServiceSuspend;
 
-            public bool Stop(HostControl hostControl)
-            {
-                return _service.Stop(hostControl);
+                return service != null && service.Continue(hostControl);
             }
 
             public void Shutdown(HostControl hostControl)

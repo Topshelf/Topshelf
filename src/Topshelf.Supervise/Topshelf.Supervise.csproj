@@ -5,15 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{508C7AAB-03DD-40C6-947D-6A8D22AAA941}</ProjectGuid>
+    <ProjectGuid>{BA8491EF-EFF1-4DFB-BEE6-FE5393E715D4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Topshelf.Tests</RootNamespace>
-    <AssemblyName>Topshelf.Tests</AssemblyName>
+    <RootNamespace>Topshelf.Supervise</RootNamespace>
+    <AssemblyName>Topshelf.Supervise</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,43 +30,44 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="  '$(TargetFrameworkVersion)' == 'v3.5' ">
-    <DefineConstants>NET35</DefineConstants>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.1.12217, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NUnit.2.6.1\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Topshelf.Supervise\Topshelf.Supervise.csproj">
-      <Project>{BA8491EF-EFF1-4DFB-BEE6-FE5393E715D4}</Project>
-      <Name>Topshelf.Supervise</Name>
-    </ProjectReference>
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandHandler.cs" />
+    <Compile Include="Commands\CommandHandlerBase.cs" />
+    <Compile Include="Commands\CommandAudit.cs" />
+    <Compile Include="Commands\CommandResult.cs" />
+    <Compile Include="Commands\RestartCommand.cs" />
+    <Compile Include="Commands\StartServiceCommand.cs" />
+    <Compile Include="Commands\WorkList.cs" />
+    <Compile Include="Commands\CommandTask.cs" />
+    <Compile Include="Commands\CommandTaskArguments.cs" />
+    <Compile Include="Commands\StopServiceCommand.cs" />
+    <Compile Include="DispatchCommandHandler.cs" />
+    <Compile Include="HostControlProxy.cs" />
+    <Compile Include="ServiceHandleProxy.cs" />
+    <Compile Include="ServiceHandleStub.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RestartServiceExtensions.cs" />
+    <Compile Include="SuperviseConfigurator.cs" />
+    <Compile Include="SuperviseConfiguratorExtensions.cs" />
+    <Compile Include="SuperviseHost.cs" />
+    <Compile Include="SuperviseService.cs" />
+    <Compile Include="SuperviseServiceBuilder.cs" />
+    <Compile Include="SuperviseServiceConfigurator.cs" />
+    <Compile Include="SuperviseServiceExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">
       <Project>{A52AD64D-6455-4A22-8CCF-581851086578}</Project>
       <Name>Topshelf</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\SolutionVersion.cs">
-      <Link>SolutionVersion.cs</Link>
-    </Compile>
-    <Compile Include="CommandLine_Specs.cs" />
-    <Compile Include="Help_Specs.cs" />
-    <Compile Include="Supervise_Specs.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

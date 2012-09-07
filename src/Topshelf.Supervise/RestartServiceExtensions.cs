@@ -1,4 +1,4 @@
-// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,9 +12,17 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    public interface ServiceControl
+    using System;
+
+    public static class RestartServiceExtensions
     {
-        bool Start(HostControl hostControl);
-        bool Stop(HostControl hostControl);
+        /// <summary>
+        ///   Schedules the service to restart at the specific interval. Useful for services that have known issues and need to be cycled regularly.
+        /// </summary>
+        /// <param name="configurator"> </param>
+        /// <param name="interval"> The interval between restarts </param>
+        public static void RestartEvery(this SuperviseConfigurator configurator, TimeSpan interval)
+        {
+        }
     }
 }

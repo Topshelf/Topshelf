@@ -10,11 +10,31 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Supervise.Commands
 {
-    public interface ServiceControl
+    using System.Collections.Generic;
+
+    public class CommandTaskArguments :
+        Dictionary<string, object>
     {
-        bool Start(HostControl hostControl);
-        bool Stop(HostControl hostControl);
+        public T Get<T>()
+        {
+            string key = typeof(T).FullName ?? typeof(T).Name;
+
+            object value;
+            if (TryGetValue(key, out value))
+            {
+                return (T)value;
+            }
+
+            throw new KeyNotFoundException("The type was not found: " + typeof(T).FullName);
+        }
+
+        public void Add<T>(T value)
+        {
+            string key = typeof(T).FullName ?? typeof(T).Name;
+
+            Add(key, value);
+        }
     }
 }
