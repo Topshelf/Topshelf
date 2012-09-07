@@ -43,6 +43,8 @@ namespace Topshelf.Supervise.Commands
 
                 serviceHandle = new ServiceHandleProxy(settings, hostControl, serviceBuilderFactory);
 
+                task.CommandScript.Variables.Set(serviceHandle);
+
                 result.Add(serviceHandle);
             }
 

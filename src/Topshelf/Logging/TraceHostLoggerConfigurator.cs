@@ -12,6 +12,9 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Logging
 {
+    using System;
+
+    [Serializable]
     public class TraceHostLoggerConfigurator :
         HostLoggerConfigurator
     {

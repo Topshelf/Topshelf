@@ -23,6 +23,7 @@ namespace Topshelf.Tests
         {
             Host host = HostFactory.New(x =>
                 {
+                    x.ApplyCommandLine("");
                     x.Supervise(sup =>
                         {
                             sup.Service<MyService>(sc =>

@@ -18,10 +18,10 @@ namespace SampleTopshelfSuperviseService
     {
         static int Main()
         {
+            // Log4NetLogWriterFactory.Use("log4net.config");
+
             return (int)HostFactory.Run(x =>
                 {
-                    x.UseLog4Net("log4net.config");
-
                     x.Supervise(s => { s.Service<PoorlyBehavedService>(); });
 
                     x.EnableServiceRecovery(r => { r.RestartService(1); });

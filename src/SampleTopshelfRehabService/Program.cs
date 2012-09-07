@@ -13,14 +13,16 @@
 namespace SampleTopshelfRehabService
 {
     using Topshelf;
+    using Topshelf.Logging;
 
     class Program
     {
         static int Main()
         {
+          //  Log4NetLogWriterFactory.Use("log4net.config");
+
             return (int)HostFactory.Run(x =>
                 {
-                    x.UseLog4Net("log4net.config");
                     x.RehabService<SampleService>();
 
                     // this will enable Pause and Continue, may break this out into a separate interface to 

@@ -54,10 +54,10 @@ namespace Topshelf.Supervise
         {
             var arguments = new CommandScriptStepArguments {_hostControl, _settings, _serviceBuilderFactory};
 
-            var script = new CommandScript();
+            var script = new CommandScript
             {
-                new CommandScriptStep<CreateServiceCommand>();
-                new CommandScriptStep<StartServiceCommand>(arguments);
+                new CommandScriptStep<CreateServiceCommand>(arguments),
+                new CommandScriptStep<StartServiceCommand>(new CommandScriptStepArguments{_hostControl}),
             };
 
             script.Variables.Add(_serviceHandle);

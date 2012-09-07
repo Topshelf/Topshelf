@@ -37,15 +37,17 @@
     <DefineConstants>NET35</DefineConstants>
     <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)</OutputPath>
   </PropertyGroup>
-   <ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' == 'v3.5'">
       <HintPath>..\packages\log4net.2.0.0\lib\net35-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="log4net" Condition="'$(TargetFrameworkVersion)' != 'v3.5'">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionVersion.cs">

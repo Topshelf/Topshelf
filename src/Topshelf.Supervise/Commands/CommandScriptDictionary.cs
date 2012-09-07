@@ -13,6 +13,7 @@
 namespace Topshelf.Supervise.Commands
 {
     using System.Collections.Generic;
+    using Runtime;
 
     public class CommandScriptDictionary :
         Dictionary<string, object>
@@ -53,6 +54,15 @@ namespace Topshelf.Supervise.Commands
         public void Add<T>(T value)
         {
             string key = typeof(T).FullName ?? typeof(T).Name;
+
+            Add(key, value);
+        }
+
+        public void Set<T>(T value)
+        {
+            string key = typeof(T).FullName ?? typeof(T).Name;
+
+            Remove(key);
 
             Add(key, value);
         }
