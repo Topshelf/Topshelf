@@ -13,14 +13,31 @@
 namespace SampleTopshelfSuperviseService
 {
     using System;
+    using System.Threading;
     using Topshelf;
+    using Topshelf.Logging;
 
     public class PoorlyBehavedService :
         ServiceControl
     {
+        readonly LogWriter _log = HostLogger.Get<PoorlyBehavedService>();
+
         public bool Start(HostControl hostControl)
         {
             Console.WriteLine("I exhibit bad behavior, but I started on command.");
+
+            ThreadPool.QueueUserWorkItem(x =>
+            {
+                Thread.Sleep(5000);
+
+                _log.Info("Stopping for no particular reason");
+
+                hostControl.Stop();
+
+                //                _log.Info("Dying an ungraceful death");
+                //
+                //                throw new InvalidOperationException("Oh, what a world.");
+            });
 
             return true;
         }

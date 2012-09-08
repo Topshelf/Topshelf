@@ -16,7 +16,7 @@ namespace Topshelf.Supervise.Threading
     using System.Collections.Generic;
     using System.Linq;
 
-    public class TryCatchOperationExecutor :
+    class TryCatchOperationExecutor :
         OperationExecutor
     {
         readonly Action<Exception> _callback;

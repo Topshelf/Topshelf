@@ -14,7 +14,7 @@ namespace Topshelf.Supervise.Threading
 {
     using System;
 
-    public class ScheduledOperationExecuterImpl :
+    class ScheduledOperationExecuterImpl :
         ScheduledOperationExecuter
     {
         readonly Fiber _fiber;

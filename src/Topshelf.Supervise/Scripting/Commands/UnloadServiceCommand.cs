@@ -29,14 +29,19 @@ namespace Topshelf.Supervise.Scripting.Commands
 
         public CommandScriptStepAudit Execute(CommandScriptStep task)
         {
+            bool unloaded = false;
             var serviceHandle = task.Arguments.Get<ServiceHandle>();
 
-            serviceHandle.Dispose();
-            serviceHandle = null;
+            if (serviceHandle != null)
+            {
+                serviceHandle.Dispose();
 
-            task.Arguments.Set(serviceHandle);
+                unloaded = true;
 
-            return new CommandScriptStepAudit(this, new CommandScriptStepResult {{"unloaded", true}});
+                task.Arguments.Set<ServiceHandle>(null);
+            }
+
+            return new CommandScriptStepAudit(this, new CommandScriptStepResult {{"unloaded", unloaded}});
         }
 
         public bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript)

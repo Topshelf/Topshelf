@@ -14,7 +14,7 @@ namespace Topshelf.Supervise.Threading
 {
     using System;
 
-    public interface Fiber
+    interface Fiber
     {
         /// <summary>
         /// Enqueue a single action to the queue

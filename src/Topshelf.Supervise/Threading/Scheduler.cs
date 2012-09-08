@@ -14,7 +14,7 @@ namespace Topshelf.Supervise.Threading
 {
     using System;
 
-    public interface Scheduler
+    interface Scheduler
     {
         /// <summary>
         /// Schedules an operation to be executed after the special interval has elapsed

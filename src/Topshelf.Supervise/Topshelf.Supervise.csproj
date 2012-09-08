@@ -67,7 +67,7 @@
     <Compile Include="SuperviseServiceConfigurator.cs" />
     <Compile Include="SuperviseServiceExtensions.cs" />
     <Compile Include="Threading\Fiber.cs" />
-    <Compile Include="Threading\FiberException.cs" />
+    <Compile Include="Threading\FiberExtensions.cs" />
     <Compile Include="Threading\OperationExecutor.cs" />
     <Compile Include="Threading\PoolFiber.cs" />
     <Compile Include="Threading\ScheduledOperation.cs" />
@@ -75,7 +75,6 @@
     <Compile Include="Threading\ScheduledOperationExecuterImpl.cs" />
     <Compile Include="Threading\ScheduledOperationList.cs" />
     <Compile Include="Threading\Scheduler.cs" />
-    <Compile Include="Threading\SchedulerException.cs" />
     <Compile Include="Threading\TimerScheduler.cs" />
     <Compile Include="Threading\TryCatchOperationExecutor.cs" />
   </ItemGroup>

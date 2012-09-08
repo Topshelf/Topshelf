@@ -14,7 +14,7 @@ namespace Topshelf.Supervise.Threading
 {
     using System;
 
-    public interface ScheduledOperation
+    interface ScheduledOperation
     {
         /// <summary>
         ///   The time coordinates when the operation is scheduled to execute

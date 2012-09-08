@@ -20,7 +20,7 @@ namespace Topshelf.Supervise.Threading
     /// An Fiber that uses the .NET ThreadPool and QueueUserWorkItem to execute
     /// actions.
     /// </summary>
-    public class PoolFiber :
+    class PoolFiber :
         Fiber
     {
         readonly OperationExecutor _executor;
@@ -77,7 +77,7 @@ namespace Topshelf.Supervise.Threading
                 {
                     timeout = waitUntil - DateTime.Now;
                     if (timeout < TimeSpan.Zero)
-                        throw new FiberException(
+                        throw new TopshelfException(
                             "Timeout expired waiting for all pending actions to complete during shutdown");
 
                     Monitor.Wait(_lock, timeout);
@@ -100,7 +100,7 @@ namespace Topshelf.Supervise.Threading
         void QueueWorkItem()
         {
             if (!ThreadPool.QueueUserWorkItem(x => Execute()))
-                throw new FiberException("QueueUserWorkItem did not accept our execute method");
+                throw new TopshelfException("QueueUserWorkItem did not accept our execute method");
 
             _executorQueued = true;
         }

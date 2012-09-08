@@ -12,7 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Supervise.Threading
 {
-    public interface ScheduledOperationExecuter :
+    interface ScheduledOperationExecuter :
         ScheduledOperation
     {
         void Execute();

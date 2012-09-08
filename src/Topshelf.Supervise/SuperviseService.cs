@@ -14,8 +14,8 @@ namespace Topshelf.Supervise
 {
     using System;
     using System.Linq;
-    using System.Threading;
     using HostConfigurators;
+    using Logging;
     using Runtime;
     using Scripting;
     using Scripting.Commands;
@@ -29,6 +29,7 @@ namespace Topshelf.Supervise
     {
         readonly CommandHandler[] _commandHandlers;
         readonly Fiber _fiber;
+        readonly LogWriter _log = HostLogger.Get<SuperviseService>();
         readonly Scheduler _scheduler;
         readonly ServiceAvailability _serviceAvailability;
         readonly ServiceBuilderFactory _serviceBuilderFactory;
@@ -68,12 +69,12 @@ namespace Topshelf.Supervise
 
         void HostControl.Stop()
         {
-            StopService();
+            _fiber.Add(StopService);
         }
 
         void HostControl.Restart()
         {
-            RestartService();
+            _fiber.Add(RestartService);
         }
 
         public void Dispose()
@@ -93,19 +94,9 @@ namespace Topshelf.Supervise
 
         bool ServiceControl.Stop(HostControl hostControl)
         {
-            var mre = new ManualResetEvent(false);
-            _fiber.Add(StopService);
-            _fiber.Add(() => mre.Set());
+            _fiber.AddAndWait(StopService, _shutdownTimeout);
 
-            mre.WaitOne(_shutdownTimeout);
-            _fiber.Add(() =>
-                {
-                    using (mre)
-                    {
-                    }
-                });
-
-            return _serviceHandle == null;
+            return (_serviceHandle == null);
         }
 
         ~SuperviseService()
@@ -129,13 +120,20 @@ namespace Topshelf.Supervise
         void StartService()
         {
             if (_serviceHandle != null)
+            {
+                _log.Debug("Attempted to start service, but it is already started");
                 return;
+            }
 
             if (!_serviceAvailability.CanStart())
+            {
+                _log.Debug("Attempted to start service, but it is unavailable");
                 return;
+            }
 
-            var arguments = new CommandScriptStepArguments {_serviceBuilderFactory};
+            _log.Debug("Starting supervised service");
 
+            var arguments = new CommandScriptStepArguments { _serviceBuilderFactory };
             var script = new CommandScript
                 {
                     new CommandScriptStep<CreateServiceCommand>(arguments),
@@ -151,6 +149,8 @@ namespace Topshelf.Supervise
 
         void StopService()
         {
+            _log.Debug("Stopping supervised service");
+
             var unloadArguments = new CommandScriptStepArguments
                 {
                     _serviceHandle,
@@ -169,8 +169,10 @@ namespace Topshelf.Supervise
             }
         }
 
-        bool RestartService()
+        void RestartService()
         {
+            _log.Debug("Restarting supervised service");
+
             var createArguments = new CommandScriptStepArguments
                 {
                     _serviceBuilderFactory,
@@ -194,7 +196,6 @@ namespace Topshelf.Supervise
             {
                 _serviceHandle = createArguments.Get<ServiceHandle>();
             }
-            return restarted;
         }
 
         CommandHandler[] CreateCommandHandlers()
@@ -211,7 +212,7 @@ namespace Topshelf.Supervise
         bool Execute(CommandScript script)
         {
             script.Variables.Add(_settings);
-            script.Variables.Add(_hostControl);
+            script.Variables.Add<HostControl>(this);
 
             return ((CommandHandler)this).Handle(script.NextCommandId, script);
         }
@@ -221,7 +222,10 @@ namespace Topshelf.Supervise
             try
             {
                 if (_serviceHandle == null)
+                {
+                    _log.Debug("Service is not running, attempting to start");
                     _fiber.Add(StartService);
+                }
             }
             finally
             {

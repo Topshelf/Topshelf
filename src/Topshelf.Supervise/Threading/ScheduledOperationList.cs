@@ -16,7 +16,7 @@ namespace Topshelf.Supervise.Threading
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ScheduledOperationList
+    class ScheduledOperationList
     {
         readonly object _lock = new object();
         readonly SortedList<DateTime, List<ScheduledOperationExecuter>> _operations;
@@ -64,7 +64,7 @@ namespace Topshelf.Supervise.Threading
                 if (_operations.Count == 0)
                     return false;
 
-                foreach (var pair in _operations)
+                foreach (KeyValuePair<DateTime, List<ScheduledOperationExecuter>> pair in _operations)
                 {
                     if (now >= pair.Key)
                         return true;

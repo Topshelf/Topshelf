@@ -18,7 +18,7 @@ namespace Topshelf.Supervise.Threading
     using System.Threading;
 
     [DebuggerDisplay("{GetType().Name} ( Count: {Count}, Next: {NextActionTime} )")]
-    public class TimerScheduler :
+    class TimerScheduler :
         Scheduler
     {
         readonly Fiber _fiber;

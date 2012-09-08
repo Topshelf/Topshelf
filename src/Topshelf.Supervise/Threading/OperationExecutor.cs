@@ -15,7 +15,7 @@ namespace Topshelf.Supervise.Threading
     using System;
     using System.Collections.Generic;
 
-    public interface OperationExecutor
+    interface OperationExecutor
     {
         void Execute(Action operation);
         void Execute(IList<Action> operations, Action<IEnumerable<Action>> remaining);
