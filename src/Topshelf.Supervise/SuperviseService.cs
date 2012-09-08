@@ -14,21 +14,30 @@ namespace Topshelf.Supervise
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using HostConfigurators;
     using Runtime;
     using Scripting;
     using Scripting.Commands;
+    using Threading;
 
     public class SuperviseService :
         ServiceControl,
         HostControl,
-        CommandHandler
+        CommandHandler,
+        IDisposable
     {
         readonly CommandHandler[] _commandHandlers;
+        readonly Fiber _fiber;
+        readonly Scheduler _scheduler;
         readonly ServiceAvailability _serviceAvailability;
         readonly ServiceBuilderFactory _serviceBuilderFactory;
         readonly HostSettings _settings;
+        readonly TimeSpan _shutdownTimeout = TimeSpan.FromSeconds(30);
+
+        bool _disposed;
         HostControl _hostControl;
+        TimeSpan _monitorInterval = TimeSpan.FromSeconds(10);
         ServiceHandle _serviceHandle;
 
         public SuperviseService(HostSettings settings, ServiceAvailability serviceAvailability,
@@ -37,6 +46,9 @@ namespace Topshelf.Supervise
             _settings = settings;
             _serviceAvailability = serviceAvailability;
             _serviceBuilderFactory = serviceBuilderFactory;
+
+            _fiber = new PoolFiber();
+            _scheduler = new TimerScheduler(new PoolFiber());
 
             _commandHandlers = CreateCommandHandlers();
         }
@@ -64,25 +76,64 @@ namespace Topshelf.Supervise
             RestartService();
         }
 
-        public bool Start(HostControl hostControl)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool ServiceControl.Start(HostControl hostControl)
         {
             _hostControl = hostControl;
 
-            if (_serviceAvailability.CanStart())
-            {
-                return StartService();
-            }
+            _fiber.Add(MonitorService);
 
             return true;
         }
 
-        public bool Stop(HostControl hostControl)
+        bool ServiceControl.Stop(HostControl hostControl)
         {
-            return StopService();
+            var mre = new ManualResetEvent(false);
+            _fiber.Add(StopService);
+            _fiber.Add(() => mre.Set());
+
+            mre.WaitOne(_shutdownTimeout);
+            _fiber.Add(() =>
+                {
+                    using (mre)
+                    {
+                    }
+                });
+
+            return _serviceHandle == null;
         }
 
-        bool StartService()
+        ~SuperviseService()
         {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+            if (disposing)
+            {
+                _scheduler.Stop(_shutdownTimeout);
+                _fiber.Shutdown(_shutdownTimeout);
+            }
+
+            _disposed = true;
+        }
+
+        void StartService()
+        {
+            if (_serviceHandle != null)
+                return;
+
+            if (!_serviceAvailability.CanStart())
+                return;
+
             var arguments = new CommandScriptStepArguments {_serviceBuilderFactory};
 
             var script = new CommandScript
@@ -96,10 +147,9 @@ namespace Topshelf.Supervise
             {
                 _serviceHandle = arguments.Get<ServiceHandle>();
             }
-            return started;
         }
 
-        bool StopService()
+        void StopService()
         {
             var unloadArguments = new CommandScriptStepArguments
                 {
@@ -117,7 +167,6 @@ namespace Topshelf.Supervise
             {
                 _serviceHandle = null;
             }
-            return stopped;
         }
 
         bool RestartService()
@@ -165,6 +214,19 @@ namespace Topshelf.Supervise
             script.Variables.Add(_hostControl);
 
             return ((CommandHandler)this).Handle(script.NextCommandId, script);
+        }
+
+        void MonitorService()
+        {
+            try
+            {
+                if (_serviceHandle == null)
+                    _fiber.Add(StartService);
+            }
+            finally
+            {
+                _scheduler.Schedule(_monitorInterval, _fiber, MonitorService);
+            }
         }
     }
 }
