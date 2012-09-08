@@ -19,6 +19,11 @@ namespace Topshelf.Supervise
     using Logging;
     using Runtime;
 
+    /// <summary>
+    /// The proxy handle into the separate AppDomain for the service. Uniquely identified
+    /// by a GUID name so that we can spin up the next instance on a restart/recycle allowing 
+    /// the new instance to warm up before actually putting it into traffic.
+    /// </summary>
     public class ServiceHandleProxy :
         ServiceHandle
     {
@@ -28,6 +33,7 @@ namespace Topshelf.Supervise
         readonly ServiceBuilderFactory _serviceBuilderFactory;
         readonly HostSettings _settings;
         AppDomain _appDomain;
+        string _appDomainName;
 
         public ServiceHandleProxy(HostSettings settings, HostControl hostControl, ServiceBuilderFactory serviceBuilderFactory)
         {
@@ -103,8 +109,11 @@ namespace Topshelf.Supervise
             AppDomain appDomain = null;
             try
             {
+                _appDomainName = string.Format("{0}.{1}.{2}", "Topshelf", _settings.Name,
+                    Guid.NewGuid().ToString("N"));
+
                 appDomain = AppDomain.CreateDomain(
-                    "Topshelf." + _settings.Name,
+                    _appDomainName,
                     null,
                     appDomainSetup,
                     permissionSet,

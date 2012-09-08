@@ -10,10 +10,9 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise.Scripting
 {
     using System.Collections.Generic;
-    using Runtime;
 
     public class CommandScriptDictionary :
         Dictionary<string, object>
@@ -34,7 +33,20 @@ namespace Topshelf.Supervise.Commands
             string key = typeof(T).FullName ?? typeof(T).Name;
 
             object val;
-            if (TryGetValue(key, out val))
+            if (base.TryGetValue(key, out val))
+            {
+                value = (T)val;
+                return true;
+            }
+
+            value = default(T);
+            return false;
+        }
+
+        public bool TryGetValue<T>(string key, out T value)
+        {
+            object val;
+            if (base.TryGetValue(key, out val))
             {
                 value = (T)val;
                 return true;

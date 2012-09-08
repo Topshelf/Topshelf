@@ -10,47 +10,54 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise.Scripting.Commands
 {
     using System;
+    using HostConfigurators;
+    using Logging;
     using Runtime;
 
-    public class StartServiceCommand :
+    public class CreateServiceCommand :
         Command
     {
         readonly Guid _compensateId;
         readonly Guid _executeId;
+        readonly LogWriter _log = HostLogger.Get<CreateServiceCommand>();
 
-        public StartServiceCommand()
+        public CreateServiceCommand()
         {
-            _executeId = new Guid("2E5B29D5-9C22-4C18-BAA5-FC3E36EBF4D9");
-            _compensateId = new Guid("9E9B8C61-2072-4910-9A52-410D887D0286");
+            _executeId = new Guid("A141E945-0A05-4833-B496-EA0630AC052A");
+            _compensateId = new Guid("03419435-7128-4ECE-9643-BFBC78A0175D");
         }
 
         public CommandScriptStepAudit Execute(CommandScriptStep task)
         {
-            var serviceHandle = task.CommandScript.Variables.Get<ServiceHandle>();
+            _log.Debug("CreateServiceCommand Executing...");
 
-            if (serviceHandle == null)
-                throw new ServiceControlException("The service handle was null and could not be started.");
+            var result = new CommandScriptStepResult();
 
-            var hostControl = task.Arguments.Get<HostControl>();
+            var settings = task.CommandScript.Variables.Get<HostSettings>();
+            var hostControl = task.CommandScript.Variables.Get<HostControl>();
 
-            bool started = serviceHandle.Start(hostControl);
+            var serviceBuilderFactory = task.Arguments.Get<ServiceBuilderFactory>();
 
-            return new CommandScriptStepAudit(this, new CommandScriptStepResult {started});
+            ServiceHandle serviceHandle = new ServiceHandleProxy(settings, hostControl, serviceBuilderFactory);
+
+            task.Arguments.Set(serviceHandle);
+
+            result.Add(serviceHandle);
+
+            return new CommandScriptStepAudit(this, result);
         }
 
         public bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript)
         {
-            var started = audit.Result.Get<bool>("started");
+            _log.Debug("CreateServiceCommand Compensating...");
 
-            if (started)
+            ServiceHandle serviceHandle;
+            if (audit.Result.TryGetValue(out serviceHandle))
             {
-                var serviceHandle = audit.Result.Get<ServiceHandle>();
-                var hostControl = audit.Result.Get<HostControl>();
-
-                return serviceHandle.Stop(hostControl);
+                serviceHandle.Dispose();
             }
 
             return true;

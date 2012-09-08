@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise.Scripting.Commands
 {
     using System;
     using Runtime;
@@ -29,27 +29,26 @@ namespace Topshelf.Supervise.Commands
 
         public CommandScriptStepAudit Execute(CommandScriptStep task)
         {
+            var hostControl = task.CommandScript.Variables.Get<HostControl>();
+
+            bool stopped = false;
+
             var serviceHandle = task.Arguments.Get<ServiceHandle>();
-            var hostControl = task.Arguments.Get<HostControl>();
-
-            bool stopped = serviceHandle.Stop(hostControl);
-
-            return new CommandScriptStepAudit(this, new CommandScriptStepResult {stopped});
+            if(serviceHandle != null)
+            {
+                stopped = serviceHandle.Stop(hostControl);
+            }
+            return new CommandScriptStepAudit(this, new CommandScriptStepResult
+                {
+                    serviceHandle,
+                    {"stopped", stopped}
+                });
         }
 
         public bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript)
         {
-            bool stopped;
-            if(audit.Result.TryGetValue(out stopped))
-            {
-                if(stopped)
-                {
-                    // we should probably restart the service, yes?
-                    
-                }
-            }
-
-            return true;
+            // we can't unstop a service
+            return false;
         }
 
         public Guid ExecuteId

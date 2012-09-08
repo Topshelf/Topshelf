@@ -12,39 +12,159 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Supervise
 {
+    using System;
+    using System.Linq;
     using HostConfigurators;
     using Runtime;
+    using Scripting;
+    using Scripting.Commands;
 
     public class SuperviseService :
-        ServiceControl
+        ServiceControl,
+        HostControl,
+        CommandHandler
     {
+        readonly CommandHandler[] _commandHandlers;
+        readonly ServiceAvailability _serviceAvailability;
         readonly ServiceBuilderFactory _serviceBuilderFactory;
         readonly HostSettings _settings;
-        readonly ServiceAvailability _serviceAvailability;
-        SuperviseHost _host;
+        HostControl _hostControl;
+        ServiceHandle _serviceHandle;
 
-        public SuperviseService(HostSettings settings, ServiceAvailability serviceAvailability, ServiceBuilderFactory serviceBuilderFactory)
+        public SuperviseService(HostSettings settings, ServiceAvailability serviceAvailability,
+            ServiceBuilderFactory serviceBuilderFactory)
         {
             _settings = settings;
             _serviceAvailability = serviceAvailability;
             _serviceBuilderFactory = serviceBuilderFactory;
+
+            _commandHandlers = CreateCommandHandlers();
+        }
+
+        bool CommandHandler.Handle(Guid commandId, CommandScript script)
+        {
+            if (commandId == Guid.Empty)
+                return true;
+
+            return _commandHandlers.Any(handler => handler.Handle(commandId, script));
+        }
+
+        void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
+        {
+            // this is for US
+        }
+
+        void HostControl.Stop()
+        {
+            StopService();
+        }
+
+        void HostControl.Restart()
+        {
+            RestartService();
         }
 
         public bool Start(HostControl hostControl)
         {
-            _host = new SuperviseHost(hostControl, _settings, _serviceBuilderFactory);
+            _hostControl = hostControl;
 
-            if(_serviceAvailability.CanStart())
-                _host.Start();
+            if (_serviceAvailability.CanStart())
+            {
+                return StartService();
+            }
 
             return true;
         }
 
         public bool Stop(HostControl hostControl)
         {
-            _host.Stop();
+            return StopService();
+        }
 
-            return true;
+        bool StartService()
+        {
+            var arguments = new CommandScriptStepArguments {_serviceBuilderFactory};
+
+            var script = new CommandScript
+                {
+                    new CommandScriptStep<CreateServiceCommand>(arguments),
+                    new CommandScriptStep<StartServiceCommand>(arguments),
+                };
+
+            bool started = Execute(script);
+            if (started)
+            {
+                _serviceHandle = arguments.Get<ServiceHandle>();
+            }
+            return started;
+        }
+
+        bool StopService()
+        {
+            var unloadArguments = new CommandScriptStepArguments
+                {
+                    _serviceHandle,
+                };
+
+            var script = new CommandScript
+                {
+                    new CommandScriptStep<StopServiceCommand>(unloadArguments),
+                    new CommandScriptStep<UnloadServiceCommand>(unloadArguments),
+                };
+
+            bool stopped = Execute(script);
+            if (stopped)
+            {
+                _serviceHandle = null;
+            }
+            return stopped;
+        }
+
+        bool RestartService()
+        {
+            var createArguments = new CommandScriptStepArguments
+                {
+                    _serviceBuilderFactory,
+                };
+
+            var unloadArguments = new CommandScriptStepArguments
+                {
+                    _serviceHandle,
+                };
+
+            var script = new CommandScript
+                {
+                    new CommandScriptStep<CreateServiceCommand>(createArguments),
+                    new CommandScriptStep<StopServiceCommand>(unloadArguments),
+                    new CommandScriptStep<StartServiceCommand>(createArguments),
+                    new CommandScriptStep<UnloadServiceCommand>(unloadArguments),
+                };
+
+            bool restarted = Execute(script);
+            if (restarted)
+            {
+                _serviceHandle = createArguments.Get<ServiceHandle>();
+            }
+            return restarted;
+        }
+
+        CommandHandler[] CreateCommandHandlers()
+        {
+            return new CommandHandler[]
+                {
+                    new CommandHandler<CreateServiceCommand>(this),
+                    new CommandHandler<StartServiceCommand>(this),
+                    new CommandHandler<StopServiceCommand>(this),
+                    new CommandHandler<UnloadServiceCommand>(this),
+                };
+        }
+
+        bool Execute(CommandScript script)
+        {
+            script.Variables.Add(_settings);
+            script.Variables.Add(_hostControl);
+
+            return ((CommandHandler)this).Handle(script.NextCommandId, script);
         }
     }
 }

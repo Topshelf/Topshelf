@@ -10,16 +10,10 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise.Scripting
 {
-    using System;
-
-    public interface Command
+    public class CommandScriptStepArguments :
+        CommandScriptDictionary
     {
-        Guid ExecuteId { get; }
-        Guid CompensateId { get; }
-
-        CommandScriptStepAudit Execute(CommandScriptStep task);
-        bool Compensate(CommandScriptStepAudit audit, CommandScript commandScript);
     }
 }

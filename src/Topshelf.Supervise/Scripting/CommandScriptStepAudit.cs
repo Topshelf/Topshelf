@@ -10,10 +10,29 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise.Scripting
 {
-    public class CommandScriptStepResult :
-        CommandScriptDictionary
+    using System;
+
+    public class CommandScriptStepAudit
     {
+        readonly CommandScriptStepResult _result;
+        readonly Type _type;
+
+        public CommandScriptStepAudit(Command command, CommandScriptStepResult result)
+        {
+            _result = result;
+            _type = command.GetType();
+        }
+
+        public CommandScriptStepResult Result
+        {
+            get { return _result; }
+        }
+
+        public Type CommandType
+        {
+            get { return _type; }
+        }
     }
 }

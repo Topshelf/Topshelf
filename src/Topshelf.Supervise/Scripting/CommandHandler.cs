@@ -10,7 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Supervise.Commands
+namespace Topshelf.Supervise.Scripting
 {
     using System;
 
@@ -19,7 +19,7 @@ namespace Topshelf.Supervise.Commands
     /// </summary>
     public interface CommandHandler
     {
-        bool Handle(Guid commandId, CommandScript commandScript);
+        bool Handle(Guid commandId, CommandScript script);
     }
 
 
@@ -31,46 +31,46 @@ namespace Topshelf.Supervise.Commands
         CommandHandler
         where T : Command, new()
     {
-        readonly CommandHandler _nextHandler;
+        readonly CommandHandler _next;
 
-        public CommandHandler(CommandHandler commandHandler)
+        public CommandHandler(CommandHandler next)
         {
-            _nextHandler = commandHandler;
+            _next = next;
         }
 
-        public bool Handle(Guid commandId, CommandScript commandScript)
+        public bool Handle(Guid commandId, CommandScript script)
         {
             var command = new T();
 
             if (command.CompensateId.Equals(commandId))
-                return HandleCompensation(commandScript);
+                return HandleCompensation(script);
 
             if (command.ExecuteId.Equals(commandId))
-                return HandleCommand(commandScript);
+                return HandleCommand(script);
 
             return false;
         }
 
-        protected bool HandleCommand(CommandScript commandScript)
+        protected bool HandleCommand(CommandScript script)
         {
-            if (commandScript.IsCompleted)
+            if (script.IsCompleted)
                 return false;
 
-            if (commandScript.ExecuteNext())
-                return _nextHandler.Handle(commandScript.NextCommandId, commandScript);
+            if (script.ExecuteNext())
+                return _next.Handle(script.NextCommandId, script);
 
-            return _nextHandler.Handle(commandScript.CompensationId, commandScript);
+            return _next.Handle(script.CompensationId, script);
         }
 
-        protected bool HandleCompensation(CommandScript commandScript)
+        protected bool HandleCompensation(CommandScript script)
         {
-            if (!commandScript.IsInProgress)
+            if (!script.IsInProgress)
                 return false;
 
-            if (commandScript.UndoLast())
-                return _nextHandler.Handle(commandScript.CompensationId, commandScript);
+            if (script.UndoLast())
+                return _next.Handle(script.CompensationId, script);
 
-            return _nextHandler.Handle(commandScript.NextCommandId, commandScript);
+            return _next.Handle(script.NextCommandId, script);
         }
     }
 }

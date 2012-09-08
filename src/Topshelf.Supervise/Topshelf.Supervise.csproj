@@ -42,18 +42,18 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
-    <Compile Include="Commands\Command.cs" />
-    <Compile Include="Commands\CommandHandler.cs" />
-    <Compile Include="Commands\CommandScriptStepAudit.cs" />
-    <Compile Include="Commands\CommandScriptDictionary.cs" />
-    <Compile Include="Commands\CommandScriptStepResult.cs" />
-    <Compile Include="Commands\CreateServiceCommand.cs" />
-    <Compile Include="Commands\RestartCommand.cs" />
-    <Compile Include="Commands\StartServiceCommand.cs" />
-    <Compile Include="Commands\CommandScript.cs" />
-    <Compile Include="Commands\CommandScriptStep.cs" />
-    <Compile Include="Commands\CommandScriptStepArguments.cs" />
-    <Compile Include="Commands\StopServiceCommand.cs" />
+    <Compile Include="Scripting\Command.cs" />
+    <Compile Include="Scripting\CommandHandler.cs" />
+    <Compile Include="Scripting\CommandScript.cs" />
+    <Compile Include="Scripting\CommandScriptDictionary.cs" />
+    <Compile Include="Scripting\CommandScriptStep.cs" />
+    <Compile Include="Scripting\CommandScriptStepArguments.cs" />
+    <Compile Include="Scripting\CommandScriptStepAudit.cs" />
+    <Compile Include="Scripting\CommandScriptStepResult.cs" />
+    <Compile Include="Scripting\Commands\CreateServiceCommand.cs" />
+    <Compile Include="Scripting\Commands\StartServiceCommand.cs" />
+    <Compile Include="Scripting\Commands\StopServiceCommand.cs" />
+    <Compile Include="Scripting\Commands\UnloadServiceCommand.cs" />
     <Compile Include="ServiceAvailability.cs" />
     <Compile Include="ServiceAvailabilityImpl.cs" />
     <Compile Include="HostControlProxy.cs" />
@@ -62,8 +62,6 @@
     <Compile Include="RestartServiceExtensions.cs" />
     <Compile Include="SuperviseConfigurator.cs" />
     <Compile Include="SuperviseConfiguratorExtensions.cs" />
-    <Compile Include="SuperviseHost.cs" />
-    <Compile Include="SuperviseHostControl.cs" />
     <Compile Include="SuperviseService.cs" />
     <Compile Include="SuperviseServiceBuilder.cs" />
     <Compile Include="SuperviseServiceConfigurator.cs" />
