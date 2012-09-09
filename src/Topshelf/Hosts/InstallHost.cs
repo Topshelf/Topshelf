@@ -26,14 +26,15 @@ namespace Topshelf.Hosts
 
         readonly HostEnvironment _environment;
         readonly InstallHostSettings _installSettings;
-        readonly IEnumerable<Action> _postActions;
-        readonly IEnumerable<Action> _preActions;
+        readonly IEnumerable<Action<InstallHostSettings>> _postActions;
+        readonly IEnumerable<Action<InstallHostSettings>> _preActions;
         readonly HostSettings _settings;
         readonly bool _sudo;
 
         public InstallHost(HostEnvironment environment, HostSettings settings, HostStartMode startMode,
             IEnumerable<string> dependencies,
-            Credentials credentials, IEnumerable<Action> preActions, IEnumerable<Action> postActions, bool sudo)
+            Credentials credentials, IEnumerable<Action<InstallHostSettings>> preActions,
+            IEnumerable<Action<InstallHostSettings>> postActions, bool sudo)
         {
             _environment = environment;
             _settings = settings;
@@ -84,17 +85,17 @@ namespace Topshelf.Hosts
 
         void ExecutePreActions()
         {
-            foreach (Action action in _preActions)
+            foreach (Action<InstallHostSettings> action in _preActions)
             {
-                action();
+                action(_installSettings);
             }
         }
 
         void ExecutePostActions()
         {
-            foreach (Action action in _postActions)
+            foreach (Action<InstallHostSettings> action in _postActions)
             {
-                action();
+                action(_installSettings);
             }
         }
 

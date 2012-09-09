@@ -24,8 +24,8 @@ namespace Topshelf.Builders
     {
         readonly IList<string> _dependencies;
         readonly HostEnvironment _environment;
-        readonly IList<Action> _postActions;
-        readonly IList<Action> _preActions;
+        readonly IList<Action<InstallHostSettings>> _postActions;
+        readonly IList<Action<InstallHostSettings>> _preActions;
         readonly HostSettings _settings;
         Credentials _credentials;
         HostStartMode _startMode;
@@ -33,8 +33,8 @@ namespace Topshelf.Builders
 
         public InstallBuilder(HostEnvironment environment, HostSettings settings)
         {
-            _preActions = new List<Action>();
-            _postActions = new List<Action>();
+            _preActions = new List<Action<InstallHostSettings>>();
+            _postActions = new List<Action<InstallHostSettings>>();
             _dependencies = new List<string>();
             _startMode = HostStartMode.Automatic;
             _credentials = new Credentials("", "", ServiceAccount.LocalSystem);
@@ -87,12 +87,12 @@ namespace Topshelf.Builders
             _startMode = startMode;
         }
 
-        public void BeforeInstall(Action callback)
+        public void BeforeInstall(Action<InstallHostSettings> callback)
         {
             _preActions.Add(callback);
         }
 
-        public void AfterInstall(Action callback)
+        public void AfterInstall(Action<InstallHostSettings> callback)
         {
             _postActions.Add(callback);
         }

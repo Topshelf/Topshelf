@@ -14,10 +14,23 @@ namespace Topshelf
 {
     using System;
     using HostConfigurators;
+    using Runtime;
 
     public static class InstallHostConfiguratorExtensions
     {
         public static HostConfigurator BeforeInstall(this HostConfigurator configurator, Action callback)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeInstall",
+                x => x.BeforeInstall(settings => callback())));
+
+            return configurator;
+        }
+
+        public static HostConfigurator BeforeInstall(this HostConfigurator configurator,
+            Action<InstallHostSettings> callback)
         {
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
@@ -29,6 +42,18 @@ namespace Topshelf
         }
 
         public static HostConfigurator AfterInstall(this HostConfigurator configurator, Action callback)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterInstall",
+                x => x.AfterInstall(settings => callback())));
+
+            return configurator;
+        }
+
+        public static HostConfigurator AfterInstall(this HostConfigurator configurator,
+            Action<InstallHostSettings> callback)
         {
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
