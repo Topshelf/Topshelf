@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.HostConfigurators
 {
+    using System;
     using Configurators;
 
     public interface HostConfigurator :
@@ -86,5 +87,19 @@ namespace Topshelf.HostConfigurators
         /// </summary>
         /// <param name="commandLine"></param>
         void ApplyCommandLine(string commandLine);
+
+        /// <summary>
+        /// Adds a command line switch (--name) that can be either true or false. Switches are CASE SeNsITiVe
+        /// </summary>
+        /// <param name="name">The name of the switch, as it will appear on the command line</param>
+        void AddCommandLineSwitch(string name, Action<bool> callback);
+
+        /// <summary>
+        /// Adds a command line definition (-name:value) that can be specified. the name is case sensitive. If the 
+        /// definition 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        void AddCommandLineDefinition(string name, Action<string> callback);
     }
 }

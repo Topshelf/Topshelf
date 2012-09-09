@@ -200,6 +200,40 @@ namespace Topshelf.Tests
             Assert.IsInstanceOf<StopHost>(host);
         }
 
+        [Test]
+        public void Extensible_the_command_line_should_be_yes()
+        {
+            bool isSuperfly = false;
+            
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+
+                    x.AddCommandLineSwitch("superfly", v => isSuperfly = v);
+
+                    x.ApplyCommandLine("--superfly");
+                });
+
+            Assert.IsTrue(isSuperfly);
+        }
+
+        [Test]
+        public void Extensible_the_command_line_should_be_yet_again()
+        {
+            string volumeLevel = null;
+            
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+
+                    x.AddCommandLineDefinition("volumeLevel", v => volumeLevel = v);
+
+                    x.ApplyCommandLine("-volumeLevel:11");
+                });
+
+            Assert.AreEqual("11", volumeLevel);
+        }
+
         class MyService : ServiceControl
         {
             public bool Start(HostControl hostControl)

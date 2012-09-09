@@ -17,7 +17,7 @@ namespace Topshelf.HostConfigurators
 
     static class CommandLineParserOptions
     {
-        internal static void InitializeCommandLineParser(ICommandLineElementParser<Option> x)
+        internal static void AddTopshelfOptions(ICommandLineElementParser<Option> x)
         {
             x.Add((from arg in x.Argument("install")
                    select (Option)new InstallOption())
@@ -61,9 +61,13 @@ namespace Topshelf.HostConfigurators
                 .Or(from disp in x.Definition("displayname")
                     select (Option)new DisplayNameOption(disp.Value))
                 .Or(from instance in x.Definition("instance")
-                    select (Option)new InstanceOption(instance.Value))
-                .Or(from unknown in x.Definition()
-                    select (Option)new UnknownOption(unknown.ToString()))
+                    select (Option)new InstanceOption(instance.Value)));
+        }
+
+        internal static void AddUnknownOptions(ICommandLineElementParser<Option> x)
+        {
+            x.Add((from unknown in x.Definition()
+                   select (Option)new UnknownOption(unknown.ToString()))
                 .Or(from unknown in x.Switch()
                     select (Option)new UnknownOption(unknown.ToString()))
                 .Or(from unknown in x.Argument()
