@@ -302,7 +302,7 @@ There are a number of built-in extension methods for well-known services, includ
     HostFactory.New(x =>
     {
         x.DependsOnMsmq(); // Microsoft Message Queueing
-        x.DependsOnSql(); // Microsoft SQL Server
+        x.DependsOnMsSql(); // Microsoft SQL Server
         x.DependsOnEventLog(); // Windows Event Log
         x.DependsOnIis(); // Internet Information Server
     });
