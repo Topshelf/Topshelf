@@ -10,23 +10,13 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Runtime
 {
-    using HostConfigurators;
-    using ServiceConfigurators;
-
-    /// <summary>
-    /// Configures the service that is to be supervised, including any of the parameters
-    /// of the supervision service
-    /// </summary>
-    public interface SuperviseConfigurator :
-        ServiceConfigurator
+    public interface ServiceEvents
     {
-        /// <summary>
-        ///   Sets the service builder to use for creating the service
-        /// </summary>
-        /// <typeparam name="T"> </typeparam>
-        /// <param name="serviceBuilderFactory"> </param>
-        void UseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory);
+        void BeforeStart(HostControl hostControl);
+        void AfterStart(HostControl hostControl);
+        void BeforeStop(HostControl hostControl);
+        void AfterStop(HostControl hostControl);
     }
 }

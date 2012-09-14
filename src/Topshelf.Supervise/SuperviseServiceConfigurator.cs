@@ -16,8 +16,10 @@ namespace Topshelf.Supervise
     using Builders;
     using Configurators;
     using HostConfigurators;
+    using ServiceConfigurators;
 
     public class SuperviseServiceConfigurator :
+        ServiceConfiguratorBase,
         SuperviseConfigurator,
         Configurator
     {
@@ -36,7 +38,7 @@ namespace Topshelf.Supervise
 
         public ServiceBuilder Build()
         {
-            return new SuperviseServiceBuilder(_serviceBuilderFactory);
+            return new SuperviseServiceBuilder(_serviceBuilderFactory, ServiceEvents);
         }
     }
 }

@@ -10,23 +10,31 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf
+namespace Topshelf.Runtime
 {
-    using HostConfigurators;
-    using ServiceConfigurators;
+    using System;
+    using System.Collections.Generic;
 
-    /// <summary>
-    /// Configures the service that is to be supervised, including any of the parameters
-    /// of the supervision service
-    /// </summary>
-    public interface SuperviseConfigurator :
-        ServiceConfigurator
+    public class EventCallbackList<T>
     {
-        /// <summary>
-        ///   Sets the service builder to use for creating the service
-        /// </summary>
-        /// <typeparam name="T"> </typeparam>
-        /// <param name="serviceBuilderFactory"> </param>
-        void UseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory);
+        readonly IList<Action<T>> _callbacks;
+
+        public EventCallbackList()
+        {
+            _callbacks = new List<Action<T>>();
+        }
+
+        public void Add(Action<T> callback)
+        {
+            _callbacks.Add(callback);
+        }
+
+        public void Notify(T data)
+        {
+            foreach (var callback in _callbacks)
+            {
+                callback(data);
+            }
+        }
     }
 }

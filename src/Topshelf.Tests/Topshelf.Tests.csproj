@@ -62,6 +62,7 @@
     </Compile>
     <Compile Include="CommandLine_Specs.cs" />
     <Compile Include="Help_Specs.cs" />
+    <Compile Include="ServiceEvent_Specs.cs" />
     <Compile Include="Supervise_Specs.cs" />
   </ItemGroup>
   <ItemGroup>

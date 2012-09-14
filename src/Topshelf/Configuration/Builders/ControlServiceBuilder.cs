@@ -19,11 +19,13 @@ namespace Topshelf.Builders
         ServiceBuilder
         where T : class, ServiceControl
     {
-        readonly ServiceFactory<T> _serviceFactory;
+        readonly ServiceEvents _serviceEvents;
+        readonly Func<HostSettings, T> _serviceFactory;
 
-        public ControlServiceBuilder(ServiceFactory<T> serviceFactory)
+        public ControlServiceBuilder(Func<HostSettings, T> serviceFactory, ServiceEvents serviceEvents)
         {
             _serviceFactory = serviceFactory;
+            _serviceEvents = serviceEvents;
         }
 
         public ServiceHandle Build(HostSettings settings)
@@ -32,7 +34,7 @@ namespace Topshelf.Builders
             {
                 T service = _serviceFactory(settings);
 
-                return new ControlServiceHandle(service);
+                return new ControlServiceHandle(service, _serviceEvents);
             }
             catch (Exception ex)
             {
@@ -44,10 +46,12 @@ namespace Topshelf.Builders
             ServiceHandle
         {
             readonly T _service;
+            readonly ServiceEvents _serviceEvents;
 
-            public ControlServiceHandle(T service)
+            public ControlServiceHandle(T service, ServiceEvents serviceEvents)
             {
                 _service = service;
+                _serviceEvents = serviceEvents;
             }
 
             public void Dispose()
@@ -59,12 +63,20 @@ namespace Topshelf.Builders
 
             public bool Start(HostControl hostControl)
             {
-                return _service.Start(hostControl);
+                _serviceEvents.BeforeStart(hostControl);
+                bool started = _service.Start(hostControl);
+                if (started)
+                    _serviceEvents.AfterStart(hostControl);
+                return started;
             }
 
             public bool Stop(HostControl hostControl)
             {
-                return _service.Stop(hostControl);
+                _serviceEvents.BeforeStop(hostControl);
+                bool stopped = _service.Stop(hostControl);
+                if (stopped)
+                    _serviceEvents.AfterStop(hostControl);
+                return stopped;
             }
 
             public bool Pause(HostControl hostControl)

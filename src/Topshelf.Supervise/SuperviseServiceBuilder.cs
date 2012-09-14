@@ -21,10 +21,12 @@ namespace Topshelf.Supervise
         ServiceBuilder
     {
         readonly ServiceBuilderFactory _serviceBuilderFactory;
+        readonly ServiceEvents _serviceEvents;
 
-        public SuperviseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory)
+        public SuperviseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory, ServiceEvents serviceEvents)
         {
             _serviceBuilderFactory = serviceBuilderFactory;
+            _serviceEvents = serviceEvents;
         }
 
         public ServiceHandle Build(HostSettings settings)
@@ -35,7 +37,7 @@ namespace Topshelf.Supervise
 
 
                 var builder = new ControlServiceBuilder<SuperviseService>(
-                    x => new SuperviseService(x, serviceAvailability, _serviceBuilderFactory));
+                    x => new SuperviseService(x, serviceAvailability, _serviceBuilderFactory), _serviceEvents);
 
                 ServiceHandle serviceHandle = builder.Build(settings);
 

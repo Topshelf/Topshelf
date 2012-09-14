@@ -16,10 +16,10 @@ namespace Topshelf.ServiceConfigurators
     using System.Collections.Generic;
     using Builders;
     using Configurators;
-    using HostConfigurators;
     using Runtime;
 
     public class DelegateServiceConfigurator<T> :
+        ServiceConfiguratorBase,
         ServiceConfigurator<T>,
         Configurator
         where T : class
@@ -95,7 +95,7 @@ namespace Topshelf.ServiceConfigurators
 
         public ServiceBuilder Build()
         {
-            var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown);
+            var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown, ServiceEvents);
             return serviceBuilder;
         }
     }

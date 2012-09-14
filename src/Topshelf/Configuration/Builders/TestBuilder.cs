@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -17,16 +17,15 @@ namespace Topshelf.Builders
     using Logging;
     using Runtime;
 
-
-    public class RunBuilder :
+    public class TestBuilder :
         HostBuilder
     {
-        static readonly LogWriter _log = HostLogger.Get<RunBuilder>();
+        static readonly LogWriter _log = HostLogger.Get<TestBuilder>();
 
-        readonly HostSettings _settings;
         readonly HostEnvironment _environment;
+        readonly HostSettings _settings;
 
-        public RunBuilder(HostEnvironment environment, HostSettings settings)
+        public TestBuilder(HostEnvironment environment, HostSettings settings)
         {
             if (settings == null)
                 throw new ArgumentNullException("settings");
@@ -67,14 +66,8 @@ namespace Topshelf.Builders
 
         Host CreateHost(ServiceHandle serviceHandle)
         {
-            if (_environment.IsRunningAsAService)
-            {
-                _log.Debug("Running as a service, creating service host.");
-                return _environment.CreateServiceHost(_settings, serviceHandle);
-            }
-
-            _log.Debug("Running as a console application, creating the console host.");
-            return new ConsoleRunHost(_settings, _environment, serviceHandle);
+            _log.Debug("Running as a test host.");
+            return new TestHost(_settings, _environment, serviceHandle);
         }
     }
 }

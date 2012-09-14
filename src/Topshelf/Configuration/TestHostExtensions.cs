@@ -1,4 +1,4 @@
-// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,21 +12,21 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
+    using Builders;
     using HostConfigurators;
-    using ServiceConfigurators;
 
-    /// <summary>
-    /// Configures the service that is to be supervised, including any of the parameters
-    /// of the supervision service
-    /// </summary>
-    public interface SuperviseConfigurator :
-        ServiceConfigurator
+    public static class TestHostExtensions
     {
         /// <summary>
-        ///   Sets the service builder to use for creating the service
+        /// Configures the test host, which simply starts and stops the service. Meant to be used
+        /// to verify the service can be created, started, stopped, and disposed without issues.
         /// </summary>
-        /// <typeparam name="T"> </typeparam>
-        /// <param name="serviceBuilderFactory"> </param>
-        void UseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory);
+        public static HostConfigurator UseTestHost(this HostConfigurator configurator)
+        {
+            configurator.UseHostBuilder((environment, settings) => new TestBuilder(environment, settings));
+            configurator.ApplyCommandLine("");
+
+            return configurator;
+        }
     }
 }

@@ -13,10 +13,10 @@
 namespace Topshelf
 {
     using System;
-    using Builders;
     using HostConfigurators;
     using Rehab;
     using Runtime;
+    using ServiceConfigurators;
 
     public static class RehabServiceExtensions
     {
@@ -26,44 +26,49 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            ServiceBuilderFactory factory = settings => new ControlServiceBuilder<T>(x => new T());
+            ServiceBuilderFactory serviceBuilderFactory = ServiceExtensions.CreateServiceBuilderFactory(x => new T(),
+                NoCallback);
 
-            ServiceBuilderFactory updaterFactory = settings => new RehabServiceBuilder<T>(factory);
-
-            configurator.UseServiceBuilder(updaterFactory);
-
-            return configurator;
+            return RehabService<T>(configurator, serviceBuilderFactory);
         }
 
-        public static HostConfigurator RehabService<T>(this HostConfigurator configurator, Func<T> serviceFactory)
+        public static HostConfigurator RehabService<T>(this HostConfigurator configurator, Func<T> factory)
             where T : class, ServiceControl
         {
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            ServiceBuilderFactory factory = settings => new ControlServiceBuilder<T>(x => serviceFactory());
+            ServiceBuilderFactory serviceBuilderFactory = ServiceExtensions.CreateServiceBuilderFactory(x => factory(),
+                NoCallback);
 
-            ServiceBuilderFactory updaterFactory = settings => new RehabServiceBuilder<T>(factory);
+            return RehabService<T>(configurator, serviceBuilderFactory);
+        }
 
-            configurator.UseServiceBuilder(updaterFactory);
+        public static HostConfigurator RehabService<T>(this HostConfigurator configurator, Func<HostSettings, T> factory)
+            where T : class, ServiceControl
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
 
-            return configurator;
+            ServiceBuilderFactory serviceBuilderFactory = ServiceExtensions.CreateServiceBuilderFactory(factory,
+                NoCallback);
+
+            return RehabService<T>(configurator, serviceBuilderFactory);
         }
 
         public static HostConfigurator RehabService<T>(this HostConfigurator configurator,
-            Func<HostSettings, T> serviceFactory)
-            where T : class, ServiceControl
+            ServiceBuilderFactory serviceBuilderFactory)
+            where T : class
         {
-            if (configurator == null)
-                throw new ArgumentNullException("configurator");
+            ServiceBuilderFactory rehabFactory = settings => new RehabServiceBuilder<T>(serviceBuilderFactory);
 
-            ServiceBuilderFactory factory = settings => new ControlServiceBuilder<T>(x => serviceFactory(x));
-
-            ServiceBuilderFactory updaterFactory = settings => new RehabServiceBuilder<T>(factory);
-
-            configurator.UseServiceBuilder(updaterFactory);
+            configurator.UseServiceBuilder(rehabFactory);
 
             return configurator;
+        }
+
+        static void NoCallback(ServiceConfigurator configurator)
+        {
         }
     }
 }

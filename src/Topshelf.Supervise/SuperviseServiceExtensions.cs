@@ -13,9 +13,6 @@
 namespace Topshelf
 {
     using System;
-    using System.Linq;
-    using Builders;
-    using Configurators;
     using HostConfigurators;
     using Runtime;
     using ServiceConfigurators;
@@ -28,9 +25,25 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            ServiceBuilderFactory factory = settings => new ControlServiceBuilder<T>(x => new T());
+            ServiceBuilderFactory serviceBuilderFactory = ServiceExtensions.CreateServiceBuilderFactory(x => new T(),
+                NoCallback);
 
-            configurator.UseServiceBuilder(factory);
+            configurator.UseServiceBuilder(serviceBuilderFactory);
+
+            return configurator;
+        }
+
+        public static SuperviseConfigurator Service<T>(this SuperviseConfigurator configurator,
+            Action<ServiceConfigurator> callback)
+            where T : class, ServiceControl, new()
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            ServiceBuilderFactory serviceBuilderFactory = ServiceExtensions.CreateServiceBuilderFactory(x => new T(),
+                callback);
+
+            configurator.UseServiceBuilder(serviceBuilderFactory);
 
             return configurator;
         }
@@ -41,9 +54,25 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            ServiceBuilderFactory factory = settings => new ControlServiceBuilder<T>(x => serviceFactory());
+            ServiceBuilderFactory serviceBuilderFactory =
+                ServiceExtensions.CreateServiceBuilderFactory(x => serviceFactory(), NoCallback);
 
-            configurator.UseServiceBuilder(factory);
+            configurator.UseServiceBuilder(serviceBuilderFactory);
+
+            return configurator;
+        }
+
+        public static SuperviseConfigurator Service<T>(this SuperviseConfigurator configurator, Func<T> serviceFactory,
+            Action<ServiceConfigurator> callback)
+            where T : class, ServiceControl
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            ServiceBuilderFactory serviceBuilderFactory =
+                ServiceExtensions.CreateServiceBuilderFactory(x => serviceFactory(), callback);
+
+            configurator.UseServiceBuilder(serviceBuilderFactory);
 
             return configurator;
         }
@@ -55,9 +84,34 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
 
-            ServiceBuilderFactory factory = settings => new ControlServiceBuilder<T>(x => serviceFactory(x));
+            ServiceBuilderFactory serviceBuilderFactory =
+                ServiceExtensions.CreateServiceBuilderFactory(serviceFactory, NoCallback);
 
-            configurator.UseServiceBuilder(factory);
+            configurator.UseServiceBuilder(serviceBuilderFactory);
+
+            return configurator;
+        }
+
+        public static SuperviseConfigurator Service<T>(this SuperviseConfigurator configurator,
+            Func<HostSettings, T> serviceFactory, Action<ServiceConfigurator> callback)
+            where T : class, ServiceControl
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            ServiceBuilderFactory serviceBuilderFactory =
+                ServiceExtensions.CreateServiceBuilderFactory(serviceFactory, callback);
+
+            configurator.UseServiceBuilder(serviceBuilderFactory);
+
+            return configurator;
+        }
+
+        public static HostConfigurator Service<T>(this HostConfigurator configurator,
+            ServiceBuilderFactory serviceBuilderFactory)
+            where T : class
+        {
+            configurator.UseServiceBuilder(serviceBuilderFactory);
 
             return configurator;
         }
@@ -69,26 +123,16 @@ namespace Topshelf
         {
             if (configurator == null)
                 throw new ArgumentNullException("configurator");
-            if (callback == null)
-                throw new ArgumentNullException("callback");
 
-            var serviceConfigurator = new DelegateServiceConfigurator<TService>();
+            ServiceBuilderFactory serviceBuilderFactory = ServiceExtensions.CreateServiceBuilderFactory(callback);
 
-            callback(serviceConfigurator);
-
-            configurator.UseServiceBuilder(x =>
-                {
-                    ConfigurationResult configurationResult =
-                        ValidateConfigurationResult.CompileResults(serviceConfigurator.Validate());
-                    if (configurationResult.Results.Any())
-                        throw new HostConfigurationException("The service was not properly configured");
-
-                    ServiceBuilder serviceBuilder = serviceConfigurator.Build();
-
-                    return serviceBuilder;
-                });
+            configurator.UseServiceBuilder(serviceBuilderFactory);
 
             return configurator;
+        }
+
+        static void NoCallback(ServiceConfigurator configurator)
+        {
         }
     }
 }

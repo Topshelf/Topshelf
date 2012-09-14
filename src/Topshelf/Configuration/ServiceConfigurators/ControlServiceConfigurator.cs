@@ -10,31 +10,38 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Builders
+namespace Topshelf.ServiceConfigurators
 {
     using System;
     using System.Collections.Generic;
+    using Builders;
+    using Configurators;
+    using HostConfigurators;
+    using Runtime;
 
-    public class EventCallbackList<T>
+    public class ControlServiceConfigurator<T> :
+        ServiceConfiguratorBase,
+        ServiceConfigurator,
+        Configurator
+        where T : class, ServiceControl
     {
-        IList<Action<T>> _callbacks;
+        readonly Func<HostSettings, T> _serviceFactory;
 
-        public EventCallbackList()
+        public ControlServiceConfigurator(Func<HostSettings, T> serviceFactory)
         {
-            _callbacks = new List<Action<T>>();
+            _serviceFactory = serviceFactory;
         }
 
-        public void Add(Action<T> callback)
+        public IEnumerable<ValidateResult> Validate()
         {
-            _callbacks.Add(callback);
+            yield break;
         }
 
-        public void Notify(T data)
+
+        public ServiceBuilder Build()
         {
-            foreach (var callback in _callbacks)
-            {
-                callback(data);
-            }
+            var serviceBuilder = new ControlServiceBuilder<T>(_serviceFactory, ServiceEvents);
+            return serviceBuilder;
         }
     }
 }
