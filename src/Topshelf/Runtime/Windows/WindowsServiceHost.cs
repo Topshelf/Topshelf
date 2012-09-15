@@ -111,8 +111,13 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
+                _log.Fatal("The service did not start successfully", ex);
                 _log.Fatal(ex);
                 throw;
+            }
+            finally
+            {
+                _log.Info("[Topshelf] Started");
             }
         }
 
