@@ -78,6 +78,34 @@ namespace Topshelf.Tests
         }
 
         [Test]
+        public void Should_create_an_install_host_with_display_name_and_instance_name()
+        {
+            Host host = HostFactory.New(x =>
+            {
+                x.Service<MyService>();
+                x.ApplyCommandLine("install -displayname \"Joe\" -instance \"42\"");
+            });
+
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual("Joe (Instance: 42)", installHost.Settings.DisplayName);
+        }
+
+        [Test]
+        public void Should_create_an_install_host_with_display_name_with_instance_name()
+        {
+            Host host = HostFactory.New(x =>
+            {
+                x.Service<MyService>();
+                x.ApplyCommandLine("install -displayname \"Joe (Instance: 42)\" -instance \"42\"");
+            });
+
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual("Joe (Instance: 42)", installHost.Settings.DisplayName);
+        }
+
+        [Test]
         public void Should_create_an_install_host_with_description()
         {
             Host host = HostFactory.New(x =>

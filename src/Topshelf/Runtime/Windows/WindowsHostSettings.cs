@@ -59,8 +59,9 @@ namespace Topshelf.Runtime.Windows
                                          ? Name
                                          : _displayName;
 
-                if (!string.IsNullOrEmpty(InstanceName))
-                    return string.Format("{0} (Instance: {1})", displayName, InstanceName);
+                var instance = string.Format(" (Instance: {0})", InstanceName);
+                if (!string.IsNullOrEmpty(InstanceName) && !displayName.EndsWith(instance))
+                    return displayName + instance;
 
                 return displayName;
             }
