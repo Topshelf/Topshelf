@@ -193,7 +193,7 @@ namespace Topshelf.Runtime.Windows
             }
             finally
             {
-                _log.Info("[Topshelf] Paused");
+                _log.Info("[Topshelf] Stopped");
             }
         }
 
