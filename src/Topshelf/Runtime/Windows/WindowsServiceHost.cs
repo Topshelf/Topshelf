@@ -163,18 +163,18 @@ namespace Topshelf.Runtime.Windows
         {
             try
             {
-                _log.Info("[Topshelf] Pausing service");
+                _log.Info("[Topshelf] Resuming service");
 
                 _serviceHandle.Continue(this);
             }
             catch (Exception ex)
             {
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _log.Fatal("The service did not start successfully", ex);
                 throw;
             }
             finally
             {
-                _log.Info("[Topshelf] Paused");
+                _log.Info("[Topshelf] Resumed");
             }
         }
 
