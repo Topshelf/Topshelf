@@ -108,9 +108,12 @@ namespace Topshelf.Runtime.Windows
                 _log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
 
                 _serviceHandle.Start(this);
+
+                _log.Info("[Topshelf] Started");
             }
             catch (Exception ex)
             {
+                _log.Fatal("The service did not start successfully", ex);
                 _log.Fatal(ex);
                 throw;
             }
@@ -123,15 +126,13 @@ namespace Topshelf.Runtime.Windows
                 _log.Info("[Topshelf] Stopping");
 
                 _serviceHandle.Stop(this);
+
+                _log.Info("[Topshelf] Stopped");
             }
             catch (Exception ex)
             {
                 _log.Fatal("The service did not shut down gracefully", ex);
                 throw;
-            }
-            finally
-            {
-                _log.Info("[Topshelf] Stopped");
             }
         }
 
@@ -142,15 +143,13 @@ namespace Topshelf.Runtime.Windows
                 _log.Info("[Topshelf] Pausing service");
 
                 _serviceHandle.Pause(this);
+
+                _log.Info("[Topshelf] Paused");
             }
             catch (Exception ex)
             {
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _log.Fatal("The service did not pause gracefully", ex);
                 throw;
-            }
-            finally
-            {
-                _log.Info("[Topshelf] Paused");
             }
         }
 
@@ -158,18 +157,16 @@ namespace Topshelf.Runtime.Windows
         {
             try
             {
-                _log.Info("[Topshelf] Pausing service");
+                _log.Info("[Topshelf] Resuming service");
 
                 _serviceHandle.Continue(this);
+
+                _log.Info("[Topshelf] Resumed");
             }
             catch (Exception ex)
             {
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _log.Fatal("The service did not resume successfully", ex);
                 throw;
-            }
-            finally
-            {
-                _log.Info("[Topshelf] Paused");
             }
         }
 
@@ -180,15 +177,13 @@ namespace Topshelf.Runtime.Windows
                 _log.Info("[Topshelf] Service is being shutdown");
 
                 _serviceHandle.Shutdown(this);
+
+                _log.Info("[Topshelf] Stopped");
             }
             catch (Exception ex)
             {
                 _log.Fatal("The service did not shut down gracefully", ex);
                 throw;
-            }
-            finally
-            {
-                _log.Info("[Topshelf] Paused");
             }
         }
 
