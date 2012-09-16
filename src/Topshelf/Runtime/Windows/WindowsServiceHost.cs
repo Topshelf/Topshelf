@@ -148,7 +148,7 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _log.Fatal("The service did not pause gracefully", ex);
                 throw;
             }
         }
@@ -165,7 +165,7 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                _log.Fatal("The service did not start successfully", ex);
+                _log.Fatal("The service did not resume successfully", ex);
                 throw;
             }
         }
