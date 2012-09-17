@@ -35,7 +35,7 @@ Topshelf has an extensible command-line, allowing services to register parameter
 What else can I get by using Topshelf?
 ----------------------------
 
-Topshelf is an open-source project, and new contributions are being accepted regularly. While the base Topshelf assembly is being kept small with very specific functionality, additional assemblies that built on top of Topshelf are also being created. For example, a supervisory extension that monitor service conditions such as CPU and memory is being created that will automatically cycle the service if conditions exceed specifications. This reduces the need to closely monitor services and manually restart them when they misbehave.
+Topshelf is an open-source project, and new contributions are being accepted regularly. While the base Topshelf assembly is being kept small with very specific functionality, additional assemblies that build on top of Topshelf are also being created. For example, a supervisory extension that monitors service conditions such as CPU and memory is being created that will automatically cycle the service if conditions exceed specifications. This reduces the need to closely monitor services and manually restart them when they misbehave.
 
 Is Topshelf just for Windows?
 ----------------------
