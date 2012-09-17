@@ -1,4 +1,0 @@
-Topshelf Key Concepts
-=====================
-
-Services

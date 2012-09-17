@@ -114,7 +114,7 @@ namespace Topshelf.Tests
 
             public bool Stop(HostControl hostControl)
             {
-                return false;
+                return true;
             }
         }
     }
