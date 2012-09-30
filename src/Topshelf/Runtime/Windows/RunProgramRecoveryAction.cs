@@ -12,6 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime.Windows
 {
+    using System;
+    
     public class RunProgramRecoveryAction :
         ServiceRecoveryAction
     {
@@ -27,7 +29,7 @@ namespace Topshelf.Runtime.Windows
         {
             return new NativeMethods.SC_ACTION
                 {
-                    Delay = Delay,
+                    Delay = DelayInMinutes * (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
                     Type = (int)NativeMethods.SC_ACTION_TYPE.RunCommand,
                 };
         }

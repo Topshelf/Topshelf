@@ -43,7 +43,7 @@ namespace Topshelf.Runtime.Windows
                     throw new TopshelfException("Failed to open service: " + settings.ServiceName);
 
                 int actionSize = Marshal.SizeOf(typeof(NativeMethods.SC_ACTION));
-                lpsaActions = Marshal.AllocHGlobal(actionSize*actions.Count + 1);
+                lpsaActions = Marshal.AllocHGlobal(actionSize*(actions.Count + 1));
                 if (lpsaActions == IntPtr.Zero)
                     throw new TopshelfException("Unable to allocate memory for service recovery actions");
 

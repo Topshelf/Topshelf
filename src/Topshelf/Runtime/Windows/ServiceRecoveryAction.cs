@@ -14,12 +14,12 @@ namespace Topshelf.Runtime.Windows
 {
     public abstract class ServiceRecoveryAction
     {
-        protected ServiceRecoveryAction(int delay)
+        protected ServiceRecoveryAction(int delayInMinutes)
         {
-            Delay = delay;
+            DelayInMinutes = delayInMinutes;
         }
 
-        public int Delay { get; private set; }
+        public int DelayInMinutes { get; private set; }
 
         public abstract NativeMethods.SC_ACTION GetAction();
     }
