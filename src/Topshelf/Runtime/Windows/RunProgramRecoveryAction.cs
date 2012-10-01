@@ -29,7 +29,7 @@ namespace Topshelf.Runtime.Windows
         {
             return new NativeMethods.SC_ACTION
                 {
-                    Delay = DelayInMinutes * (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
+                    Delay = (int)TimeSpan.FromMinutes(DelayInMinutes).TotalMilliseconds,
                     Type = (int)NativeMethods.SC_ACTION_TYPE.RunCommand,
                 };
         }
