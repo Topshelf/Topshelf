@@ -114,6 +114,8 @@ namespace Topshelf.Hosts
             {
                 _exit.Set();
 
+                /* Ilya Grebnov: Removing this hack to avoid application deadlock
+
                 // this is evil, but perhaps a good thing to let us clean up properly.
 
                 int deadThreadId = Interlocked.Increment(ref _deadThread);
@@ -121,6 +123,8 @@ namespace Topshelf.Hosts
                 Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
                 while (true)
                     Thread.Sleep(TimeSpan.FromHours(1));
+
+                Ilya Grebnov: End of changes */
             }
         }
 

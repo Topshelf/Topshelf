@@ -12,11 +12,13 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime.Windows
 {
+    using System;
+
     public class RestartServiceRecoveryAction :
         ServiceRecoveryAction
     {
-        public RestartServiceRecoveryAction(int delay)
-            : base(delay)
+        public RestartServiceRecoveryAction(int delayInMinutes)
+            : base(delayInMinutes)
         {
         }
 
@@ -24,7 +26,7 @@ namespace Topshelf.Runtime.Windows
         {
             return new NativeMethods.SC_ACTION
                 {
-                    Delay = Delay,
+                    Delay = (int)TimeSpan.FromMinutes(DelayInMinutes).TotalMilliseconds,
                     Type = (int)NativeMethods.SC_ACTION_TYPE.RestartService,
                 };
         }
