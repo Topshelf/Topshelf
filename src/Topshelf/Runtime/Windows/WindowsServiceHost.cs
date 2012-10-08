@@ -198,11 +198,15 @@ namespace Topshelf.Runtime.Windows
 
             Stop();
 
+            /* Ilya Grebnov: Removing this hack to avoid application deadlock
+
             int deadThreadId = Interlocked.Increment(ref _deadThread);
             Thread.CurrentThread.IsBackground = true;
             Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
             while (true)
                 Thread.Sleep(TimeSpan.FromHours(1));
+                
+            Ilya Grebnov: End of changes */
         }
     }
 }
