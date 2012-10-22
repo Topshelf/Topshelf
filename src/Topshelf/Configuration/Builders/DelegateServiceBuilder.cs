@@ -99,12 +99,12 @@ namespace Topshelf.Builders
 
             public bool Pause(HostControl hostControl)
             {
-                return _pause(_service, hostControl);
+                return _pause != null && _pause(_service, hostControl);
             }
 
             public bool Continue(HostControl hostControl)
             {
-                return _continue(_service, hostControl);
+                return _continue != null && _continue(_service, hostControl);
             }
 
             public bool Stop(HostControl hostControl)
@@ -121,7 +121,8 @@ namespace Topshelf.Builders
 
             public void Shutdown(HostControl hostControl)
             {
-                _shutdown(_service, hostControl);
+                if(_shutdown != null)
+                    _shutdown(_service, hostControl);
             }
         }
     }

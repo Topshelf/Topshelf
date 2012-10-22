@@ -27,23 +27,13 @@ namespace Topshelf.ServiceConfigurators
         Func<T, HostControl, bool> _continue;
         ServiceFactory<T> _factory;
         Func<T, HostControl, bool> _pause;
+
+
+        bool _pauseConfigured;
+        Action<T, HostControl> _shutdown;
+        bool _shutdownConfigured;
         Func<T, HostControl, bool> _start;
         Func<T, HostControl, bool> _stop;
-        Action<T, HostControl> _shutdown;
-
-
-        bool _canPauseAndContinue;
-        bool _canShutdown;
-
-        public bool CanPauseAndContinue
-        {
-            get { return _canPauseAndContinue; }
-        }
-
-        public bool CanShutdown
-        {
-            get { return _canShutdown; }
-        }
 
         public IEnumerable<ValidateResult> Validate()
         {
@@ -54,10 +44,12 @@ namespace Topshelf.ServiceConfigurators
                 yield return this.Failure("Start", "must not be null");
             if (_stop == null)
                 yield return this.Failure("Stop", "must not be null");
-            if (_pause != null && _continue == null)
+            if (_pauseConfigured && (_pause != null && _continue == null))
                 yield return this.Failure("Continue", "must not be null if pause is specified");
-            if (_pause == null && _continue != null)
+            if (_pauseConfigured && (_pause == null && _continue != null))
                 yield return this.Failure("Pause", "must not be null if continue is specified");
+            if (_shutdownConfigured && _shutdown == null)
+                yield return this.Failure("Shutdown", "must not be null if shutdown is allowed");
         }
 
         public void ConstructUsing(ServiceFactory<T> serviceFactory)
@@ -77,25 +69,26 @@ namespace Topshelf.ServiceConfigurators
 
         public void WhenPaused(Func<T, HostControl, bool> pause)
         {
-            _canPauseAndContinue = true;
+            _pauseConfigured = true;
             _pause = pause;
         }
 
         public void WhenContinued(Func<T, HostControl, bool> @continue)
         {
-            _canPauseAndContinue = true;
+            _pauseConfigured = true;
             _continue = @continue;
         }
 
-        public void WhenShutdown(Action<T,HostControl> shutdown)
+        public void WhenShutdown(Action<T, HostControl> shutdown)
         {
-            _canShutdown = true;
+            _shutdownConfigured = true;
             _shutdown = shutdown;
         }
 
         public ServiceBuilder Build()
         {
-            var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown, ServiceEvents);
+            var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown,
+                ServiceEvents);
             return serviceBuilder;
         }
     }
