@@ -55,8 +55,9 @@
     <Compile Include="Scripting\Commands\StopServiceCommand.cs" />
     <Compile Include="Scripting\Commands\UnloadServiceCommand.cs" />
     <Compile Include="ServiceAvailability.cs" />
-    <Compile Include="ServiceAvailabilityImpl.cs" />
+    <Compile Include="DownFileServiceAvailability.cs" />
     <Compile Include="HostControlProxy.cs" />
+    <Compile Include="ServiceAvailabilityHost.cs" />
     <Compile Include="ServiceHandleProxy.cs" />
     <Compile Include="ServiceHandleStub.cs" />
     <Compile Include="RestartServiceExtensions.cs" />

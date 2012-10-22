@@ -16,6 +16,7 @@ namespace Topshelf
     using HostConfigurators;
     using Runtime;
     using ServiceConfigurators;
+    using Supervise;
 
     public static class SuperviseServiceExtensions
     {

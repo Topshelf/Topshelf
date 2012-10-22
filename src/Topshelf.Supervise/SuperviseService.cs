@@ -13,6 +13,7 @@
 namespace Topshelf.Supervise
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using HostConfigurators;
     using Logging;
@@ -24,6 +25,7 @@ namespace Topshelf.Supervise
     public class SuperviseService :
         ServiceControl,
         HostControl,
+        ServiceAvailabilityHost,
         CommandHandler,
         IDisposable
     {
@@ -31,7 +33,7 @@ namespace Topshelf.Supervise
         readonly Fiber _fiber;
         readonly LogWriter _log = HostLogger.Get<SuperviseService>();
         readonly Scheduler _scheduler;
-        readonly ServiceAvailability _serviceAvailability;
+        readonly IList<ServiceAvailability> _serviceAvailability;
         readonly ServiceBuilderFactory _serviceBuilderFactory;
         readonly HostSettings _settings;
         readonly TimeSpan _shutdownTimeout = TimeSpan.FromSeconds(30);
@@ -41,12 +43,11 @@ namespace Topshelf.Supervise
         TimeSpan _monitorInterval = TimeSpan.FromSeconds(10);
         ServiceHandle _serviceHandle;
 
-        public SuperviseService(HostSettings settings, ServiceAvailability serviceAvailability,
-            ServiceBuilderFactory serviceBuilderFactory)
+        public SuperviseService(HostSettings settings, ServiceBuilderFactory serviceBuilderFactory)
         {
             _settings = settings;
-            _serviceAvailability = serviceAvailability;
             _serviceBuilderFactory = serviceBuilderFactory;
+            _serviceAvailability = new List<ServiceAvailability>();
 
             _fiber = new PoolFiber();
             _scheduler = new TimerScheduler(new PoolFiber());
@@ -81,6 +82,13 @@ namespace Topshelf.Supervise
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        void ServiceAvailabilityHost.StopService(string reason)
+        {
+            _log.DebugFormat("Service stop requested: {0}", reason);
+
+            _fiber.Add(StopService);
         }
 
         bool ServiceControl.Start(HostControl hostControl)
@@ -125,15 +133,16 @@ namespace Topshelf.Supervise
                 return;
             }
 
-            if (!_serviceAvailability.CanStart())
+            string reason;
+            if (!CanStartService(out reason))
             {
-                _log.Debug("Attempted to start service, but it is unavailable");
+                _log.DebugFormat("Attempted to start service, but it is not available: {0}", reason);
                 return;
             }
 
             _log.Debug("Starting supervised service");
 
-            var arguments = new CommandScriptStepArguments { _serviceBuilderFactory };
+            var arguments = new CommandScriptStepArguments {_serviceBuilderFactory};
             var script = new CommandScript
                 {
                     new CommandScriptStep<CreateServiceCommand>(arguments),
@@ -231,6 +240,23 @@ namespace Topshelf.Supervise
             {
                 _scheduler.Schedule(_monitorInterval, _fiber, MonitorService);
             }
+        }
+
+        bool CanStartService(out string reason)
+        {
+            foreach (var availability in _serviceAvailability)
+            {
+                if(!availability.CanStart(out reason))
+                    return false;
+            }
+
+            reason = null;
+            return true;
+        }
+
+        public void AddServiceAvailability(ServiceAvailability serviceAvailability)
+        {
+            _fiber.Add(() => _serviceAvailability.Add(serviceAvailability));
         }
     }
 }

@@ -13,10 +13,16 @@
 namespace Topshelf.Supervise
 {
     /// <summary>
-    ///   Used to determine if the service is available for the specific operation
+    /// Used to determine if the service is available for the specific operation
     /// </summary>
     public interface ServiceAvailability
     {
-        bool CanStart();
+        /// <summary>
+        /// Determines if the service can be started. If the service can not be
+        /// started, the return is false and the reason is specified.
+        /// </summary>
+        /// <param name="reason"></param>
+        /// <returns></returns>
+        bool CanStart(out string reason);
     }
 }

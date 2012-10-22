@@ -13,6 +13,7 @@
 namespace Topshelf
 {
     using System;
+    using Supervise;
 
     public static class RestartServiceExtensions
     {

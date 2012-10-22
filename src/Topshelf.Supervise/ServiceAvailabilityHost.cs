@@ -12,23 +12,14 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Supervise
 {
-    using System;
-    using System.IO;
-
-    public class ServiceAvailabilityImpl :
-        ServiceAvailability
+    /// <summary>
+    /// The host for a service availability
+    /// </summary>
+    public interface ServiceAvailabilityHost
     {
-        const string DownFilename = ".down";
-
-        public bool CanStart()
-        {
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string filename = Path.Combine(baseDirectory, DownFilename);
-
-            if (File.Exists(filename))
-                return false;
-
-            return true;
-        }
+        /// <summary>
+        /// Stop the service for the reason specified
+        /// </summary>
+        void StopService(string reason);
     }
 }

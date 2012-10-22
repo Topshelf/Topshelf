@@ -33,11 +33,7 @@ namespace Topshelf.Supervise
         {
             try
             {
-                ServiceAvailability serviceAvailability = new ServiceAvailabilityImpl();
-
-
-                var builder = new ControlServiceBuilder<SuperviseService>(
-                    x => new SuperviseService(x, serviceAvailability, _serviceBuilderFactory), _serviceEvents);
+                var builder = new ControlServiceBuilder<SuperviseService>(CreateSuperviseService, _serviceEvents);
 
                 ServiceHandle serviceHandle = builder.Build(settings);
 
@@ -47,6 +43,17 @@ namespace Topshelf.Supervise
             {
                 throw new ServiceBuilderException("An exception occurred creating supervise service", ex);
             }
+        }
+
+        SuperviseService CreateSuperviseService(HostSettings settings)
+        {
+
+            var service = new SuperviseService(settings, _serviceBuilderFactory);
+            
+            ServiceAvailability serviceAvailability = new DownFileServiceAvailability(service);
+            service.AddServiceAvailability(serviceAvailability);
+
+            return service;
         }
     }
 }
