@@ -105,9 +105,16 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Starting");
 
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+                _log.DebugFormat("[Topshelf] Current Directory: {0}", Directory.GetCurrentDirectory());
+
                 _log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
 
-                _serviceHandle.Start(this);
+                if (!_serviceHandle.Start(this))
+                {
+                    throw new TopshelfException("The service did not start successfully (returned false).");
+                }
 
                 _log.Info("[Topshelf] Started");
             }
@@ -125,7 +132,8 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Stopping");
 
-                _serviceHandle.Stop(this);
+                if(!_serviceHandle.Stop(this))
+                    throw new TopshelfException("The service did not stop successfully (return false).");
 
                 _log.Info("[Topshelf] Stopped");
             }
@@ -142,7 +150,8 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Pausing service");
 
-                _serviceHandle.Pause(this);
+                if(!_serviceHandle.Pause(this))
+                    throw new TopshelfException("The service did not pause successfully (returned false).");
 
                 _log.Info("[Topshelf] Paused");
             }
@@ -159,7 +168,8 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Resuming service");
 
-                _serviceHandle.Continue(this);
+                if(!_serviceHandle.Continue(this))
+                    throw new TopshelfException("The service did not continue successfully (returned false).");
 
                 _log.Info("[Topshelf] Resumed");
             }
