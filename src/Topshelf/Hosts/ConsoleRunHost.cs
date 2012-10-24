@@ -15,6 +15,9 @@ namespace Topshelf.Hosts
     using System;
     using System.IO;
     using System.Threading;
+#if !NET35
+    using System.Threading.Tasks;
+#endif
     using Logging;
     using Runtime;
 
@@ -118,9 +121,16 @@ namespace Topshelf.Hosts
             if (e.IsTerminating)
             {
                 _exit.Set();
+                
+#if !NET35
+                // it isn't likely that a TPL thread should land here, but if it does let's no block it
+                if(Task.CurrentId.HasValue)
+                {
+                    return;
+                }
+#endif
 
                 // this is evil, but perhaps a good thing to let us clean up properly.
-
                 int deadThreadId = Interlocked.Increment(ref _deadThread);
                 Thread.CurrentThread.IsBackground = true;
                 Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
