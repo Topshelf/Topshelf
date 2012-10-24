@@ -18,7 +18,20 @@ namespace SampleTopshelfService
     {
         static void Main()
         {
-            HostFactory.Run(x => x.Service<SampleService>());
+            HostFactory.Run(x =>
+                {
+                    x.UseLog4Net("log4net.config");
+
+                    bool throwOnStart = false;
+                    bool throwOnStop = false;
+                    bool throwUnhandled = false;
+
+                    x.Service(settings => new SampleService(throwOnStart, throwOnStop, throwUnhandled));
+
+                    x.AddCommandLineSwitch("throwonstart", v => throwOnStart = v);
+                    x.AddCommandLineSwitch("throwonstop", v => throwOnStop = v);
+                    x.AddCommandLineSwitch("throwunhandled", v => throwUnhandled = v);
+                });
         }
 
         void SansInterface()

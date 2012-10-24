@@ -55,6 +55,7 @@ namespace Topshelf.Hosts
                 return TopshelfExitCode.ServiceAlreadyInstalled;
             }
 
+            bool started = false;
             try
             {
                 _log.Debug("Starting up as a console application");
@@ -63,7 +64,10 @@ namespace Topshelf.Hosts
 
                 Console.CancelKeyPress += HandleCancelKeyPress;
 
-                _serviceHandle.Start(this);
+                if(!_serviceHandle.Start(this))
+                    throw new TopshelfException("The service failed to start (return false).");
+
+                started = true;
 
                 _log.InfoFormat("The {0} service is now running, press Control+C to exit.", _settings.ServiceName);
 
@@ -77,7 +81,8 @@ namespace Topshelf.Hosts
             }
             finally
             {
-                StopService();
+                if(started)
+                    StopService();
 
                 _exit.Close();
                 (_exit as IDisposable).Dispose();
@@ -132,7 +137,8 @@ namespace Topshelf.Hosts
                 {
                     _log.InfoFormat("Stopping the {0} service", _settings.ServiceName);
 
-                    _serviceHandle.Stop(this);
+                    if(!_serviceHandle.Stop(this))
+                        throw new TopshelfException("The service failed to stop (returned false).");
                 }
             }
             catch (Exception ex)

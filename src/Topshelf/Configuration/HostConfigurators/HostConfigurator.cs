@@ -13,10 +13,8 @@
 namespace Topshelf.HostConfigurators
 {
     using System;
-    using Configurators;
 
-    public interface HostConfigurator :
-        Configurator
+    public interface HostConfigurator
     {
         /// <summary>
         ///   Specifies the name of the service as it should be displayed in the service control manager

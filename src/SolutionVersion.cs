@@ -9,5 +9,5 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisibleAttribute(false)]
 [assembly: CLSCompliantAttribute(true)]
-[assembly: AssemblyInformationalVersion("3.0.3.fa7ab4")]
+[assembly: AssemblyInformationalVersion("3.0.3.2aed1f")]
 

@@ -51,6 +51,8 @@ namespace Topshelf.Runtime.Windows
 
             AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
+            ExitCode = (int)TopshelfExitCode.Ok;
+
             _log.Info("Starting as a Windows service");
 
             if (!_environment.IsServiceInstalled(_settings.ServiceName))
@@ -67,8 +69,7 @@ namespace Topshelf.Runtime.Windows
 
             Run(this);
 
-            ExitCode = (int)TopshelfExitCode.Ok;
-            return TopshelfExitCode.Ok;
+            return (TopshelfExitCode)Enum.ToObject(typeof(TopshelfExitCode), ExitCode);
         }
 
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
@@ -122,6 +123,8 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Fatal("The service did not start successfully", ex);
                 _log.Fatal(ex);
+
+                ExitCode = (int)TopshelfExitCode.StartServiceFailed;
                 throw;
             }
         }
@@ -140,6 +143,7 @@ namespace Topshelf.Runtime.Windows
             catch (Exception ex)
             {
                 _log.Fatal("The service did not shut down gracefully", ex);
+                ExitCode = (int)TopshelfExitCode.StopServiceFailed;
                 throw;
             }
         }

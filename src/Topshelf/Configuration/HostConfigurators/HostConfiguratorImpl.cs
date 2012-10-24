@@ -25,7 +25,8 @@ namespace Topshelf.HostConfigurators
     using Runtime.Windows;
 
     public class HostConfiguratorImpl :
-        HostConfigurator
+        HostConfigurator,
+        Configurator
     {
         readonly IList<HostBuilderConfigurator> _configurators;
         readonly WindowsHostSettings _settings;
