@@ -37,6 +37,20 @@ namespace Topshelf.Runtime.Linux
             return "";
         }
 
+        public static ServicePaths GeneratePathsForService(InstallHostSettings settings)
+        {
+            return new ServicePathsImpl
+                {
+                };
+        }
+
+        public class ServicePathsImpl 
+            : ServicePaths
+        {
+            public string Configuration { get; set; }
+            public string WorkingDirectory { get; set; }
+        }
+
         public void UninstallService(HostSettings settings, Action beforeUninstall, Action afterUninstall)
         {
             throw new NotImplementedException();
@@ -51,5 +65,11 @@ namespace Topshelf.Runtime.Linux
         {
             throw new NotImplementedException();
         }
+    }
+
+    public interface ServicePaths
+    {
+        string Configuration { get; }
+        string WorkingDirectory { get; }
     }
 }
