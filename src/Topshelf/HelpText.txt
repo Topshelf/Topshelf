@@ -1,4 +1,4 @@
-﻿Topshelf is a library that simplifies the creation of Windows services using .NET.
+﻿Topshelf is a library that simplifies the creation of Windows services using .NET/Mono.
 
 Command-Line Reference
 
