@@ -3,7 +3,7 @@ namespace Topshelf.Runtime.Linux
     using System;
 
     [Serializable]
-    public class WindowsHostSettings :
+    public class HostSettingsImpl :
         HostSettings
     {
         public const string InstanceSeparator = "$";
@@ -13,7 +13,7 @@ namespace Topshelf.Runtime.Linux
         /// <summary>
         ///   Creates a new WindowsServiceDescription using empty strings for the properties. The class is required to have names by the consumers.
         /// </summary>
-        public WindowsHostSettings()
+        public HostSettingsImpl()
             : this(string.Empty, string.Empty)
         {
         }
@@ -23,7 +23,7 @@ namespace Topshelf.Runtime.Linux
         /// </summary>
         /// <param name="name"> </param>
         /// <param name="instanceName"> </param>
-        public WindowsHostSettings(string name, string instanceName)
+        public HostSettingsImpl(string name, string instanceName)
         {
             if (name == null)
                 throw new ArgumentNullException("name");

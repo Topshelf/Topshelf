@@ -14,7 +14,7 @@ namespace Topshelf.Runtime.Windows
 {
     using Builders;
 
-    public class WindowsHostEnvironmentBuilder :
+    public class HostEnvironmentBuilder :
         EnvironmentBuilder
     {
         public HostEnvironment Build()

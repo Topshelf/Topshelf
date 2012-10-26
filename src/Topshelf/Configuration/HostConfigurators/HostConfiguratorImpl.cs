@@ -33,7 +33,7 @@ namespace Topshelf.HostConfigurators
         Configurator
     {
         readonly IList<HostBuilderConfigurator> _configurators;
-        readonly WindowsHostSettings _settings;
+        readonly HostSettingsImpl _settings;
         bool _commandLineApplied;
         EnvironmentBuilderFactory _environmentBuilderFactory;
         HostBuilderFactory _hostBuilderFactory;
@@ -44,7 +44,7 @@ namespace Topshelf.HostConfigurators
         {
             _configurators = new List<HostBuilderConfigurator>();
             _commandLineOptionConfigurators = new List<CommandLineConfigurator>();
-            _settings = new WindowsHostSettings();
+            _settings = new HostSettingsImpl();
 
             _environmentBuilderFactory = DefaultEnvironmentBuilderFactory;
             _hostBuilderFactory = DefaultHostBuilderFactory;
@@ -223,7 +223,7 @@ namespace Topshelf.HostConfigurators
 
         static EnvironmentBuilder DefaultEnvironmentBuilderFactory()
         {
-            return new WindowsHostEnvironmentBuilder();
+            return new HostEnvironmentBuilder();
         }
     }
 }
