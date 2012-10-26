@@ -98,7 +98,7 @@ namespace Topshelf.HostConfigurators
 
         void ConfigureServiceRecovery(InstallHostSettings installSettings)
         {
-            var controller = new WindowsServiceRecoveryController();
+            var controller = new ServiceRecoveryController();
             controller.SetServiceRecoveryOptions(_settings, _options);
         }
     }

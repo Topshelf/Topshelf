@@ -18,7 +18,7 @@ namespace Topshelf.Runtime.Windows
     using System.Runtime.InteropServices;
     using System.Security.Permissions;
 
-    public class WindowsServiceRecoveryController
+    public class ServiceRecoveryController
     {
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public void SetServiceRecoveryOptions(HostSettings settings, ServiceRecoveryOptions options)

@@ -193,6 +193,10 @@
     <Compile Include="Runtime\HostSettings.cs" />
     <Compile Include="Runtime\Linux\LinuxHostEnvironment.cs" />
     <Compile Include="Runtime\Linux\HostEnvironmentBuilder.cs" />
+    <Compile Include="Runtime\Linux\RestartServiceRecoveryAction.cs" />
+    <Compile Include="Runtime\Linux\RestartSystemRecoveryAction.cs" />
+    <Compile Include="Runtime\Linux\RunProgramRecoveryAction.cs" />
+    <Compile Include="Runtime\Linux\ServiceRecoveryController.cs" />
     <Compile Include="Runtime\ServiceEvents.cs" />
     <Compile Include="Runtime\ServiceEventsImpl.cs" />
     <Compile Include="Runtime\ServiceFactory.cs" />
@@ -211,7 +215,7 @@
     <Compile Include="Runtime\Windows\WindowsHostEnvironment.cs" Condition=" '$(OS)' == 'Windows_NT' " />
     <Compile Include="Runtime\Windows\HostEnvironmentBuilder.cs" Condition=" '$(OS)' == 'Windows_NT' " />
     <Compile Include="Runtime\Windows\HostSettingsImpl.cs" Condition=" '$(OS)' == 'Windows_NT' " />
-    <Compile Include="Runtime\Windows\WindowsServiceRecoveryController.cs" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Compile Include="Runtime\Windows\ServiceRecoveryController.cs" Condition=" '$(OS)' == 'Windows_NT' " />
     <Compile Include="Runtime\Windows\WindowsServiceHost.cs" Condition=" '$(OS)' == 'Windows_NT' ">
       <SubType>Component</SubType>
     </Compile>

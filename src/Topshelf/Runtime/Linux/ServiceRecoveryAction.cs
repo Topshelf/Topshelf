@@ -17,8 +17,11 @@ namespace Topshelf
 	// have a look at what upstart supports
 	
 	public enum RecoveryAction
-	{
-		Restart
+	{ 
+        None = 0,
+        RestartService = 1,
+        RestartSystem = 2,
+        RunCommand = 3
 	}
 }
 
