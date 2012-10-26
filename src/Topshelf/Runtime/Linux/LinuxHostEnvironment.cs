@@ -26,9 +26,15 @@ namespace Topshelf.Runtime.Linux
             throw new NotImplementedException();
         }
 
-        public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall)
+        public void InstallService(
+            InstallHostSettings settings, Action beforeInstall, Action afterInstall)
         {
             throw new NotImplementedException();
+        }
+
+        public static string GenerateUpstartScript(InstallHostSettings settings)
+        {
+            return "";
         }
 
         public void UninstallService(HostSettings settings, Action beforeUninstall, Action afterUninstall)
