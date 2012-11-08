@@ -15,7 +15,8 @@ props = {
   :output => File.expand_path("build_output"),
   :artifacts => File.expand_path("build_artifacts"),
   :lib => File.expand_path("lib"),
-  :projects => ["Topshelf"]
+  :projects => ["Topshelf"],
+  :keyfile => File.expand_path("Topshelf.snk")
 }
 
 desc "Cleans, compiles, il-merges, unit tests, prepares examples, packages zip"
@@ -77,6 +78,8 @@ msbuild :build35 do |msb|
                 :TargetFrameworkVersion => "v3.5"
 	msb.use :net35
 	msb.targets :Clean, :Build
+  msb.properties[:SignAssembly] = 'true'
+  msb.properties[:AssemblyOriginatorKeyFile] = props[:keyfile]
 	msb.solution = 'src/Topshelf.sln'
 end
 
@@ -86,6 +89,8 @@ msbuild :build4 do |msb|
 		:Platform => 'Any CPU'
 	msb.use :net4
 	msb.targets :Clean, :Build
+  msb.properties[:SignAssembly] = 'true'
+  msb.properties[:AssemblyOriginatorKeyFile] = props[:keyfile]
 	msb.solution = 'src/Topshelf.sln'
 end
 

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("3.0.3")]
 [assembly: AssemblyFileVersion("3.0.3")]
 
+[assembly: AssemblyInformationalVersion("3.0.3.5e5113")]
 [assembly: ComVisibleAttribute(false)]
 [assembly: CLSCompliantAttribute(true)]
-[assembly: AssemblyInformationalVersion("3.0.3.2aed1f")]
 
