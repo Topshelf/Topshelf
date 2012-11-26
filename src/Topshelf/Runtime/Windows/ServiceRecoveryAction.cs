@@ -12,11 +12,13 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime.Windows
 {
+    using System;
+
     public abstract class ServiceRecoveryAction
     {
         protected ServiceRecoveryAction(int delay)
         {
-            Delay = delay;
+            Delay = (int)TimeSpan.FromMinutes(delay).TotalMilliseconds;
         }
 
         public int Delay { get; private set; }
