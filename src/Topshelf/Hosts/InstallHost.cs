@@ -28,13 +28,18 @@ namespace Topshelf.Hosts
         readonly InstallHostSettings _installSettings;
         readonly IEnumerable<Action<InstallHostSettings>> _postActions;
         readonly IEnumerable<Action<InstallHostSettings>> _preActions;
+        readonly IEnumerable<Action<InstallHostSettings>> _postRollbackActions;
+        readonly IEnumerable<Action<InstallHostSettings>> _preRollbackActions;
         readonly HostSettings _settings;
         readonly bool _sudo;
 
         public InstallHost(HostEnvironment environment, HostSettings settings, HostStartMode startMode,
             IEnumerable<string> dependencies,
             Credentials credentials, IEnumerable<Action<InstallHostSettings>> preActions,
-            IEnumerable<Action<InstallHostSettings>> postActions, bool sudo)
+            IEnumerable<Action<InstallHostSettings>> postActions,
+            IEnumerable<Action<InstallHostSettings>> preRollbackActions,
+            IEnumerable<Action<InstallHostSettings>> postRollbackActions,
+            bool sudo)
         {
             _environment = environment;
             _settings = settings;
@@ -43,6 +48,8 @@ namespace Topshelf.Hosts
 
             _preActions = preActions;
             _postActions = postActions;
+            _preRollbackActions = preRollbackActions;
+            _postRollbackActions = postRollbackActions;
             _sudo = sudo;
         }
 
@@ -78,7 +85,7 @@ namespace Topshelf.Hosts
 
             _log.DebugFormat("Attempting to install '{0}'", _settings.ServiceName);
 
-            _environment.InstallService(_installSettings, ExecutePreActions, ExecutePostActions);
+            _environment.InstallService(_installSettings, ExecutePreActions, ExecutePostActions, ExecutePreRollbackActions, ExecutePostRollbackActions);
 
             return TopshelfExitCode.Ok;
         }
@@ -94,6 +101,22 @@ namespace Topshelf.Hosts
         void ExecutePostActions()
         {
             foreach (Action<InstallHostSettings> action in _postActions)
+            {
+                action(_installSettings);
+            }
+        }
+
+        void ExecutePreRollbackActions()
+        {
+            foreach (Action<InstallHostSettings> action in _preRollbackActions)
+            {
+                action(_installSettings);
+            }
+        }
+
+        void ExecutePostRollbackActions()
+        {
+            foreach (Action<InstallHostSettings> action in _postRollbackActions)
             {
                 action(_installSettings);
             }

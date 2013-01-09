@@ -51,12 +51,16 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
-        public void InstallService(Action<InstallEventArgs> beforeInstall, Action<InstallEventArgs> afterInstall)
+        public void InstallService(Action<InstallEventArgs> beforeInstall, Action<InstallEventArgs> afterInstall, Action<InstallEventArgs> beforeRollback, Action<InstallEventArgs> afterRollback)
         {
             if (beforeInstall != null)
                 _installer.BeforeInstall += (sender, args) => beforeInstall(args);
             if (afterInstall != null)
                 _installer.AfterInstall += (sender, args) => afterInstall(args);
+            if (beforeRollback != null)
+                _installer.BeforeRollback += (sender, args) => beforeRollback(args);
+            if (afterRollback != null)
+                _installer.AfterRollback += (sender, args) => afterRollback(args);
 
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
@@ -125,7 +129,7 @@ namespace Topshelf.Runtime.Windows
                 throw new TopshelfException("Assembly.GetEntryAssembly() is null for some reason.");
 
             string path = string.Format("/assemblypath={0}", assembly.Location);
-            string[] commandLine = {path};
+            string[] commandLine = { path };
 
             var context = new InstallContext(null, commandLine);
             transactedInstaller.Context = context;
