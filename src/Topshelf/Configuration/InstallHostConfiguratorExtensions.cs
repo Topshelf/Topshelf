@@ -62,5 +62,51 @@ namespace Topshelf
 
             return configurator;
         }
+
+        public static HostConfigurator BeforeRollback(this HostConfigurator configurator, Action callback)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeRollback",
+                x => x.BeforeRollback(settings => callback())));
+
+            return configurator;
+        }
+
+        public static HostConfigurator BeforeRollback(this HostConfigurator configurator,
+            Action<InstallHostSettings> callback)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeRollback",
+                x => x.BeforeRollback(callback)));
+
+            return configurator;
+        }
+
+        public static HostConfigurator AfterRollback(this HostConfigurator configurator, Action callback)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterRollback",
+                x => x.AfterRollback(settings => callback())));
+
+            return configurator;
+        }
+
+        public static HostConfigurator AfterRollback(this HostConfigurator configurator,
+            Action<InstallHostSettings> callback)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterRollback", 
+                x => x.AfterRollback(callback)));
+
+            return configurator;
+        }
     }
 }

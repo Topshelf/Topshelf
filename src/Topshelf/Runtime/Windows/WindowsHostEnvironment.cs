@@ -164,7 +164,7 @@ namespace Topshelf.Runtime.Windows
             return new WindowsServiceHost(this, settings, serviceHandle);
         }
 
-        public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall)
+        public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback)
         {
             using (var installer = new HostServiceInstaller(settings))
             {
@@ -180,7 +180,19 @@ namespace Topshelf.Runtime.Windows
                             afterInstall();
                     };
 
-                installer.InstallService(before, after);
+                Action<InstallEventArgs> before2 = x =>
+                    {
+                        if (beforeRollback != null)
+                            beforeRollback();
+                    };
+
+                Action<InstallEventArgs> after2 = x =>
+                    {
+                        if (afterRollback != null)
+                            afterRollback();
+                    };
+
+                installer.InstallService(before, after, before2, after2);
             }
         }
 
