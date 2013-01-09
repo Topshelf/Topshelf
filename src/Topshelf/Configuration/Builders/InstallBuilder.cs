@@ -26,6 +26,8 @@ namespace Topshelf.Builders
         readonly HostEnvironment _environment;
         readonly IList<Action<InstallHostSettings>> _postActions;
         readonly IList<Action<InstallHostSettings>> _preActions;
+        readonly IList<Action<InstallHostSettings>> _postRollbackActions;
+        readonly IList<Action<InstallHostSettings>> _preRollbackActions;
         readonly HostSettings _settings;
         Credentials _credentials;
         HostStartMode _startMode;
@@ -35,6 +37,8 @@ namespace Topshelf.Builders
         {
             _preActions = new List<Action<InstallHostSettings>>();
             _postActions = new List<Action<InstallHostSettings>>();
+            _preRollbackActions = new List<Action<InstallHostSettings>>();
+            _postRollbackActions = new List<Action<InstallHostSettings>>();
             _dependencies = new List<string>();
             _startMode = HostStartMode.Automatic;
             _credentials = new Credentials("", "", ServiceAccount.LocalSystem);
@@ -56,7 +60,7 @@ namespace Topshelf.Builders
         public Host Build(ServiceBuilder serviceBuilder)
         {
             return new InstallHost(_environment, _settings, _startMode, _dependencies.ToArray(), _credentials,
-                _preActions, _postActions, _sudo);
+                _preActions, _postActions, _preRollbackActions, _postRollbackActions, _sudo);
         }
 
         public void Match<T>(Action<T> callback)
@@ -95,6 +99,16 @@ namespace Topshelf.Builders
         public void AfterInstall(Action<InstallHostSettings> callback)
         {
             _postActions.Add(callback);
+        }
+
+        public void BeforeRollback(Action<InstallHostSettings> callback)
+        {
+            _preRollbackActions.Add(callback);
+        }
+
+        public void AfterRollback(Action<InstallHostSettings> callback)
+        {
+            _postRollbackActions.Add(callback);
         }
 
         public void AddDependency(string name)
