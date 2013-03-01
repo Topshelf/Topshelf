@@ -51,11 +51,15 @@ namespace Topshelf.Runtime.Windows
                     return;
                 }
 
-                sc.Start();
-                while (sc.Status == ServiceControllerStatus.Stopped || sc.Status == ServiceControllerStatus.StartPending)
+                if (sc.Status == ServiceControllerStatus.Stopped || sc.Status == ServiceControllerStatus.Paused)
                 {
-                    Thread.Sleep(500);
-                    sc.Refresh();
+                    sc.Start();
+                    sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
+                }
+                else
+                {
+                    // Status is StopPending, ContinuePending or PausedPending, print warning
+                    _log.WarnFormat("The {0} service can't be started now as it has the status {1}. Try again later...", serviceName, sc.Status.ToString());
                 }
             }
         }
@@ -76,11 +80,15 @@ namespace Topshelf.Runtime.Windows
                     return;
                 }
 
-                sc.Stop();
-                while (sc.Status == ServiceControllerStatus.Running || sc.Status == ServiceControllerStatus.StopPending)
+                if (sc.Status == ServiceControllerStatus.Running || sc.Status == ServiceControllerStatus.Paused)
                 {
-                    Thread.Sleep(500);
-                    sc.Refresh();
+                    sc.Stop();
+                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                }
+                else
+                {
+                    // Status is StartPending, ContinuePending or PausedPending, print warning
+                    _log.WarnFormat("The {0} service can't be stopped now as it has the status {1}. Try again later...", serviceName, sc.Status.ToString());
                 }
             }
         }
