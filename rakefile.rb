@@ -12,6 +12,7 @@ OUTPUT_PATH = 'bin/Release'
 
 props = {
   :src => File.expand_path("src"),
+  :nuget => File.join(File.expand_path("src"), ".nuget", "nuget.exe"),
   :output => File.expand_path("build_output"),
   :artifacts => File.expand_path("build_artifacts"),
   :lib => File.expand_path("lib"),
@@ -76,7 +77,7 @@ msbuild :build35 do |msb|
 	msb.properties :Configuration => "Release",
 		:Platform => 'Any CPU',
                 :TargetFrameworkVersion => "v3.5"
-	msb.use :net35
+	msb.use :net4
 	msb.targets :Clean, :Build
   msb.properties[:SignAssembly] = 'true'
   msb.properties[:AssemblyOriginatorKeyFile] = props[:keyfile]
@@ -124,20 +125,32 @@ zip :zip_output => [:versioning] do |zip|
 	zip.output_path = props[:artifacts]
 end
 
-desc "Restore NuGet Packages"
-task :nuget_restore do
-  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Tests","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
-  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.Log4Net","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
-  sh "#{File.join(props[:lib], 'nuget.exe')} install #{File.join(props[:src],"Topshelf.NLog","packages.config")} -Source https://nuget.org/api/v2/ -o #{File.join(props[:src],"packages")}"
+desc "restores missing packages"
+msbuild :nuget_restore do |msb|
+  msb.use :net4
+  msb.targets :RestorePackages
+  msb.solution = File.join(props[:src], "Topshelf.Tests", "Topshelf.Tests.csproj")
+end
+desc "restores missing packages"
+msbuild :nuget_restore do |msb|
+  msb.use :net4
+  msb.targets :RestorePackages
+  msb.solution = File.join(props[:src], "Topshelf.Log4Net", "Topshelf.Log4Net.csproj")
+end
+desc "restores missing packages"
+msbuild :nuget_restore do |msb|
+  msb.use :net4
+  msb.targets :RestorePackages
+  msb.solution = File.join(props[:src], "Topshelf.NLog", "Topshelf.NLog.csproj")
 end
 
 desc "Builds the nuget package"
 task :nuget => [:versioning, :create_nuspec] do
-  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
-  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.Log4Net.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
-  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
-  sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.Rehab.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
-	sh "#{File.join(props[:lib], 'nuget.exe')} pack #{props[:artifacts]}/Topshelf.Supervise.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Log4Net.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#props[:nuget] pack #{props[:artifacts]}/Topshelf.Rehab.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+	sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Supervise.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 end
 
 nuspec :create_nuspec do |nuspec|
