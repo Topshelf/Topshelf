@@ -40,6 +40,13 @@ namespace Topshelf.Runtime
         bool IsServiceInstalled(string serviceName);
 
         /// <summary>
+        /// Determines if the service is stopped, to prevent a debug instance from being started
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        bool IsServiceStopped(string serviceName);
+
+        /// <summary>
         /// Start the service using operating system controls
         /// </summary>
         /// <param name="serviceName">The name of the service</param>

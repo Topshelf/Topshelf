@@ -13,6 +13,7 @@
 namespace Topshelf.Hosts
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Threading;
 #if !NET35
@@ -54,8 +55,13 @@ namespace Topshelf.Hosts
 
             if (_environment.IsServiceInstalled(_settings.ServiceName))
             {
-                _log.ErrorFormat("The {0} service is installed as a service", _settings.ServiceName);
-                return TopshelfExitCode.ServiceAlreadyInstalled;
+                if (!_environment.IsServiceStopped(_settings.ServiceName))
+                {
+                    _log.ErrorFormat("The {0} service is running and must be stopped before running via the console",
+                        _settings.ServiceName);
+             
+                    return TopshelfExitCode.ServiceAlreadyRunning;
+                }
             }
 
             bool started = false;

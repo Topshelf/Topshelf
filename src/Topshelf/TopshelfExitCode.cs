@@ -20,6 +20,7 @@ namespace Topshelf
         ServiceAlreadyInstalled = 3,
         ServiceNotInstalled = 4,
         StartServiceFailed = 5,
-        StopServiceFailed = 6
+        StopServiceFailed = 6,
+        ServiceAlreadyRunning = 7,
     }
 }

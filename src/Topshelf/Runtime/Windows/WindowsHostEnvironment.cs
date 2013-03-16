@@ -21,7 +21,6 @@ namespace Topshelf.Runtime.Windows
     using System.Runtime.InteropServices;
     using System.Security.Principal;
     using System.ServiceProcess;
-    using System.Threading;
     using Logging;
 
     public class WindowsHostEnvironment :
@@ -33,6 +32,14 @@ namespace Topshelf.Runtime.Windows
         {
             return ServiceController.GetServices()
                 .Any(service => string.CompareOrdinal(service.ServiceName, serviceName) == 0);
+        }
+
+        public bool IsServiceStopped(string serviceName)
+        {
+            using (var sc = new ServiceController(serviceName))
+            {
+                return sc.Status == ServiceControllerStatus.Stopped;
+            }
         }
 
         public void StartService(string serviceName)
