@@ -16,9 +16,9 @@ namespace SampleTopshelfService
 
     class Program
     {
-        static void Main()
+        static int Main()
         {
-            HostFactory.Run(x =>
+            return (int)HostFactory.Run(x =>
                 {
                     x.UseLog4Net("log4net.config");
 
