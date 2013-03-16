@@ -32,6 +32,7 @@ namespace Topshelf.Runtime.Windows
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;
         int _deadThread;
+        bool _disposed;
 
         public WindowsServiceHost(HostEnvironment environment, HostSettings settings, ServiceHandle serviceHandle)
         {
@@ -202,6 +203,19 @@ namespace Topshelf.Runtime.Windows
                 _log.Fatal("The service did not shut down gracefully", ex);
                 throw;
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && !_disposed)
+            {
+                if (_serviceHandle != null)
+                    _serviceHandle.Dispose();
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
         }
 
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
