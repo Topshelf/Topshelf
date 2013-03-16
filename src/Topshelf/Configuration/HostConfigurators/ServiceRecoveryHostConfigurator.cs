@@ -40,15 +40,6 @@ namespace Topshelf.HostConfigurators
             {
                 if (!_options.Actions.Any())
                     yield return this.Failure("No service recovery actions were specified.");
-
-                if (_options.Actions.Count(x => x.GetType() == typeof(RestartServiceRecoveryAction)) > 1)
-                    yield return this.Failure("Only a single restart service action can be specified.");
-
-                if (_options.Actions.Count(x => x.GetType() == typeof(RestartSystemRecoveryAction)) > 1)
-                    yield return this.Failure("Only a single restart system action can be specified.");
-
-                if (_options.Actions.Count(x => x.GetType() == typeof(RunProgramRecoveryAction)) > 1)
-                    yield return this.Failure("Only a single run program action can be specified.");
             }
         }
 
@@ -90,6 +81,11 @@ namespace Topshelf.HostConfigurators
             Options.ResetPeriod = days;
 
             return this;
+        }
+
+        public void OnCrashOnly()
+        {
+            Options.RecoverOnCrashOnly = true;
         }
 
         void ConfigureServiceRecovery(InstallHostSettings installSettings)

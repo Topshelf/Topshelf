@@ -30,6 +30,8 @@ namespace Topshelf.Runtime.Windows
             get { return _actions; }
         }
 
+        public bool RecoverOnCrashOnly { get; set; }
+
         public void AddAction(ServiceRecoveryAction serviceRecoveryAction)
         {
             _actions.Add(serviceRecoveryAction);

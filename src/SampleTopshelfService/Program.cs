@@ -28,6 +28,15 @@ namespace SampleTopshelfService
 
                     x.Service(settings => new SampleService(throwOnStart, throwOnStop, throwUnhandled));
 
+                    x.EnableServiceRecovery(r =>
+                        {
+                            r.RestartService(0);
+                            r.RestartService(0);
+                            r.RestartService(0);
+
+                            r.OnCrashOnly();
+                        });
+
                     x.AddCommandLineSwitch("throwonstart", v => throwOnStart = v);
                     x.AddCommandLineSwitch("throwonstop", v => throwOnStop = v);
                     x.AddCommandLineSwitch("throwunhandled", v => throwUnhandled = v);

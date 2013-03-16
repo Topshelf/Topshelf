@@ -39,5 +39,11 @@ namespace Topshelf
         /// </summary>
         /// <param name="days"> </param>
         ServiceRecoveryConfigurator SetResetPeriod(int days);
+
+        /// <summary>
+        /// Specifies that the recovery actions should only be taken on a service crash. If the service exists
+        /// with a non-zero exit code, it will not be restarted.
+        /// </summary>
+        void OnCrashOnly();
     }
 }

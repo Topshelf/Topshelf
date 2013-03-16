@@ -158,6 +158,13 @@ namespace Topshelf.Runtime.Windows
             public IntPtr actions;
         }
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct SERVICE_FAILURE_ACTIONS_FLAG
+        {
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool fFailureActionsOnNonCrashFailures;
+        }
+
         public enum SC_ACTION_TYPE
         {
             None = 0,
@@ -174,5 +181,6 @@ namespace Topshelf.Runtime.Windows
         }
 
         public const int SERVICE_CONFIG_FAILURE_ACTIONS = 2;
+        public const int SERVICE_CONFIG_FAILURE_ACTIONS_FLAG = 4;
     }
 }

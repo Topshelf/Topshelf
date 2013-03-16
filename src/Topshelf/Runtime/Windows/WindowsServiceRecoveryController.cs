@@ -27,6 +27,8 @@ namespace Topshelf.Runtime.Windows
             IntPtr serviceHandle = IntPtr.Zero;
             IntPtr lpsaActions = IntPtr.Zero;
             IntPtr lpInfo = IntPtr.Zero;
+            IntPtr lpFlagInfo = IntPtr.Zero;
+
             try
             {
                 List<NativeMethods.SC_ACTION> actions = options.Actions.Select(x => x.GetAction()).ToList();
@@ -88,9 +90,33 @@ namespace Topshelf.Runtime.Windows
                 {
                     throw new TopshelfException("Failed to change service recovery options");
                 }
+
+                if (false == options.RecoverOnCrashOnly)
+                {
+                    var flag = new NativeMethods.SERVICE_FAILURE_ACTIONS_FLAG();
+                    flag.fFailureActionsOnNonCrashFailures = true;
+
+                    lpFlagInfo = Marshal.AllocHGlobal(Marshal.SizeOf(flag));
+                    if (lpFlagInfo == IntPtr.Zero)
+                        throw new TopshelfException("Failed to allocate memory for failure flag");
+
+                    Marshal.StructureToPtr(flag, lpFlagInfo, false);
+
+                    try
+                    {
+                        NativeMethods.ChangeServiceConfig2(serviceHandle,
+                            NativeMethods.SERVICE_CONFIG_FAILURE_ACTIONS_FLAG, lpFlagInfo);
+                    }
+                    catch
+                    {
+                        // this fails on XP, but we don't care really as it's optional
+                    }
+                }
             }
             finally
             {
+                if (lpFlagInfo != IntPtr.Zero)
+                    Marshal.FreeHGlobal(lpFlagInfo);
                 if (lpInfo != IntPtr.Zero)
                     Marshal.FreeHGlobal(lpInfo);
                 if (lpsaActions != IntPtr.Zero)
