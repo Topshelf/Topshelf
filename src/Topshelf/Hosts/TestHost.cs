@@ -40,28 +40,35 @@ namespace Topshelf.Hosts
 
         public TopshelfExitCode Run()
         {
+            var exitCode = TopshelfExitCode.AbnormalExit;
             try
             {
+                exitCode = TopshelfExitCode.StartServiceFailed;
+
                 _log.InfoFormat("The {0} service is being started.", _settings.ServiceName);
                 _serviceHandle.Start(this);
                 _log.InfoFormat("The {0} service was started.", _settings.ServiceName);
 
                 Thread.Sleep(100);
 
+                exitCode = TopshelfExitCode.StopServiceFailed;
+
                 _log.InfoFormat("The {0} service is being stopped.", _settings.ServiceName);
                 _serviceHandle.Stop(this);
+                _log.InfoFormat("The {0} service was stopped.", _settings.ServiceName);
+
+                exitCode = TopshelfExitCode.Ok;
             }
             catch (Exception ex)
             {
-                _log.Error("The service did not shut down gracefully", ex);
+                _log.Error("The service threw an exception during testing.", ex);
             }
             finally
             {
                 _serviceHandle.Dispose();
-                _log.InfoFormat("The {0} service was stopped.", _settings.ServiceName);
             }
 
-            return TopshelfExitCode.Ok;
+            return exitCode;
         }
 
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)

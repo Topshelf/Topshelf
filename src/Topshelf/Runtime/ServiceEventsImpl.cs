@@ -114,6 +114,7 @@ namespace Topshelf.Runtime
 
             public void CancelStart()
             {
+                throw new ServiceControlException("The start service operation was canceled.");
             }
         }
 
