@@ -201,6 +201,7 @@ namespace Topshelf.Runtime.Windows
             catch (Exception ex)
             {
                 _log.Fatal("The service did not shut down gracefully", ex);
+                ExitCode = (int)TopshelfExitCode.StopServiceFailed;
                 throw;
             }
         }
@@ -221,6 +222,8 @@ namespace Topshelf.Runtime.Windows
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _log.Error("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+
+            ExitCode = (int)TopshelfExitCode.UnhandledServiceException;
 
             Stop();
 

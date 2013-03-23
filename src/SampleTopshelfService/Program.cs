@@ -33,8 +33,6 @@ namespace SampleTopshelfService
                             r.RestartService(0);
                             r.RestartService(0);
                             r.RestartService(0);
-
-                            r.OnCrashOnly();
                         });
 
                     x.AddCommandLineSwitch("throwonstart", v => throwOnStart = v);

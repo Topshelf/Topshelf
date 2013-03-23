@@ -22,5 +22,6 @@ namespace Topshelf
         StartServiceFailed = 5,
         StopServiceFailed = 6,
         ServiceAlreadyRunning = 7,
+        UnhandledServiceException = 8,
     }
 }
