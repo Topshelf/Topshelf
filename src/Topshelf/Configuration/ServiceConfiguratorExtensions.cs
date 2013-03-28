@@ -14,6 +14,7 @@ namespace Topshelf
 {
     using System;
     using ServiceConfigurators;
+    using System.ServiceProcess;
 
     public static class ServiceConfiguratorExtensions
     {
@@ -116,6 +117,21 @@ namespace Topshelf
                 {
                     callback(service);
                 });
+
+            return configurator;
+        }
+
+        public static ServiceConfigurator<T> WhenSessionEvent<T>(this ServiceConfigurator<T> configurator,
+            Action<T, SessionChangeReason, int> callback)
+            where T : class
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.WhenSessionEvent((service, control, reason, id) =>
+            {
+                callback(service, reason, id);
+            });
 
             return configurator;
         }

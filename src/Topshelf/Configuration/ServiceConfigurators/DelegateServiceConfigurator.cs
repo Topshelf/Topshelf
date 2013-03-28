@@ -17,6 +17,7 @@ namespace Topshelf.ServiceConfigurators
     using Builders;
     using Configurators;
     using Runtime;
+    using System.ServiceProcess;
 
     public class DelegateServiceConfigurator<T> :
         ServiceConfiguratorBase,
@@ -35,6 +36,9 @@ namespace Topshelf.ServiceConfigurators
         Func<T, HostControl, bool> _start;
         Func<T, HostControl, bool> _stop;
 
+        Action<T, HostControl, SessionChangeReason, int> _sessionevent;
+        bool _sessioneventConfigured;
+
         public IEnumerable<ValidateResult> Validate()
         {
             if (_factory == null)
@@ -50,6 +54,8 @@ namespace Topshelf.ServiceConfigurators
                 yield return this.Failure("Pause", "must not be null if continue is specified");
             if (_shutdownConfigured && _shutdown == null)
                 yield return this.Failure("Shutdown", "must not be null if shutdown is allowed");
+            if (_sessioneventConfigured && _sessionevent == null)
+                yield return this.Failure("SessionEvent", "must not be null if SessionEvent is allowed");
         }
 
         public void ConstructUsing(ServiceFactory<T> serviceFactory)
@@ -85,9 +91,15 @@ namespace Topshelf.ServiceConfigurators
             _shutdown = shutdown;
         }
 
+        public void WhenSessionEvent(Action<T, HostControl, SessionChangeReason, int> sessionevent)
+        {
+            _sessioneventConfigured = true;
+            _sessionevent = sessionevent;
+        }
+
         public ServiceBuilder Build()
         {
-            var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown,
+            var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown, _sessionevent,
                 ServiceEvents);
             return serviceBuilder;
         }

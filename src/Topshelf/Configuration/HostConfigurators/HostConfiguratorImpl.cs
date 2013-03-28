@@ -118,6 +118,11 @@ namespace Topshelf.HostConfigurators
             _settings.CanShutdown = true;
         }
 
+        public void EnableHandleSessionChangeEvent()
+        {
+            _settings.CanHandleSessionChangeEvent = true;
+        }
+
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
         {
             _hostBuilderFactory = hostBuilderFactory;

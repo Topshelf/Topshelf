@@ -14,6 +14,7 @@ namespace Topshelf.Builders
 {
     using System;
     using Runtime;
+    using System.ServiceProcess;
 
     public class ControlServiceBuilder<T> :
         ServiceBuilder
@@ -100,6 +101,11 @@ namespace Topshelf.Builders
                 {
                     serviceShutdown.Shutdown(hostControl);
                 }
+            }
+
+            public void SessionEvent(HostControl hostControl, SessionChangeReason reason, int id)
+            {
+                // nothing to control
             }
         }
     }

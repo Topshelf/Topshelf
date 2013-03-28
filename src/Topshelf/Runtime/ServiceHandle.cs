@@ -13,6 +13,7 @@
 namespace Topshelf.Runtime
 {
     using System;
+    using System.ServiceProcess;
 
     /// <summary>
     /// A handle to a service being hosted by the Host
@@ -47,6 +48,12 @@ namespace Topshelf.Runtime
         /// <param name="hostControl"></param>
         /// <returns>True if the service was stopped, or false if the service cannot be stopped at this time</returns>
         bool Stop(HostControl hostControl);
+
+        /// <summary>Handles the session change event</summary>
+        /// <param name="hostControl"></param>
+        /// <param name="reason">The change reason.</param>
+        /// <param name="id">The session id.</param>
+        void SessionEvent(HostControl hostControl, SessionChangeReason reason, int id);
 
         /// <summary>
         /// Handle the shutdown event

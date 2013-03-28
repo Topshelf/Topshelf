@@ -14,6 +14,7 @@ namespace Topshelf.Builders
 {
     using System;
     using Runtime;
+    using System.ServiceProcess;
 
     public class DelegateServiceBuilder<T> :
         ServiceBuilder
@@ -26,17 +27,19 @@ namespace Topshelf.Builders
         readonly Action<T, HostControl> _shutdown;
         readonly Func<T, HostControl, bool> _start;
         readonly Func<T, HostControl, bool> _stop;
+        readonly Action<T, HostControl, SessionChangeReason, int> _sessionevent;
 
         public DelegateServiceBuilder(ServiceFactory<T> serviceFactory, Func<T, HostControl, bool> start,
             Func<T, HostControl, bool> stop, Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue,
-            Action<T, HostControl> shutdown, ServiceEvents serviceEvents)
-        {
+            Action<T, HostControl> shutdown, Action<T, HostControl, SessionChangeReason, int> sessionevent, ServiceEvents serviceEvents)
+    {
             _serviceFactory = serviceFactory;
             _start = start;
             _stop = stop;
             _pause = pause;
             _continue = @continue;
             _shutdown = shutdown;
+            _sessionevent = sessionevent;
             _serviceEvents = serviceEvents;
         }
 
@@ -46,7 +49,7 @@ namespace Topshelf.Builders
             {
                 T service = _serviceFactory(settings);
 
-                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown, _serviceEvents);
+                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown, _sessionevent, _serviceEvents);
             }
             catch (Exception ex)
             {
@@ -64,10 +67,11 @@ namespace Topshelf.Builders
             readonly Action<T, HostControl> _shutdown;
             readonly Func<T, HostControl, bool> _start;
             readonly Func<T, HostControl, bool> _stop;
+            readonly Action<T, HostControl, SessionChangeReason, int> _sessionevent;
 
             public DelegateServiceHandle(T service, Func<T, HostControl, bool> start, Func<T, HostControl, bool> stop,
                 Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue, Action<T, HostControl> shutdown,
-                ServiceEvents serviceEvents)
+                Action<T, HostControl, SessionChangeReason, int> sessionevent, ServiceEvents serviceEvents)
             {
                 _service = service;
                 _start = start;
@@ -75,6 +79,7 @@ namespace Topshelf.Builders
                 _pause = pause;
                 _continue = @continue;
                 _shutdown = shutdown;
+                _sessionevent = sessionevent;
                 _serviceEvents = serviceEvents;
             }
 
@@ -123,6 +128,12 @@ namespace Topshelf.Builders
             {
                 if(_shutdown != null)
                     _shutdown(_service, hostControl);
+            }
+
+            public void SessionEvent(HostControl hostControl, SessionChangeReason reason, int id)
+            {
+                if (_sessionevent != null)
+                    _sessionevent(_service, hostControl, reason, id);
             }
         }
     }

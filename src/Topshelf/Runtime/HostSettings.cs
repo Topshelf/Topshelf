@@ -49,6 +49,11 @@ namespace Topshelf.Runtime
         bool CanPauseAndContinue { get; }
 
         /// <summary>
+        ///   True if the service can handle the session change event
+        /// </summary>
+        bool CanHandleSessionChangeEvent { get; }
+
+        /// <summary>
         ///   True if the service can handle the shutdown event
         /// </summary>
         bool CanShutdown { get; }
