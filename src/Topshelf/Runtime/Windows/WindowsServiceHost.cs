@@ -47,6 +47,14 @@ namespace Topshelf.Runtime.Windows
 
             CanPauseAndContinue = settings.CanPauseAndContinue;
             CanShutdown = settings.CanShutdown;
+            CanHandleSessionChangeEvent = settings.CanHandleSessionChangeEvent;
+        }
+
+        protected override void OnSessionChange(SessionChangeDescription changeDescription)
+        {
+            _serviceHandle.SessionEvent(this, changeDescription.Reason, changeDescription.SessionId);
+
+            base.OnSessionChange(changeDescription);
         }
 
         public TopshelfExitCode Run()

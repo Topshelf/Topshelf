@@ -21,6 +21,8 @@ namespace Topshelf.Hosts
 #endif
     using Logging;
     using Runtime;
+    using System.ServiceProcess;
+    using Microsoft.Win32;
 
     public class ConsoleRunHost :
         Host,
@@ -45,6 +47,19 @@ namespace Topshelf.Hosts
             _settings = settings;
             _environment = environment;
             _serviceHandle = serviceHandle;
+
+            if (_settings.CanHandleSessionChangeEvent)
+            {
+                SystemEvents.SessionSwitch += new SessionSwitchEventHandler(OnSessionChange);
+            }
+        }
+
+        void OnSessionChange(object sender, SessionSwitchEventArgs e)
+        {
+            int sessionid = Process.GetCurrentProcess().SessionId;
+
+            // We can cast the reason directly, the enums are identical
+            _serviceHandle.SessionEvent(this, (SessionChangeReason)e.Reason, sessionid);
         }
 
         public TopshelfExitCode Run()

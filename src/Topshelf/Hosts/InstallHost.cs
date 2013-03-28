@@ -169,6 +169,11 @@ namespace Topshelf.Hosts
                 get { return _settings.CanPauseAndContinue; }
             }
 
+            public bool CanHandleSessionChangeEvent
+            {
+                get { return _settings.CanHandleSessionChangeEvent; }
+            }
+
             public bool CanShutdown
             {
                 get { return _settings.CanShutdown; }

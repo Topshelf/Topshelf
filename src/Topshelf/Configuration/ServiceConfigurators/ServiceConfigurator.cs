@@ -14,6 +14,7 @@ namespace Topshelf.ServiceConfigurators
 {
     using System;
     using Runtime;
+    using System.ServiceProcess;
 
     public interface ServiceConfigurator
     {
@@ -48,5 +49,6 @@ namespace Topshelf.ServiceConfigurators
         void WhenPaused(Func<T, HostControl, bool> pause);
         void WhenContinued(Func<T, HostControl, bool> @continue);
         void WhenShutdown(Action<T, HostControl> shutdown);
+        void WhenSessionEvent(Action<T, HostControl, SessionChangeReason, int> sessionevent);
     }
 }
