@@ -27,8 +27,13 @@ Get started in four simple steps!
 
 ### Contributing
 
-1. `git config --global core.autoclrf false`
-3. Make a pull request
+1. Clone
+1. Branch
+1. `git submodule init`
+1. `git submodule update`
+1. Make changes
+1. Push
+1. Make a pull request
 
 ### Source
 
@@ -73,5 +78,5 @@ To run the build, rake, .NET 3.5, and .NET 4.0 are required. To open the solutio
 
 # CREDITS
 Logo Design by [The Agile Badger](http://www.theagilebadger.com)
-Copyright 2007-2011 Travis Smith, Chris Patterson, Dru Sellers, Henrik Feldt et al. All rights reserved
+Copyright 2007-2013 Travis Smith, Chris Patterson, Dru Sellers, Henrik Feldt et al. All rights reserved
 
