@@ -77,6 +77,7 @@
     <Compile Include="Configuration\CommandLineParser\StringCommandLineParser.cs" />
     <Compile Include="Configuration\CommandLineParser\SwitchElement.cs" />
     <Compile Include="Configuration\CommandLineParser\TokenElement.cs" />
+    <Compile Include="Configuration\HostConfiguratorExtensions.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineDefinitionConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineSwitchConfigurator.cs" />
