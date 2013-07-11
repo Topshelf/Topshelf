@@ -68,7 +68,7 @@ This option is typically set using the command-line argument, but it allowed her
 Service Configuration
 =====================
 
-The service can be configured in multiple ways, each with different goals. For services that can handle a depedency on Topshelf, the ``ServiceControl`` interface provides a lot of value for implementing the service control methods. Additionally, a zero-dependency solution is also available when lambda methods can be used to call methods in the service class.
+The service can be configured in multiple ways, each with different goals. For services that can handle a dependency on Topshelf, the ``ServiceControl`` interface provides a lot of value for implementing the service control methods. Additionally, a zero-dependency solution is also available when lambda methods can be used to call methods in the service class.
 
 
 Simple Service
@@ -87,7 +87,7 @@ To configure a simple service, the easiest configuration method is available.
     class MyService : ServiceControl
     {}
 
-If the service does not have a default constructor, the constructor can be specified, allowing the service to be creating by the application, such as when a container needs to be used.
+If the service does not have a default constructor, the constructor can be specified, allowing the service to be created by the application, such as when a container needs to be used.
 
 .. sourcecode:: csharp
 
@@ -164,7 +164,7 @@ The ``HostControl`` interface can be retained and used as the service is running
 Service Start Modes
 ===================
 
-There are multiple service start modes, each of which can be specified by the configuration. This option is only used by the service is being installed.
+There are multiple service start modes, each of which can be specified by the configuration. This option is only used if the service is being installed.
 
 .. sourcecode:: csharp
 
