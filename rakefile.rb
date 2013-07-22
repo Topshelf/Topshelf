@@ -244,6 +244,25 @@ nuspec :create_nuspec do |nuspec|
   nuspec.file(File.join(props[:src], "Topshelf.Supervise\\**\\*.cs").gsub("/","\\"), "src")
 end
 
+nuspec :create_nuspec do |nuspec|
+  nuspec.id = 'Topshelf.Serilog'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith, Nicholas Blumhardt'
+  nuspec.summary = 'Topshelf, Friction-free Windows Services'
+  nuspec.description = 'Serilog Logging Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf.Serilog'
+  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
+  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.requireLicenseAcceptance = "false"
+  nuspec.dependency "Topshelf", NUGET_VERSION
+  nuspec.dependency "Serilog", "0.8.5"
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Serilog.nuspec')
+  add_files props[:output], 'Topshelf.Serilog.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf.Serilog\\**\\*.cs").gsub("/","\\"), "src")
+end
+
 def project_outputs(props)
 	props[:projects].map{ |p| "src/#{p}/bin/#{BUILD_CONFIG}/#{p}.dll" }.
 		concat( props[:projects].map{ |p| "src/#{p}/bin/#{BUILD_CONFIG}/#{p}.exe" } ).
