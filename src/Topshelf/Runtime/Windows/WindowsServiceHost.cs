@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -21,6 +21,7 @@ namespace Topshelf.Runtime.Windows
     using System.Threading.Tasks;
 #endif
     using Logging;
+
 
     public class WindowsServiceHost :
         ServiceBase,
@@ -47,6 +48,7 @@ namespace Topshelf.Runtime.Windows
 
             CanPauseAndContinue = settings.CanPauseAndContinue;
             CanShutdown = settings.CanShutdown;
+            CanHandleSessionChangeEvent = settings.CanSessionChanged;
         }
 
         public TopshelfExitCode Run()
@@ -117,9 +119,7 @@ namespace Topshelf.Runtime.Windows
                 _log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
 
                 if (!_serviceHandle.Start(this))
-                {
                     throw new TopshelfException("The service did not start successfully (returned false).");
-                }
 
                 _log.Info("[Topshelf] Started");
             }
@@ -139,7 +139,7 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Stopping");
 
-                if(!_serviceHandle.Stop(this))
+                if (!_serviceHandle.Stop(this))
                     throw new TopshelfException("The service did not stop successfully (return false).");
 
                 _log.Info("[Topshelf] Stopped");
@@ -158,7 +158,7 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Pausing service");
 
-                if(!_serviceHandle.Pause(this))
+                if (!_serviceHandle.Pause(this))
                     throw new TopshelfException("The service did not pause successfully (returned false).");
 
                 _log.Info("[Topshelf] Paused");
@@ -176,7 +176,7 @@ namespace Topshelf.Runtime.Windows
             {
                 _log.Info("[Topshelf] Resuming service");
 
-                if(!_serviceHandle.Continue(this))
+                if (!_serviceHandle.Continue(this))
                     throw new TopshelfException("The service did not continue successfully (returned false).");
 
                 _log.Info("[Topshelf] Resumed");
@@ -206,6 +206,27 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
+        protected override void OnSessionChange(SessionChangeDescription changeDescription)
+        {
+            try
+            {
+                _log.Info("[Topshelf] Service session changed");
+
+                var arguments = new WindowsSessionChangedArguments(changeDescription);
+
+                _serviceHandle.SessionChanged(this, arguments);
+
+                _log.Info("[Topshelf] Stopped");
+            }
+            catch (Exception ex)
+            {
+                _log.Fatal("The service did not shut down gracefully", ex);
+                ExitCode = (int)TopshelfExitCode.StopServiceFailed;
+                throw;
+            }
+        }
+
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && !_disposed)
@@ -231,9 +252,7 @@ namespace Topshelf.Runtime.Windows
 #if !NET35
             // it isn't likely that a TPL thread should land here, but if it does let's no block it
             if (Task.CurrentId.HasValue)
-            {
                 return;
-            }
 #endif
 
             int deadThreadId = Interlocked.Increment(ref _deadThread);
@@ -241,6 +260,32 @@ namespace Topshelf.Runtime.Windows
             Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
             while (true)
                 Thread.Sleep(TimeSpan.FromHours(1));
+        }
+
+
+        class WindowsSessionChangedArguments :
+            SessionChangedArguments
+        {
+            readonly SessionChangeReasonCode _reasonCode;
+            readonly int _sessionId;
+
+            public WindowsSessionChangedArguments(SessionChangeDescription changeDescription)
+            {
+                _reasonCode =
+                    (SessionChangeReasonCode)
+                    Enum.ToObject(typeof(SessionChangeReasonCode), (int)changeDescription.Reason);
+                _sessionId = changeDescription.SessionId;
+            }
+
+            public SessionChangeReasonCode ReasonCode
+            {
+                get { return _reasonCode; }
+            }
+
+            public int SessionId
+            {
+                get { return _sessionId; }
+            }
         }
     }
 }

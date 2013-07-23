@@ -97,6 +97,12 @@ namespace Topshelf.Rehab
             _service.Shutdown(control);
         }
 
+        public void SessionChanged(HostControl hostControl, SessionChangedArguments arguments)
+        {
+            var control = new AppDomainHostControl(this);
+            _service.SessionChanged(control, arguments);
+        }
+
         void RestartService(object state)
         {
             try

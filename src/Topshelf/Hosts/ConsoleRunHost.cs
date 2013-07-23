@@ -20,7 +20,9 @@ namespace Topshelf.Hosts
     using System.Threading.Tasks;
 #endif
     using Logging;
+    using Microsoft.Win32;
     using Runtime;
+
 
     public class ConsoleRunHost :
         Host,
@@ -45,7 +47,20 @@ namespace Topshelf.Hosts
             _settings = settings;
             _environment = environment;
             _serviceHandle = serviceHandle;
+
+            if (settings.CanSessionChanged)
+            {
+                SystemEvents.SessionSwitch += OnSessionChanged;
+            }
         }
+
+        void OnSessionChanged(object sender, SessionSwitchEventArgs e)
+        {
+            var arguments = new ConsoleSessionChangedArguments(e.Reason);
+
+            _serviceHandle.SessionChanged(this, arguments);
+        }
+
 
         public TopshelfExitCode Run()
         {
@@ -59,7 +74,7 @@ namespace Topshelf.Hosts
                 {
                     _log.ErrorFormat("The {0} service is running and must be stopped before running via the console",
                         _settings.ServiceName);
-             
+
                     return TopshelfExitCode.ServiceAlreadyRunning;
                 }
             }
@@ -73,7 +88,7 @@ namespace Topshelf.Hosts
 
                 Console.CancelKeyPress += HandleCancelKeyPress;
 
-                if(!_serviceHandle.Start(this))
+                if (!_serviceHandle.Start(this))
                     throw new TopshelfException("The service failed to start (return false).");
 
                 started = true;
@@ -90,7 +105,7 @@ namespace Topshelf.Hosts
             }
             finally
             {
-                if(started)
+                if (started)
                     StopService();
 
                 _exit.Close();
@@ -102,11 +117,13 @@ namespace Topshelf.Hosts
             return TopshelfExitCode.Ok;
         }
 
+
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
         {
             // good for you, maybe we'll use a timer for startup at some point but for debugging
             // it's a pain in the ass
         }
+
 
         void HostControl.Stop()
         {
@@ -114,11 +131,13 @@ namespace Topshelf.Hosts
             _exit.Set();
         }
 
+
         void HostControl.Restart()
         {
             _log.Info("Service Restart requested, but we don't support that here, so we are exiting.");
             _exit.Set();
         }
+
 
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
@@ -127,10 +146,10 @@ namespace Topshelf.Hosts
             if (e.IsTerminating)
             {
                 _exit.Set();
-                
+
 #if !NET35
                 // it isn't likely that a TPL thread should land here, but if it does let's no block it
-                if(Task.CurrentId.HasValue)
+                if (Task.CurrentId.HasValue)
                 {
                     return;
                 }
@@ -145,6 +164,7 @@ namespace Topshelf.Hosts
             }
         }
 
+
         void StopService()
         {
             try
@@ -153,7 +173,7 @@ namespace Topshelf.Hosts
                 {
                     _log.InfoFormat("Stopping the {0} service", _settings.ServiceName);
 
-                    if(!_serviceHandle.Stop(this))
+                    if (!_serviceHandle.Stop(this))
                         throw new TopshelfException("The service failed to stop (returned false).");
                 }
             }
@@ -168,6 +188,7 @@ namespace Topshelf.Hosts
                 _log.InfoFormat("The {0} service has stopped.", _settings.ServiceName);
             }
         }
+
 
         void HandleCancelKeyPress(object sender, ConsoleCancelEventArgs consoleCancelEventArgs)
         {
@@ -192,6 +213,30 @@ namespace Topshelf.Hosts
             {
                 _hasCancelled = false;
                 _log.Error("The service is not in a state where it can be stopped.");
+            }
+        }
+
+
+        class ConsoleSessionChangedArguments :
+            SessionChangedArguments
+        {
+            readonly SessionChangeReasonCode _reasonCode;
+            readonly int _sessionId;
+
+            public ConsoleSessionChangedArguments(SessionSwitchReason reason)
+            {
+                _reasonCode = (SessionChangeReasonCode)Enum.ToObject(typeof(SessionChangeReasonCode), (int)reason);
+                _sessionId = Process.GetCurrentProcess().SessionId;
+            }
+
+            public SessionChangeReasonCode ReasonCode
+            {
+                get { return _reasonCode; }
+            }
+
+            public int SessionId
+            {
+                get { return _sessionId; }
             }
         }
     }

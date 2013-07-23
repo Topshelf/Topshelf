@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,6 +13,7 @@
 namespace Topshelf.Runtime
 {
     using System;
+
 
     /// <summary>
     /// A handle to a service being hosted by the Host
@@ -53,5 +54,12 @@ namespace Topshelf.Runtime
         /// </summary>
         /// <param name="hostControl"></param>
         void Shutdown(HostControl hostControl);
+
+        /// <summary>
+        /// Handle the session change event
+        /// </summary>
+        /// <param name="hostControl"></param>
+        /// <param name="arguments"></param>
+        void SessionChanged(HostControl hostControl, SessionChangedArguments arguments);
     }
 }

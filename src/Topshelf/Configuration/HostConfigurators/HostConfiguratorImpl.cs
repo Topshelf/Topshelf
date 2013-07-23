@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,7 +13,6 @@
 namespace Topshelf.HostConfigurators
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using Builders;
@@ -24,17 +23,18 @@ namespace Topshelf.HostConfigurators
     using Runtime;
     using Runtime.Windows;
 
+
     public class HostConfiguratorImpl :
         HostConfigurator,
         Configurator
     {
+        readonly IList<CommandLineConfigurator> _commandLineOptionConfigurators;
         readonly IList<HostBuilderConfigurator> _configurators;
         readonly WindowsHostSettings _settings;
         bool _commandLineApplied;
         EnvironmentBuilderFactory _environmentBuilderFactory;
         HostBuilderFactory _hostBuilderFactory;
         ServiceBuilderFactory _serviceBuilderFactory;
-        IList<CommandLineConfigurator> _commandLineOptionConfigurators;
 
         public HostConfiguratorImpl()
         {
@@ -70,9 +70,7 @@ namespace Topshelf.HostConfigurators
             }
 
             foreach (ValidateResult result in _configurators.SelectMany(x => x.Validate()))
-            {
                 yield return result;
-            }
 
             yield return this.Success("Name", _settings.Name);
 
@@ -116,6 +114,11 @@ namespace Topshelf.HostConfigurators
         public void EnableShutdown()
         {
             _settings.CanShutdown = true;
+        }
+
+        public void EnableSessionChanged()
+        {
+            _settings.CanSessionChanged = true;
         }
 
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
@@ -173,8 +176,8 @@ namespace Topshelf.HostConfigurators
         {
             Type type = typeof(HostFactory);
             HostLogger.Get<HostConfiguratorImpl>()
-                .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
-                    Environment.Version);
+                      .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
+                          Environment.Version);
 
             EnvironmentBuilder environmentBuilder = _environmentBuilderFactory();
 
@@ -185,9 +188,7 @@ namespace Topshelf.HostConfigurators
             HostBuilder builder = _hostBuilderFactory(environment, _settings);
 
             foreach (HostBuilderConfigurator configurator in _configurators)
-            {
                 builder = configurator.Configure(builder);
-            }
 
             return builder.Build(serviceBuilder);
         }
@@ -195,19 +196,15 @@ namespace Topshelf.HostConfigurators
         void ApplyCommandLineOptions(IEnumerable<Option> options)
         {
             foreach (Option option in options)
-            {
                 option.ApplyTo(this);
-            }
         }
 
         void ConfigureCommandLineParser(ICommandLineElementParser<Option> parser)
         {
             CommandLineParserOptions.AddTopshelfOptions(parser);
 
-            foreach (var optionConfigurator in _commandLineOptionConfigurators)
-            {
+            foreach (CommandLineConfigurator optionConfigurator in _commandLineOptionConfigurators)
                 optionConfigurator.Configure(parser);
-            }
 
             CommandLineParserOptions.AddUnknownOptions(parser);
         }

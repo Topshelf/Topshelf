@@ -1,4 +1,4 @@
-// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -13,16 +13,10 @@
 namespace Topshelf
 {
     /// <summary>
-    /// Implemented by services that support service shutdown
+    /// Implemented by services that support session change events
     /// </summary>
-    public interface ServiceShutdown
+    public interface ServiceSessionChange
     {
-        /// <summary>
-        /// Called when the operating system invokes the service shutdown method. There is little
-        /// time to react here, but the application try to use RequestAdditionalTime if necessary,
-        /// but this is really a shut down quick and bail method.
-        /// </summary>
-        /// <param name="hostControl"></param>
-        void Shutdown(HostControl hostControl);
+        void SessionChange(HostControl hostControl, SessionChangedArguments changedArguments);
     }
 }

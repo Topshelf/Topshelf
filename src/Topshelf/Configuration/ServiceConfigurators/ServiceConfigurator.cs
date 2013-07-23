@@ -48,5 +48,6 @@ namespace Topshelf.ServiceConfigurators
         void WhenPaused(Func<T, HostControl, bool> pause);
         void WhenContinued(Func<T, HostControl, bool> @continue);
         void WhenShutdown(Action<T, HostControl> shutdown);
+        void WhenSessionChanged(Action<T, HostControl, SessionChangedArguments> sessionChanged);
     }
 }

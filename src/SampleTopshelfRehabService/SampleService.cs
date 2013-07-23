@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -17,9 +17,12 @@ namespace SampleTopshelfRehabService
     using Topshelf;
     using Topshelf.Logging;
 
+
     class SampleService :
         ServiceControl,
-        ServiceShutdown
+        ServiceSuspend,
+        ServiceShutdown,
+        ServiceSessionChange
     {
         LogWriter _log;
 
@@ -34,17 +37,17 @@ namespace SampleTopshelfRehabService
             Thread.Sleep(1000);
 
             ThreadPool.QueueUserWorkItem(x =>
-            {
-                Thread.Sleep(3000);
+                {
+                    Thread.Sleep(3000);
 
-                _log.Info("Requesting a restart!!!");
+                    _log.Info("Requesting a restart!!!");
 
-                hostControl.Restart();
+                    hostControl.Restart();
 
 //                _log.Info("Dying an ungraceful death");
 //
 //                throw new InvalidOperationException("Oh, what a world.");
-            });
+                });
             _log.Info("SampleService Started");
 
             return true;
@@ -55,6 +58,16 @@ namespace SampleTopshelfRehabService
             _log.Info("SampleService Stopped");
 
             return true;
+        }
+
+        public void SessionChange(HostControl hostControl, SessionChangedArguments changedArguments)
+        {
+            _log.Info("Service session changed");
+        }
+
+        public void Shutdown(HostControl hostControl)
+        {
+            _log.Info("Service is being shutdown, bye!");
         }
 
         public bool Pause(HostControl hostControl)
@@ -69,11 +82,6 @@ namespace SampleTopshelfRehabService
             _log.Info("SampleService Continued");
 
             return true;
-        }
-
-        public void Shutdown(HostControl hostControl)
-        {
-            _log.Info("Service is being shutdown, bye!");
         }
     }
 }

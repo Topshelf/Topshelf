@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -18,6 +18,7 @@ namespace Topshelf.ServiceConfigurators
     using Configurators;
     using Runtime;
 
+
     public class DelegateServiceConfigurator<T> :
         ServiceConfiguratorBase,
         ServiceConfigurator<T>,
@@ -30,6 +31,8 @@ namespace Topshelf.ServiceConfigurators
 
 
         bool _pauseConfigured;
+        bool _sessionChangeConfigured;
+        Action<T, HostControl, SessionChangedArguments> _sessionChanged;
         Action<T, HostControl> _shutdown;
         bool _shutdownConfigured;
         Func<T, HostControl, bool> _start;
@@ -50,6 +53,8 @@ namespace Topshelf.ServiceConfigurators
                 yield return this.Failure("Pause", "must not be null if continue is specified");
             if (_shutdownConfigured && _shutdown == null)
                 yield return this.Failure("Shutdown", "must not be null if shutdown is allowed");
+            if (_sessionChangeConfigured && _sessionChanged == null)
+                yield return this.Failure("SessionChange", "must not be null if session change is allowed");
         }
 
         public void ConstructUsing(ServiceFactory<T> serviceFactory)
@@ -85,10 +90,16 @@ namespace Topshelf.ServiceConfigurators
             _shutdown = shutdown;
         }
 
+        public void WhenSessionChanged(Action<T, HostControl, SessionChangedArguments> sessionChanged)
+        {
+            _sessionChangeConfigured = true;
+            _sessionChanged = sessionChanged;
+        }
+
         public ServiceBuilder Build()
         {
             var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown,
-                ServiceEvents);
+                _sessionChanged, ServiceEvents);
             return serviceBuilder;
         }
     }

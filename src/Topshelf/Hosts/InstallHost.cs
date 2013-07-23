@@ -174,6 +174,11 @@ namespace Topshelf.Hosts
                 get { return _settings.CanShutdown; }
             }
 
+            public bool CanSessionChanged
+            {
+                get { return _settings.CanSessionChanged; }
+            }
+
             public ServiceAccount Account
             {
                 get { return _credentials.Account; }

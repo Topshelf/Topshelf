@@ -26,10 +26,11 @@ namespace Topshelf.Builders
         readonly Action<T, HostControl> _shutdown;
         readonly Func<T, HostControl, bool> _start;
         readonly Func<T, HostControl, bool> _stop;
+        readonly Action<T, HostControl, SessionChangedArguments> _sessionChanged;
 
         public DelegateServiceBuilder(ServiceFactory<T> serviceFactory, Func<T, HostControl, bool> start,
             Func<T, HostControl, bool> stop, Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue,
-            Action<T, HostControl> shutdown, ServiceEvents serviceEvents)
+            Action<T, HostControl> shutdown, Action<T, HostControl, SessionChangedArguments> sessionChanged, ServiceEvents serviceEvents)
         {
             _serviceFactory = serviceFactory;
             _start = start;
@@ -38,6 +39,7 @@ namespace Topshelf.Builders
             _continue = @continue;
             _shutdown = shutdown;
             _serviceEvents = serviceEvents;
+            _sessionChanged = sessionChanged;
         }
 
         public ServiceHandle Build(HostSettings settings)
@@ -46,7 +48,7 @@ namespace Topshelf.Builders
             {
                 T service = _serviceFactory(settings);
 
-                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown, _serviceEvents);
+                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown, _sessionChanged, _serviceEvents);
             }
             catch (Exception ex)
             {
@@ -64,10 +66,11 @@ namespace Topshelf.Builders
             readonly Action<T, HostControl> _shutdown;
             readonly Func<T, HostControl, bool> _start;
             readonly Func<T, HostControl, bool> _stop;
+            readonly Action<T, HostControl, SessionChangedArguments> _sessionChanged;
 
             public DelegateServiceHandle(T service, Func<T, HostControl, bool> start, Func<T, HostControl, bool> stop,
                 Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue, Action<T, HostControl> shutdown,
-                ServiceEvents serviceEvents)
+                Action<T, HostControl, SessionChangedArguments> sessionChanged, ServiceEvents serviceEvents)
             {
                 _service = service;
                 _start = start;
@@ -76,6 +79,7 @@ namespace Topshelf.Builders
                 _continue = @continue;
                 _shutdown = shutdown;
                 _serviceEvents = serviceEvents;
+                _sessionChanged = sessionChanged;
             }
 
             public void Dispose()
@@ -123,6 +127,12 @@ namespace Topshelf.Builders
             {
                 if(_shutdown != null)
                     _shutdown(_service, hostControl);
+            }
+
+            public void SessionChanged(HostControl hostControl, SessionChangedArguments arguments)
+            {
+                if (_sessionChanged != null)
+                    _sessionChanged(_service, hostControl, arguments);
             }
         }
     }

@@ -74,6 +74,11 @@ namespace Topshelf.Supervise
             _service.Shutdown(_hostControl);
         }
 
+        public void SessionChanged(HostControl hostControl, SessionChangedArguments arguments)
+        {
+            _service.SessionChanged(hostControl, arguments);
+        }
+
         void UnloadServiceAppDomain()
         {
             try

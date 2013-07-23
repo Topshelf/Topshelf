@@ -41,6 +41,11 @@ namespace Topshelf.Rehab
             _serviceHandle.Shutdown(hostControl);
         }
 
+        public void SessionChanged(HostControl hostControl, SessionChangedArguments arguments)
+        {
+            _serviceHandle.SessionChanged(hostControl, arguments);
+        }
+
         public bool Pause(HostControl hostControl)
         {
             return _serviceHandle.Pause(hostControl);

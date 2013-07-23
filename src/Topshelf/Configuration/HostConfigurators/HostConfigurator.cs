@@ -51,6 +51,11 @@ namespace Topshelf.HostConfigurators
         void EnableShutdown();
 
         /// <summary>
+        /// Enabled support for the session changed event
+        /// </summary>
+        void EnableSessionChanged();
+
+        /// <summary>
         ///   Specifies the builder factory to use when the service is invoked
         /// </summary>
         /// <param name="hostBuilderFactory"> </param>

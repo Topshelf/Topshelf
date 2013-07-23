@@ -101,6 +101,15 @@ namespace Topshelf.Builders
                     serviceShutdown.Shutdown(hostControl);
                 }
             }
+
+            public void SessionChanged(HostControl hostControl, SessionChangedArguments arguments)
+            {
+                var sessionChange = _service as ServiceSessionChange;
+                if (sessionChange != null)
+                {
+                    sessionChange.SessionChange(hostControl, arguments);
+                }
+            }
         }
     }
 }

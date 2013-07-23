@@ -96,5 +96,7 @@ namespace Topshelf.Runtime.Windows
         public bool CanPauseAndContinue { get; set; }
 
         public bool CanShutdown { get; set; }
+
+        public bool CanSessionChanged { get; set; }
     }
 }
