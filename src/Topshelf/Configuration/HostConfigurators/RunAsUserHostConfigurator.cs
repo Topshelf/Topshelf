@@ -21,30 +21,30 @@ namespace Topshelf.HostConfigurators
     public class RunAsUserHostConfigurator :
         HostBuilderConfigurator
     {
-        readonly string _password;
-        readonly string _username;
-
         public RunAsUserHostConfigurator(string username, string password)
         {
-            _username = username;
-            _password = password;
+            this.Username = username;
+            this.Password = password;
         }
+
+        public string Password { get; private set; }
+        public string Username { get; private set; }
 
         public HostBuilder Configure(HostBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.RunAs(_username, _password, ServiceAccount.User));
+            builder.Match<InstallBuilder>(x => x.RunAs(this.Username, this.Password, ServiceAccount.User));
 
             return builder;
         }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (string.IsNullOrEmpty(_username))
+            if (string.IsNullOrEmpty(this.Username))
                 yield return this.Failure("Username", "must be specified for a User account type");
-            if (string.IsNullOrEmpty(_password))
+            if (string.IsNullOrEmpty(this.Password))
                 yield return this.Failure("Password", "must be specified for a User account type");
         }
     }

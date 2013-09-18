@@ -20,29 +20,29 @@ namespace Topshelf.HostConfigurators
     public class UninstallHostConfiguratorAction :
         HostBuilderConfigurator
     {
-        readonly Action<UninstallBuilder> _callback;
-        readonly string _key;
-
         public UninstallHostConfiguratorAction(string key, Action<UninstallBuilder> callback)
         {
-            _key = key;
-            _callback = callback;
+            this.Key = key;
+            this.Callback = callback;
         }
+
+        public Action<UninstallBuilder> Callback { get; private set; }
+        public string Key { get; private set; }
 
         public HostBuilder Configure(HostBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<UninstallBuilder>(x => _callback(x));
+            builder.Match<UninstallBuilder>(x => this.Callback(x));
 
             return builder;
         }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (_callback == null)
-                yield return this.Failure(_key, "must not be null");
+            if (this.Callback == null)
+                yield return this.Failure(this.Key, "must not be null");
         }
     }
 }

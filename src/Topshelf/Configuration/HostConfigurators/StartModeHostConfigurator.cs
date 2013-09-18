@@ -21,12 +21,12 @@ namespace Topshelf.HostConfigurators
     public class StartModeHostConfigurator :
         HostBuilderConfigurator
     {
-        readonly HostStartMode _startMode;
-
         public StartModeHostConfigurator(HostStartMode startMode)
         {
-            _startMode = startMode;
+            this.StartMode = startMode;
         }
+
+        public HostStartMode StartMode { get; private set; }
 
         public IEnumerable<ValidateResult> Validate()
         {
@@ -42,7 +42,7 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.SetStartMode(_startMode));
+            builder.Match<InstallBuilder>(x => x.SetStartMode(this.StartMode));
 
             return builder;
         }

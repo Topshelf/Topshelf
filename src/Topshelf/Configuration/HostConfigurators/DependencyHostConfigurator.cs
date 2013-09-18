@@ -23,19 +23,19 @@ namespace Topshelf.HostConfigurators
     public class DependencyHostConfigurator :
         HostBuilderConfigurator
     {
-        readonly string _name;
-
         public DependencyHostConfigurator(string name)
         {
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            _name = name;
+            this.Name = name;
         }
+
+        public string Name { get; private set; }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (string.IsNullOrEmpty(_name))
+            if (string.IsNullOrEmpty(this.Name))
                 yield return this.Failure("Dependency", "must not be null");
         }
 
@@ -44,7 +44,7 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.AddDependency(_name));
+            builder.Match<InstallBuilder>(x => x.AddDependency(this.Name));
 
             return builder;
         }

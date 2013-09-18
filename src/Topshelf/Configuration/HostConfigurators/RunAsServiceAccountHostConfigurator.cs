@@ -21,19 +21,19 @@ namespace Topshelf.HostConfigurators
     public class RunAsServiceAccountHostConfigurator :
         HostBuilderConfigurator
     {
-        readonly ServiceAccount _accountType;
-
         public RunAsServiceAccountHostConfigurator(ServiceAccount accountType)
         {
-            _accountType = accountType;
+            this.AccountType = accountType;
         }
+
+        public ServiceAccount AccountType { get; private set; }
 
         public HostBuilder Configure(HostBuilder builder)
         {
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.RunAs("", "", _accountType));
+            builder.Match<InstallBuilder>(x => x.RunAs("", "", this.AccountType));
 
             return builder;
         }

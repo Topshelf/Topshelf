@@ -20,22 +20,22 @@ namespace Topshelf.HostConfigurators
     public class InstallHostConfiguratorAction :
         HostBuilderConfigurator
     {
-        readonly Action<InstallBuilder> _callback;
-        readonly string _key;
-
         public InstallHostConfiguratorAction(string key, Action<InstallBuilder> callback)
         {
             if (callback == null)
                 throw new ArgumentNullException("callback");
 
-            _key = key;
-            _callback = callback;
+            this.Key = key;
+            this.Callback = callback;
         }
+
+        public Action<InstallBuilder> Callback { get; private set; }
+        public string Key { get; private set; }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (_callback == null)
-                yield return this.Failure(_key, "A null callback was specified");
+            if (this.Callback == null)
+                yield return this.Failure(this.Key, "A null callback was specified");
         }
 
         public HostBuilder Configure(HostBuilder builder)
@@ -43,7 +43,7 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => _callback(x));
+            builder.Match<InstallBuilder>(x => this.Callback(x));
 
             return builder;
         }
