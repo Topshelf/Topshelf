@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -18,13 +18,14 @@ namespace Topshelf.HostConfigurators
     using Builders;
     using Configurators;
 
+
     public class RunAsUserHostConfigurator :
         HostBuilderConfigurator
     {
         public RunAsUserHostConfigurator(string username, string password)
         {
-            this.Username = username;
-            this.Password = password;
+            Username = username;
+            Password = password;
         }
 
         public string Password { get; private set; }
@@ -35,16 +36,16 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.RunAs(this.Username, this.Password, ServiceAccount.User));
+            builder.Match<InstallBuilder>(x => x.RunAs(Username, Password, ServiceAccount.User));
 
             return builder;
         }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (string.IsNullOrEmpty(this.Username))
+            if (string.IsNullOrEmpty(Username))
                 yield return this.Failure("Username", "must be specified for a User account type");
-            if (string.IsNullOrEmpty(this.Password))
+            if (string.IsNullOrEmpty(Password))
                 yield return this.Failure("Password", "must be specified for a User account type");
         }
     }

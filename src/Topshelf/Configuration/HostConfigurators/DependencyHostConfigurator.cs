@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -17,6 +17,7 @@ namespace Topshelf.HostConfigurators
     using Builders;
     using Configurators;
 
+
     /// <summary>
     /// Adds a dependency to the InstallBuilder (ignored otherwise)
     /// </summary>
@@ -28,14 +29,14 @@ namespace Topshelf.HostConfigurators
             if (name == null)
                 throw new ArgumentNullException("name");
 
-            this.Name = name;
+            Name = name;
         }
 
         public string Name { get; private set; }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (string.IsNullOrEmpty(this.Name))
+            if (string.IsNullOrEmpty(Name))
                 yield return this.Failure("Dependency", "must not be null");
         }
 
@@ -44,7 +45,7 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<InstallBuilder>(x => x.AddDependency(this.Name));
+            builder.Match<InstallBuilder>(x => x.AddDependency(Name));
 
             return builder;
         }

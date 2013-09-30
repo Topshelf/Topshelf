@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -17,13 +17,14 @@ namespace Topshelf.HostConfigurators
     using Builders;
     using Configurators;
 
+
     public class UninstallHostConfiguratorAction :
         HostBuilderConfigurator
     {
         public UninstallHostConfiguratorAction(string key, Action<UninstallBuilder> callback)
         {
-            this.Key = key;
-            this.Callback = callback;
+            Key = key;
+            Callback = callback;
         }
 
         public Action<UninstallBuilder> Callback { get; private set; }
@@ -34,15 +35,15 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-            builder.Match<UninstallBuilder>(x => this.Callback(x));
+            builder.Match<UninstallBuilder>(x => Callback(x));
 
             return builder;
         }
 
         public IEnumerable<ValidateResult> Validate()
         {
-            if (this.Callback == null)
-                yield return this.Failure(this.Key, "must not be null");
+            if (Callback == null)
+                yield return this.Failure(Key, "must not be null");
         }
     }
 }
