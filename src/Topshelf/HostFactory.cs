@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2012 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -17,6 +17,7 @@ namespace Topshelf
     using HostConfigurators;
     using Logging;
 
+
     /// <summary>
     ///   Configure and run a service host using the HostFactory
     /// </summary>
@@ -29,30 +30,40 @@ namespace Topshelf
         /// <returns> A Topshelf service host, ready to run </returns>
         public static Host New(Action<HostConfigurator> configureCallback)
         {
-            if (configureCallback == null)
-                throw new ArgumentNullException("configureCallback");
-
-            var configurator = new HostConfiguratorImpl();
-
-            Type declaringType = configureCallback.Method.DeclaringType;
-            if (declaringType != null)
+            try
             {
-                string defaultServiceName = declaringType.Namespace;
-                if (!string.IsNullOrEmpty(defaultServiceName))
-                    configurator.SetServiceName(defaultServiceName);
+                if (configureCallback == null)
+                    throw new ArgumentNullException("configureCallback");
+
+                var configurator = new HostConfiguratorImpl();
+
+                Type declaringType = configureCallback.Method.DeclaringType;
+                if (declaringType != null)
+                {
+                    string defaultServiceName = declaringType.Namespace;
+                    if (!string.IsNullOrEmpty(defaultServiceName))
+                        configurator.SetServiceName(defaultServiceName);
+                }
+
+                configureCallback(configurator);
+
+                configurator.ApplyCommandLine();
+
+                ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
+
+                if (result.Message.Length > 0)
+                {
+                    HostLogger.Get(typeof(HostFactory))
+                              .InfoFormat("Configuration Result:\n{0}", result.Message);
+                }
+
+                return configurator.CreateHost();
             }
-
-            configureCallback(configurator);
-
-            configurator.ApplyCommandLine();
-
-            ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
-
-            if (result.Message.Length > 0)
-                HostLogger.Get(typeof(HostFactory))
-                    .InfoFormat("Configuration Result:\n{0}", result.Message);
-
-            return configurator.CreateHost();
+            catch (Exception ex)
+            {
+                HostLogger.Get(typeof(HostFactory)).Error("An exception occurred creating the host", ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -70,7 +81,7 @@ namespace Topshelf
             catch (Exception ex)
             {
                 HostLogger.Get(typeof(HostFactory))
-                    .Error("The service terminated abnormally", ex);
+                          .Error("The service terminated abnormally", ex);
 
                 return TopshelfExitCode.AbnormalExit;
             }
