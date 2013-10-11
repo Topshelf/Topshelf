@@ -33,7 +33,7 @@ Get started in four simple steps!
 ### Source
 
  1. Clone the source down to your machine.
-   `git clone git://github.com/Topshelf/Topshelf.git`
+   `git clone --recursive git://github.com/Topshelf/Topshelf.git`
  2. Download git, ruby and gems. Install – a tutorial is [here][gems]
  3. gem install rake albacore
  4. **Important:** Run `rake global_version` in order to generate the SolutionVersion.cs file which is otherwise missing.
