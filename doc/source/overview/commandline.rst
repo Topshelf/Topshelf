@@ -14,7 +14,8 @@ The help text from the command line is shown below for easy reference.
     service.exe **[verb]** [-option:value] [-switch]
 
     **run**               Runs the service from the command line (default)
-    **help**, --help      Displays help
+    
+    **help** or **--help**      Displays help
 
     **install**           Installs the service
 
