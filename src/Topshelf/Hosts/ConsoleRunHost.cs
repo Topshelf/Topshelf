@@ -86,6 +86,7 @@ namespace Topshelf.Hosts
 
                 _exit = new ManualResetEvent(false);
 
+                Console.Title = _settings.DisplayName;
                 Console.CancelKeyPress += HandleCancelKeyPress;
 
                 if (!_serviceHandle.Start(this))
