@@ -34,6 +34,7 @@ namespace Topshelf.Runtime.Windows
         readonly HostSettings _settings;
         int _deadThread;
         bool _disposed;
+        Exception _unhandledException;
 
         public WindowsServiceHost(HostEnvironment environment, HostSettings settings, ServiceHandle serviceHandle)
         {
@@ -150,6 +151,13 @@ namespace Topshelf.Runtime.Windows
                 ExitCode = (int)TopshelfExitCode.StopServiceFailed;
                 throw;
             }
+
+            if (_unhandledException != null)
+            {
+                ExitCode = (int)TopshelfExitCode.UnhandledServiceException;
+                _log.Info("[Topshelf] Unhandled exception detected, rethrowing to cause application to restart.");
+                throw new InvalidOperationException("An unhandled exception was detected", _unhandledException);
+            }
         }
 
         protected override void OnPause()
@@ -243,8 +251,14 @@ namespace Topshelf.Runtime.Windows
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _log.Error("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+            
+//            // IF not terminating, then no reason to stop the service?
+//            if (!e.IsTerminating)
+//                return;
+//          This needs to be a configuration option to avoid breaking compatibility
 
             ExitCode = (int)TopshelfExitCode.UnhandledServiceException;
+            _unhandledException = e.ExceptionObject as Exception;
 
             Stop();
 
