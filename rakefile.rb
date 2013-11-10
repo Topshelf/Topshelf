@@ -104,14 +104,14 @@ end
 
 desc "Runs unit tests"
 nunit :tests35 => [:build35] do |nunit|
-          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.2', 'tools', 'nunit-console.exe')
+          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.3', 'tools', 'nunit-console.exe')
           nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-3.5.xml')}\""
           nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
 
 desc "Runs unit tests"
 nunit :tests4 => [:build4] do |nunit|
-          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.2', 'tools', 'nunit-console.exe')
+          nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.3', 'tools', 'nunit-console.exe')
           nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-4.0.xml')}\""
           nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
@@ -183,7 +183,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.requireLicenseAcceptance = "false"
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "Log4Net", "2.0.1"
+  nuspec.dependency "Log4Net", "2.0.2"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Log4Net.nuspec')
   add_files props[:output], 'Topshelf.Log4Net.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.Log4Net\\**\\*.cs").gsub("/","\\"), "src")
@@ -202,7 +202,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.requireLicenseAcceptance = "false"
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "NLog", "2.0.1.2"
+  nuspec.dependency "NLog", "2.1.0"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
