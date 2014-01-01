@@ -61,5 +61,12 @@ namespace Topshelf.Runtime
         /// <param name="hostControl"></param>
         /// <param name="arguments"></param>
         void SessionChanged(HostControl hostControl, SessionChangedArguments arguments);
+
+        /// <summary>
+        /// Handle the custom command
+        /// </summary>
+        /// <param name="hostControl"></param>
+        /// <param name="command"></param>
+        void CustomCommand(HostControl hostControl, int command);
     }
 }

@@ -103,6 +103,12 @@ namespace Topshelf.Rehab
             _service.SessionChanged(control, arguments);
         }
 
+        public void CustomCommand(HostControl hostControl, int command)
+        {
+            var control = new AppDomainHostControl(this);
+            _service.CustomCommand(control, command);
+        }
+
         void RestartService(object state)
         {
             try

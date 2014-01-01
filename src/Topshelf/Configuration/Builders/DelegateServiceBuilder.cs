@@ -27,10 +27,12 @@ namespace Topshelf.Builders
         readonly Func<T, HostControl, bool> _start;
         readonly Func<T, HostControl, bool> _stop;
         readonly Action<T, HostControl, SessionChangedArguments> _sessionChanged;
+        readonly Action<T, HostControl, int> _customCommand;
 
         public DelegateServiceBuilder(ServiceFactory<T> serviceFactory, Func<T, HostControl, bool> start,
             Func<T, HostControl, bool> stop, Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue,
-            Action<T, HostControl> shutdown, Action<T, HostControl, SessionChangedArguments> sessionChanged, ServiceEvents serviceEvents)
+            Action<T, HostControl> shutdown, Action<T, HostControl, SessionChangedArguments> sessionChanged,
+            Action<T, HostControl, int> customCommand, ServiceEvents serviceEvents)
         {
             _serviceFactory = serviceFactory;
             _start = start;
@@ -38,8 +40,9 @@ namespace Topshelf.Builders
             _pause = pause;
             _continue = @continue;
             _shutdown = shutdown;
-            _serviceEvents = serviceEvents;
             _sessionChanged = sessionChanged;
+            _customCommand = customCommand;
+            _serviceEvents = serviceEvents;
         }
 
         public ServiceHandle Build(HostSettings settings)
@@ -48,7 +51,7 @@ namespace Topshelf.Builders
             {
                 T service = _serviceFactory(settings);
 
-                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown, _sessionChanged, _serviceEvents);
+                return new DelegateServiceHandle(service, _start, _stop, _pause, _continue, _shutdown, _sessionChanged, _customCommand, _serviceEvents);
             }
             catch (Exception ex)
             {
@@ -67,10 +70,12 @@ namespace Topshelf.Builders
             readonly Func<T, HostControl, bool> _start;
             readonly Func<T, HostControl, bool> _stop;
             readonly Action<T, HostControl, SessionChangedArguments> _sessionChanged;
+            readonly Action<T, HostControl, int> _customCommand;
 
             public DelegateServiceHandle(T service, Func<T, HostControl, bool> start, Func<T, HostControl, bool> stop,
                 Func<T, HostControl, bool> pause, Func<T, HostControl, bool> @continue, Action<T, HostControl> shutdown,
-                Action<T, HostControl, SessionChangedArguments> sessionChanged, ServiceEvents serviceEvents)
+                Action<T, HostControl, SessionChangedArguments> sessionChanged,
+                Action<T, HostControl, int> customCommand, ServiceEvents serviceEvents)
             {
                 _service = service;
                 _start = start;
@@ -78,8 +83,9 @@ namespace Topshelf.Builders
                 _pause = pause;
                 _continue = @continue;
                 _shutdown = shutdown;
-                _serviceEvents = serviceEvents;
                 _sessionChanged = sessionChanged;
+                _customCommand = customCommand;
+                _serviceEvents = serviceEvents;
             }
 
             public void Dispose()
@@ -133,6 +139,12 @@ namespace Topshelf.Builders
             {
                 if (_sessionChanged != null)
                     _sessionChanged(_service, hostControl, arguments);
+            }
+
+            public void CustomCommand(HostControl hostControl, int command)
+            {
+                if (_customCommand != null)
+                    _customCommand(_service, hostControl, command);
             }
         }
     }

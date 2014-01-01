@@ -110,6 +110,15 @@ namespace Topshelf.Builders
                     sessionChange.SessionChange(hostControl, arguments);
                 }
             }
+
+            public void CustomCommand(HostControl hostControl, int command)
+            {
+                var customCommand = _service as ServiceCustomCommand;
+                if (customCommand != null)
+                {
+                    customCommand.CustomCommand(hostControl, command);
+                }
+            }
         }
     }
 }

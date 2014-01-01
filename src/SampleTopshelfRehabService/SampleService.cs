@@ -22,7 +22,8 @@ namespace SampleTopshelfRehabService
         ServiceControl,
         ServiceSuspend,
         ServiceShutdown,
-        ServiceSessionChange
+        ServiceSessionChange,
+        ServiceCustomCommand
     {
         LogWriter _log;
 
@@ -82,6 +83,11 @@ namespace SampleTopshelfRehabService
             _log.Info("SampleService Continued");
 
             return true;
+        }
+
+        public void CustomCommand(HostControl hostControl, int command)
+        {
+            _log.Info(string.Format("Custom command received: {0}", command));
         }
     }
 }
