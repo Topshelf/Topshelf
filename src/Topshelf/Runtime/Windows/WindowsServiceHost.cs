@@ -234,6 +234,21 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
+        protected override void OnCustomCommand(int command)
+        {
+            try
+            {
+                _log.Info(string.Format("[Topshelf] Custom command {0} received", command));
+
+                _serviceHandle.CustomCommand(this, command);
+
+                _log.Info("[Topshelf] Custom command {0} processed");
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unhandled exception during custom command processing detected", ex);
+            }
+        }
 
         protected override void Dispose(bool disposing)
         {

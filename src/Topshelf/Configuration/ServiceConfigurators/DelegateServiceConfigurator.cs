@@ -37,6 +37,8 @@ namespace Topshelf.ServiceConfigurators
         bool _shutdownConfigured;
         Func<T, HostControl, bool> _start;
         Func<T, HostControl, bool> _stop;
+        bool _customCommandReceivedConfigured;
+        Action<T, HostControl, int> _customCommandReceived;
 
         public IEnumerable<ValidateResult> Validate()
         {
@@ -55,6 +57,8 @@ namespace Topshelf.ServiceConfigurators
                 yield return this.Failure("Shutdown", "must not be null if shutdown is allowed");
             if (_sessionChangeConfigured && _sessionChanged == null)
                 yield return this.Failure("SessionChange", "must not be null if session change is allowed");
+            if (_customCommandReceivedConfigured && _customCommandReceived == null)
+                yield return this.Failure("CustomCommand", "must not be null if custom command is allowed");
         }
 
         public void ConstructUsing(ServiceFactory<T> serviceFactory)
@@ -96,10 +100,16 @@ namespace Topshelf.ServiceConfigurators
             _sessionChanged = sessionChanged;
         }
 
+        public void WhenCustomCommandReceived(Action<T, HostControl, int> customCommandReceived)
+        {
+            _customCommandReceivedConfigured = true;
+            _customCommandReceived = customCommandReceived;
+        }
+
         public ServiceBuilder Build()
         {
             var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown,
-                _sessionChanged, ServiceEvents);
+                _sessionChanged, _customCommandReceived, ServiceEvents);
             return serviceBuilder;
         }
     }

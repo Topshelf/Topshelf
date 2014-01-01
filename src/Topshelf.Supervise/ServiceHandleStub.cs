@@ -52,6 +52,11 @@ namespace Topshelf.Supervise
             _serviceHandle.SessionChanged(hostControl, arguments);
         }
 
+        public void CustomCommand(HostControl hostControl, int command)
+        {
+            _serviceHandle.CustomCommand(hostControl, command);
+        }
+
         public bool Pause(HostControl hostControl)
         {
             return _serviceHandle.Pause(hostControl);

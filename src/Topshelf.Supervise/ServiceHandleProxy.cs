@@ -79,6 +79,11 @@ namespace Topshelf.Supervise
             _service.SessionChanged(hostControl, arguments);
         }
 
+        public void CustomCommand(HostControl hostControl, int command)
+        {
+            _service.CustomCommand(hostControl, command);
+        }
+
         void UnloadServiceAppDomain()
         {
             try
