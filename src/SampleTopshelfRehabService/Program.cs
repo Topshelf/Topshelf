@@ -22,7 +22,7 @@ namespace SampleTopshelfRehabService
                 {
                     x.UseLog4Net("log4net.config");
                  
-                    x.RehabService<SampleService>();
+                    x.Service<SampleService>();
 
                     // this will enable Pause and Continue, may break this out into a separate interface to 
                     // reduce the footprint on the service code if pause and continue are not supported.

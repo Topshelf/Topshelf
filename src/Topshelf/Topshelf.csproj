@@ -47,6 +47,7 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="Configuration\Builders\CommandBuilder.cs" />
     <Compile Include="Configuration\Builders\ControlServiceBuilder.cs" />
     <Compile Include="Configuration\Builders\DelegateServiceBuilder.cs" />
     <Compile Include="Configuration\Builders\EnvironmentBuilder.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Configuration\CommandLineParser\SwitchElement.cs" />
     <Compile Include="Configuration\CommandLineParser\TokenElement.cs" />
     <Compile Include="Configuration\HostConfiguratorExtensions.cs" />
+    <Compile Include="Configuration\HostConfigurators\CommandConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineDefinitionConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\CommandLineSwitchConfigurator.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Configuration\HostConfigurators\UninstallHostConfiguratorAction.cs" />
     <Compile Include="Configuration\HostConfigurators\UnknownCommandLineOptionHostConfigurator.cs" />
     <Compile Include="Configuration\Options\AutostartOption.cs" />
+    <Compile Include="Configuration\Options\CommandOption.cs" />
     <Compile Include="Configuration\Options\DelayedOption.cs" />
     <Compile Include="Configuration\Options\DisabledOption.cs" />
     <Compile Include="Configuration\Options\DisplayNameOption.cs" />
@@ -159,6 +162,7 @@
     <Compile Include="HostStartedContext.cs" />
     <Compile Include="HostStopContext.cs" />
     <Compile Include="HostStoppedContext.cs" />
+    <Compile Include="Hosts\CommandHost.cs" />
     <Compile Include="Hosts\ConsoleRunHost.cs" />
     <Compile Include="Hosts\HelpHost.cs" />
     <Compile Include="Hosts\InstallHost.cs" />

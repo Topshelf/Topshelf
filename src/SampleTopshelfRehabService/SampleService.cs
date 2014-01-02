@@ -39,11 +39,11 @@ namespace SampleTopshelfRehabService
 
             ThreadPool.QueueUserWorkItem(x =>
                 {
-                    Thread.Sleep(3000);
+    //                Thread.Sleep(3000);
 
-                    _log.Info("Requesting a restart!!!");
+  //                  _log.Info("Requesting a restart!!!");
 
-                    hostControl.Restart();
+//                    hostControl.Restart();
 
 //                _log.Info("Dying an ungraceful death");
 //

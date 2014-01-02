@@ -19,12 +19,18 @@ namespace Topshelf.HostConfigurators
     {
         internal static void AddTopshelfOptions(ICommandLineElementParser<Option> x)
         {
+            int n;
+
             x.Add((from arg in x.Argument("install")
                    select (Option)new InstallOption())
                 .Or(from arg in x.Argument("uninstall")
                     select (Option)new UninstallOption())
                 .Or(from arg in x.Argument("start")
                     select (Option)new StartOption())
+                .Or(from arg in x.Argument("command")
+                    from cmd in x.Argument()
+                    where int.TryParse(cmd.Id, out n)
+                    select (Option)new CommandOption(cmd.Id))
                 .Or(from arg in x.Argument("help")
                     select (Option)new HelpOption())
                 .Or(from arg in x.Argument("stop")

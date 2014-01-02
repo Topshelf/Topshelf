@@ -179,6 +179,22 @@ namespace Topshelf.Runtime.Windows
             return new WindowsServiceHost(this, settings, serviceHandle);
         }
 
+        public void SendServiceCommand(string serviceName, int command)
+        {
+            using (var sc = new ServiceController(serviceName))
+            {
+                if (sc.Status == ServiceControllerStatus.Running)
+                {
+                    sc.ExecuteCommand(command);
+                }
+                else
+                {
+                    _log.WarnFormat("The {0} service can't be commanded now as it has the status {1}. Try again later...",
+                        serviceName, sc.Status.ToString());
+                }
+            }
+        }
+
         public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback)
         {
             using (var installer = new HostServiceInstaller(settings))

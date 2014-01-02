@@ -89,5 +89,12 @@ namespace Topshelf.Runtime
         /// <param name="serviceHandle"></param>
         /// <returns></returns>
         Host CreateServiceHost(HostSettings settings, ServiceHandle serviceHandle);
+
+        /// <summary>
+        /// Send a command to a service to make it do something
+        /// </summary>
+        /// <param name="serviceName">The service name</param>
+        /// <param name="command">The command value</param>
+        void SendServiceCommand(string serviceName, int command);
     }
 }
