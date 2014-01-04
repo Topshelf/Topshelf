@@ -183,7 +183,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.requireLicenseAcceptance = "false"
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "Log4Net", "2.0.2"
+  nuspec.dependency "Log4Net", "2.0.3"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Log4Net.nuspec')
   add_files props[:output], 'Topshelf.Log4Net.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.Log4Net\\**\\*.cs").gsub("/","\\"), "src")
