@@ -242,7 +242,7 @@ namespace Topshelf.Runtime.Windows
 
                 _serviceHandle.CustomCommand(this, command);
 
-                _log.Info("[Topshelf] Custom command {0} processed");
+                _log.Info(string.Format("[Topshelf] Custom command {0} processed", command));
             }
             catch (Exception ex)
             {
