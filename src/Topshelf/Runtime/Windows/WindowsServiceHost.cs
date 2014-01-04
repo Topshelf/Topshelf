@@ -265,7 +265,7 @@ namespace Topshelf.Runtime.Windows
 
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            _log.Error("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+            _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
             
 //            // IF not terminating, then no reason to stop the service?
 //            if (!e.IsTerminating)

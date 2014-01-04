@@ -142,7 +142,7 @@ namespace Topshelf.Hosts
 
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            _log.Error("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+            _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
 
             if (e.IsTerminating)
             {
