@@ -48,10 +48,8 @@ Now for the play by play.
 #. This tells Topshelf how to build an instance of the service. Currently we are just going to ‘new it up’ but we could just as easily pull it from an IoC container with some code that would look something like ‘container.GetInstance<TownCrier>()’
 #. How does Topshelf start the service
 #. How does Topshelf stop the service
-#. Here we are setting up the ‘run as’ and have selected the ‘local system’
-#. We can also set up from the command line
-#. Interactively with a win from type prompt
-#. We can also just pass in some username/password as string arguments
+#. Here we are setting up the ‘run as’ and have selected the ‘local system’. We can also set up from the command line
+   Interactively with a win from type prompt and we can also just pass in some username/password as string arguments
 #. Here we are setting up the description for the winservice to be use in the windows service monitor
 #. Here we are setting up the display name for the winservice to be use in the windows service monitor
 #. Here we are setting up the service name for the winservice to be use in the windows service monitor
