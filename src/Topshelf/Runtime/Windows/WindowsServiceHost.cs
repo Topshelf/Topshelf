@@ -238,11 +238,11 @@ namespace Topshelf.Runtime.Windows
         {
             try
             {
-                _log.Info(string.Format("[Topshelf] Custom command {0} received", command));
+                _log.InfoFormat("[Topshelf] Custom command {0} received", command);
 
                 _serviceHandle.CustomCommand(this, command);
 
-                _log.Info(string.Format("[Topshelf] Custom command {0} processed", command));
+                _log.InfoFormat("[Topshelf] Custom command {0} processed", command);
             }
             catch (Exception ex)
             {
