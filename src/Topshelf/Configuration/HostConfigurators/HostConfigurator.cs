@@ -41,6 +41,18 @@ namespace Topshelf.HostConfigurators
         void SetInstanceName(string instanceName);
 
         /// <summary>
+        /// Sets the amount of time to wait for the service to start before timing out. Default is 10 seconds.
+        /// </summary>
+        /// <param name="startTimeOut"></param>
+        void SetStartTimeout(TimeSpan startTimeOut);
+
+        /// <summary>
+        /// Sets the amount of time to wait for the service to stop before timing out. Default is 10 seconds.
+        /// </summary>
+        /// <param name="stopTimeOut"></param>
+        void SetStopTimeout(TimeSpan stopTimeOut);
+
+        /// <summary>
         /// Enable pause and continue support for the service (default is disabled)
         /// </summary>
         void EnablePauseAndContinue();

@@ -106,6 +106,16 @@ namespace Topshelf.HostConfigurators
             _settings.InstanceName = instanceName;
         }
 
+        public void SetStartTimeout(TimeSpan startTimeOut)
+        {
+          _settings.StartTimeOut = startTimeOut;
+        }
+
+        public void SetStopTimeout(TimeSpan stopTimeOut)
+        {
+          _settings.StopTimeOut = stopTimeOut;
+        }
+
         public void EnablePauseAndContinue()
         {
             _settings.CanPauseAndContinue = true;

@@ -12,6 +12,8 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime
 {
+    using System;
+
     /// <summary>
     ///   The settings that have been configured for the operating system service
     /// </summary>
@@ -57,5 +59,15 @@ namespace Topshelf.Runtime
         /// True if the service handles session change events
         /// </summary>
         bool CanSessionChanged { get; }
+
+        /// <summary>
+        /// The amount of time to wait for the service to start before timing out. Default is 10 seconds.
+        /// </summary>
+        TimeSpan StartTimeOut { get; }
+
+        /// <summary>
+        /// The amount of time to wait for the service to stop before timing out. Default is 10 seconds.
+        /// </summary>
+        TimeSpan StopTimeOut { get; }
     }
 }

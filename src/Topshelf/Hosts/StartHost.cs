@@ -59,7 +59,7 @@ namespace Topshelf.Hosts
 
             try
             {
-                _environment.StartService(_settings.ServiceName);
+                _environment.StartService(_settings.ServiceName, _settings.StartTimeOut);
 
                 _log.InfoFormat("The {0} service was started.", _settings.ServiceName);
                 return TopshelfExitCode.Ok;
