@@ -203,6 +203,16 @@ namespace Topshelf.Hosts
             {
                 get { return _startMode; }
             }
+
+            public TimeSpan StartTimeOut
+            {
+              get { return _settings.StartTimeOut; }
+            }
+            
+            public TimeSpan StopTimeOut
+            {
+              get { return _settings.StopTimeOut; }
+            }
         }
     }
 }
