@@ -50,6 +50,7 @@ namespace Topshelf.Runtime.Windows
             CanPauseAndContinue = settings.CanPauseAndContinue;
             CanShutdown = settings.CanShutdown;
             CanHandleSessionChangeEvent = settings.CanSessionChanged;
+            ServiceName = _settings.ServiceName;
         }
 
         public TopshelfExitCode Run()
@@ -127,7 +128,6 @@ namespace Topshelf.Runtime.Windows
             catch (Exception ex)
             {
                 _log.Fatal("The service did not start successfully", ex);
-                _log.Fatal(ex);
 
                 ExitCode = (int)TopshelfExitCode.StartServiceFailed;
                 throw;
