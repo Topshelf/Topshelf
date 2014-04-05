@@ -27,6 +27,7 @@ The help text from the command line is shown below for easy reference.
       --disabled        The service should be set to disabled
       --manual          The service should be started manually
       --delayed         The service should start automatically (delayed)
+      --localsystem     Run the service with the local system account
       --localservice    Run the service with the local service account
       --networkservice  Run the service with the network service permission
       --interactive     The service will prompt the user at installation for
