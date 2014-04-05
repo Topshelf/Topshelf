@@ -116,6 +116,7 @@
     <Compile Include="Configuration\HostConfigurators\UnknownCommandLineOptionHostConfigurator.cs" />
     <Compile Include="Configuration\Options\AutostartOption.cs" />
     <Compile Include="Configuration\Options\CommandOption.cs" />
+    <Compile Include="Configuration\Options\LocalSystemOption.cs" />
     <Compile Include="Configuration\Options\DelayedOption.cs" />
     <Compile Include="Configuration\Options\DisabledOption.cs" />
     <Compile Include="Configuration\Options\DisplayNameOption.cs" />

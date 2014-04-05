@@ -52,6 +52,8 @@ namespace Topshelf.HostConfigurators
                     select (Option)new DelayedOption())
                 .Or(from interactive in x.Switch("interactive")
                     select (Option)new InteractiveOption())
+                .Or(from autostart in x.Switch("localsystem")
+                    select (Option)new LocalSystemOption())
                 .Or(from autostart in x.Switch("localservice")
                     select (Option)new LocalServiceOption())
                 .Or(from autostart in x.Switch("networkservice")
