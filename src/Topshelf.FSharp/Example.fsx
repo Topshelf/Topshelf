@@ -21,7 +21,7 @@ let main args =
 
   with_topshelf <| fun conf ->
     run_as_network_service conf
-    "Topshelf.SampleService" |> service_name conf
+    naming_from_this_asm conf
 
     service conf <| fun _ ->
       { new ServiceControl with

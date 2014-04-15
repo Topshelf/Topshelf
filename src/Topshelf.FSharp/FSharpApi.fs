@@ -141,7 +141,7 @@ module FSharpApi =
     let naming_from_asm (conf : HostConfigurator) asm =
       HostConfiguratorExtensions.UseAssemblyInfoForServiceInfo(conf, asm)
 
-    let naming_from_asm_entry (conf : HostConfigurator) =
+    let naming_from_this_asm (conf : HostConfigurator) =
       HostConfiguratorExtensions.UseAssemblyInfoForServiceInfo conf
 
   [<AutoOpen>]
