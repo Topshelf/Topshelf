@@ -149,6 +149,7 @@ module FSharpApi =
     let with_recovery (conf : HostConfigurator) f =
       ServiceRecoveryConfiguratorExtensions.EnableServiceRecovery(conf,
         new Action<_>(f))
+      |> ignore
 
     let restart (span : TimeSpan) (c : ServiceRecoveryConfigurator) =
       c.RestartService(int span.TotalMinutes) |> ignore

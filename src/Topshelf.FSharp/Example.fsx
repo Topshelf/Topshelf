@@ -10,7 +10,6 @@ open System.Reflection
 open System
 
 open Topshelf
-open HostControl
 open Time
 
 [<EntryPoint>]
@@ -20,20 +19,23 @@ let main args =
 
   with_topshelf <| fun conf ->
     run_as_network_service conf
+
     naming_from_this_asm conf
+
+    with_recovery conf (restart (s 20))
 
     service conf <| fun _ ->
       { new ServiceControl with
           member x.Start hc =
             info "sample service starting"
 
-            (s 30) |> request_more_time hc
+            (s 30) |> HostControl.request_more_time hc
             sleep (s 1)
 
             Threading.ThreadPool.QueueUserWorkItem(fun cb ->
               sleep (s 3)
               info "requesting stop"
-              hc |> stop) |> ignore
+              hc |> HostControl.stop) |> ignore
 
             info "sample service started"
             true
