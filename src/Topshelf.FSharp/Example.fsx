@@ -11,12 +11,12 @@ open System
 
 open Topshelf
 open HostControl
+open Time
 
 [<EntryPoint>]
 let main args =
   let prefix = "http://*:8080/"
   let info : string -> unit = fun s -> Console.WriteLine(sprintf "%s logger/sample-service: %s" (DateTime.UtcNow.ToString("o")) s)
-  let s (secs : int) = TimeSpan.FromSeconds (float secs)
   let sleep (time : TimeSpan) = System.Threading.Thread.Sleep(time)
 
   with_topshelf <| fun conf ->
