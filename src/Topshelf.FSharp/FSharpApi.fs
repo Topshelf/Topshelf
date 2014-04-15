@@ -150,16 +150,16 @@ module FSharpApi =
       ServiceRecoveryConfiguratorExtensions.EnableServiceRecovery(conf,
         new Action<_>(f))
 
-    let restart (c : ServiceRecoveryConfigurator) (span : TimeSpan) =
+    let restart (span : TimeSpan) (c : ServiceRecoveryConfigurator) =
       c.RestartService(int span.TotalMinutes) |> ignore
 
-    let restart_computer (c : ServiceRecoveryConfigurator) (span : TimeSpan) message =
+    let restart_computer (span : TimeSpan) message (c : ServiceRecoveryConfigurator) =
       c.RestartComputer(int span.TotalMinutes, message) |> ignore
 
-    let run_program (c : ServiceRecoveryConfigurator) (span : TimeSpan) cmd =
+    let run_program (span : TimeSpan) cmd (c : ServiceRecoveryConfigurator) =
       c.RunProgram(int span.TotalMinutes, cmd) |> ignore
 
-    let set_reset_period (c : ServiceRecoveryConfigurator) (days : TimeSpan) =
+    let set_reset_period (days : TimeSpan) (c : ServiceRecoveryConfigurator) =
       c.SetResetPeriod(int days.TotalDays) |> ignore
 
     let on_crash_only (c : ServiceRecoveryConfigurator) =
