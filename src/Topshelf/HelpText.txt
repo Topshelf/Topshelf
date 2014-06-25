@@ -17,6 +17,7 @@ Command-Line Reference
                         multiple times
       -username         The username to run the service
       -password         The password for the specified username
+      --localsystem     Run the service with the local system account
       --localservice    Run the service with the local service account
       --networkservice  Run the service with the network service permission
       --interactive     The service will prompt the user at installation for 

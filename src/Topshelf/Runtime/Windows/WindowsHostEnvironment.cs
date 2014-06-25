@@ -42,7 +42,7 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
-        public void StartService(string serviceName)
+        public void StartService(string serviceName, TimeSpan startTimeOut)
         {
             using (var sc = new ServiceController(serviceName))
             {
@@ -61,7 +61,7 @@ namespace Topshelf.Runtime.Windows
                 if (sc.Status == ServiceControllerStatus.Stopped || sc.Status == ServiceControllerStatus.Paused)
                 {
                     sc.Start();
-                    sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
+                    sc.WaitForStatus(ServiceControllerStatus.Running, startTimeOut);
                 }
                 else
                 {
@@ -71,7 +71,7 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
-        public void StopService(string serviceName)
+        public void StopService(string serviceName, TimeSpan stopTimeOut)
         {
             using (var sc = new ServiceController(serviceName))
             {
@@ -90,7 +90,7 @@ namespace Topshelf.Runtime.Windows
                 if (sc.Status == ServiceControllerStatus.Running || sc.Status == ServiceControllerStatus.Paused)
                 {
                     sc.Stop();
-                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                    sc.WaitForStatus(ServiceControllerStatus.Stopped, stopTimeOut);
                 }
                 else
                 {

@@ -50,13 +50,15 @@ namespace Topshelf.Runtime
         /// Start the service using operating system controls
         /// </summary>
         /// <param name="serviceName">The name of the service</param>
-        void StartService(string serviceName);
+        /// <param name="startTimeOut">Waits for the service to reach the running status in the specified time.</param>
+        void StartService(string serviceName, TimeSpan startTimeOut);
 
         /// <summary>
         /// Stop the service using operating system controls
         /// </summary>
-        /// <param name="serviceName"></param>
-        void StopService(string serviceName);
+        /// <param name="serviceName">The name of the service</param>
+        /// <param name="stopTimeOut">Waits for the service to reach the stopeed status in the specified time.</param>
+        void StopService(string serviceName, TimeSpan stopTimeOut);
 
         /// <summary>
         /// Install the service using the settings provided

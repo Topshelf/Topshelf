@@ -51,7 +51,7 @@ namespace Topshelf.Hosts
 
             try
             {
-                _environment.StopService(_settings.ServiceName);
+                _environment.StopService(_settings.ServiceName, _settings.StopTimeOut);
 
                 _log.InfoFormat("The {0} service was stopped.", _settings.ServiceName);
                 return TopshelfExitCode.Ok;

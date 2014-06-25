@@ -12,6 +12,7 @@
 // specific language governing permissions and limitations under the License.
 namespace SampleTopshelfService
 {
+    using System;
     using Topshelf;
 
     class Program
@@ -29,6 +30,9 @@ namespace SampleTopshelfService
                     bool throwUnhandled = false;
 
                     x.Service(settings => new SampleService(throwOnStart, throwOnStop, throwUnhandled));
+
+                    x.SetStartTimeout(TimeSpan.FromSeconds(10));
+                    x.SetStopTimeout(TimeSpan.FromSeconds(10));
 
                     x.EnableServiceRecovery(r =>
                         {
