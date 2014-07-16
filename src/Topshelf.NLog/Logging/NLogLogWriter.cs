@@ -67,7 +67,7 @@ namespace Topshelf.Logging
 
         public void Log(LoggingLevel level, object obj, Exception exception)
         {
-            _log.LogException(GetNLogLevel(level), obj == null
+            _log.Log(GetNLogLevel(level), obj == null
                                                        ? ""
                                                        : obj.ToString(), exception);
         }
@@ -95,7 +95,7 @@ namespace Topshelf.Logging
 
         public void Debug(object obj, Exception exception)
         {
-            _log.LogException(LogLevel.Debug, obj == null
+            _log.Log(LogLevel.Debug, obj == null
                                                        ? ""
                                                        : obj.ToString(), exception);
         }
@@ -112,7 +112,7 @@ namespace Topshelf.Logging
 
         public void Info(object obj, Exception exception)
         {
-            _log.LogException(LogLevel.Info, obj == null
+            _log.Log(LogLevel.Info, obj == null
                                                       ? ""
                                                       : obj.ToString(), exception);
         }
@@ -129,7 +129,7 @@ namespace Topshelf.Logging
 
         public void Warn(object obj, Exception exception)
         {
-            _log.LogException(LogLevel.Warn, obj == null
+            _log.Log(LogLevel.Warn, obj == null
                                                       ? ""
                                                       : obj.ToString(), exception);
         }
@@ -146,7 +146,7 @@ namespace Topshelf.Logging
 
         public void Error(object obj, Exception exception)
         {
-            _log.LogException(LogLevel.Error, obj == null
+            _log.Log(LogLevel.Error, obj == null
                                                        ? ""
                                                        : obj.ToString(), exception);
         }
@@ -163,7 +163,7 @@ namespace Topshelf.Logging
 
         public void Fatal(object obj, Exception exception)
         {
-            _log.LogException(LogLevel.Fatal, obj == null
+            _log.Log(LogLevel.Fatal, obj == null
                                                        ? ""
                                                        : obj.ToString(), exception);
         }
