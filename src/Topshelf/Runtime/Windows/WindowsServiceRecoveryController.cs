@@ -14,6 +14,7 @@ namespace Topshelf.Runtime.Windows
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security.Permissions;
@@ -85,10 +86,14 @@ namespace Topshelf.Runtime.Windows
 
                 Marshal.StructureToPtr(failureActions, lpInfo, false);
 
+                // If user specified a Restart option, get shutdown privileges
+                if(options.Actions.Any(x => x.GetType() == typeof(RestartSystemRecoveryAction)))
+                    RequestShutdownPrivileges();
+
                 if (!NativeMethods.ChangeServiceConfig2(serviceHandle,
                     NativeMethods.SERVICE_CONFIG_FAILURE_ACTIONS, lpInfo))
                 {
-                    throw new TopshelfException("Failed to change service recovery options");
+                    throw new TopshelfException(string.Format("Failed to change service recovery options. Windows Error: {0}", new Win32Exception().Message));
                 }
 
                 if (false == options.RecoverOnCrashOnly)
@@ -126,6 +131,33 @@ namespace Topshelf.Runtime.Windows
                 if (scmHandle != IntPtr.Zero)
                     NativeMethods.CloseServiceHandle(scmHandle);
             }
+        }
+
+        private void RequestShutdownPrivileges()
+        {
+            IntPtr hToken;
+            ThrowOnFail(
+                NativeMethods.OpenProcessToken(System.Diagnostics.Process.GetCurrentProcess().Handle,
+                (int)NativeMethods.SYSTEM_ACCESS.TOKEN_ADJUST_PRIVILEGES | 
+                (int)NativeMethods.SYSTEM_ACCESS.TOKEN_QUERY, out hToken));
+
+            NativeMethods.TOKEN_PRIVILEGES tkp;
+            tkp.PrivilegeCount = 1;
+            tkp.Privileges.Attributes = (int)NativeMethods.SYSTEM_ACCESS.SE_PRIVILEGE_ENABLED;
+            const string SE_SHUTDOWN_NAME = "SeShutdownPrivilege";
+            ThrowOnFail(
+                NativeMethods.LookupPrivilegeValue("", SE_SHUTDOWN_NAME, out tkp.Privileges.pLuid));
+
+            ThrowOnFail(
+                NativeMethods.AdjustTokenPrivileges(hToken, false, ref tkp, 0U, IntPtr.Zero, IntPtr.Zero));
+        }
+
+        private static void ThrowOnFail(bool success)
+        {
+            if(!success)
+                throw new TopshelfException(string.Format(
+                    "Computer shutdown was specified as a recovery option, but privileges could not be acquired. Windows Error: {0}",
+                    new Win32Exception().Message));
         }
     }
 }
