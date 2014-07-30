@@ -144,6 +144,8 @@ namespace Topshelf.Hosts
         {
             _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
 
+            HostLogger.Shutdown();
+
             if (e.IsTerminating)
             {
                 _exit.Set();
