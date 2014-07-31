@@ -30,6 +30,11 @@ namespace Topshelf.Runtime.Windows
 
         public bool IsServiceInstalled(string serviceName)
         {
+            if (Type.GetType("Mono.Runtime") != null)
+            {
+                return false;
+            }
+            
             return ServiceController.GetServices()
                 .Any(service => string.CompareOrdinal(service.ServiceName, serviceName) == 0);
         }
