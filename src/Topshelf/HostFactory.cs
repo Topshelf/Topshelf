@@ -62,6 +62,7 @@ namespace Topshelf
             catch (Exception ex)
             {
                 HostLogger.Get(typeof(HostFactory)).Error("An exception occurred creating the host", ex);
+                HostLogger.Shutdown();
                 throw;
             }
         }
@@ -82,7 +83,8 @@ namespace Topshelf
             {
                 HostLogger.Get(typeof(HostFactory))
                           .Error("The service terminated abnormally", ex);
-
+                HostLogger.Shutdown();
+                
                 return TopshelfExitCode.AbnormalExit;
             }
         }
