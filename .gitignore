@@ -1,26 +1,17 @@
-build_output/*
-build_artifacts/*
-doc/build/*
-
-nuget.exe
+build/
+packages/
+bin/
+obj/
 
 *.suo
 *.user
-packages
 *.dotCover
 *.dotSettings
 
-bin
-obj
 _ReSharper*
-
 *.ReSharper
 *.cache
-*~
 *.swp
 *.bak
 *.orig
-
-# osx noise
 .DS_Store
-Gemfile.lock
