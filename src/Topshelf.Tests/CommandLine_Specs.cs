@@ -246,6 +246,40 @@ namespace Topshelf.Tests
         }
 
         [Test]
+        public void Need_to_handle_crazy_special_characters_in_arguments()
+        {
+            string password = null;
+            
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+
+                    x.AddCommandLineDefinition("password", v => password = v);
+
+                    x.ApplyCommandLine("-password:abc123!@#=$%^&*()-+");
+                });
+
+            Assert.AreEqual("abc123!@#=$%^&*()-+", password);
+        }
+
+        [Test]
+        public void Need_to_handle_crazy_special_characters_in_argument()
+        {
+            string password = null;
+            
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+
+                    x.AddCommandLineDefinition("password", v => password = v);
+
+                    x.ApplyCommandLine("-password \"abc123=:,.<>/?;!@#$%^&*()-+\"");
+                });
+
+            Assert.AreEqual("abc123=:,.<>/?;!@#$%^&*()-+", password);
+        }
+
+        [Test]
         public void Extensible_the_command_line_should_be_yet_again()
         {
             string volumeLevel = null;
