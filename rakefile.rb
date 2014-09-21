@@ -78,7 +78,7 @@ msbuild :build35 do |msb|
 		:Platform => 'Any CPU',
                 :TargetFrameworkVersion => "v3.5"
 	msb.use :net4
-	msb.targets :Clean, :Build
+  msb.targets :Rebuild
   msb.properties[:SignAssembly] = 'true'
   msb.properties[:AssemblyOriginatorKeyFile] = props[:keyfile]
 	msb.solution = 'src/Topshelf.sln'
@@ -89,7 +89,7 @@ msbuild :build4 do |msb|
 	msb.properties :Configuration => "Release",
 		:Platform => 'Any CPU'
 	msb.use :net4
-	msb.targets :Clean, :Build
+  msb.targets :Rebuild
   msb.properties[:SignAssembly] = 'true'
   msb.properties[:AssemblyOriginatorKeyFile] = props[:keyfile]
 	msb.solution = 'src/Topshelf.sln'
@@ -105,14 +105,14 @@ end
 desc "Runs unit tests"
 nunit :tests35 => [:build35] do |nunit|
           nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.3', 'tools', 'nunit-console.exe')
-          nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-3.5.xml')}\""
+          nunit.parameters = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-3.5.xml')}\""
           nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
 
 desc "Runs unit tests"
 nunit :tests4 => [:build4] do |nunit|
           nunit.command = File.join('src', 'packages','NUnit.Runners.2.6.3', 'tools', 'nunit-console.exe')
-          nunit.options = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-4.0.xml')}\""
+          nunit.parameters = "/framework=#{CLR_TOOLS_VERSION}", '/nothread', '/nologo', '/labels', "\"/xml=#{File.join(props[:artifacts], 'nunit-test-results-net-4.0.xml')}\""
           nunit.assemblies = FileList[File.join(props[:src], "Topshelf.Tests/bin/Release", "Topshelf.Tests.dll")]
 end
 
@@ -120,9 +120,8 @@ task :package => [:nuget, :zip_output]
 
 desc "ZIPs up the build results."
 zip :zip_output => [:versioning] do |zip|
-	zip.directories_to_zip = [props[:output]]
-	zip.output_file = "Topshelf-#{NUGET_VERSION}.zip"
-	zip.output_path = props[:artifacts]
+  zip.dirs = [props[:output]]
+  zip.output_path = File.join(props[:artifacts], "Topshelf-#{NUGET_VERSION}.zip")
 end
 
 desc "restores missing packages"
@@ -156,15 +155,15 @@ end
 nuspec :create_nuspec do |nuspec|
   nuspec.id = 'Topshelf'
   nuspec.version = NUGET_VERSION
-  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.authors = ['Chris Patterson', 'Dru Sellers', 'Travis Smith']
   nuspec.summary = 'Topshelf, Friction-free Windows Services'
   nuspec.description = 'Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
   nuspec.title = 'Topshelf'
-  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
-  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
   nuspec.language = "en-US"
-  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-  nuspec.requireLicenseAcceptance = "false"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.nuspec')
   add_files props[:output], 'Topshelf.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf\\**\\*.cs").gsub("/","\\"), "src")
@@ -173,15 +172,15 @@ end
 nuspec :create_nuspec do |nuspec|
   nuspec.id = 'Topshelf.Log4Net'
   nuspec.version = NUGET_VERSION
-  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.authors = ['Chris Patterson', 'Dru Sellers', 'Travis Smith']
   nuspec.summary = 'Topshelf, Friction-free Windows Services'
   nuspec.description = 'Log4Net Logging Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
   nuspec.title = 'Topshelf.Log4Net'
-  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
-  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
   nuspec.language = "en-US"
-  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-  nuspec.requireLicenseAcceptance = "false"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
   nuspec.dependency "Log4Net", "2.0.3"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Log4Net.nuspec')
@@ -192,17 +191,17 @@ end
 nuspec :create_nuspec do |nuspec|
   nuspec.id = 'Topshelf.NLog'
   nuspec.version = NUGET_VERSION
-  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.authors = ['Chris Patterson', 'Dru Sellers', 'Travis Smith']
   nuspec.summary = 'Topshelf, Friction-free Windows Services'
   nuspec.description = 'NLog Logging Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
   nuspec.title = 'Topshelf.NLog'
-  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
-  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
   nuspec.language = "en-US"
-  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-  nuspec.requireLicenseAcceptance = "false"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "NLog", "2.1.0"
+  nuspec.dependency "NLog", "3.1.0"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
@@ -211,15 +210,15 @@ end
 nuspec :create_nuspec do |nuspec|
   nuspec.id = 'Topshelf.Rehab'
   nuspec.version = NUGET_VERSION
-  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.authors = ['Chris Patterson', 'Dru Sellers', 'Travis Smith']
   nuspec.summary = 'Topshelf, Friction-free Windows Services'
   nuspec.description = 'Rehab provides automatic updates to services. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
   nuspec.title = 'Topshelf.Rehab'
-  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
-  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
   nuspec.language = "en-US"
-  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-  nuspec.requireLicenseAcceptance = "false"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Rehab.nuspec')
   add_files props[:output], 'Topshelf.Rehab.{dll,pdb,xml}', nuspec
@@ -229,15 +228,15 @@ end
 nuspec :create_nuspec do |nuspec|
   nuspec.id = 'Topshelf.Supervise'
   nuspec.version = NUGET_VERSION
-  nuspec.authors = 'Chris Patterson, Dru Sellers, Travis Smith'
+  nuspec.authors = ['Chris Patterson', 'Dru Sellers', 'Travis Smith']
   nuspec.summary = 'Topshelf, Supervised Services'
   nuspec.description = 'Supervise provides automatic recovery, memory and CPU monitoring, and scheduled restarting to services. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
   nuspec.title = 'Topshelf.Supervise'
-  nuspec.projectUrl = 'http://github.com/Topshelf/Topshelf'
-  nuspec.iconUrl = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
   nuspec.language = "en-US"
-  nuspec.licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-  nuspec.requireLicenseAcceptance = "false"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Supervise.nuspec')
   add_files props[:output], 'Topshelf.Supervise.{dll,pdb,xml}', nuspec
