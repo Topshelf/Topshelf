@@ -54,7 +54,7 @@ task :clean do
 end
 
 desc "Cleans, versions, compiles the application and generates build_output/."
-task :compile => [:versioning, :global_version, :build4, :tests4, :copy4, :build35, :tests35, :copy35]
+task :compile => [:versioning, :global_version, :build4, :tests4, :copy4, :build4un, :copy4un, :build35, :tests35, :copy35]
 
 task :copy35 => [:build35] do
   copyOutputFiles File.join(props[:src], "Topshelf/bin/Release/v3.5"), "Topshelf.{dll,pdb,xml}", File.join(props[:output], 'net-3.5')
@@ -69,7 +69,11 @@ task :copy4 => [:build4] do
   copyOutputFiles File.join(props[:src], "Topshelf.Log4Net/bin/Release"), "Topshelf.Log4Net.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
   copyOutputFiles File.join(props[:src], "Topshelf.NLog/bin/Release"), "Topshelf.NLog.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
   copyOutputFiles File.join(props[:src], "Topshelf.Rehab/bin/Release"), "Topshelf.Rehab.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
-	copyOutputFiles File.join(props[:src], "Topshelf.Supervise/bin/Release"), "Topshelf.Supervise.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+  copyOutputFiles File.join(props[:src], "Topshelf.Supervise/bin/Release"), "Topshelf.Supervise.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+end
+
+task :copy4un => [:build4un] do
+  copyOutputFiles File.join(props[:src], "Topshelf.Elmah/bin/Release"), "Topshelf.Elmah.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
 end
 
 desc "Only compiles the application."
@@ -86,12 +90,21 @@ end
 
 desc "Only compiles the application."
 msbuild :build4 do |msb|
-	msb.properties :Configuration => "Release",
-		:Platform => 'Any CPU'
-	msb.use :net4
+  msb.properties :Configuration => "Release",
+    :Platform => 'Any CPU'
+  msb.use :net4
   msb.targets :Rebuild
   msb.properties[:SignAssembly] = 'true'
   msb.properties[:AssemblyOriginatorKeyFile] = props[:keyfile]
+  msb.solution = 'src/Topshelf.sln'
+end
+
+desc "Only compiles the application."
+msbuild :build4un do |msb|
+	msb.properties :Configuration => "ReleaseUnsigned",
+		:Platform => 'Any CPU'
+	msb.use :net4
+  msb.targets :Build
 	msb.solution = 'src/Topshelf.sln'
 end
 
@@ -148,6 +161,7 @@ task :nuget => [:versioning, :create_nuspec] do
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Log4Net.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Elmah.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Rehab.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 	sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Supervise.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 end
@@ -205,6 +219,25 @@ nuspec :create_nuspec do |nuspec|
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
+end
+
+nuspec :create_nuspec do |nuspec|
+  nuspec.id = 'Topshelf.Elmah'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = ['Brian Wilson']
+  nuspec.summary = 'Topshelf Elmah, Elmah Logging for Topshelf'
+  nuspec.description = 'Elmah Logging Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf.Elmah'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
+  nuspec.dependency "Topshelf", NUGET_VERSION
+  nuspec.dependency "elmah.corelibrary", "1.2.2"
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Elmah.nuspec')
+  add_files props[:output], 'Topshelf.Elmah.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf.Elmah\\**\\*.cs").gsub("/","\\"), "src")
 end
 
 nuspec :create_nuspec do |nuspec|
