@@ -29,7 +29,11 @@ namespace SampleTopshelfService
                     bool throwOnStop = false;
                     bool throwUnhandled = false;
 
-                    x.Service(settings => new SampleService(throwOnStart, throwOnStop, throwUnhandled));
+                    x.Service(settings => new SampleService(throwOnStart, throwOnStop, throwUnhandled), s =>
+                    {
+                        s.BeforeStartingService(_ => Console.WriteLine("BeforeStart"));
+                        s.BeforeStoppingService(_ => Console.WriteLine("BeforeStop"));
+                    });
 
                     x.SetStartTimeout(TimeSpan.FromSeconds(10));
                     x.SetStopTimeout(TimeSpan.FromSeconds(10));

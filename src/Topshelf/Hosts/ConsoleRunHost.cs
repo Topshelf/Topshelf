@@ -212,8 +212,8 @@ namespace Topshelf.Hosts
             _log.Info("Control+C detected, attempting to stop service.");
             if (_serviceHandle.Stop(this))
             {
-                _exit.Set();
                 _hasCancelled = true;
+                _exit.Set();
             }
             else
             {
