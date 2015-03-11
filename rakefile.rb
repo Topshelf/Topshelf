@@ -78,7 +78,7 @@ end
 
 desc "Only compiles the application."
 msbuild :build35 do |msb|
-	msb.properties :Configuration => "Release",
+	msb.properties :Configuration => "Release35",
 		:Platform => 'Any CPU',
                 :TargetFrameworkVersion => "v3.5"
 	msb.use :net4
