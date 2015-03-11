@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf", "Topshelf\Topshelf.csproj", "{A52AD64D-6455-4A22-8CCF-581851086578}"
 EndProject
@@ -32,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E9335D
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Elmah", "Topshelf.Elmah\Topshelf.Elmah.csproj", "{B6990D65-5B8A-4332-B01F-DE60D7042F6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Serilog", "Topshelf.Serilog\Topshelf.Serilog.csproj", "{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -182,6 +184,21 @@ Global
 		{B6990D65-5B8A-4332-B01F-DE60D7042F6E}.ReleaseUnsigned|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B6990D65-5B8A-4332-B01F-DE60D7042F6E}.ReleaseUnsigned|Mixed Platforms.Build.0 = Release|Any CPU
 		{B6990D65-5B8A-4332-B01F-DE60D7042F6E}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.Release|x86.ActiveCfg = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|Any CPU.ActiveCfg = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|Any CPU.Build.0 = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|Mixed Platforms.Build.0 = Release|Any CPU
+		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
