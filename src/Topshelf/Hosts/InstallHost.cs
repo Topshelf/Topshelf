@@ -192,6 +192,7 @@ namespace Topshelf.Hosts
             public string Password
             {
                 get { return _credentials.Password; }
+                set { _credentials.Password = value; }
             }
 
             public string[] Dependencies
