@@ -20,7 +20,7 @@ namespace Topshelf.Runtime
         ServiceAccount Account { get; }
         
         string Username { get; }
-        string Password { get;}
+        string Password { get; set; }
 
         string[] Dependencies { get; }
         
