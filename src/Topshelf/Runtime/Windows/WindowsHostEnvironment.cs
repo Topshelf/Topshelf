@@ -35,8 +35,7 @@ namespace Topshelf.Runtime.Windows
                 return false;
             }
             
-            return ServiceController.GetServices()
-                .Any(service => string.CompareOrdinal(service.ServiceName, serviceName) == 0);
+            return IsServiceListed(serviceName);
         }
 
         public bool IsServiceStopped(string serviceName)
@@ -290,6 +289,23 @@ namespace Topshelf.Runtime.Windows
                 _log.Error("Unable to get parent process (ignored)", ex);
             }
             return null;
+        }
+
+        bool IsServiceListed(string serviceName)
+        {
+            bool result = false;
+
+            try
+            {
+                result = ServiceController.GetServices()
+                                    .Any(service => string.CompareOrdinal(service.ServiceName, serviceName) == 0);
+            }
+            catch (InvalidOperationException)
+            {
+                _log.Debug("Cannot access Service List due to permissions. Assuming the service is not installed.");
+            }
+
+            return result;
         }
     }
 }
