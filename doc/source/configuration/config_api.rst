@@ -18,7 +18,7 @@ Specify the base name of the service, as it is registered in the services contro
 
 It is recommended that service names not contains spaces or other whitespace characters.
 
-.. warning:: 
+.. warning::
 
 Each service on the system must have a unique name. If you need to run multiple instances of the same service,
 consider using the InstanceName command-line option when registering the service.
@@ -174,6 +174,30 @@ There are multiple service start modes, each of which can be specified by the co
         x.StartAutomaticallyDelayed(); // Automatic (Delayed) -- only available on .NET 4.0 or later
         x.StartManually(); // Start the service manually
         x.Disabled(); // install the service as disabled
+    });
+
+Service Recovery
+================
+
+Topshelf also exposes the options need to configure the service recovery options as well.
+
+.. sourcecode:: csharp
+    HostFactory.New(x =>
+    {
+        x.EnableServiceRecovery(r =>
+        {
+            //you can have up to three of these
+            r.RestartComputer(5, "message");
+            r.RestartService(0);
+            //the last one will act for all subsequent failures
+            r.RunProgram(7, "ping google.com");
+
+            //should this be true for crashed or non-zero exits
+            r.OnCrashOnly();
+
+            //number of days until the error count resets
+            r.SetResetPeriod(1);
+        });
     });
 
 Service Identity
@@ -351,7 +375,7 @@ To configure the service recovery options, a configurator is available to specif
         {
             rc.RestartService(1); // restart the service after 1 minute
             rc.RestartSystem(1, "System is restarting!"); // restart the system after 1 minute
-            rc.RunProgram(1, "notepad.exe"); // run a program 
+            rc.RunProgram(1, "notepad.exe"); // run a program
             rc.SetResetPeriod(1); // set the reset interval to one day
         })
     });
