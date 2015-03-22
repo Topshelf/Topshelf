@@ -182,6 +182,7 @@ Service Recovery
 Topshelf also exposes the options need to configure the service recovery options as well.
 
 .. sourcecode:: csharp
+
     HostFactory.New(x =>
     {
         x.EnableServiceRecovery(r =>
