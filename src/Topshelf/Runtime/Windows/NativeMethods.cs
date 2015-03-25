@@ -141,26 +141,26 @@ namespace Topshelf.Runtime.Windows
 
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode,
             SetLastError = true)]
-        public static extern IntPtr OpenSCManager(string machineName, string databaseName, uint dwAccess);
+        public static extern SafeTokenHandle OpenSCManager(string machineName, string databaseName, uint dwAccess);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseServiceHandle(IntPtr hSCObject);
+        public static extern bool CloseServiceHandle(SafeTokenHandle hSCObject);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, uint dwDesiredAccess);
+        public static extern SafeTokenHandle OpenService(SafeTokenHandle hSCManager, string lpServiceName, uint dwDesiredAccess);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool ChangeServiceConfig2(IntPtr serviceHandle, uint infoLevel,
+        public static extern bool ChangeServiceConfig2(SafeTokenHandle serviceHandle, uint infoLevel,
             IntPtr lpInfo);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool OpenProcessToken(IntPtr ProcessHandle, int DesiredAccess, out IntPtr TokenHandle);
+        public static extern bool OpenProcessToken(IntPtr ProcessHandle, int DesiredAccess, out SafeTokenHandle TokenHandle);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool AdjustTokenPrivileges(IntPtr TokenHandle,
+        public static extern bool AdjustTokenPrivileges(SafeTokenHandle TokenHandle,
             [MarshalAs(UnmanagedType.Bool)]bool DisableAllPrivileges,
             ref TOKEN_PRIVILEGES NewState,
             UInt32 BufferLength,
