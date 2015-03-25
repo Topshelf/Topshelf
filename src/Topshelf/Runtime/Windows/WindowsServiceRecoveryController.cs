@@ -24,8 +24,8 @@ namespace Topshelf.Runtime.Windows
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public void SetServiceRecoveryOptions(HostSettings settings, ServiceRecoveryOptions options)
         {
-            IntPtr scmHandle = IntPtr.Zero;
-            IntPtr serviceHandle = IntPtr.Zero;
+            SafeTokenHandle scmHandle = null;
+            SafeTokenHandle serviceHandle = null;
             IntPtr lpsaActions = IntPtr.Zero;
             IntPtr lpInfo = IntPtr.Zero;
             IntPtr lpFlagInfo = IntPtr.Zero;
@@ -37,12 +37,12 @@ namespace Topshelf.Runtime.Windows
                     throw new TopshelfException("Must be at least one failure action configured");
 
                 scmHandle = NativeMethods.OpenSCManager(null, null, (int)NativeMethods.SCM_ACCESS.SC_MANAGER_ALL_ACCESS);
-                if (scmHandle == IntPtr.Zero)
+                if (scmHandle == null)
                     throw new TopshelfException("Failed to open service control manager");
 
                 serviceHandle = NativeMethods.OpenService(scmHandle, settings.ServiceName,
                     (int)NativeMethods.SCM_ACCESS.SC_MANAGER_ALL_ACCESS);
-                if (serviceHandle == IntPtr.Zero)
+                if (serviceHandle == null)
                     throw new TopshelfException("Failed to open service: " + settings.ServiceName);
 
                 int actionSize = Marshal.SizeOf(typeof(NativeMethods.SC_ACTION));
@@ -126,16 +126,16 @@ namespace Topshelf.Runtime.Windows
                     Marshal.FreeHGlobal(lpInfo);
                 if (lpsaActions != IntPtr.Zero)
                     Marshal.FreeHGlobal(lpsaActions);
-                if (serviceHandle != IntPtr.Zero)
+                if (serviceHandle != null)
                     NativeMethods.CloseServiceHandle(serviceHandle);
-                if (scmHandle != IntPtr.Zero)
+                if (scmHandle != null)
                     NativeMethods.CloseServiceHandle(scmHandle);
             }
         }
 
         private void RequestShutdownPrivileges()
         {
-            IntPtr hToken;
+            SafeTokenHandle hToken;
             ThrowOnFail(
                 NativeMethods.OpenProcessToken(System.Diagnostics.Process.GetCurrentProcess().Handle,
                 (int)NativeMethods.SYSTEM_ACCESS.TOKEN_ADJUST_PRIVILEGES | 

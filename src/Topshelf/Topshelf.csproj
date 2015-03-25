@@ -199,6 +199,7 @@
     <Compile Include="Runtime\Windows\RestartServiceRecoveryAction.cs" />
     <Compile Include="Runtime\Windows\RestartSystemRecoveryAction.cs" />
     <Compile Include="Runtime\Windows\RunProgramRecoveryAction.cs" />
+    <Compile Include="Runtime\Windows\SafeTokenHandle.cs" />
     <Compile Include="Runtime\Windows\ServiceRecoveryAction.cs" />
     <Compile Include="Runtime\Windows\ServiceRecoveryOptions.cs" />
     <Compile Include="Runtime\Windows\WindowsHostEnvironment.cs" />
