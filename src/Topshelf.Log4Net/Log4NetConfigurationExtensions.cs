@@ -38,5 +38,16 @@ namespace Topshelf
         {
             Log4NetLogWriterFactory.Use(configFileName);
         }
+
+        /// <summary>
+        ///   Specify that you want to use the Log4net logging engine.
+        /// </summary>
+        /// <param name="configurator"> </param>
+        /// <param name="configFileName"> The name of the log4net xml configuration file </param>
+        /// <param name="watchFile"> Should log4net watch the config file? </param>
+        public static void UseLog4Net(this HostConfigurator configurator, string configFileName, bool watchFile)
+        {
+            Log4NetLogWriterFactory.Use(configFileName, watchFile);
+        }
     }
 }
