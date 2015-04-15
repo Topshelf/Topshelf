@@ -21,7 +21,7 @@ namespace Topshelf.Runtime.Windows
     using System.Threading.Tasks;
 #endif
     using Logging;
-
+    using Topshelf.HostConfigurators;
 
     public class WindowsServiceHost :
         ServiceBase,
@@ -32,11 +32,12 @@ namespace Topshelf.Runtime.Windows
         readonly HostEnvironment _environment;
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;
+        readonly HostConfigurator _configurator;
         int _deadThread;
         bool _disposed;
         Exception _unhandledException;
 
-        public WindowsServiceHost(HostEnvironment environment, HostSettings settings, ServiceHandle serviceHandle)
+        public WindowsServiceHost(HostEnvironment environment, HostSettings settings, ServiceHandle serviceHandle, HostConfigurator configurator)
         {
             if (settings == null)
                 throw new ArgumentNullException("settings");
@@ -46,6 +47,7 @@ namespace Topshelf.Runtime.Windows
             _settings = settings;
             _serviceHandle = serviceHandle;
             _environment = environment;
+            _configurator = configurator;
 
             CanPauseAndContinue = settings.CanPauseAndContinue;
             CanShutdown = settings.CanShutdown;
@@ -119,6 +121,9 @@ namespace Topshelf.Runtime.Windows
                 _log.DebugFormat("[Topshelf] Current Directory: {0}", Directory.GetCurrentDirectory());
 
                 _log.DebugFormat("[Topshelf] Arguments: {0}", string.Join(",", args));
+
+                string startArgs = string.Join(" ", args);
+                _configurator.ApplyCommandLine(startArgs);
 
                 if (!_serviceHandle.Start(this))
                     throw new TopshelfException("The service did not start successfully (returned false).");

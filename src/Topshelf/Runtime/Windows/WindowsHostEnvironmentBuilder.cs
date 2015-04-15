@@ -13,13 +13,21 @@
 namespace Topshelf.Runtime.Windows
 {
     using Builders;
+    using Topshelf.HostConfigurators;
 
     public class WindowsHostEnvironmentBuilder :
         EnvironmentBuilder
     {
+        HostConfigurator _hostConfigurator;
+
+        public WindowsHostEnvironmentBuilder(HostConfigurator configurator)
+        {
+            _hostConfigurator = configurator;
+        }
+
         public HostEnvironment Build()
         {
-            return new WindowsHostEnvironment();
+            return new WindowsHostEnvironment(_hostConfigurator);
         }
     }
 }

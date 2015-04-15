@@ -22,11 +22,18 @@ namespace Topshelf.Runtime.Windows
     using System.Security.Principal;
     using System.ServiceProcess;
     using Logging;
+    using Topshelf.HostConfigurators;
 
     public class WindowsHostEnvironment :
         HostEnvironment
     {
         readonly LogWriter _log = HostLogger.Get(typeof(WindowsHostEnvironment));
+        private HostConfigurator _hostConfigurator;
+
+        public WindowsHostEnvironment(HostConfigurator configurator)
+        {
+            _hostConfigurator = configurator;
+        }
 
         public bool IsServiceInstalled(string serviceName)
         {
@@ -180,7 +187,7 @@ namespace Topshelf.Runtime.Windows
 
         public Host CreateServiceHost(HostSettings settings, ServiceHandle serviceHandle)
         {
-            return new WindowsServiceHost(this, settings, serviceHandle);
+            return new WindowsServiceHost(this, settings, serviceHandle, this._hostConfigurator);
         }
 
         public void SendServiceCommand(string serviceName, int command)
