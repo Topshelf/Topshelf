@@ -1,7 +1,7 @@
 Topshelf - An easy service hosting framework for building Windows services using .NET
 =======
 
-![TopShelf](http://www.phatboyg.com/top-shelf-3-small.png "Topshelf")
+![Topshelf](http://www.phatboyg.com/top-shelf-3-small.png "Topshelf")
 
 Topshelf is a framework for hosting services written using the .NET framework. The creation of services is simplified, allowing developers to create a simple console application that can be installed as a service using Topshelf. The reason for this is simple: It is far easier to debug a console application than a service. And once the application is tested and ready for production, Topshelf makes it easy to install the application as a service.
 
@@ -10,7 +10,7 @@ Apache 2.0 - see LICENSE
 
 # INFO
 
-## Getting started with TopShelf
+## Getting started with Topshelf
 
 Get started in four simple steps!
 
@@ -58,7 +58,7 @@ Get started in four simple steps!
 
  You can alternatively edit and build for .Net 3.5 instead of .Net 4.0 with this step:
 
- * Edit all `TopShelf/src/**/*.csproj` files at the top of the files, where it says:
+ * Edit all `Topshelf/src/**/*.csproj` files at the top of the files, where it says:
     `<TargetFrameworkVersion Condition=" '$(TargetFrameworkVersion)' == '' ">v4.0</TargetFrameworkVersion>`
 
    Change `v4.0` to `v3.5`. The build script itself won't be affected by this change, but it'll help Visual Studio know what version we're building for.
