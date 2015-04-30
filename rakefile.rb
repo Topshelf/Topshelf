@@ -74,6 +74,7 @@ end
 
 task :copy4un => [:build4un] do
   copyOutputFiles File.join(props[:src], "Topshelf.Elmah/bin/Release"), "Topshelf.Elmah.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
+  copyOutputFiles File.join(props[:src], "Topshelf.Serilog/bin/Release"), "Topshelf.Serilog.{dll,pdb,xml}", File.join(props[:output], 'net-4.0-full')
 end
 
 desc "Only compiles the application."
@@ -155,6 +156,12 @@ msbuild :nuget_restore do |msb|
   msb.targets :RestorePackages
   msb.solution = File.join(props[:src], "Topshelf.NLog", "Topshelf.NLog.csproj")
 end
+desc "restores missing packages"
+msbuild :nuget_restore do |msb|
+  msb.use :net4
+  msb.targets :RestorePackages
+  msb.solution = File.join(props[:src], "Topshelf.Serilog", "Topshelf.Serilog.csproj")
+end
 
 desc "Builds the nuget package"
 task :nuget => [:versioning, :create_nuspec] do
@@ -162,6 +169,7 @@ task :nuget => [:versioning, :create_nuspec] do
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Log4Net.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.NLog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Elmah.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
+  sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Serilog.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
   sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Rehab.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 	sh "#{props[:nuget]} pack #{props[:artifacts]}/Topshelf.Supervise.nuspec /Symbols /OutputDirectory #{props[:artifacts]}"
 end
@@ -215,7 +223,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "NLog", "3.1.0"
+  nuspec.dependency "NLog", "3.2.1"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
@@ -238,6 +246,25 @@ nuspec :create_nuspec do |nuspec|
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Elmah.nuspec')
   add_files props[:output], 'Topshelf.Elmah.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.Elmah\\**\\*.cs").gsub("/","\\"), "src")
+end
+
+nuspec :create_nuspec do |nuspec|
+  nuspec.id = 'Topshelf.Serilog'
+  nuspec.version = NUGET_VERSION
+  nuspec.authors = ['Mogens Heller Grabe']
+  nuspec.summary = 'Topshelf Serilog, interfaces to Serilog'
+  nuspec.description = 'Serilog Integration for Topshelf. Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.'
+  nuspec.title = 'Topshelf.Serilog'
+  nuspec.project_url = 'http://github.com/Topshelf/Topshelf'
+  nuspec.icon_url = 'http://topshelf-project.com/wp-content/themes/pandora/slide.1.png'
+  nuspec.language = "en-US"
+  nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
+  nuspec.require_license_acceptance
+  nuspec.dependency "Topshelf", NUGET_VERSION
+  nuspec.dependency "Serilog", "1.5.5"
+  nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Serilog.nuspec')
+  add_files props[:output], 'Topshelf.Serilog.{dll,pdb,xml}', nuspec
+  nuspec.file(File.join(props[:src], "Topshelf.Serilog\\**\\*.cs").gsub("/","\\"), "src")
 end
 
 nuspec :create_nuspec do |nuspec|
