@@ -68,7 +68,7 @@ namespace Topshelf.Runtime
         /// <param name="afterInstall"> </param>
         /// <param name="beforeRollback"> </param>
         /// <param name="afterRollback"> </param>
-        void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback);
+        void InstallService(InstallHostSettings settings, Action<InstallHostSettings> beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback);
 
         /// <summary>
         /// Uninstall the service using the settings provided

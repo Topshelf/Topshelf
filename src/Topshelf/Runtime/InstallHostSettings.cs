@@ -12,18 +12,11 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime
 {
-    using System.ServiceProcess;
-
     public interface InstallHostSettings :
         HostSettings
     {
-        ServiceAccount Account { get; }
-        
-        string Username { get; }
-        string Password { get; set; }
-
+        Credentials Credentials { get; set; }
         string[] Dependencies { get; }
-        
         HostStartMode StartMode { get; }
     }
 }

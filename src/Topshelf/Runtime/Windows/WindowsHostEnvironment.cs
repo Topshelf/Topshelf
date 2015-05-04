@@ -200,14 +200,19 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
-        public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback)
+        public void InstallService(InstallHostSettings settings, Action<InstallHostSettings> beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback)
         {
             using (var installer = new HostServiceInstaller(settings))
             {
                 Action<InstallEventArgs> before = x =>
                     {
                         if (beforeInstall != null)
-                            beforeInstall();
+                        {
+                            beforeInstall(settings);
+                            installer.ServiceProcessInstaller.Username = settings.Credentials.Username;
+                            installer.ServiceProcessInstaller.Password = settings.Credentials.Password;
+                            installer.ServiceProcessInstaller.Account = settings.Credentials.Account;
+                        }
                     };
 
                 Action<InstallEventArgs> after = x =>
