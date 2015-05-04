@@ -90,7 +90,7 @@ namespace Topshelf.Hosts
             return TopshelfExitCode.Ok;
         }
 
-        void ExecutePreActions()
+        void ExecutePreActions(InstallHostSettings settings)
         {
             foreach (Action<InstallHostSettings> action in _preActions)
             {
@@ -125,7 +125,7 @@ namespace Topshelf.Hosts
         class InstallServiceSettingsImpl :
             InstallHostSettings
         {
-            readonly Credentials _credentials;
+            private Credentials _credentials;
             readonly string[] _dependencies;
             readonly HostSettings _settings;
             readonly HostStartMode _startMode;
@@ -179,20 +179,10 @@ namespace Topshelf.Hosts
                 get { return _settings.CanSessionChanged; }
             }
 
-            public ServiceAccount Account
+            public Credentials Credentials
             {
-                get { return _credentials.Account; }
-            }
-
-            public string Username
-            {
-                get { return _credentials.Username; }
-            }
-
-            public string Password
-            {
-                get { return _credentials.Password; }
-                set { _credentials.Password = value; }
+                get { return _credentials; }
+                set { _credentials = value; }
             }
 
             public string[] Dependencies
