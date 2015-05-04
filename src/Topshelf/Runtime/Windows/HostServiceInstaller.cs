@@ -26,6 +26,13 @@ namespace Topshelf.Runtime.Windows
     {
         readonly Installer _installer;
         readonly TransactedInstaller _transactedInstaller;
+        public ServiceProcessInstaller ServiceProcessInstaller
+        {
+            get
+            {
+            	return (ServiceProcessInstaller)_installer.Installers[1];      
+            }
+        }
 
         public HostServiceInstaller(InstallHostSettings settings)
         {
@@ -86,7 +93,7 @@ namespace Topshelf.Runtime.Windows
             var installers = new Installer[]
                 {
                     ConfigureServiceInstaller(settings, settings.Dependencies, settings.StartMode),
-                    ConfigureServiceProcessInstaller(settings.Account, settings.Username, settings.Password)
+                    ConfigureServiceProcessInstaller(settings.Credentials.Account, settings.Credentials.Username, settings.Credentials.Password)
                 };
 
             //DO not auto create EventLog Source while install service
