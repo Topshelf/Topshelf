@@ -19,14 +19,9 @@ namespace Topshelf.Logging
     {
         readonly Func<string, ILogger> _loggerFactory;
 
-        SerilogLogWriterFactory(LoggerConfiguration loggerConfiguration)
+        SerilogLogWriterFactory(ILogger logger)
         {
-            _loggerFactory = name => loggerConfiguration.CreateLogger().ForContext("SourceContext", name);
-        }
-
-        SerilogLogWriterFactory()
-        {
-            _loggerFactory = name => Log.ForContext("SourceContext", name);
+            _loggerFactory = name => logger.ForContext("SourceContext", name);
         }
 
         public LogWriter Get(string name)
@@ -38,35 +33,24 @@ namespace Topshelf.Logging
         {
         }
 
-        public static void Use()
+        public static void Use(ILogger logger)
         {
-            HostLogger.UseLogger(new SerilogHostLoggerConfigurator());
-        }
-
-        public static void Use(LoggerConfiguration loggerConfiguration)
-        {
-            HostLogger.UseLogger(new SerilogHostLoggerConfigurator(loggerConfiguration));
+            HostLogger.UseLogger(new SerilogHostLoggerConfigurator(logger));
         }
 
         [Serializable]
         public class SerilogHostLoggerConfigurator : HostLoggerConfigurator
         {
-            readonly LoggerConfiguration _factory;
+            readonly ILogger _logger;
 
-            public SerilogHostLoggerConfigurator(LoggerConfiguration factory)
+            public SerilogHostLoggerConfigurator(ILogger logger)
             {
-                _factory = factory;
-            }
-
-            public SerilogHostLoggerConfigurator()
-            {
+                _logger = logger;
             }
 
             public LogWriterFactory CreateLogWriterFactory()
             {
-                return _factory == null 
-                    ? new SerilogLogWriterFactory() 
-                    : new SerilogLogWriterFactory(_factory);
+                return new SerilogLogWriterFactory(_logger);
             }
         }
     }
