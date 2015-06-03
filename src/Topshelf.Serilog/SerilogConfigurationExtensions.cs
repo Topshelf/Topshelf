@@ -23,7 +23,7 @@ namespace Topshelf
         /// </summary>
         public static void UseSerilog(this HostConfigurator configurator)
         {
-            SerilogLogWriterFactory.Use();
+            SerilogLogWriterFactory.Use(Log.Logger);
         }
 
         /// <summary>
@@ -31,7 +31,15 @@ namespace Topshelf
         /// </summary>
         public static void UseSerilog(this HostConfigurator configurator, LoggerConfiguration loggerConfiguration)
         {
-            SerilogLogWriterFactory.Use(loggerConfiguration);
+            SerilogLogWriterFactory.Use(loggerConfiguration.CreateLogger());
+        }
+
+        /// <summary>
+        /// Configures Topshelf to use Serilog for logging, using the given root logger <see cref="ILogger"/> to create loggers.
+        /// </summary>
+        public static void UseSerilog(this HostConfigurator configurator, ILogger rootLogger)
+        {
+            SerilogLogWriterFactory.Use(rootLogger);
         }
     }
 }
