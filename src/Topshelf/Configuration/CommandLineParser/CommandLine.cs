@@ -21,7 +21,7 @@ namespace Topshelf.CommandLineParser
     /// </summary>
     static class CommandLine
     {
-        static readonly StringCommandLineParser _parser = new StringCommandLineParser();
+        static readonly StringCommandLineParser Parser = new StringCommandLineParser();
 
         /// <summary>
         ///   Gets the command line from the Environment.CommandLine, removing the application name if present
@@ -29,22 +29,17 @@ namespace Topshelf.CommandLineParser
         /// <returns> The complete, unparsed command line that was specified when the program was executed </returns>
         public static string GetUnparsedCommandLine()
         {
-            string line = Environment.CommandLine;
-
-            string applicationPath = Environment.GetCommandLineArgs().First();
-
-            if (line == applicationPath)
-                return "";
-
-            if (line.Substring(0, applicationPath.Length) == applicationPath)
-                return line.Substring(applicationPath.Length);
-
-            string quotedApplicationPath = "\"" + applicationPath + "\"";
-
-            if (line.Substring(0, quotedApplicationPath.Length) == quotedApplicationPath)
-                return line.Substring(quotedApplicationPath.Length);
-
-            return line;
+            var line = Environment.CommandLine;
+            var applicationPath = Environment.GetCommandLineArgs().First();
+            return "";
+            //if (line == applicationPath)
+            //    return "";
+            //if (line.Substring(0, applicationPath.Length) == applicationPath)
+            //    return line.Substring(applicationPath.Length);
+            //var quotedApplicationPath = "\"" + applicationPath + "\"";
+            //if (line.Substring(0, quotedApplicationPath.Length) == quotedApplicationPath)
+            //    return line.Substring(quotedApplicationPath.Length);
+            //return line;
         }
 
         /// <summary>
@@ -54,14 +49,12 @@ namespace Topshelf.CommandLineParser
         /// <returns> The command line elements that were found </returns>
         static IEnumerable<ICommandLineElement> Parse(string commandLine)
         {
-            Result<string, ICommandLineElement> result = _parser.All(commandLine);
+            Result<string, ICommandLineElement> result = Parser.All(commandLine);
             while (result != null)
             {
                 yield return result.Value;
-
                 string rest = result.Rest;
-
-                result = _parser.All(rest);
+                result = Parser.All(rest);
             }
         }
 
@@ -80,9 +73,7 @@ namespace Topshelf.CommandLineParser
         public static IEnumerable<T> Parse<T>(Action<ICommandLineElementParser<T>> initializer, string commandLine)
         {
             var elementParser = new CommandLineElementParser<T>();
-
             initializer(elementParser);
-
             return elementParser.Parse(Parse(commandLine));
         }
     }

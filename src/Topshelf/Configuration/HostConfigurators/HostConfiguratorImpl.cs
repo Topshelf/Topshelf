@@ -64,7 +64,7 @@ namespace Topshelf.HostConfigurators
                 yield return this.Failure("Name", "must be specified and not empty");
             else
             {
-                var disallowed = new[] {' ', '\t', '\r', '\n', '\\', '/'};
+                var disallowed = new[] { ' ', '\t', '\r', '\n', '\\', '/' };
                 if (_settings.Name.IndexOfAny(disallowed) >= 0)
                     yield return this.Failure("Name", "must not contain whitespace, '/', or '\\' characters");
             }
@@ -108,12 +108,12 @@ namespace Topshelf.HostConfigurators
 
         public void SetStartTimeout(TimeSpan startTimeOut)
         {
-          _settings.StartTimeOut = startTimeOut;
+            _settings.StartTimeOut = startTimeOut;
         }
 
         public void SetStopTimeout(TimeSpan stopTimeOut)
         {
-          _settings.StopTimeOut = stopTimeOut;
+            _settings.StopTimeOut = stopTimeOut;
         }
 
         public void EnablePauseAndContinue()
@@ -156,7 +156,7 @@ namespace Topshelf.HostConfigurators
             if (_commandLineApplied)
                 return;
 
-            IEnumerable<Option> options = CommandLine.Parse<Option>(ConfigureCommandLineParser);
+            var options = CommandLine.Parse<Option>(ConfigureCommandLineParser);
             ApplyCommandLineOptions(options);
         }
 
@@ -188,24 +188,17 @@ namespace Topshelf.HostConfigurators
             HostLogger.Get<HostConfiguratorImpl>()
                       .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
                           Environment.Version);
-
-            EnvironmentBuilder environmentBuilder = _environmentBuilderFactory(this);
-
-            HostEnvironment environment = environmentBuilder.Build();
-
-            ServiceBuilder serviceBuilder = _serviceBuilderFactory(_settings);
-
-            HostBuilder builder = _hostBuilderFactory(environment, _settings);
-
-            foreach (HostBuilderConfigurator configurator in _configurators)
-                builder = configurator.Configure(builder);
-
+            var environmentBuilder = _environmentBuilderFactory(this);
+            var environment = environmentBuilder.Build();
+            var serviceBuilder = _serviceBuilderFactory(_settings);
+            var builder = _hostBuilderFactory(environment, _settings);
+            builder = _configurators.Aggregate(builder, (current, configurator) => configurator.Configure(current));
             return builder.Build(serviceBuilder);
         }
 
         void ApplyCommandLineOptions(IEnumerable<Option> options)
         {
-            foreach (Option option in options)
+            foreach (var option in options)
                 option.ApplyTo(this);
         }
 
@@ -213,7 +206,7 @@ namespace Topshelf.HostConfigurators
         {
             CommandLineParserOptions.AddTopshelfOptions(parser);
 
-            foreach (CommandLineConfigurator optionConfigurator in _commandLineOptionConfigurators)
+            foreach (var optionConfigurator in _commandLineOptionConfigurators)
                 optionConfigurator.Configure(parser);
 
             CommandLineParserOptions.AddUnknownOptions(parser);
