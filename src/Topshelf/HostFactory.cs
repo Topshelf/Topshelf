@@ -33,30 +33,20 @@ namespace Topshelf
             try
             {
                 if (configureCallback == null)
-                    throw new ArgumentNullException("configureCallback");
-
+                    throw new ArgumentNullException(nameof(configureCallback));
                 var configurator = new HostConfiguratorImpl();
-
-                Type declaringType = configureCallback.Method.DeclaringType;
-                if (declaringType != null)
-                {
-                    string defaultServiceName = declaringType.Namespace;
-                    if (!string.IsNullOrEmpty(defaultServiceName))
-                        configurator.SetServiceName(defaultServiceName);
-                }
-
+                var declaringType = configureCallback.Method.DeclaringType;
+                var defaultServiceName = declaringType?.Namespace;
+                if (!string.IsNullOrEmpty(defaultServiceName))
+                    configurator.SetServiceName(defaultServiceName);
                 configureCallback(configurator);
-
                 configurator.ApplyCommandLine();
-
-                ConfigurationResult result = ValidateConfigurationResult.CompileResults(configurator.Validate());
-
+                var result = ValidateConfigurationResult.CompileResults(configurator.Validate());
                 if (result.Message.Length > 0)
                 {
                     HostLogger.Get(typeof(HostFactory))
                               .InfoFormat("Configuration Result:\n{0}", result.Message);
                 }
-
                 return configurator.CreateHost();
             }
             catch (Exception ex)
@@ -84,7 +74,7 @@ namespace Topshelf
                 HostLogger.Get(typeof(HostFactory))
                           .Error("The service terminated abnormally", ex);
                 HostLogger.Shutdown();
-                
+
                 return TopshelfExitCode.AbnormalExit;
             }
         }

@@ -1,0 +1,42 @@
+{
+  "locked": false,
+  "version": -9998,
+  "projectFileDependencyGroups": {
+    "": [
+      "System.ServiceProcess.ServiceController >= 4.0.0-beta-23019"
+    ],
+    "DNX,Version=v4.5.1": [
+      "framework/System.Configuration.Install >= 4.0.0.0"
+    ]
+  },
+  "libraries": {
+    "System.ServiceProcess.ServiceController/4.0.0-beta-23019": {
+      "serviceable": false,
+      "sha": "+KO1vfmieBfDk3kT2CazdF2lJpgQabd4SXuOS/zZRXtETfGytk70wV7KRjf4dF6Qia7zNtdGZ4Xkx5i8mZV28Q==",
+      "frameworks": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {},
+          "frameworkAssemblies": [
+            "mscorlib",
+            "System.ServiceProcess"
+          ],
+          "runtimeAssemblies": [
+            "lib/net46/System.ServiceProcess.ServiceController.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net46/System.ServiceProcess.ServiceController.dll"
+          ]
+        }
+      },
+      "files": [
+        "System.ServiceProcess.ServiceController.4.0.0-beta-23019.nupkg",
+        "System.ServiceProcess.ServiceController.4.0.0-beta-23019.nupkg.sha512",
+        "System.ServiceProcess.ServiceController.nuspec",
+        "lib/DNXCore50/System.ServiceProcess.ServiceController.dll",
+        "lib/net46/System.ServiceProcess.ServiceController.dll",
+        "ref/dotnet/System.ServiceProcess.ServiceController.dll",
+        "ref/net46/System.ServiceProcess.ServiceController.dll"
+      ]
+    }
+  }
+}
