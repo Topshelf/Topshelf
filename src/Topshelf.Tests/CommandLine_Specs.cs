@@ -31,7 +31,17 @@ namespace Topshelf.Tests
 
             Assert.IsInstanceOf<InstallHost>(host);
         }
+        [Test]
+        public void Should_create_an_install_host_without_being_case_sensitive()
+        {
+            Host host = HostFactory.New(x =>
+            {
+                x.Service<MyService>();
+                x.ApplyCommandLine("Install");
+            });
 
+            Assert.IsInstanceOf<InstallHost>(host);
+        }
         [Test]
         public void Should_throw_an_exception_on_an_invalid_command_line()
         {
@@ -156,6 +166,20 @@ namespace Topshelf.Tests
             {
                 x.Service<MyService>();
                 x.ApplyCommandLine("install --manual");
+            });
+
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual(HostStartMode.Manual, installHost.InstallSettings.StartMode);
+        }
+
+        [Test]
+        public void Should_create_an_install_host_to_start_manually_without_being_case_sensitive()
+        {
+            Host host = HostFactory.New(x =>
+            {
+                x.Service<MyService>();
+                x.ApplyCommandLine("InstAll --ManuAl");
             });
 
             Assert.IsInstanceOf<InstallHost>(host);
