@@ -79,7 +79,7 @@ namespace Topshelf.CommandLineParser
         public Parser<IEnumerable<ICommandLineElement>, ISwitchElement> Switch(string key)
         {
             return from sw in Switch()
-                   where sw.Key == key
+                   where string.Equals(sw.Key, key, StringComparison.OrdinalIgnoreCase)
                    select sw;
         }
 
@@ -100,7 +100,7 @@ namespace Topshelf.CommandLineParser
         public Parser<IEnumerable<ICommandLineElement>, IArgumentElement> Argument(string value)
         {
             return from arg in Argument()
-                   where arg.Id == value
+                   where string.Equals(arg.Id, value, StringComparison.OrdinalIgnoreCase)
                    select arg;
         }
 
