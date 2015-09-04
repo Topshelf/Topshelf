@@ -1,4 +1,3 @@
 version: 1.0.{build}
 before_build:
  git submodule update --init --recursive
-
