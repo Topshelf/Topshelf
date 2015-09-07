@@ -13,6 +13,7 @@
 namespace Topshelf
 {
     using System;
+    using System.Reflection;
     using Configurators;
     using HostConfigurators;
     using Logging;
@@ -40,7 +41,7 @@ namespace Topshelf
                 Type declaringType = configureCallback.Method.DeclaringType;
                 if (declaringType != null)
                 {
-                    string defaultServiceName = declaringType.Namespace;
+                    string defaultServiceName = Assembly.GetEntryAssembly().GetName().Name;
                     if (!string.IsNullOrEmpty(defaultServiceName))
                         configurator.SetServiceName(defaultServiceName);
                 }
