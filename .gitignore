@@ -2,7 +2,6 @@ build_output/*
 build_artifacts/*
 doc/build/*
 
-nuget.exe
 
 *.suo
 *.user
@@ -24,3 +23,5 @@ _ReSharper*
 # osx noise
 .DS_Store
 Gemfile.lock
+
+src/Topshelf.userprefs
