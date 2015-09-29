@@ -119,39 +119,39 @@ namespace Topshelf.Tests
             Assert.AreEqual("Joe is good", installHost.Settings.Description);
         }
 
-		[Test]
-		public void Should_create_an_install_host_with_service_name_and_instance_name()
-		{
-			Host host = HostFactory.New(x =>
-			{
-				x.Service<MyService>();
-				x.ApplyCommandLine("install -servicename \"Joe\" -instance \"42\"");
-			});
+        [Test]
+        public void Should_create_an_install_host_with_service_name_and_instance_name()
+        {
+            Host host = HostFactory.New(x =>
+            {
+                x.Service<MyService>();
+                x.ApplyCommandLine("install -servicename \"Joe\" -instance \"42\"");
+            });
 
-			Assert.IsInstanceOf<InstallHost>(host);
-			var installHost = (InstallHost)host;
-			Assert.AreEqual("Joe", installHost.Settings.Name);
-			Assert.AreEqual("42", installHost.Settings.InstanceName);
-			Assert.AreEqual("Joe$42", installHost.Settings.ServiceName);
-		}
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual("Joe", installHost.Settings.Name);
+            Assert.AreEqual("42", installHost.Settings.InstanceName);
+            Assert.AreEqual("Joe$42", installHost.Settings.ServiceName);
+        }
 
-		[Test]
-		public void Should_create_and_install_host_with_service_name_containing_space()
-		{
-			Host host = HostFactory.New(x =>
-			{
-				x.Service<MyService>();
-				x.ApplyCommandLine("install -servicename \"Joe's Service\" -instance \"42\"");
-			});
+        [Test]
+        public void Should_create_and_install_host_with_service_name_containing_space()
+        {
+            Host host = HostFactory.New(x =>
+            {
+                x.Service<MyService>();
+                x.ApplyCommandLine("install -servicename \"Joe's Service\" -instance \"42\"");
+            });
 
-			Assert.IsInstanceOf<InstallHost>(host);
-			var installHost = (InstallHost)host;
-			Assert.AreEqual("Joe's Service", installHost.Settings.Name);
-			Assert.AreEqual("42", installHost.Settings.InstanceName);
-			Assert.AreEqual("Joe's Service$42", installHost.Settings.ServiceName);
-		}
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual("Joe's Service", installHost.Settings.Name);
+            Assert.AreEqual("42", installHost.Settings.InstanceName);
+            Assert.AreEqual("Joe's Service$42", installHost.Settings.ServiceName);
+        }
 
-		[Test]
+        [Test]
         public void Should_create_an_install_host_to_start_automatically()
         {
             Host host = HostFactory.New(x =>
