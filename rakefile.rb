@@ -223,7 +223,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "NLog", "3.2.1"
+  nuspec.dependency "NLog", "4.1.2"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
