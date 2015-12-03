@@ -204,7 +204,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "Log4Net", "2.0.3"
+  nuspec.dependency "Log4Net", "2.0.4"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Log4Net.nuspec')
   add_files props[:output], 'Topshelf.Log4Net.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.Log4Net\\**\\*.cs").gsub("/","\\"), "src")
@@ -223,7 +223,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "NLog", "3.2.1"
+  nuspec.dependency "NLog", "4.2.2"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.NLog.nuspec')
   add_files props[:output], 'Topshelf.NLog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.NLog\\**\\*.cs").gsub("/","\\"), "src")
@@ -261,7 +261,7 @@ nuspec :create_nuspec do |nuspec|
   nuspec.license_url = "http://www.apache.org/licenses/LICENSE-2.0"
   nuspec.require_license_acceptance
   nuspec.dependency "Topshelf", NUGET_VERSION
-  nuspec.dependency "Serilog", "1.5.5"
+  nuspec.dependency "Serilog", "1.5.14"
   nuspec.output_file = File.join(props[:artifacts], 'Topshelf.Serilog.nuspec')
   add_files props[:output], 'Topshelf.Serilog.{dll,pdb,xml}', nuspec
   nuspec.file(File.join(props[:src], "Topshelf.Serilog\\**\\*.cs").gsub("/","\\"), "src")
