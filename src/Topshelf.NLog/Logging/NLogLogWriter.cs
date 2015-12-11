@@ -67,9 +67,9 @@ namespace Topshelf.Logging
 
         public void Log(LoggingLevel level, object obj, Exception exception)
         {
-            _log.Log(GetNLogLevel(level), obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            _log.Log(GetNLogLevel(level), exception, obj == null
+                                                           ? ""
+                                                           : obj.ToString());
         }
 
         public void Log(LoggingLevel level, LogWriterOutputProvider messageProvider)
@@ -95,9 +95,9 @@ namespace Topshelf.Logging
 
         public void Debug(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Debug, obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            _log.Log(LogLevel.Debug, exception, obj == null
+                                                           ? ""
+                                                           : obj.ToString());
         }
 
         public void Debug(LogWriterOutputProvider messageProvider)
@@ -112,9 +112,9 @@ namespace Topshelf.Logging
 
         public void Info(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Info, obj == null
-                                                      ? ""
-                                                      : obj.ToString(), exception);
+            _log.Log(LogLevel.Info, exception, obj == null
+                                                          ? ""
+                                                          : obj.ToString());
         }
 
         public void Info(LogWriterOutputProvider messageProvider)
@@ -129,9 +129,9 @@ namespace Topshelf.Logging
 
         public void Warn(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Warn, obj == null
-                                                      ? ""
-                                                      : obj.ToString(), exception);
+            _log.Log(LogLevel.Warn, exception, obj == null
+                                                          ? ""
+                                                          : obj.ToString());
         }
 
         public void Warn(LogWriterOutputProvider messageProvider)
@@ -146,9 +146,9 @@ namespace Topshelf.Logging
 
         public void Error(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Error, obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            _log.Log(LogLevel.Error, exception, obj == null
+                                                           ? ""
+                                                           : obj.ToString());
         }
 
         public void Error(LogWriterOutputProvider messageProvider)
@@ -163,9 +163,9 @@ namespace Topshelf.Logging
 
         public void Fatal(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Fatal, obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            _log.Log(LogLevel.Fatal, exception, obj == null
+                                                           ? ""
+                                                           : obj.ToString());
         }
 
         public void Fatal(LogWriterOutputProvider messageProvider)
