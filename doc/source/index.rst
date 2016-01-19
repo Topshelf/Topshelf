@@ -6,7 +6,7 @@
 Welcome to Topshelf's documentation!
 =======================================
 
-.. image:: http://www.phatboyg.com/top-shelf-3-small.png
+.. image:: http://topshelf-project.com/slide.1.png
 
 Contents:
 
