@@ -82,7 +82,8 @@ namespace Topshelf.Logging
             error.HostName = Environment.MachineName;
             error.Detail = exception == null ? message : exception.StackTrace;
 
-            _log.Log(error);
+            if(IsLogLevelEnabled(logLevel))
+                _log.Log(error);
         }
 
         private string GetLogLevel(ElmahLogLevelsEnum logLevel)
@@ -244,7 +245,23 @@ namespace Topshelf.Logging
         {
             WriteToElmah(ElmahLogLevelsEnum.Fatal, format, args);
         }
-
+        private bool IsLogLevelEnabled(ElmahLogLevelsEnum logLevel)
+        {
+            switch (logLevel)
+            {
+                case ElmahLogLevelsEnum.Debug:
+                    return IsDebugEnabled;
+                case ElmahLogLevelsEnum.Info:
+                    return IsInfoEnabled;
+                case ElmahLogLevelsEnum.Warn:
+                    return IsWarnEnabled;
+                case ElmahLogLevelsEnum.Error:
+                    return IsErrorEnabled;
+                case ElmahLogLevelsEnum.Fatal:
+                    return IsFatalEnabled;
+            }
+            return true;
+        }
         public bool IsDebugEnabled
         {
             get { return _logLevels.IsDebugEnabled; }
