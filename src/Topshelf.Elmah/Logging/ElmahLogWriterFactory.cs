@@ -18,9 +18,15 @@ namespace Topshelf.Logging
     public class ElmahLogWriterFactory :
         LogWriterFactory
     {
+        private readonly ElmahLogLevels _logLevels;
+        private ElmahLogWriterFactory(ElmahLogLevels logLevels)
+        {
+            _logLevels = logLevels;
+        }
+
         public LogWriter Get(string name)
         {
-            return new ElmahLogWriter();
+            return new ElmahLogWriter(_logLevels);
         }
 
         public void Shutdown()
@@ -28,9 +34,9 @@ namespace Topshelf.Logging
 
         }
 
-        public static void Use()
+        public static void Use(ElmahLogLevels logLevels = null)
         {
-            HostLogger.UseLogger(new ElmahHostLoggerConfigurator());
+            HostLogger.UseLogger(new ElmahHostLoggerConfigurator(logLevels));
         }
 
 
@@ -38,9 +44,15 @@ namespace Topshelf.Logging
         public class ElmahHostLoggerConfigurator :
             HostLoggerConfigurator
         {
+            private readonly ElmahLogLevels _logLevels;
+            public ElmahHostLoggerConfigurator(ElmahLogLevels logLevels)
+            {
+                _logLevels = logLevels;
+            }
+
             public LogWriterFactory CreateLogWriterFactory()
             {
-                return new ElmahLogWriterFactory();
+                return new ElmahLogWriterFactory(_logLevels);
             }
         }
     }

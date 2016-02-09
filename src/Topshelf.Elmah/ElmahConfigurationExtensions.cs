@@ -28,5 +28,15 @@ namespace Topshelf
         {
             ElmahLogWriterFactory.Use();
         }
+
+        /// <summary>
+        ///   Specify that you want to use the Elmah logging engine.
+        /// </summary>
+        /// <param name="configurator"> </param>
+        /// <param name="logLevels">The desired level of elmah logging</param>
+        public static void UseElmah(this HostConfigurator configurator, ElmahLogLevels logLevels)
+        {
+            ElmahLogWriterFactory.Use(logLevels);
+        }
     }
 }
