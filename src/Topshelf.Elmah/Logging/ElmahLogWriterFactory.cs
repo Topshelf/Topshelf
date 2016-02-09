@@ -26,7 +26,7 @@ namespace Topshelf.Logging
 
         public LogWriter Get(string name)
         {
-            return new ElmahLogWriter();
+            return new ElmahLogWriter(_logLevels);
         }
 
         public void Shutdown()
