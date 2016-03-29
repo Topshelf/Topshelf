@@ -64,7 +64,7 @@ namespace SampleTopshelfService
                         {
                             s.ConstructUsing(() => new SampleSansInterfaceService());
                             s.WhenStarted(v => v.Start());
-                            s.WhenStarted(v => v.Stop());
+                            s.WhenStopped(v => v.Stop());
                         });
                 });
         }
