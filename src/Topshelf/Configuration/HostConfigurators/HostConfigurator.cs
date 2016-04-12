@@ -76,7 +76,6 @@ namespace Topshelf.HostConfigurators
         /// <summary>
         ///   Sets the service builder to use for creating the service
         /// </summary>
-        /// <typeparam name="T"> </typeparam>
         /// <param name="serviceBuilderFactory"> </param>
         void UseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory);
 
@@ -107,6 +106,7 @@ namespace Topshelf.HostConfigurators
         /// Adds a command line switch (--name) that can be either true or false. Switches are CASE SeNsITiVe
         /// </summary>
         /// <param name="name">The name of the switch, as it will appear on the command line</param>
+        /// <param name="callback"></param>
         void AddCommandLineSwitch(string name, Action<bool> callback);
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Topshelf.HostConfigurators
         /// definition 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="value"></param>
+        /// <param name="callback"></param>
         void AddCommandLineDefinition(string name, Action<string> callback);
     }
 }

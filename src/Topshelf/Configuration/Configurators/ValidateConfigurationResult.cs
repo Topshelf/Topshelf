@@ -10,6 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+
 namespace Topshelf.Configurators
 {
     using System;
@@ -17,7 +18,7 @@ namespace Topshelf.Configurators
     using System.Diagnostics;
     using System.Linq;
 
-    [Serializable, DebuggerDisplay("{DebuggerString()}")]
+    [Serializable, DebuggerDisplay("{Message}")]
     public class ValidateConfigurationResult :
         ConfigurationResult
     {
@@ -42,19 +43,11 @@ namespace Topshelf.Configurators
         {
             get
             {
-#if NET40
-            var debuggerString = string.Join(", ", _results);
-#else
-                string debuggerString = string.Join(Environment.NewLine, _results.Select(x => x.ToString()).ToArray());
-#endif
+                string debuggerString = string.Join(", ", _results);
 
-#if NET40
-            return string.IsNullOrWhiteSpace(debuggerString)
-#else
-                return string.IsNullOrEmpty(debuggerString)
-#endif
-                           ? ""
-                           : debuggerString;
+                return string.IsNullOrWhiteSpace(debuggerString)
+                    ? ""
+                    : debuggerString;
             }
         }
 
@@ -64,9 +57,9 @@ namespace Topshelf.Configurators
 
             if (result.ContainsFailure)
             {
-                string message = "The service was not properly configured: " 
-                    + Environment.NewLine
-                    + result.Message;
+                string message = "The service was not properly configured: "
+                                 + Environment.NewLine
+                                 + result.Message;
 
                 throw new HostConfigurationException(message);
             }

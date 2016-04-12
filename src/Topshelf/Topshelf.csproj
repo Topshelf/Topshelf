@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Topshelf</RootNamespace>
     <AssemblyName>Topshelf</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>3001,3009</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,10 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>3001,3009</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="  '$(TargetFrameworkVersion)' == 'v3.5' ">
-    <DefineConstants>NET35</DefineConstants>
-    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)</OutputPath>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,8 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionVersion.cs">
-      <Link>SolutionVersion.cs</Link>
+      <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="Caching\Cache.cs" />
+    <Compile Include="Caching\CacheItemCallback.cs" />
+    <Compile Include="Caching\ConcurrentCache.cs" />
+    <Compile Include="Caching\DictionaryCache.cs" />
+    <Compile Include="Caching\GenericTypeCache.cs" />
+    <Compile Include="Caching\KeySelector.cs" />
+    <Compile Include="Caching\MissingValueProvider.cs" />
+    <Compile Include="Caching\ReadCache.cs" />
     <Compile Include="Configuration\Builders\CommandBuilder.cs" />
     <Compile Include="Configuration\Builders\ControlServiceBuilder.cs" />
     <Compile Include="Configuration\Builders\DelegateServiceBuilder.cs" />
@@ -181,6 +188,8 @@
     <Compile Include="Logging\TraceHostLoggerConfigurator.cs" />
     <Compile Include="Logging\TraceLogWriter.cs" />
     <Compile Include="Logging\TraceLogWriterFactory.cs" />
+    <Compile Include="Logging\TypeExtensions.cs" />
+    <Compile Include="Logging\TypeNameFormatter.cs" />
     <Compile Include="Runtime\EventCallbackList.cs" />
     <Compile Include="Runtime\HostEnvironment.cs" />
     <Compile Include="Runtime\HostStartMode.cs" />
@@ -220,14 +229,9 @@
     <Compile Include="TopshelfExitCode.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Internals\**\*.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="HelpText.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

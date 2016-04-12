@@ -10,21 +10,13 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+
 namespace Topshelf.Runtime.Windows
 {
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Reflection;
-    using System.Security.Principal;
-    using Topshelf.Logging;
+    using Logging;
 
     public static class WindowsUserAccessControl
     {
-        static readonly LogWriter _log = HostLogger.Get(typeof(WindowsUserAccessControl));
-
-       
-
-     
+        static readonly LogWriter _log = HostLogger.Get(typeof (WindowsUserAccessControl));
     }
 }

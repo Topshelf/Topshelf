@@ -16,7 +16,6 @@ namespace Topshelf.ServiceConfigurators
     using System.Collections.Generic;
     using Builders;
     using Configurators;
-    using HostConfigurators;
     using Runtime;
 
     public class ControlServiceConfigurator<T> :

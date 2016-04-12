@@ -22,7 +22,7 @@ namespace Topshelf.Runtime.Windows
     using System.Security.Principal;
     using System.ServiceProcess;
     using Logging;
-    using Topshelf.HostConfigurators;
+    using HostConfigurators;
 
     public class WindowsHostEnvironment :
         HostEnvironment

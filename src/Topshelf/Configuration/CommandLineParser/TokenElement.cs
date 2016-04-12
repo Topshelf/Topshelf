@@ -20,7 +20,7 @@ namespace Topshelf.CommandLineParser
             Token = token;
         }
 
-        public string Token { get; private set; }
+        public string Token { get; }
 
         public override string ToString()
         {
@@ -49,9 +49,7 @@ namespace Topshelf.CommandLineParser
 
         public override int GetHashCode()
         {
-            return (Token != null
-                        ? Token.GetHashCode()
-                        : 0);
+            return Token?.GetHashCode() ?? 0;
         }
 
         public static ICommandLineElement New(string token)

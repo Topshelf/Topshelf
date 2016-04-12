@@ -17,11 +17,9 @@ namespace Topshelf.Runtime.Windows
     using System.Reflection;
     using System.ServiceProcess;
     using System.Threading;
-#if !NET35
     using System.Threading.Tasks;
-#endif
     using Logging;
-    using Topshelf.HostConfigurators;
+    using HostConfigurators;
 
     public class WindowsServiceHost :
         ServiceBase,
@@ -280,16 +278,14 @@ namespace Topshelf.Runtime.Windows
 //          This needs to be a configuration option to avoid breaking compatibility
 
             ExitCode = (int)TopshelfExitCode.UnhandledServiceException;
-            _unhandledException = e.ExceptionObject as Exception;
+            _unhandledException = (Exception) e.ExceptionObject;
 
             Stop();
 
 
-#if !NET35
             // it isn't likely that a TPL thread should land here, but if it does let's no block it
             if (Task.CurrentId.HasValue)
                 return;
-#endif
 
             int deadThreadId = Interlocked.Increment(ref _deadThread);
             Thread.CurrentThread.IsBackground = true;
