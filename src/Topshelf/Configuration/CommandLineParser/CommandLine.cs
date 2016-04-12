@@ -81,7 +81,7 @@ namespace Topshelf.CommandLineParser
         {
             var elementParser = new CommandLineElementParser<T>();
 
-            initializer(elementParser);
+            initializer?.Invoke(elementParser);
 
             return elementParser.Parse(Parse(commandLine));
         }

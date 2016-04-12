@@ -13,7 +13,6 @@
 namespace Topshelf.Logging
 {
     using System;
-    using Internals.Extensions;
 
     public static class HostLogger
     {

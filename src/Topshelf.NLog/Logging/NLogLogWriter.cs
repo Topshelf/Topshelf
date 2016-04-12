@@ -31,7 +31,7 @@ namespace Topshelf.Logging
         public NLogLogWriter(Logger log, string name)
         {
             if (name == null)
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             _log = log;
         }
 
@@ -67,9 +67,10 @@ namespace Topshelf.Logging
 
         public void Log(LoggingLevel level, object obj, Exception exception)
         {
-            _log.Log(GetNLogLevel(level), obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            if (obj != null)
+                _log.Log(GetNLogLevel(level), exception, obj.ToString());
+            else
+                _log.Log(GetNLogLevel(level), exception);
         }
 
         public void Log(LoggingLevel level, LogWriterOutputProvider messageProvider)
@@ -95,9 +96,10 @@ namespace Topshelf.Logging
 
         public void Debug(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Debug, obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            if (obj != null)
+                _log.Log(LogLevel.Debug, exception, obj.ToString());
+            else
+                _log.Log(LogLevel.Debug, exception);
         }
 
         public void Debug(LogWriterOutputProvider messageProvider)
@@ -112,9 +114,10 @@ namespace Topshelf.Logging
 
         public void Info(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Info, obj == null
-                                                      ? ""
-                                                      : obj.ToString(), exception);
+            if (obj != null)
+                _log.Log(LogLevel.Info, exception, obj.ToString());
+            else
+                _log.Log(LogLevel.Info, exception);
         }
 
         public void Info(LogWriterOutputProvider messageProvider)
@@ -129,9 +132,10 @@ namespace Topshelf.Logging
 
         public void Warn(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Warn, obj == null
-                                                      ? ""
-                                                      : obj.ToString(), exception);
+            if (obj != null)
+                _log.Log(LogLevel.Warn, exception, obj.ToString());
+            else
+                _log.Log(LogLevel.Warn, exception);
         }
 
         public void Warn(LogWriterOutputProvider messageProvider)
@@ -146,9 +150,10 @@ namespace Topshelf.Logging
 
         public void Error(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Error, obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            if (obj != null)
+                _log.Log(LogLevel.Error, exception, obj.ToString());
+            else
+                _log.Log(LogLevel.Error, exception);
         }
 
         public void Error(LogWriterOutputProvider messageProvider)
@@ -163,9 +168,10 @@ namespace Topshelf.Logging
 
         public void Fatal(object obj, Exception exception)
         {
-            _log.Log(LogLevel.Fatal, obj == null
-                                                       ? ""
-                                                       : obj.ToString(), exception);
+            if (obj != null)
+                _log.Log(LogLevel.Fatal, exception, obj.ToString());
+            else
+                _log.Log(LogLevel.Fatal, exception);
         }
 
         public void Fatal(LogWriterOutputProvider messageProvider)
@@ -223,7 +229,7 @@ namespace Topshelf.Logging
             _log.Log(LogLevel.Fatal, format, args);
         }
 
-        LogLevel GetNLogLevel(LoggingLevel level)
+        static LogLevel GetNLogLevel(LoggingLevel level)
         {
             if (level == LoggingLevel.Fatal)
                 return LogLevel.Fatal;
@@ -241,15 +247,13 @@ namespace Topshelf.Logging
             return LogLevel.Off;
         }
 
-        LogMessageGenerator ToGenerator(LogWriterOutputProvider provider)
+        static LogMessageGenerator ToGenerator(LogWriterOutputProvider provider)
         {
             return () =>
-                {
-                    object obj = provider();
-                    return obj == null
-                               ? ""
-                               : obj.ToString();
-                };
+            {
+                object obj = provider?.Invoke();
+                return obj?.ToString() ?? "";
+            };
         }
     }
 }

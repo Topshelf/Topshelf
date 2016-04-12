@@ -31,8 +31,8 @@ namespace Topshelf.CommandLineParser
             Value = value;
         }
 
-        public string Key { get; private set; }
-        public bool Value { get; private set; }
+        public string Key { get; }
+        public bool Value { get; }
 
         public override string ToString()
         {
@@ -63,9 +63,7 @@ namespace Topshelf.CommandLineParser
         {
             unchecked
             {
-                return ((Key != null
-                             ? Key.GetHashCode()
-                             : 0)*397) ^ Value.GetHashCode();
+                return ((Key?.GetHashCode() ?? 0)*397) ^ Value.GetHashCode();
             }
         }
 

@@ -14,7 +14,7 @@ namespace Topshelf.Logging
 {
     using System;
     using System.Diagnostics;
-    using Internals.Caching;
+    using Caching;
 
     public class TraceLogWriterFactory :
         LogWriterFactory

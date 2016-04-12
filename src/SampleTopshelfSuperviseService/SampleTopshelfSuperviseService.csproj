@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleTopshelfSuperviseService</RootNamespace>
     <AssemblyName>SampleTopshelfSuperviseService</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -35,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="  '$(TargetFrameworkVersion)' == 'v3.5' ">
     <DefineConstants>NET35</DefineConstants>
@@ -63,10 +65,6 @@
     <ProjectReference Include="..\Topshelf.Log4Net\Topshelf.Log4Net.csproj">
       <Project>{0EE64D46-5728-45DB-8D0E-044CE2677FD8}</Project>
       <Name>Topshelf.Log4Net</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Topshelf.Supervise\Topshelf.Supervise.csproj">
-      <Project>{BA8491EF-EFF1-4DFB-BEE6-FE5393E715D4}</Project>
-      <Name>Topshelf.Supervise</Name>
     </ProjectReference>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj">
       <Project>{A52AD64D-6455-4A22-8CCF-581851086578}</Project>

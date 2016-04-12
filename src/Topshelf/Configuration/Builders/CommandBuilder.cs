@@ -50,7 +50,7 @@ namespace Topshelf.Builders
             where T : class, HostBuilder
         {
             if (callback == null)
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
 
             var self = this as T;
             if (self != null)

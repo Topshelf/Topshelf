@@ -20,7 +20,7 @@ namespace Topshelf.CommandLineParser
             Id = id;
         }
 
-        public string Id { get; private set; }
+        public string Id { get; }
 
         public override string ToString()
         {
@@ -49,9 +49,7 @@ namespace Topshelf.CommandLineParser
 
         public override int GetHashCode()
         {
-            return (Id != null
-                        ? Id.GetHashCode()
-                        : 0);
+            return Id?.GetHashCode() ?? 0;
         }
 
         public static ICommandLineElement New(string id)
