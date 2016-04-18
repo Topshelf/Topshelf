@@ -320,6 +320,34 @@ namespace Topshelf.Tests
             Assert.AreEqual("11", volumeLevel);
         }
 
+        [Test]
+        public void Should_require_password_option_when_specifying_username()
+        {
+            Assert.Throws<Topshelf.HostConfigurationException>(() =>
+            {
+                Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+                    x.ApplyCommandLine("install -username \"Joe\"");
+                });
+            });
+        }
+
+        [Test]
+        public void Will_allow_blank_password_when_specifying_username()
+        {
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+                    x.ApplyCommandLine("install -username \"Joe\" -password \"\"");
+                });
+
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual("Joe", installHost.InstallSettings.Username);
+            Assert.AreEqual("", installHost.InstallSettings.Password);
+        }
+
         class MyService : ServiceControl
         {
             public bool Start(HostControl hostControl)
