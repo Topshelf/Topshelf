@@ -45,7 +45,7 @@ namespace Topshelf.HostConfigurators
         {
             if (string.IsNullOrEmpty(Username))
                 yield return this.Failure("Username", "must be specified for a User account type");
-            if (string.IsNullOrEmpty(Password))
+            if (Password == null)
                 yield return this.Failure("Password", "must be specified for a User account type");
         }
     }
