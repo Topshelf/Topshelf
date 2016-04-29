@@ -305,7 +305,7 @@ namespace Topshelf.Runtime.Windows
             try
             {
                 result = ServiceController.GetServices()
-                                    .Any(service => string.CompareOrdinal(service.ServiceName, serviceName) == 0);
+                                    .Any(service => string.Equals(service.ServiceName, serviceName, StringComparison.OrdinalIgnoreCase)));
             }
             catch (InvalidOperationException)
             {
