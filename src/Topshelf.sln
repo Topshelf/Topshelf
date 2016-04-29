@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf", "Topshelf\Topshelf.csproj", "{A52AD64D-6455-4A22-8CCF-581851086578}"
 EndProject
@@ -14,14 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Log4Net", "Topshelf.Log4Net\Topshelf.Log4Net.csproj", "{0EE64D46-5728-45DB-8D0E-044CE2677FD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.NLog", "Topshelf.NLog\Topshelf.NLog.csproj", "{55FC6F5C-778F-4E77-8C55-C62216858CE7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E9335DBD-95C0-4199-97EA-EE4ACEFB4F04}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Elmah", "Topshelf.Elmah\Topshelf.Elmah.csproj", "{B6990D65-5B8A-4332-B01F-DE60D7042F6E}"
 EndProject
