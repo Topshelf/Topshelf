@@ -360,8 +360,8 @@ namespace Topshelf.Tests
 
             Assert.IsInstanceOf<InstallHost>(host);
             var installHost = (InstallHost)host;
-            Assert.AreEqual("Joe", installHost.InstallSettings.Username);
-            Assert.AreEqual("", installHost.InstallSettings.Password);
+            Assert.AreEqual("Joe", installHost.InstallSettings.Credentials.Username);
+            Assert.AreEqual("", installHost.InstallSettings.Credentials.Password);
         }
 
         class MyService : ServiceControl
