@@ -6,10 +6,11 @@ using System.Reflection;
 [assembly: AssemblyProductAttribute("Topshelf")]
 [assembly: AssemblyVersionAttribute("4.0.0.0")]
 [assembly: AssemblyFileVersionAttribute("4.0.0.0")]
-[assembly: AssemblyInformationalVersionAttribute("4.0.0.0 (develop/0eec82de)")]
+[assembly: AssemblyInformationalVersionAttribute("4.0.0.0 (drb/a3ac1e81)")]
 [assembly: AssemblyCopyrightAttribute("Copyright 2012 Chris Patterson, Dru Sellers, Travis Smith, All rights reserved.")]
 namespace System {
     internal static class AssemblyVersionInformation {
         internal const string Version = "4.0.0.0";
+        internal const string InformationalVersion = "4.0.0.0 (drb/a3ac1e81)";
     }
 }
