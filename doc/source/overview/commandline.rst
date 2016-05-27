@@ -58,3 +58,15 @@ The help text from the command line is shown below for easy reference.
       -instance         An instance name if registering the service
                         multiple times
       --sudo            Prompts for UAC if running on Vista/W7/2008
+
+
+Examples
+'''''''''
+    
+    ** Basic Service Installation**
+    MyService.exe install -username:DOMAIN\ServiceAccount -password:itsASecret -servicename:AwesomeService --autostart
+    
+    ** Service Installation with Quoted Arguments
+    MyService.exe install -username "DOMAIN\Service Account" -password:"Its A Secret" -servicename "Awesome Service" --autostart
+    
+    
