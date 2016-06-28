@@ -53,6 +53,11 @@ namespace Topshelf.Hosts
             {
                 SystemEvents.SessionSwitch += OnSessionChanged;
             }
+
+            if (settings.CanHandlePowerEvent)
+            {
+                SystemEvents.PowerModeChanged += OnPowerModeChanged;
+            }
         }
 
         void OnSessionChanged(object sender, SessionSwitchEventArgs e)
@@ -60,6 +65,13 @@ namespace Topshelf.Hosts
             var arguments = new ConsoleSessionChangedArguments(e.Reason);
 
             _serviceHandle.SessionChanged(this, arguments);
+        }
+
+        void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            var arguments = new ConsolePowerEventArguments(e.Mode);
+
+            _serviceHandle.PowerEvent(this, arguments);
         }
 
 
@@ -249,6 +261,34 @@ namespace Topshelf.Hosts
             public int SessionId
             {
                 get { return _sessionId; }
+            }
+        }
+
+        class ConsolePowerEventArguments :
+            PowerEventArguments
+        {
+            readonly PowerEventCode _eventCode;
+            public ConsolePowerEventArguments(PowerModes powerMode)
+            {
+                switch (powerMode)
+                {
+                    case PowerModes.Resume:
+                        _eventCode = PowerEventCode.ResumeAutomatic; 
+                        break;
+                    case PowerModes.StatusChange:
+                        _eventCode = PowerEventCode.PowerStatusChange;
+                        break;
+                    case PowerModes.Suspend:
+                        _eventCode = PowerEventCode.Suspend;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(powerMode), powerMode, null);
+                }
+            }
+
+            public PowerEventCode EventCode
+            {
+                get { return _eventCode; }
             }
         }
     }

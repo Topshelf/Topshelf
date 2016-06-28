@@ -32,7 +32,9 @@ namespace Topshelf.ServiceConfigurators
 
         bool _pauseConfigured;
         bool _sessionChangeConfigured;
+        bool _powerEventConfigured;
         Action<T, HostControl, SessionChangedArguments> _sessionChanged;
+        Func<T, HostControl, PowerEventArguments, bool> _powerEvent;
         Action<T, HostControl> _shutdown;
         bool _shutdownConfigured;
         Func<T, HostControl, bool> _start;
@@ -57,6 +59,8 @@ namespace Topshelf.ServiceConfigurators
                 yield return this.Failure("Shutdown", "must not be null if shutdown is allowed");
             if (_sessionChangeConfigured && _sessionChanged == null)
                 yield return this.Failure("SessionChange", "must not be null if session change is allowed");
+            if (_powerEventConfigured && _powerEvent == null)
+                yield return this.Failure("PowerEvent", "must not be null if power event reaction is allowed");
             if (_customCommandReceivedConfigured && _customCommandReceived == null)
                 yield return this.Failure("CustomCommand", "must not be null if custom command is allowed");
         }
@@ -100,6 +104,12 @@ namespace Topshelf.ServiceConfigurators
             _sessionChanged = sessionChanged;
         }
 
+        public void WhenPowerEvent(Func<T, HostControl, PowerEventArguments, bool> powerEvent)
+        {
+            _powerEventConfigured = true;
+            _powerEvent = powerEvent;
+        }
+
         public void WhenCustomCommandReceived(Action<T, HostControl, int> customCommandReceived)
         {
             _customCommandReceivedConfigured = true;
@@ -109,7 +119,7 @@ namespace Topshelf.ServiceConfigurators
         public ServiceBuilder Build()
         {
             var serviceBuilder = new DelegateServiceBuilder<T>(_factory, _start, _stop, _pause, _continue, _shutdown,
-                _sessionChanged, _customCommandReceived, ServiceEvents);
+                _sessionChanged, _powerEvent, _customCommandReceived, ServiceEvents);
             return serviceBuilder;
         }
     }

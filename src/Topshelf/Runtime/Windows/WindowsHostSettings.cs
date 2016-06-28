@@ -102,6 +102,8 @@ namespace Topshelf.Runtime.Windows
 
         public bool CanSessionChanged { get; set; }
         
+        public bool CanHandlePowerEvent { get; set; }
+
         public TimeSpan StartTimeOut { get; set; }
         
         public TimeSpan StopTimeOut { get; set; }

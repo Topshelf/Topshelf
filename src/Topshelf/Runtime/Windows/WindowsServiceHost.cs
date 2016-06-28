@@ -49,6 +49,7 @@ namespace Topshelf.Runtime.Windows
 
             CanPauseAndContinue = settings.CanPauseAndContinue;
             CanShutdown = settings.CanShutdown;
+            CanHandlePowerEvent = settings.CanHandlePowerEvent;
             CanHandleSessionChangeEvent = settings.CanSessionChanged;
             ServiceName = _settings.ServiceName;
         }
@@ -237,16 +238,41 @@ namespace Topshelf.Runtime.Windows
 
                 _serviceHandle.SessionChanged(this, arguments);
 
-                _log.Info("[Topshelf] Stopped");
+                _log.Info("[Topshelf] Service session changed handled");
             }
             catch (Exception ex)
             {
                 _settings.ExceptionCallback?.Invoke(ex);
 
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _log.Fatal("The did not handle Service session change correctly", ex);
                 ExitCode = (int)TopshelfExitCode.StopServiceFailed;
                 throw;
             }
+        }
+
+        protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
+        {
+            try
+            {
+                _log.Info("[Topshelf] Power event raised");
+
+                var arguments = new WindowsPowerEventArguments(powerStatus);
+
+                var result = _serviceHandle.PowerEvent(this, arguments);
+
+                _log.Info("[Topshelf] Power event handled");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _settings.ExceptionCallback?.Invoke(ex);
+
+                _log.Fatal("The service did handle the Power event correctly", ex);
+                ExitCode = (int)TopshelfExitCode.StopServiceFailed;
+                throw;
+            }
+
         }
 
         protected override void OnCustomCommand(int command)
@@ -333,6 +359,23 @@ namespace Topshelf.Runtime.Windows
             public int SessionId
             {
                 get { return _sessionId; }
+            }
+        }
+
+        class WindowsPowerEventArguments :
+            PowerEventArguments
+        {
+            readonly PowerEventCode _eventCode;
+
+            public WindowsPowerEventArguments(PowerBroadcastStatus powerStatus)
+            {
+                _eventCode = (PowerEventCode) Enum.ToObject(typeof(PowerEventCode), (int)powerStatus);
+            }
+
+
+            public PowerEventCode EventCode
+            {
+                get { return _eventCode; }
             }
         }
     }

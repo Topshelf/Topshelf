@@ -198,6 +198,7 @@
     <Compile Include="Logging\TraceLogWriterFactory.cs" />
     <Compile Include="Logging\TypeExtensions.cs" />
     <Compile Include="Logging\TypeNameFormatter.cs" />
+    <Compile Include="PowerEventCode.cs" />
     <Compile Include="Runtime\EventCallbackList.cs" />
     <Compile Include="Runtime\HostEnvironment.cs" />
     <Compile Include="Runtime\HostStartMode.cs" />
@@ -229,9 +230,11 @@
     <Compile Include="Runtime\Windows\WindowsUserAccessControl.cs" />
     <Compile Include="ServiceControl.cs" />
     <Compile Include="ServiceCustomCommand.cs" />
+    <Compile Include="ServicePowerEvent.cs" />
     <Compile Include="ServiceSessionChange.cs" />
     <Compile Include="ServiceShutdown.cs" />
     <Compile Include="ServiceSuspend.cs" />
+    <Compile Include="PowerEventArguments.cs" />
     <Compile Include="SessionChangedArguments.cs" />
     <Compile Include="SessionChangeReasonCode.cs" />
     <Compile Include="TopshelfExitCode.cs" />

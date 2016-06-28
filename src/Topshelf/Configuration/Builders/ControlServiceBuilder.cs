@@ -111,6 +111,17 @@ namespace Topshelf.Builders
                 }
             }
 
+            public bool PowerEvent(HostControl hostControl, PowerEventArguments arguments)
+            {
+                var powerEvent = _service as ServicePowerEvent;
+                if (powerEvent != null)
+                {
+                    return powerEvent.PowerEvent(hostControl, arguments);
+                }
+
+                return false;
+            }
+
             public void CustomCommand(HostControl hostControl, int command)
             {
                 var customCommand = _service as ServiceCustomCommand;

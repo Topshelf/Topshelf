@@ -49,6 +49,7 @@ namespace Topshelf.ServiceConfigurators
         void WhenContinued(Func<T, HostControl, bool> @continue);
         void WhenShutdown(Action<T, HostControl> shutdown);
         void WhenSessionChanged(Action<T, HostControl, SessionChangedArguments> sessionChanged);
+        void WhenPowerEvent(Func<T, HostControl, PowerEventArguments, bool> powerEvent);
         void WhenCustomCommandReceived(Action<T, HostControl, int> customCommandReceived);
     }
 }
