@@ -267,9 +267,28 @@ namespace Topshelf.Hosts
         class ConsolePowerEventArguments :
             PowerEventArguments
         {
+            readonly PowerEventCode _eventCode;
             public ConsolePowerEventArguments(PowerModes powerModes)
             {
-                // TODO map 
+                switch (powerModes)
+                {
+                    case PowerModes.Resume:
+                        _eventCode = PowerEventCode.ResumeAutomatic; 
+                        break;
+                    case PowerModes.StatusChange:
+                        _eventCode = PowerEventCode.PowerStatusChange;
+                        break;
+                    case PowerModes.Suspend:
+                        _eventCode = PowerEventCode.Suspend;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(powerModes), powerModes, null);
+                }
+            }
+
+            public PowerEventCode EventCode
+            {
+                get { return _eventCode; }
             }
         }
     }

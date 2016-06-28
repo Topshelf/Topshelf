@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
+// Copyright 2007-2013 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,8 +12,16 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    public interface PowerEventArguments
+    public enum PowerEventCode
     {
-        PowerEventCode EventCode { get; }
+        QuerySuspend = 0,
+        QuerySuspendFailed = 2,
+        Suspend = 4,
+        ResumeCritical = 6,
+        ResumeSuspend = 7,
+        BatteryLow = 9,
+        PowerStatusChange = 10,
+        OemEvent = 11,
+        ResumeAutomatic = 18
     }
 }

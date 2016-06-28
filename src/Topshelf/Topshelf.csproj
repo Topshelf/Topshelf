@@ -198,6 +198,7 @@
     <Compile Include="Logging\TraceLogWriterFactory.cs" />
     <Compile Include="Logging\TypeExtensions.cs" />
     <Compile Include="Logging\TypeNameFormatter.cs" />
+    <Compile Include="PowerEventCode.cs" />
     <Compile Include="Runtime\EventCallbackList.cs" />
     <Compile Include="Runtime\HostEnvironment.cs" />
     <Compile Include="Runtime\HostStartMode.cs" />

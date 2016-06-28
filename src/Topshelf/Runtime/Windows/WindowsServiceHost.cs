@@ -363,9 +363,17 @@ namespace Topshelf.Runtime.Windows
         class WindowsPowerEventArguments :
             PowerEventArguments
         {
+            readonly PowerEventCode _eventCode;
+
             public WindowsPowerEventArguments(PowerBroadcastStatus powerStatus)
             {
-                // TODO
+                _eventCode = (PowerEventCode) Enum.ToObject(typeof(PowerEventCode), (int)powerStatus);
+            }
+
+
+            public PowerEventCode EventCode
+            {
+                get { return _eventCode; }
             }
         }
     }
