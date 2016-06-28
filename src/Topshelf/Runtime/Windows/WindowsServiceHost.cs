@@ -49,6 +49,7 @@ namespace Topshelf.Runtime.Windows
 
             CanPauseAndContinue = settings.CanPauseAndContinue;
             CanShutdown = settings.CanShutdown;
+            CanHandlePowerEvent = settings.CanHandlePowerEvent;
             CanHandleSessionChangeEvent = settings.CanSessionChanged;
             ServiceName = _settings.ServiceName;
         }
@@ -249,6 +250,29 @@ namespace Topshelf.Runtime.Windows
             }
         }
 
+        protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
+        {
+            try
+            {
+                _log.Info("[Topshelf] Power event changed");
+
+                var arguments = new WindowsPowerEventArguments(powerStatus);
+
+                var result = this._serviceHandle.PowerEvent(this, arguments);
+
+                _log.Info("[Topshelf] Stopped");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _log.Fatal("The service did not shut down gracefully", ex);
+                ExitCode = (int)TopshelfExitCode.StopServiceFailed;
+                throw;
+            }
+
+        }
+
         protected override void OnCustomCommand(int command)
         {
             try
@@ -333,6 +357,15 @@ namespace Topshelf.Runtime.Windows
             public int SessionId
             {
                 get { return _sessionId; }
+            }
+        }
+
+        class WindowsPowerEventArguments :
+            PowerEventArguments
+        {
+            public WindowsPowerEventArguments(PowerBroadcastStatus powerStatus)
+            {
+                // TODO
             }
         }
     }

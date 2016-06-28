@@ -179,6 +179,14 @@ namespace Topshelf.Hosts
                 get { return _settings.CanSessionChanged; }
             }
 
+            /// <summary>
+            /// True if the service handles power change events
+            /// </summary>
+            public bool CanHandlePowerEvent
+            {
+                get { return _settings.CanHandlePowerEvent; }
+            }
+
             public Credentials Credentials
             {
                 get { return _credentials; }

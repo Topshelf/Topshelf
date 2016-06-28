@@ -63,6 +63,13 @@ namespace Topshelf.Runtime
         void SessionChanged(HostControl hostControl, SessionChangedArguments arguments);
 
         /// <summary>
+        /// Handle the power change event
+        /// </summary>
+        /// <param name="hostControl"></param>
+        /// <param name="arguments"></param>
+        bool PowerEvent(HostControl hostControl, PowerEventArguments arguments);
+
+        /// <summary>
         /// Handle the custom command
         /// </summary>
         /// <param name="hostControl"></param>

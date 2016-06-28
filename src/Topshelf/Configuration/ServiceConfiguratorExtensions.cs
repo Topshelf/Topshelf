@@ -134,5 +134,17 @@ namespace Topshelf
 
            return configurator;
        }
-  }
+
+        public static ServiceConfigurator<T> WhenPowerEvent<T>(this ServiceConfigurator<T> configurator, 
+            Func<T, PowerEventArguments, bool> callback)
+            where T : class
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            configurator.WhenPowerEvent((service, control, arguments) => callback(service, arguments));
+
+            return configurator;
+        }
+    }
 }

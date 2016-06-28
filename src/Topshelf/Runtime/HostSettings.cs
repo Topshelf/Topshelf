@@ -61,6 +61,11 @@ namespace Topshelf.Runtime
         bool CanSessionChanged { get; }
 
         /// <summary>
+        /// True if the service handles power change events
+        /// </summary>
+        bool CanHandlePowerEvent { get; }
+
+        /// <summary>
         /// The amount of time to wait for the service to start before timing out. Default is 10 seconds.
         /// </summary>
         TimeSpan StartTimeOut { get; }
