@@ -268,9 +268,9 @@ namespace Topshelf.Hosts
             PowerEventArguments
         {
             readonly PowerEventCode _eventCode;
-            public ConsolePowerEventArguments(PowerModes powerModes)
+            public ConsolePowerEventArguments(PowerModes powerMode)
             {
-                switch (powerModes)
+                switch (powerMode)
                 {
                     case PowerModes.Resume:
                         _eventCode = PowerEventCode.ResumeAutomatic; 
@@ -282,7 +282,7 @@ namespace Topshelf.Hosts
                         _eventCode = PowerEventCode.Suspend;
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(powerModes), powerModes, null);
+                        throw new ArgumentOutOfRangeException(nameof(powerMode), powerMode, null);
                 }
             }
 
