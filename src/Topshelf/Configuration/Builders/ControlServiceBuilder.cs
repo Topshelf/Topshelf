@@ -113,10 +113,10 @@ namespace Topshelf.Builders
 
             public bool PowerEvent(HostControl hostControl, PowerEventArguments arguments)
             {
-                var powerChange = _service as ServicePowerEvent;
-                if (powerChange != null)
+                var powerEvent = _service as ServicePowerEvent;
+                if (powerEvent != null)
                 {
-                    return powerChange.PowerEvent(hostControl, arguments);
+                    return powerEvent.PowerEvent(hostControl, arguments);
                 }
 
                 return false;
