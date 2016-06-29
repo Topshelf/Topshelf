@@ -238,13 +238,13 @@ namespace Topshelf.Runtime.Windows
 
                 _serviceHandle.SessionChanged(this, arguments);
 
-                _log.Info("[Topshelf] Stopped");
+                _log.Info("[Topshelf] Service session changed handled");
             }
             catch (Exception ex)
             {
                 _settings.ExceptionCallback?.Invoke(ex);
 
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _log.Fatal("The did not handle Service session change correctly", ex);
                 ExitCode = (int)TopshelfExitCode.StopServiceFailed;
                 throw;
             }
@@ -254,19 +254,21 @@ namespace Topshelf.Runtime.Windows
         {
             try
             {
-                _log.Info("[Topshelf] Power event changed");
+                _log.Info("[Topshelf] Power event raised");
 
                 var arguments = new WindowsPowerEventArguments(powerStatus);
 
-                var result = this._serviceHandle.PowerEvent(this, arguments);
+                var result = _serviceHandle.PowerEvent(this, arguments);
 
-                _log.Info("[Topshelf] Stopped");
+                _log.Info("[Topshelf] Power event handled");
 
                 return result;
             }
             catch (Exception ex)
             {
-                _log.Fatal("The service did not shut down gracefully", ex);
+                _settings.ExceptionCallback?.Invoke(ex);
+
+                _log.Fatal("The service did handle the Power event correctly", ex);
                 ExitCode = (int)TopshelfExitCode.StopServiceFailed;
                 throw;
             }
