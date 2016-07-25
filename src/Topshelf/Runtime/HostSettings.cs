@@ -69,5 +69,10 @@ namespace Topshelf.Runtime
         /// The amount of time to wait for the service to stop before timing out. Default is 10 seconds.
         /// </summary>
         TimeSpan StopTimeOut { get; }
+
+        /// <summary>
+        /// A callback to provide additional exception handling beyond what is already provided
+        /// </summary>
+        Action<Exception> ExceptionHandler { get; }
     }
 }

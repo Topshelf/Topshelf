@@ -102,6 +102,10 @@ namespace Topshelf.Hosts
             }
             catch (Exception ex)
             {
+                // Call the custom exception handler if it is not null
+                //
+                _settings.ExceptionHandler?.Invoke(ex);
+
                 _log.Error("An exception occurred", ex);
 
                 return TopshelfExitCode.AbnormalExit;
@@ -144,6 +148,10 @@ namespace Topshelf.Hosts
 
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            // Call the custom exception handler if it is not null
+            //
+            _settings.ExceptionHandler?.Invoke((Exception)e.ExceptionObject);
+
             _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
 
             HostLogger.Shutdown();
@@ -185,6 +193,10 @@ namespace Topshelf.Hosts
             }
             catch (Exception ex)
             {
+                // Call the custom exception handler if it is not null
+                //
+                _settings.ExceptionHandler?.Invoke(ex);
+
                 _log.Error("The service did not shut down gracefully", ex);
             }
             finally
