@@ -51,6 +51,11 @@ namespace SampleTopshelfService
                     x.AddCommandLineSwitch("throwonstart", v => throwOnStart = v);
                     x.AddCommandLineSwitch("throwonstop", v => throwOnStop = v);
                     x.AddCommandLineSwitch("throwunhandled", v => throwUnhandled = v);
+
+                    x.AddExceptionHandler(ex =>
+                    {
+                        Console.WriteLine("Exception thrown - " + ex.Message);
+                    });
                 });
         }
 

@@ -182,6 +182,11 @@ namespace Topshelf.HostConfigurators
             _commandLineOptionConfigurators.Add(configurator);
         }
 
+        public void AddExceptionHandler(Action<Exception> callback)
+        {
+            _settings.ExceptionHandler = callback;
+        }
+
         public Host CreateHost()
         {
             Type type = typeof(HostFactory);
