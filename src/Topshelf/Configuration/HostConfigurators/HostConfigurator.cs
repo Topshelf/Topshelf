@@ -116,5 +116,12 @@ namespace Topshelf.HostConfigurators
         /// <param name="name"></param>
         /// <param name="callback"></param>
         void AddCommandLineDefinition(string name, Action<string> callback);
+
+        /// <summary>
+        /// Adds custom exception handler that will be called for any exception caught
+        /// by Topshelf while a service is starting, running or stopping.
+        /// </summary>
+        /// <param name="callback"></param>
+        void AddExceptionHandler(Action<Exception> callback);
     }
 }
