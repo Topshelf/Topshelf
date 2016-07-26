@@ -41,6 +41,11 @@ namespace Topshelf.CommandLineParser
             Value = (from symbol in Rep(Char(char.IsLetterOrDigit).Or(Char(char.IsPunctuation)).Or(Char(char.IsSymbol)))
                      select symbol.Aggregate("", (s, ch) => s + ch));
 
+            ValueInQuotes = from oq in Char('"')
+                            from value in Rep(EscChar)
+                            from cq in Char('"')
+                            select value.Aggregate("", (s, ch) => s + ch);
+
             Definition = (from w in Whitespace
                           from c in Char('-').Or(Char('/'))
                           from key in Id
@@ -51,10 +56,8 @@ namespace Topshelf.CommandLineParser
                     from c in Char('-').Or(Char('/'))
                     from key in Id
                     from ws in Whitespace
-                    from oq in Char('"')
-                    from value in Rep(EscChar)
-                    from cq in Char('"')
-                    select DefinitionElement.New(key, value.Aggregate("", (s, ch) => s + ch)));
+                    from value in ValueInQuotes.Or(Value)
+                    select DefinitionElement.New(key, value));
 
             EmptyDefinition = (from w in Whitespace
                                from c in Char('-').Or(Char('/'))
@@ -107,6 +110,7 @@ namespace Topshelf.CommandLineParser
         Parser<string, string> Id { get; set; }
         Parser<string, string> Key { get; set; }
         Parser<string, string> Value { get; set; }
+        Parser<string, string> ValueInQuotes { get; set; }
 
         Parser<string, ICommandLineElement> Definition { get; set; }
         Parser<string, ICommandLineElement> EmptyDefinition { get; set; }
