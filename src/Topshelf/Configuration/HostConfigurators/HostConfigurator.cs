@@ -122,6 +122,6 @@ namespace Topshelf.HostConfigurators
         /// by Topshelf while a service is starting, running or stopping.
         /// </summary>
         /// <param name="callback"></param>
-        void AddExceptionHandler(Action<Exception> callback);
+        void OnException(Action<Exception> callback);
     }
 }

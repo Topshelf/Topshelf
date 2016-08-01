@@ -182,7 +182,7 @@ namespace Topshelf.HostConfigurators
             _commandLineOptionConfigurators.Add(configurator);
         }
 
-        public void AddExceptionHandler(Action<Exception> callback)
+        public void OnException(Action<Exception> callback)
         {
             _settings.ExceptionHandler = callback;
         }
