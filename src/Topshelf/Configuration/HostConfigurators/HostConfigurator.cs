@@ -118,10 +118,12 @@ namespace Topshelf.HostConfigurators
         void AddCommandLineDefinition(string name, Action<string> callback);
 
         /// <summary>
-        /// Adds custom exception handler that will be called for any exception caught
-        /// by Topshelf while a service is starting, running or stopping.
+        /// Specifies a callback to be run when Topshelf encounters an exception while starting, running
+        /// or stopping. This callback does not replace Topshelf's default handling of any exceptions, and 
+        /// is intended to allow for local cleanup, logging, etc. This is not required, and is only invoked
+        /// if a callback is provided.
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">The action to run when an exception occurs.</param>
         void OnException(Action<Exception> callback);
     }
 }
