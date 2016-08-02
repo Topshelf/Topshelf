@@ -104,7 +104,7 @@ namespace Topshelf.Hosts
             {
                 // Call the custom exception handler if it is not null
                 //
-                _settings.ExceptionHandler?.Invoke(ex);
+                _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Error("An exception occurred", ex);
 
@@ -150,7 +150,7 @@ namespace Topshelf.Hosts
         {
             // Call the custom exception handler if it is not null
             //
-            _settings.ExceptionHandler?.Invoke((Exception)e.ExceptionObject);
+            _settings.ExceptionCallback?.Invoke((Exception)e.ExceptionObject);
 
             _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
 
@@ -195,7 +195,7 @@ namespace Topshelf.Hosts
             {
                 // Call the custom exception handler if it is not null
                 //
-                _settings.ExceptionHandler?.Invoke(ex);
+                _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Error("The service did not shut down gracefully", ex);
             }

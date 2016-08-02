@@ -184,7 +184,7 @@ namespace Topshelf.HostConfigurators
 
         public void OnException(Action<Exception> callback)
         {
-            _settings.ExceptionHandler = callback;
+            _settings.ExceptionCallback = callback;
         }
 
         public Host CreateHost()
