@@ -106,6 +106,6 @@ namespace Topshelf.Runtime.Windows
         
         public TimeSpan StopTimeOut { get; set; }
 
-        public Action<Exception> ExceptionHandler { get; set; }
+        public Action<Exception> ExceptionCallback { get; set; }
     }
 }

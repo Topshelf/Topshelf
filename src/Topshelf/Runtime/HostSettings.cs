@@ -71,8 +71,9 @@ namespace Topshelf.Runtime
         TimeSpan StopTimeOut { get; }
 
         /// <summary>
-        /// A callback to provide additional exception handling beyond what is already provided
+        /// A callback to provide visibility into exceptions while Topshelf is performing its
+        /// own handling.
         /// </summary>
-        Action<Exception> ExceptionHandler { get; }
+        Action<Exception> ExceptionCallback { get; }
     }
 }

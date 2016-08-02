@@ -205,9 +205,9 @@ namespace Topshelf.Hosts
               get { return _settings.StopTimeOut; }
             }
 
-            public Action<Exception> ExceptionHandler
+            public Action<Exception> ExceptionCallback
             {
-                get { return _settings.ExceptionHandler; }
+                get { return _settings.ExceptionCallback; }
             }
         }
     }
