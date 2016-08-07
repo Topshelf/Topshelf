@@ -21,9 +21,9 @@ namespace SampleTopshelfService
         {
             return (int)HostFactory.Run(x =>
                 {
-                    x.UseLog4Net("log4net.config");
+                    // x.UseLog4Net("log4net.config");
 
-                    x.UseAssemblyInfoForServiceInfo();
+                    // x.UseAssemblyInfoForServiceInfo();
 
                     bool throwOnStart = false;
                     bool throwOnStop = false;
@@ -35,18 +35,18 @@ namespace SampleTopshelfService
                         s.BeforeStoppingService(_ => Console.WriteLine("BeforeStop"));
                     });
 
-                    x.SetStartTimeout(TimeSpan.FromSeconds(10));
-                    x.SetStopTimeout(TimeSpan.FromSeconds(10));
+                    // x.SetStartTimeout(TimeSpan.FromSeconds(10));
+                    // x.SetStopTimeout(TimeSpan.FromSeconds(10));
 
-                    x.EnableServiceRecovery(r =>
-                        {
-                            r.RestartService(3);
-                            r.RunProgram(7, "ping google.com");
-                            r.RestartComputer(5, "message");
+                    // x.EnableServiceRecovery(r =>
+                    //     {
+                    //         r.RestartService(3);
+                    //         r.RunProgram(7, "ping google.com");
+                    //         r.RestartComputer(5, "message");
 
-                            r.OnCrashOnly();
-                            r.SetResetPeriod(2);
-                        });
+                    //         r.OnCrashOnly();
+                    //         r.SetResetPeriod(2);
+                    //     });
 
                     x.AddCommandLineSwitch("throwonstart", v => throwOnStart = v);
                     x.AddCommandLineSwitch("throwonstop", v => throwOnStop = v);
