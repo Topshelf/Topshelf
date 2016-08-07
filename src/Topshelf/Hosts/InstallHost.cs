@@ -15,7 +15,6 @@ namespace Topshelf.Hosts
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.ServiceProcess;
     using Logging;
     using Runtime;
 
@@ -35,7 +34,7 @@ namespace Topshelf.Hosts
 
         public InstallHost(HostEnvironment environment, HostSettings settings, HostStartMode startMode,
             IEnumerable<string> dependencies,
-            Credentials credentials, IEnumerable<Action<InstallHostSettings>> preActions,
+            IEnumerable<Action<InstallHostSettings>> preActions,
             IEnumerable<Action<InstallHostSettings>> postActions,
             IEnumerable<Action<InstallHostSettings>> preRollbackActions,
             IEnumerable<Action<InstallHostSettings>> postRollbackActions,
@@ -44,7 +43,7 @@ namespace Topshelf.Hosts
             _environment = environment;
             _settings = settings;
 
-            _installSettings = new InstallServiceSettingsImpl(settings, credentials, startMode, dependencies.ToArray());
+            _installSettings = new InstallServiceSettingsImpl(settings, startMode, dependencies.ToArray());
 
             _preActions = preActions;
             _postActions = postActions;
@@ -125,15 +124,13 @@ namespace Topshelf.Hosts
         class InstallServiceSettingsImpl :
             InstallHostSettings
         {
-            private Credentials _credentials;
             readonly string[] _dependencies;
             readonly HostSettings _settings;
             readonly HostStartMode _startMode;
 
-            public InstallServiceSettingsImpl(HostSettings settings, Credentials credentials, HostStartMode startMode,
+            public InstallServiceSettingsImpl(HostSettings settings, HostStartMode startMode,
                 string[] dependencies)
             {
-                _credentials = credentials;
                 _settings = settings;
                 _startMode = startMode;
                 _dependencies = dependencies;
@@ -177,12 +174,6 @@ namespace Topshelf.Hosts
             public bool CanSessionChanged
             {
                 get { return _settings.CanSessionChanged; }
-            }
-
-            public Credentials Credentials
-            {
-                get { return _credentials; }
-                set { _credentials = value; }
             }
 
             public string[] Dependencies

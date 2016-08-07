@@ -5,7 +5,6 @@ namespace Topshelf.Caching
     using System.Collections.Generic;
     using System.Linq;
 
-    [Serializable]
     class DictionaryCache<TKey, TValue> :
         Cache<TKey, TValue>
     {

@@ -15,7 +15,6 @@ namespace Topshelf.Builders
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.ServiceProcess;
     using Hosts;
     using Runtime;
 
@@ -29,7 +28,6 @@ namespace Topshelf.Builders
         readonly IList<Action<InstallHostSettings>> _postRollbackActions;
         readonly IList<Action<InstallHostSettings>> _preRollbackActions;
         readonly HostSettings _settings;
-        Credentials _credentials;
         HostStartMode _startMode;
         bool _sudo;
 
@@ -41,8 +39,7 @@ namespace Topshelf.Builders
             _postRollbackActions = new List<Action<InstallHostSettings>>();
             _dependencies = new List<string>();
             _startMode = HostStartMode.Automatic;
-            _credentials = new Credentials("", "", ServiceAccount.LocalSystem);
-
+            
             _environment = environment;
             _settings = settings;
         }
@@ -59,7 +56,7 @@ namespace Topshelf.Builders
 
         public Host Build(ServiceBuilder serviceBuilder)
         {
-            return new InstallHost(_environment, _settings, _startMode, _dependencies.ToArray(), _credentials,
+            return new InstallHost(_environment, _settings, _startMode, _dependencies.ToArray(),
                 _preActions, _postActions, _preRollbackActions, _postRollbackActions, _sudo);
         }
 
@@ -74,11 +71,6 @@ namespace Topshelf.Builders
             {
                 callback(self);
             }
-        }
-
-        public void RunAs(string username, string password, ServiceAccount accountType)
-        {
-            _credentials = new Credentials(username, password, accountType);
         }
 
         public void Sudo()

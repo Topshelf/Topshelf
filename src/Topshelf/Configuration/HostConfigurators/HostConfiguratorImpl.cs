@@ -21,7 +21,7 @@ namespace Topshelf.HostConfigurators
     using Logging;
     using Options;
     using Runtime;
-    using Runtime.Windows;
+    // using Runtime.Windows;
 
 
     public class HostConfiguratorImpl :
@@ -30,9 +30,9 @@ namespace Topshelf.HostConfigurators
     {
         readonly IList<CommandLineConfigurator> _commandLineOptionConfigurators;
         readonly IList<HostBuilderConfigurator> _configurators;
-        readonly WindowsHostSettings _settings;
+        HostSettings _settings;
         bool _commandLineApplied;
-        EnvironmentBuilderFactory _environmentBuilderFactory;
+        // EnvironmentBuilderFactory _environmentBuilderFactory;
         HostBuilderFactory _hostBuilderFactory;
         ServiceBuilderFactory _serviceBuilderFactory;
 
@@ -40,9 +40,8 @@ namespace Topshelf.HostConfigurators
         {
             _configurators = new List<HostBuilderConfigurator>();
             _commandLineOptionConfigurators = new List<CommandLineConfigurator>();
-            _settings = new WindowsHostSettings();
-
-            _environmentBuilderFactory = DefaultEnvironmentBuilderFactory;
+            
+            // _environmentBuilderFactory = DefaultEnvironmentBuilderFactory;
             _hostBuilderFactory = DefaultHostBuilderFactory;
         }
 
@@ -54,81 +53,11 @@ namespace Topshelf.HostConfigurators
             if (_serviceBuilderFactory == null)
                 yield return this.Failure("ServiceBuilderFactory", "must not be null");
 
-            if (_environmentBuilderFactory == null)
-                yield return this.Failure("EnvironmentBuilderFactory", "must not be null");
-
-            if (string.IsNullOrEmpty(_settings.DisplayName) && string.IsNullOrEmpty(_settings.Name))
-                yield return this.Failure("DisplayName", "must be specified and not empty");
-
-            if (string.IsNullOrEmpty(_settings.Name))
-                yield return this.Failure("Name", "must be specified and not empty");
-            else
-            {
-                var disallowed = new[] {'\t', '\r', '\n', '\\', '/'};
-                if (_settings.Name.IndexOfAny(disallowed) >= 0)
-                    yield return this.Failure("Name", "must not contain whitespace, '/', or '\\' characters");
-            }
+            // if (_environmentBuilderFactory == null)
+            //     yield return this.Failure("EnvironmentBuilderFactory", "must not be null");
 
             foreach (ValidateResult result in _configurators.SelectMany(x => x.Validate()))
                 yield return result;
-
-            yield return this.Success("Name", _settings.Name);
-
-            if (_settings.Name != _settings.DisplayName)
-                yield return this.Success("DisplayName", _settings.DisplayName);
-
-            if (_settings.Name != _settings.Description)
-                yield return this.Success("Description", _settings.Description);
-
-            if (!string.IsNullOrEmpty(_settings.InstanceName))
-                yield return this.Success("InstanceName", _settings.InstanceName);
-
-            yield return this.Success("ServiceName", _settings.ServiceName);
-        }
-
-        public void SetDisplayName(string name)
-        {
-            _settings.DisplayName = name;
-        }
-
-        public void SetServiceName(string name)
-        {
-            _settings.Name = name;
-        }
-
-        public void SetDescription(string description)
-        {
-            _settings.Description = description;
-        }
-
-        public void SetInstanceName(string instanceName)
-        {
-            _settings.InstanceName = instanceName;
-        }
-
-        public void SetStartTimeout(TimeSpan startTimeOut)
-        {
-          _settings.StartTimeOut = startTimeOut;
-        }
-
-        public void SetStopTimeout(TimeSpan stopTimeOut)
-        {
-          _settings.StopTimeOut = stopTimeOut;
-        }
-
-        public void EnablePauseAndContinue()
-        {
-            _settings.CanPauseAndContinue = true;
-        }
-
-        public void EnableShutdown()
-        {
-            _settings.CanShutdown = true;
-        }
-
-        public void EnableSessionChanged()
-        {
-            _settings.CanSessionChanged = true;
         }
 
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
@@ -143,7 +72,7 @@ namespace Topshelf.HostConfigurators
 
         public void UseEnvironmentBuilder(EnvironmentBuilderFactory environmentBuilderFactory)
         {
-            _environmentBuilderFactory = environmentBuilderFactory;
+            // _environmentBuilderFactory = environmentBuilderFactory;
         }
 
         public void AddConfigurator(HostBuilderConfigurator configurator)
@@ -186,21 +115,21 @@ namespace Topshelf.HostConfigurators
         {
             Type type = typeof(HostFactory);
             HostLogger.Get<HostConfiguratorImpl>()
-                      .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
-                          Environment.Version);
+                      .InfoFormat("{0}", type.Namespace);
 
-            EnvironmentBuilder environmentBuilder = _environmentBuilderFactory(this);
+            // EnvironmentBuilder environmentBuilder = _environmentBuilderFactory(this);
 
-            HostEnvironment environment = environmentBuilder.Build();
+            // HostEnvironment environment = environmentBuilder.Build();
 
-            ServiceBuilder serviceBuilder = _serviceBuilderFactory(_settings);
+            // ServiceBuilder serviceBuilder = _serviceBuilderFactory(_settings);
 
-            HostBuilder builder = _hostBuilderFactory(environment, _settings);
+            // HostBuilder builder = _hostBuilderFactory(environment, _settings);
 
-            foreach (HostBuilderConfigurator configurator in _configurators)
-                builder = configurator.Configure(builder);
+            // foreach (HostBuilderConfigurator configurator in _configurators)
+            //     builder = configurator.Configure(builder);
 
-            return builder.Build(serviceBuilder);
+            // return builder.Build(serviceBuilder);
+            return null;
         }
 
         void ApplyCommandLineOptions(IEnumerable<Option> options)
@@ -224,9 +153,9 @@ namespace Topshelf.HostConfigurators
             return new RunBuilder(environment, settings);
         }
 
-        static EnvironmentBuilder DefaultEnvironmentBuilderFactory(HostConfigurator configurator)
-        {
-            return new WindowsHostEnvironmentBuilder(configurator);
-        }
+        // static EnvironmentBuilder DefaultEnvironmentBuilderFactory(HostConfigurator configurator)
+        // {
+        //     return new WindowsHostEnvironmentBuilder(configurator);
+        // }
     }
 }

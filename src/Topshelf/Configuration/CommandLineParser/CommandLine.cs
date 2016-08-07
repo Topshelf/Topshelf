@@ -29,7 +29,7 @@ namespace Topshelf.CommandLineParser
         /// <returns> The complete, unparsed command line that was specified when the program was executed </returns>
         public static string GetUnparsedCommandLine()
         {
-            string line = Environment.CommandLine;
+            string line = "";// Environment.CommandLine;
 
             string applicationPath = Environment.GetCommandLineArgs().First();
 

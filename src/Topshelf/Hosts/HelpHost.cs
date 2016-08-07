@@ -40,18 +40,20 @@ namespace Topshelf.Hosts
 
             const string helpText = "Topshelf.HelpText.txt";
 
-            Stream stream = typeof(HelpHost).Assembly.GetManifestResourceStream(helpText);
-            if (stream == null)
-            {
-                Console.WriteLine("Unable to load help text");
-                return TopshelfExitCode.AbnormalExit;
-            }
+            // Stream stream = typeof(HelpHost).Assembly.GetManifestResourceStream(helpText);
+            // if (stream == null)
+            // {
+            //     Console.WriteLine("Unable to load help text");
+            //     return TopshelfExitCode.AbnormalExit;
+            // }
 
-            using (TextReader reader = new StreamReader(stream))
-            {
-                string text = reader.ReadToEnd();
-                Console.WriteLine(text);
-            }
+            // using (TextReader reader = new StreamReader(stream))
+            // {
+            //     string text = reader.ReadToEnd();
+            //     Console.WriteLine(text);
+            // }
+
+            Console.WriteLine("Help");
 
             return TopshelfExitCode.Ok;
         }

@@ -18,7 +18,7 @@ namespace Topshelf.Configurators
     using System.Diagnostics;
     using System.Linq;
 
-    [Serializable, DebuggerDisplay("{Message}")]
+    [DebuggerDisplay("{Message}")]
     public class ValidateConfigurationResult :
         ConfigurationResult
     {

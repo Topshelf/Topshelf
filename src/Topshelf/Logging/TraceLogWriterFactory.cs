@@ -49,7 +49,6 @@ namespace Topshelf.Logging
             {
                 Trace.Listeners.Remove(_listener);
 
-                _listener.Close();
                 (_listener as IDisposable).Dispose();
                 _listener = null;
             }

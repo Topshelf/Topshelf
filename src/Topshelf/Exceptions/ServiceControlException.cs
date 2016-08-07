@@ -13,9 +13,7 @@
 namespace Topshelf
 {
     using System;
-    using System.Runtime.Serialization;
-
-    [Serializable]
+    
     public class ServiceControlException :
         TopshelfException
     {
@@ -30,11 +28,6 @@ namespace Topshelf
 
         public ServiceControlException(string message, Exception innerException)
             : base(message, innerException)
-        {
-        }
-
-        protected ServiceControlException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
 

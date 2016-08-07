@@ -14,7 +14,6 @@ namespace Topshelf.Logging
 {
     using System;
 
-    [Serializable]
     public class TraceHostLoggerConfigurator :
         HostLoggerConfigurator
     {

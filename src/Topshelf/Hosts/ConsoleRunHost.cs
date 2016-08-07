@@ -16,9 +16,6 @@ namespace Topshelf.Hosts
     using System.Diagnostics;
     using System.IO;
     using System.Threading;
-#if !NET35
-    using System.Threading.Tasks;
-#endif
     using Logging;
     using Microsoft.Win32;
     using Runtime;
@@ -49,25 +46,25 @@ namespace Topshelf.Hosts
             _environment = environment;
             _serviceHandle = serviceHandle;
 
-            if (settings.CanSessionChanged)
-            {
-                SystemEvents.SessionSwitch += OnSessionChanged;
-            }
+            // if (settings.CanSessionChanged)
+            // {
+            //     SystemEvents.SessionSwitch += OnSessionChanged;
+            // }
         }
 
-        void OnSessionChanged(object sender, SessionSwitchEventArgs e)
-        {
-            var arguments = new ConsoleSessionChangedArguments(e.Reason);
+        // void OnSessionChanged(object sender, SessionSwitchEventArgs e)
+        // {
+        //     var arguments = new ConsoleSessionChangedArguments(e.Reason);
 
-            _serviceHandle.SessionChanged(this, arguments);
-        }
+        //     _serviceHandle.SessionChanged(this, arguments);
+        // }
 
 
         public TopshelfExitCode Run()
         {
-            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+            // Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-            AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
+            // AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
             if (_environment.IsServiceInstalled(_settings.ServiceName))
             {
@@ -111,7 +108,6 @@ namespace Topshelf.Hosts
                 if (started)
                     StopService();
 
-                _exit.Close();
                 (_exit as IDisposable).Dispose();
 
                 HostLogger.Shutdown();
@@ -142,33 +138,33 @@ namespace Topshelf.Hosts
         }
 
 
-        void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
+//         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
+//         {
+//             _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
 
-            HostLogger.Shutdown();
+//             HostLogger.Shutdown();
 
-            if (e.IsTerminating)
-            {
-                _exitCode = TopshelfExitCode.UnhandledServiceException;
-                _exit.Set();
+//             if (e.IsTerminating)
+//             {
+//                 _exitCode = TopshelfExitCode.UnhandledServiceException;
+//                 _exit.Set();
 
-#if !NET35
-                // it isn't likely that a TPL thread should land here, but if it does let's no block it
-                if (Task.CurrentId.HasValue)
-                {
-                    return;
-                }
-#endif
+// #if !NET35
+//                 // it isn't likely that a TPL thread should land here, but if it does let's no block it
+//                 if (Task.CurrentId.HasValue)
+//                 {
+//                     return;
+//                 }
+// #endif
 
-                // this is evil, but perhaps a good thing to let us clean up properly.
-                int deadThreadId = Interlocked.Increment(ref _deadThread);
-                Thread.CurrentThread.IsBackground = true;
-                Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
-                while (true)
-                    Thread.Sleep(TimeSpan.FromHours(1));
-            }
-        }
+//                 // this is evil, but perhaps a good thing to let us clean up properly.
+//                 int deadThreadId = Interlocked.Increment(ref _deadThread);
+//                 Thread.CurrentThread.IsBackground = true;
+//                 Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
+//                 while (true)
+//                     Thread.Sleep(TimeSpan.FromHours(1));
+//             }
+//         }
 
 
         void StopService()
@@ -223,27 +219,27 @@ namespace Topshelf.Hosts
         }
 
 
-        class ConsoleSessionChangedArguments :
-            SessionChangedArguments
-        {
-            readonly SessionChangeReasonCode _reasonCode;
-            readonly int _sessionId;
+        // class ConsoleSessionChangedArguments :
+        //     SessionChangedArguments
+        // {
+        //     readonly SessionChangeReasonCode _reasonCode;
+        //     readonly int _sessionId;
 
-            public ConsoleSessionChangedArguments(SessionSwitchReason reason)
-            {
-                _reasonCode = (SessionChangeReasonCode)Enum.ToObject(typeof(SessionChangeReasonCode), (int)reason);
-                _sessionId = Process.GetCurrentProcess().SessionId;
-            }
+        //     public ConsoleSessionChangedArguments(SessionSwitchReason reason)
+        //     {
+        //         _reasonCode = (SessionChangeReasonCode)Enum.ToObject(typeof(SessionChangeReasonCode), (int)reason);
+        //         _sessionId = Process.GetCurrentProcess().SessionId;
+        //     }
 
-            public SessionChangeReasonCode ReasonCode
-            {
-                get { return _reasonCode; }
-            }
+        //     public SessionChangeReasonCode ReasonCode
+        //     {
+        //         get { return _reasonCode; }
+        //     }
 
-            public int SessionId
-            {
-                get { return _sessionId; }
-            }
-        }
+        //     public int SessionId
+        //     {
+        //         get { return _sessionId; }
+        //     }
+        // }
     }
 }

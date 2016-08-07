@@ -37,13 +37,13 @@ namespace Topshelf
 
                 var configurator = new HostConfiguratorImpl();
 
-                Type declaringType = configureCallback.Method.DeclaringType;
-                if (declaringType != null)
-                {
-                    string defaultServiceName = declaringType.Namespace;
-                    if (!string.IsNullOrEmpty(defaultServiceName))
-                        configurator.SetServiceName(defaultServiceName);
-                }
+                // Type declaringType = configureCallback.Method.DeclaringType;
+                // if (declaringType != null)
+                // {
+                //     string defaultServiceName = declaringType.Namespace;
+                //     if (!string.IsNullOrEmpty(defaultServiceName))
+                //         configurator.SetServiceName(defaultServiceName);
+                // }
 
                 configureCallback(configurator);
 

@@ -6,7 +6,6 @@ namespace Topshelf.Caching
     using System.Collections.Generic;
     using System.Linq;
 
-    [Serializable]
     class ConcurrentCache<TKey, TValue> :
         Cache<TKey, TValue>
     {

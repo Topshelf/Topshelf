@@ -20,52 +20,52 @@ namespace Topshelf.HostConfigurators
         ///   Specifies the name of the service as it should be displayed in the service control manager
         /// </summary>
         /// <param name="name"> </param>
-        void SetDisplayName(string name);
+        //void SetDisplayName(string name);
 
         /// <summary>
         ///   Specifies the name of the service as it is registered in the service control manager
         /// </summary>
         /// <param name="name"> </param>
-        void SetServiceName(string name);
+        //void SetServiceName(string name);
 
         /// <summary>
         ///   Specifies the description of the service that is displayed in the service control manager
         /// </summary>
         /// <param name="description"> </param>
-        void SetDescription(string description);
+        //void SetDescription(string description);
 
         /// <summary>
         ///   Specifies the service instance name that should be used when the service is registered
         /// </summary>
         /// <param name="instanceName"> </param>
-        void SetInstanceName(string instanceName);
+        //void SetInstanceName(string instanceName);
 
         /// <summary>
         /// Sets the amount of time to wait for the service to start before timing out. Default is 10 seconds.
         /// </summary>
         /// <param name="startTimeOut"></param>
-        void SetStartTimeout(TimeSpan startTimeOut);
+        //void SetStartTimeout(TimeSpan startTimeOut);
 
         /// <summary>
         /// Sets the amount of time to wait for the service to stop before timing out. Default is 10 seconds.
         /// </summary>
         /// <param name="stopTimeOut"></param>
-        void SetStopTimeout(TimeSpan stopTimeOut);
+        //void SetStopTimeout(TimeSpan stopTimeOut);
 
         /// <summary>
         /// Enable pause and continue support for the service (default is disabled)
         /// </summary>
-        void EnablePauseAndContinue();
+        //void EnablePauseAndContinue();
 
         /// <summary>
         /// Enable support for service shutdown (signaled by the host OS)
         /// </summary>
-        void EnableShutdown();
+        //void EnableShutdown();
 
         /// <summary>
         /// Enabled support for the session changed event
         /// </summary>
-        void EnableSessionChanged();
+        //void EnableSessionChanged();
 
         /// <summary>
         ///   Specifies the builder factory to use when the service is invoked

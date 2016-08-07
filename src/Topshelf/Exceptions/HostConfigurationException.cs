@@ -13,9 +13,7 @@
 namespace Topshelf
 {
     using System;
-    using System.Runtime.Serialization;
-
-    [Serializable]
+    
     public class HostConfigurationException :
         TopshelfException
     {
@@ -30,11 +28,6 @@ namespace Topshelf
 
         public HostConfigurationException(string message, Exception innerException)
             : base(message, innerException)
-        {
-        }
-
-        protected HostConfigurationException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

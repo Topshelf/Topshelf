@@ -14,7 +14,6 @@ namespace Topshelf.Configurators
 {
     using System;
 
-    [Serializable]
     public enum ValidationResultDisposition
     {
         Success,
