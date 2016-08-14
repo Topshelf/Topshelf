@@ -363,6 +363,22 @@ Specifies that the service supports the shutdown service command, allowing the s
     });
 
 
+OnException
+--------------
+
+Provides a callback for exceptions that are thrown while the service is running. This callback is not a handler, and will not affect the default exception handling that Topshelf already provides. It is intended to provide visibility into thrown exceptions for triggering external actions, logging, etc.
+
+.. sourcecode:: csharp
+
+    HostFactory.New(x =>
+    {
+        x.OnException(ex =>
+        {
+            // Do something with the exception
+        });
+    });
+
+
 Service Recovery
 ================
 
