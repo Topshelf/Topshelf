@@ -59,6 +59,7 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="ExceptionHandler_Specs.cs" />
     <Compile Include="BeforeStart_Specs.cs" />
     <Compile Include="CommandLine_Specs.cs" />
     <Compile Include="Help_Specs.cs" />
