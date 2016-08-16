@@ -61,8 +61,6 @@ namespace Topshelf.Hosts
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Error("The service threw an exception during testing.", ex);

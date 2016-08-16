@@ -130,8 +130,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Fatal("The service did not start successfully", ex);
@@ -154,8 +152,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Fatal("The service did not shut down gracefully", ex);
@@ -184,8 +180,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Fatal("The service did not pause gracefully", ex);
@@ -206,8 +200,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Fatal("The service did not resume successfully", ex);
@@ -227,8 +219,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Fatal("The service did not shut down gracefully", ex);
@@ -251,8 +241,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Fatal("The service did not shut down gracefully", ex);
@@ -273,8 +261,6 @@ namespace Topshelf.Runtime.Windows
             }
             catch (Exception ex)
             {
-                // Call the custom exception handler if it is not null
-                //
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Error("Unhandled exception during custom command processing detected", ex);
@@ -296,8 +282,6 @@ namespace Topshelf.Runtime.Windows
 
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            // Call the custom exception handler if it is not null
-            //
             _settings.ExceptionCallback?.Invoke((Exception)e.ExceptionObject);
 
             _log.Fatal("The service threw an unhandled exception", (Exception)e.ExceptionObject);
