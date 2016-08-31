@@ -216,8 +216,25 @@ namespace Topshelf.Runtime.Windows
                         {
                             beforeInstall(settings);
                             installer.ServiceProcessInstaller.Username = settings.Credentials.Username;
-                            installer.ServiceProcessInstaller.Password = settings.Credentials.Password;
                             installer.ServiceProcessInstaller.Account = settings.Credentials.Account;
+
+                            // Group Managed Service Account (gMSA) workaround per
+                            // https://connect.microsoft.com/VisualStudio/feedback/details/795196/service-process-installer-should-support-virtual-service-accounts
+                            if (settings.Credentials.Account == ServiceAccount.User &&
+                                settings.Credentials.Username != null &&
+                                settings.Credentials.Username.EndsWith("$", StringComparison.InvariantCulture))
+                            {
+                                _log.InfoFormat("Installing as gMSA {0}.", settings.Credentials.Username);
+                                installer.ServiceProcessInstaller.Password = null;
+                                installer.ServiceProcessInstaller
+                                    .GetType()
+                                    .GetField("haveLoginInfo", BindingFlags.Instance | BindingFlags.NonPublic)
+                                    .SetValue(installer.ServiceProcessInstaller, true);
+                            }
+                            else
+                            {
+                                installer.ServiceProcessInstaller.Password = settings.Credentials.Password;
+                            }
                         }
                     };
 
