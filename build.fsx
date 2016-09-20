@@ -12,7 +12,7 @@ let packagesPath = FullName "./src/packages"
 let keyFile = FullName "./Topshelf.snk"
 
 let assemblyVersion = "4.0.0.0"
-let baseVersion = "4.0.1"
+let baseVersion = "4.0.2"
 
 let semVersion : SemVerInfo = parse baseVersion
 
