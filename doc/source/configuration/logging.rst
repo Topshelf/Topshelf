@@ -1,7 +1,24 @@
 Logging Integration with Topshelf
 =================================
 
-By default, Topshelf uses a TraceSource for logging. This is part of the .NET framework, and thus does not introduce any additional dependencies. However, many applications use more advanced logging libraries, such as log4net or NLog. To support this, an extensible logging interface is used by Topshelf.
+By default, Topshelf uses a TraceSource for logging. This is part of the .NET framework, and thus does not introduce any additional dependencies. However, many applications use more advanced logging libraries, such as Logary or NLog. To support this, an extensible logging interface is used by Topshelf.
+
+Logary integration
+------------------
+
+To ship logs with Logary, use the Logary.Adapters.Topshelf nuget. Once you've added this nuget to your project, you can configure Topshelf to use it via the configuration builder:
+
+.. sourcecode:: csharp
+
+    using (var logary = ...Result)
+        HostFactory.New(x =>
+        {
+            x.UseLogary(logary);
+        });
+        
+This makes it possible to get your logs off your node, so that you avoid running out of disk space and can log to modern log tagrets, such as ElasticSearch and InfluxDB.
+
+For more information, see the Logary README at https://github.com/logary/logary.
 
 log4net Integration
 -------------------
