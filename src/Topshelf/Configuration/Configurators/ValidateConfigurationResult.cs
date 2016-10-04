@@ -43,7 +43,7 @@ namespace Topshelf.Configurators
         {
             get
             {
-                string debuggerString = string.Join(", ", _results);
+                string debuggerString = string.Join(Environment.NewLine, _results);
 
                 return string.IsNullOrWhiteSpace(debuggerString)
                     ? ""
