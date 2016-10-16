@@ -99,6 +99,13 @@ namespace Topshelf.Runtime.Windows
             //DO not auto create EventLog Source while install service
             //MSDN: When the installation is performed, it automatically creates an EventLogInstaller to install the event log source associated with the ServiceBase derived class. The Log property for this source is set by the ServiceInstaller constructor to the computer's Application log. When you set the ServiceName of the ServiceInstaller (which should be identical to the ServiceBase..::.ServiceName of the service), the Source is automatically set to the same value. In an installation failure, the source's installation is rolled-back along with previously installed services.
             //MSDN: from EventLog.CreateEventSource Method (String, String) : an ArgumentException thrown when The first 8 characters of logName match the first 8 characters of an existing event log name.
+            RemoveEventLogInstallers(installers);
+
+            return CreateHostInstaller(settings, installers);
+        }
+
+        private static void RemoveEventLogInstallers(Installer[] installers)
+        {
             foreach (var installer in installers)
             {
                 var eventLogInstallers = installer.Installers.OfType<EventLogInstaller>().ToArray();
@@ -107,8 +114,6 @@ namespace Topshelf.Runtime.Windows
                     installer.Installers.Remove(eventLogInstaller);
                 }
             }
-
-            return CreateHostInstaller(settings, installers);
         }
 
         Installer CreateInstaller(HostSettings settings)
@@ -119,6 +124,8 @@ namespace Topshelf.Runtime.Windows
                     ConfigureServiceProcessInstaller(ServiceAccount.LocalService, "", ""),
                 };
 
+            RemoveEventLogInstallers(installers);
+
             return CreateHostInstaller(settings, installers);
         }
 
@@ -127,13 +134,13 @@ namespace Topshelf.Runtime.Windows
             string arguments = " ";
 
             if (!string.IsNullOrEmpty(settings.InstanceName))
-                arguments += string.Format(" -instance \"{0}\"", settings.InstanceName);
+                arguments += $" -instance \"{settings.InstanceName}\"";
 
             if (!string.IsNullOrEmpty(settings.DisplayName))
-                arguments += string.Format(" -displayname \"{0}\"", settings.DisplayName);
+                arguments += $" -displayname \"{settings.DisplayName}\"";
 
             if (!string.IsNullOrEmpty(settings.Name))
-                arguments += string.Format(" -servicename \"{0}\"", settings.Name);
+                arguments += $" -servicename \"{settings.Name}\"";
 
             return new HostInstaller(settings, arguments, installers);
         }
@@ -192,9 +199,7 @@ namespace Topshelf.Runtime.Windows
 
                 case HostStartMode.AutomaticDelayed:
                     installer.StartType = ServiceStartMode.Automatic;
-#if !NET35
                     installer.DelayedAutoStart = true;
-#endif
                     break;
             }
         }
