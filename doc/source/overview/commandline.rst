@@ -61,12 +61,14 @@ The help text from the command line is shown below for easy reference.
 
 
 Examples
-'''''''''
+''''''''
     
-    ** Basic Service Installation**
+**Basic Service Installation**
+
     MyService.exe install -username:DOMAIN\ServiceAccount -password:itsASecret -servicename:AwesomeService --autostart
     
-    ** Service Installation with Quoted Arguments
+**Service Installation with Quoted Arguments**
+
     MyService.exe install -username "DOMAIN\Service Account" -password:"Its A Secret" -servicename "Awesome Service" --autostart
     
     
