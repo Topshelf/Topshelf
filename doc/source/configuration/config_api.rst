@@ -179,7 +179,7 @@ There are multiple service start modes, each of which can be specified by the co
 Service Recovery
 ================
 
-Topshelf also exposes the options need to configure the service recovery options as well.
+Topshelf also exposes the options needed to configure the service recovery options as well.
 
 .. sourcecode:: csharp
 
