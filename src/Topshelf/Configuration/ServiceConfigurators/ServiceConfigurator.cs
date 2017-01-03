@@ -15,29 +15,49 @@ namespace Topshelf.ServiceConfigurators
     using System;
     using Runtime;
 
+    /// <summary>
+    /// The Service Configurator interface.
+    /// </summary>
     public interface ServiceConfigurator
     {
         /// <summary>
         /// Registers a callback invoked before the service Start method is called.
         /// </summary>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
         void BeforeStartingService(Action<HostStartContext> callback);
 
         /// <summary>
         /// Registers a callback invoked after the service Start method is called.
         /// </summary>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
         void AfterStartingService(Action<HostStartedContext> callback);
 
         /// <summary>
         /// Registers a callback invoked before the service Stop method is called.
         /// </summary>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
         void BeforeStoppingService(Action<HostStopContext> callback);
 
         /// <summary>
         /// Registers a callback invoked after the service Stop method is called.
         /// </summary>
+        /// <param name="callback">
+        /// The callback.
+        /// </param>
         void AfterStoppingService(Action<HostStoppedContext> callback);
     }
 
+    /// <summary>
+    /// The ServiceConfigurator interface.
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
     public interface ServiceConfigurator<T> :
         ServiceConfigurator
         where T : class
