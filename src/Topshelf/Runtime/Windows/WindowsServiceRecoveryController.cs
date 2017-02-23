@@ -24,8 +24,8 @@ namespace Topshelf.Runtime.Windows
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public void SetServiceRecoveryOptions(HostSettings settings, ServiceRecoveryOptions options)
         {
-            SafeTokenHandle scmHandle = null;
-            SafeTokenHandle serviceHandle = null;
+            SCMHandle scmHandle = null;
+            SCMHandle serviceHandle = null;
             IntPtr lpsaActions = IntPtr.Zero;
             IntPtr lpInfo = IntPtr.Zero;
             IntPtr lpFlagInfo = IntPtr.Zero;
@@ -127,9 +127,9 @@ namespace Topshelf.Runtime.Windows
                 if (lpsaActions != IntPtr.Zero)
                     Marshal.FreeHGlobal(lpsaActions);
                 if (serviceHandle != null)
-                    NativeMethods.CloseServiceHandle(serviceHandle);
+                    serviceHandle.Close();
                 if (scmHandle != null)
-                    NativeMethods.CloseServiceHandle(scmHandle);
+                    scmHandle.Close();
             }
         }
 

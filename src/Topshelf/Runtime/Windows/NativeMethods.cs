@@ -141,17 +141,17 @@ namespace Topshelf.Runtime.Windows
 
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", ExactSpelling = true, CharSet = CharSet.Unicode,
             SetLastError = true)]
-        public static extern SafeTokenHandle OpenSCManager(string machineName, string databaseName, uint dwAccess);
+        public static extern SCMHandle OpenSCManager(string machineName, string databaseName, uint dwAccess);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseServiceHandle(SafeTokenHandle hSCObject);
+        public static extern bool CloseServiceHandle(IntPtr hSCObject);
 
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern SafeTokenHandle OpenService(SafeTokenHandle hSCManager, string lpServiceName, uint dwDesiredAccess);
+        public static extern SCMHandle OpenService(SCMHandle hSCManager, string lpServiceName, uint dwDesiredAccess);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool ChangeServiceConfig2(SafeTokenHandle serviceHandle, uint infoLevel,
+        public static extern bool ChangeServiceConfig2(SCMHandle serviceHandle, uint infoLevel,
             IntPtr lpInfo);
 
         [DllImport("advapi32.dll", SetLastError = true)]
