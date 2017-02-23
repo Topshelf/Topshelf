@@ -113,6 +113,7 @@
     <Compile Include="Configuration\DependencyExtensions.cs" />
     <Compile Include="Configuration\HostConfigurators\DependencyHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\EnvironmentBuilderFactory.cs" />
+    <Compile Include="Configuration\HostConfigurators\RunAsVirtualAccountHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\SystemOnlyHelpHostConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\HostBuilderConfigurator.cs" />
     <Compile Include="Configuration\HostConfigurators\HostBuilderFactory.cs" />
