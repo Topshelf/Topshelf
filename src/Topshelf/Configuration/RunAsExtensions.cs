@@ -30,6 +30,18 @@ namespace Topshelf
             return configurator;
         }
 
+        public static HostConfigurator RunAsVirtualServiceAccount(this HostConfigurator configurator)
+        {
+            if (configurator == null)
+                throw new ArgumentNullException("configurator");
+
+            var runAsConfigurator = new RunAsVirtualAccountHostConfigurator();
+
+            configurator.AddConfigurator(runAsConfigurator);
+
+            return configurator;
+        }
+
         public static HostConfigurator RunAsPrompt(this HostConfigurator configurator)
         {
             if (configurator == null)
