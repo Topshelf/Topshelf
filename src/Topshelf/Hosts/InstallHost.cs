@@ -14,6 +14,7 @@ namespace Topshelf.Hosts
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Linq;
     using System.ServiceProcess;
     using Logging;
@@ -129,6 +130,7 @@ namespace Topshelf.Hosts
             readonly string[] _dependencies;
             readonly HostSettings _settings;
             readonly HostStartMode _startMode;
+            readonly NameValueCollection _additionalCommandLineArguments;
 
             public InstallServiceSettingsImpl(HostSettings settings, Credentials credentials, HostStartMode startMode,
                 string[] dependencies)
@@ -137,6 +139,7 @@ namespace Topshelf.Hosts
                 _settings = settings;
                 _startMode = startMode;
                 _dependencies = dependencies;
+                _additionalCommandLineArguments = new NameValueCollection();
             }
 
             public string Name
@@ -201,6 +204,11 @@ namespace Topshelf.Hosts
             public HostStartMode StartMode
             {
                 get { return _startMode; }
+            }
+
+            public NameValueCollection AdditionalCommandLineArguments
+            {
+                get { return _additionalCommandLineArguments; }
             }
 
             public TimeSpan StartTimeOut

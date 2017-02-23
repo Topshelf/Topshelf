@@ -12,11 +12,14 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime
 {
+    using System.Collections.Specialized;
+
     public interface InstallHostSettings :
         HostSettings
     {
         Credentials Credentials { get; set; }
         string[] Dependencies { get; }
         HostStartMode StartMode { get; }
+        NameValueCollection AdditionalCommandLineArguments { get; }
     }
 }

@@ -13,6 +13,7 @@
 namespace Topshelf.Runtime.Windows
 {
     using System.Collections;
+    using System.Collections.Specialized;
     using System.Configuration.Install;
     using Logging;
     using Microsoft.Win32;
@@ -22,11 +23,11 @@ namespace Topshelf.Runtime.Windows
     {
         static readonly LogWriter _log = HostLogger.Get<HostInstaller>();
 
-        readonly string _arguments;
+        readonly NameValueCollection _arguments;
         readonly Installer[] _installers;
         readonly HostSettings _settings;
 
-        public HostInstaller(HostSettings settings, string arguments, Installer[] installers)
+        public HostInstaller(HostSettings settings, NameValueCollection arguments, Installer[] installers)
         {
             _installers = installers;
             _arguments = arguments;
@@ -56,7 +57,10 @@ namespace Topshelf.Runtime.Windows
 
                 _log.DebugFormat("Service path: {0}", imagePath);
 
-                imagePath += _arguments;
+                foreach (string key in _arguments)
+                {
+                    imagePath += $" -{key} \"{_arguments[key]}\"";
+                }
 
                 _log.DebugFormat("Image path: {0}", imagePath);
 
