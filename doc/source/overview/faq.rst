@@ -16,11 +16,11 @@ What if my service requires custom installation options?
 
 Topshelf supports most of the commonly used service installation options, including:
 
-Automatic, Automatic (Delayed), Manual, and Disabled start options
-Local System, Local Service, Network Service, Username/Password, or prompted service credentials during installation.
-Service start dependencies, including SQL Server, MSMQ, and others
-Multiple instance service installation with distinct service names
-Service Recovery options, including restart, reboot, or run program
+* Automatic, Automatic (Delayed), Manual, and Disabled start options. 
+* Local System, Local Service, Network Service, Username/Password, or prompted service credentials during installation. 
+* Service start dependencies, including SQL Server, MSMQ, and others.  
+* Multiple instance service installation with distinct service names. 
+* Service Recovery options, including restart, reboot, or run program. 
 
 What’s the impact to my service?
 ----------------------------
