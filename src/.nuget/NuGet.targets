@@ -136,7 +136,7 @@
                         webClient.Proxy.Credentials = CredentialCache.DefaultCredentials;
                     }
 
-                    webClient.DownloadFile("https://www.nuget.org/nuget.exe", OutputFilename);
+                    webClient.DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", OutputFilename);
 
                     return true;
                 }
