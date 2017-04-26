@@ -21,6 +21,8 @@ namespace Topshelf.Hosts
 #endif
     using Logging;
     using Microsoft.Win32;
+    using Mono.Unix;
+    using Mono.Unix.Native;
     using Runtime;
 
 
@@ -102,6 +104,8 @@ namespace Topshelf.Hosts
 
                 Console.Title = _settings.DisplayName;
                 Console.CancelKeyPress += HandleCancelKeyPress;
+                if (Environment.OSVersion.Platform == PlatformID.Unix)
+                    new Thread(UnixSignalThread) {IsBackground = true}.Start();
 
                 if (!_serviceHandle.Start(this))
                     throw new TopshelfException("The service failed to start (return false).");
@@ -237,6 +241,30 @@ namespace Topshelf.Hosts
             {
                 _hasCancelled = false;
                 _log.Error("The service is not in a state where it can be stopped.");
+            }
+        }
+
+        void UnixSignalThread()
+        {
+            if (Type.GetType("Mono.Runtime") == null) return;
+
+            var shutdownSignals = new[] {new UnixSignal(Signum.SIGINT), new UnixSignal(Signum.SIGTERM)};
+
+            while (!_hasCancelled)
+            {
+                var detectedSignal = shutdownSignals[UnixSignal.WaitAny(shutdownSignals)];
+
+                _log.Info(detectedSignal.Signum + " detected, attempting to stop service.");
+                if (_serviceHandle.Stop(this))
+                {
+                    _hasCancelled = true;
+                    _exit.Set();
+                }
+                else
+                {
+                    _hasCancelled = false;
+                    _log.Error("The service is not in a state where it can be stopped.");
+                }
             }
         }
 
