@@ -204,6 +204,7 @@ namespace Topshelf.Hosts
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Error("The service did not shut down gracefully", ex);
+                _exitCode = TopshelfExitCode.StopServiceFailed;
             }
             finally
             {
