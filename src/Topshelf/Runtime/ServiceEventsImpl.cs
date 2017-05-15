@@ -97,6 +97,11 @@ namespace Topshelf.Runtime
                 _hostControl.Stop();
             }
 
+            public void Stop(TopshelfExitCode exitCode)
+            {
+                _hostControl.Stop(exitCode);
+            }
+
             public void Restart()
             {
                 _hostControl.Restart();

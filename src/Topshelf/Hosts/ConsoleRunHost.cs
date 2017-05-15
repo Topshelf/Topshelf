@@ -148,6 +148,12 @@ namespace Topshelf.Hosts
             _exit.Set();
         }
 
+        void HostControl.Stop(TopshelfExitCode exitCode)
+        {
+            _log.Info($"Service Stop requested with exit code {exitCode}, exiting.");
+            _exitCode = exitCode;
+            _exit.Set();
+        }
 
         void HostControl.Restart()
         {
