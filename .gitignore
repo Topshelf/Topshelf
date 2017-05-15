@@ -11,6 +11,8 @@ packages
 *.dotSettings
 
 .fake
+.idea
+
 
 bin
 obj
