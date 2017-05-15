@@ -95,11 +95,13 @@ namespace Topshelf.Runtime.Windows
             throw new NotImplementedException("This is not done yet, so I'm trying");
         }
 
-        void HostControl.Stop()
-        {
+        private void InternalStop(TopshelfExitCode? exitCode = null)
+        {
             if (CanStop)
             {
                 _log.Debug("Stop requested by hosted service");
+                if (exitCode.HasValue)
+                    ExitCode = (int)exitCode.Value;
                 Stop();
             }
             else
@@ -107,6 +109,17 @@ namespace Topshelf.Runtime.Windows
                 _log.Debug("Stop requested by hosted service, but service cannot be stopped at this time");
                 throw new ServiceControlException("The service cannot be stopped at this time");
             }
+
+        }
+
+        void HostControl.Stop()
+        {
+            InternalStop();
+        }
+
+        void HostControl.Stop(TopshelfExitCode exitCode)
+        {
+            InternalStop(exitCode);
         }
 
         protected override void OnStart(string[] args)
