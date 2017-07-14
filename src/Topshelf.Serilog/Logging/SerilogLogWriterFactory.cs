@@ -31,6 +31,7 @@ namespace Topshelf.Logging
 
         public void Shutdown()
         {
+            Log.CloseAndFlush();
         }
 
         public static void Use(ILogger logger)
