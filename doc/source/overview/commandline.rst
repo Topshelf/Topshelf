@@ -65,10 +65,10 @@ Examples
     
 **Basic Service Installation**
 
-    MyService.exe install -username:DOMAIN\ServiceAccount -password:itsASecret -servicename:AwesomeService --autostart
+    MyService.exe install -username:DOMAIN\\ServiceAccount -password:itsASecret -servicename:AwesomeService --autostart
     
 **Service Installation with Quoted Arguments**
 
-    MyService.exe install -username "DOMAIN\Service Account" -password:"Its A Secret" -servicename "Awesome Service" --autostart
+    MyService.exe install -username "DOMAIN\\Service Account" -password:"Its A Secret" -servicename "Awesome Service" --autostart
     
     
