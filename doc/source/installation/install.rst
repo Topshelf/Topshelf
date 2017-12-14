@@ -36,6 +36,7 @@ To clone the repository using git try the following::
 If you want the development branch (where active development happens)::
 
     git clone git://github.com/Topshelf/Topshelf.git
+    cd Topshelf
     git checkout develop
 
 Build Dependencies
