@@ -39,6 +39,8 @@ namespace Topshelf.Logging
         {
             _logFactory.Flush();
             _logFactory.SuspendLogging();
+            
+            LogManager.Shutdown();
         }
 
         public static void Use()
