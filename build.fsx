@@ -12,7 +12,7 @@ let packagesPath = FullName "./src/packages"
 let keyFile = FullName "./Topshelf.snk"
 
 let assemblyVersion = "4.0.0.0"
-let baseVersion = "4.0.3"
+let baseVersion = "4.1.0"
 
 let semVersion : SemVerInfo = parse baseVersion
 
@@ -32,13 +32,12 @@ let informationalVersion = (fun _ ->
 
 let nugetVersion = (fun _ ->
   let branchName = (branch ".")
-  let label = if branchName="master" then "" else "-" + (if branchName="mt3" then "beta" else branchName)
+  let label = if branchName="master" then "" else "-" + branchName)
   (Version + label)
 )
 
 let InfoVersion = informationalVersion()
 let NuGetVersion = nugetVersion()
-
 
 printfn "Using version: %s" Version
 
