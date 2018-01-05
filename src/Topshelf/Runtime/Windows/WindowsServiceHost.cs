@@ -95,7 +95,7 @@ namespace Topshelf.Runtime.Windows
             throw new NotImplementedException("This is not done yet, so I'm trying");
         }
 
-        private void InternalStop(TopshelfExitCode? exitCode = null)
+        void InternalStop(TopshelfExitCode? exitCode = null)
         {
             if (CanStop)
             {
@@ -109,6 +109,18 @@ namespace Topshelf.Runtime.Windows
                 _log.Debug("Stop requested by hosted service, but service cannot be stopped at this time");
                 throw new ServiceControlException("The service cannot be stopped at this time");
             }
+
+
+        }
+
+        void HostControl.Stop()
+        {
+            InternalStop();
+        }
+
+        void HostControl.Stop(TopshelfExitCode exitCode)
+        {
+            InternalStop(exitCode);
         }
 
         void HostControl.Stop()
