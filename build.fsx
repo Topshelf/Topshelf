@@ -32,7 +32,7 @@ let informationalVersion = (fun _ ->
 
 let nugetVersion = (fun _ ->
   let branchName = (branch ".")
-  let label = if branchName="master" then "" else "-" + branchName)
+  let label = if branchName="master" then "" else "-" + branchName
   (Version + label)
 )
 
