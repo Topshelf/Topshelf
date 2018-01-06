@@ -1,23 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf", "Topshelf\Topshelf.csproj", "{A52AD64D-6455-4A22-8CCF-581851086578}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf", "Topshelf\Topshelf.csproj", "{A52AD64D-6455-4A22-8CCF-581851086578}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{94D59671-81F3-44B9-B54D-8E5D616DB0BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTopshelfService", "SampleTopshelfService\SampleTopshelfService.csproj", "{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleTopshelfService", "SampleTopshelfService\SampleTopshelfService.csproj", "{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Tests", "Topshelf.Tests\Topshelf.Tests.csproj", "{508C7AAB-03DD-40C6-947D-6A8D22AAA941}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.Tests", "Topshelf.Tests\Topshelf.Tests.csproj", "{508C7AAB-03DD-40C6-947D-6A8D22AAA941}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Log4Net", "Topshelf.Log4Net\Topshelf.Log4Net.csproj", "{0EE64D46-5728-45DB-8D0E-044CE2677FD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.Log4Net", "Topshelf.Log4Net\Topshelf.Log4Net.csproj", "{0EE64D46-5728-45DB-8D0E-044CE2677FD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.NLog", "Topshelf.NLog\Topshelf.NLog.csproj", "{55FC6F5C-778F-4E77-8C55-C62216858CE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.NLog", "Topshelf.NLog\Topshelf.NLog.csproj", "{55FC6F5C-778F-4E77-8C55-C62216858CE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Elmah", "Topshelf.Elmah\Topshelf.Elmah.csproj", "{B6990D65-5B8A-4332-B01F-DE60D7042F6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.Elmah", "Topshelf.Elmah\Topshelf.Elmah.csproj", "{B6990D65-5B8A-4332-B01F-DE60D7042F6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Serilog", "Topshelf.Serilog\Topshelf.Serilog.csproj", "{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.Serilog", "Topshelf.Serilog\Topshelf.Serilog.csproj", "{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,20 +48,21 @@ Global
 		{A52AD64D-6455-4A22-8CCF-581851086578}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
 		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|x86.ActiveCfg = Debug|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|x86.Build.0 = Debug|x86
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Debug|x86.Build.0 = Debug|Any CPU
 		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|Mixed Platforms.Build.0 = Release|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|x86.ActiveCfg = Release|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|x86.Build.0 = Release|x86
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|x86.ActiveCfg = Release|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.Release|x86.Build.0 = Release|Any CPU
 		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|Any CPU.ActiveCfg = Release|Any CPU
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|Mixed Platforms.ActiveCfg = Release|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|x86.ActiveCfg = Release|x86
-		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|x86.Build.0 = Release|x86
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|Mixed Platforms.Build.0 = Release|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
+		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3}.ReleaseUnsigned|x86.Build.0 = Release|Any CPU
 		{508C7AAB-03DD-40C6-947D-6A8D22AAA941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{508C7AAB-03DD-40C6-947D-6A8D22AAA941}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{508C7AAB-03DD-40C6-947D-6A8D22AAA941}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -133,5 +134,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E5A0AD7B-1806-4F99-84F0-55BD72C1C7A3} = {94D59671-81F3-44B9-B54D-8E5D616DB0BB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF857ED9-FBAA-438F-881E-A8BB738CA86C}
 	EndGlobalSection
 EndGlobal

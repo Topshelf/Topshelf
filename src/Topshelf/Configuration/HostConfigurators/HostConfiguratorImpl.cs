@@ -21,6 +21,7 @@ namespace Topshelf.HostConfigurators
     using Logging;
     using Options;
     using Runtime;
+    using Runtime.DotNetCore;
     using Runtime.Windows;
 
 
@@ -108,12 +109,12 @@ namespace Topshelf.HostConfigurators
 
         public void SetStartTimeout(TimeSpan startTimeOut)
         {
-          _settings.StartTimeOut = startTimeOut;
+            _settings.StartTimeOut = startTimeOut;
         }
 
         public void SetStopTimeout(TimeSpan stopTimeOut)
         {
-          _settings.StopTimeOut = stopTimeOut;
+            _settings.StopTimeOut = stopTimeOut;
         }
 
         public void EnablePauseAndContinue()
@@ -191,8 +192,8 @@ namespace Topshelf.HostConfigurators
         {
             Type type = typeof(HostFactory);
             HostLogger.Get<HostConfiguratorImpl>()
-                      .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
-                          Environment.Version);
+                .InfoFormat("{0} v{1}, .NET Framework v{2}", type.Namespace, type.Assembly.GetName().Version,
+                    Environment.Version);
 
             EnvironmentBuilder environmentBuilder = _environmentBuilderFactory(this);
 
@@ -231,7 +232,11 @@ namespace Topshelf.HostConfigurators
 
         static EnvironmentBuilder DefaultEnvironmentBuilderFactory(HostConfigurator configurator)
         {
+#if NETCORE
+            return new DotNetCoreEnvironmentBuilder(configurator);
+#else
             return new WindowsHostEnvironmentBuilder(configurator);
+#endif
         }
     }
 }
