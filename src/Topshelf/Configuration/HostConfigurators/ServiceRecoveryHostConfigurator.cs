@@ -55,25 +55,40 @@ namespace Topshelf.HostConfigurators
             return builder;
         }
 
+        public ServiceRecoveryConfigurator RestartService(TimeSpan delay)
+        {
+            Options.AddAction(new RestartServiceRecoveryAction(delay));
+
+            return this;
+        }
+
         public ServiceRecoveryConfigurator RestartService(int delayInMinutes)
         {
-            Options.AddAction(new RestartServiceRecoveryAction(delayInMinutes));
+            return RestartService(TimeSpan.FromMinutes(delayInMinutes));
+        }
+
+        public ServiceRecoveryConfigurator RestartComputer(TimeSpan delay, string message)
+        {
+            Options.AddAction(new RestartSystemRecoveryAction(delay, message));
 
             return this;
         }
 
         public ServiceRecoveryConfigurator RestartComputer(int delayInMinutes, string message)
         {
-            Options.AddAction(new RestartSystemRecoveryAction(delayInMinutes, message));
+            return RestartComputer(TimeSpan.FromMinutes(delayInMinutes), message);
+        }
+
+        public ServiceRecoveryConfigurator RunProgram(TimeSpan delay, string command)
+        {
+            Options.AddAction(new RunProgramRecoveryAction(delay, command));
 
             return this;
         }
 
         public ServiceRecoveryConfigurator RunProgram(int delayInMinutes, string command)
         {
-            Options.AddAction(new RunProgramRecoveryAction(delayInMinutes, command));
-
-            return this;
+            return RunProgram(TimeSpan.FromMinutes(delayInMinutes), command);
         }
 
         public ServiceRecoveryConfigurator SetResetPeriod(int days)

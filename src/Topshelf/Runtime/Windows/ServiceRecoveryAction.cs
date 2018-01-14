@@ -16,9 +16,9 @@ namespace Topshelf.Runtime.Windows
 
     public abstract class ServiceRecoveryAction
     {
-        protected ServiceRecoveryAction(int delay)
+        protected ServiceRecoveryAction(TimeSpan delay)
         {
-            Delay = (int)TimeSpan.FromMinutes(delay).TotalMilliseconds;
+            Delay = (int)delay.TotalMilliseconds;
         }
 
         public int Delay { get; private set; }
