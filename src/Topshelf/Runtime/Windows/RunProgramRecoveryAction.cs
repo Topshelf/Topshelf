@@ -15,7 +15,7 @@ namespace Topshelf.Runtime.Windows
     public class RunProgramRecoveryAction :
         ServiceRecoveryAction
     {
-        public RunProgramRecoveryAction(int delay, string command)
+        public RunProgramRecoveryAction(System.TimeSpan delay, string command)
             : base(delay)
         {
             Command = command;

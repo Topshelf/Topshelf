@@ -15,7 +15,7 @@ namespace Topshelf.Runtime.Windows
     public class RestartSystemRecoveryAction :
         ServiceRecoveryAction
     {
-        public RestartSystemRecoveryAction(int delay, string restartMessage)
+        public RestartSystemRecoveryAction(System.TimeSpan delay, string restartMessage)
             : base(delay)
         {
             RestartMessage = restartMessage;
