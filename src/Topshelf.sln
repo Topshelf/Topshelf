@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.Elmah", "Topshelf.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Topshelf.Serilog", "Topshelf.Serilog\Topshelf.Serilog.csproj", "{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Topshelf.Extensions.Logging", "Topshelf.Extensions.Logging\Topshelf.Extensions.Logging.csproj", "{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,24 @@ Global
 		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|Any CPU.ActiveCfg = Release|Any CPU
 		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{20F2B28C-3AD6-4B1D-9371-15DF77443DA8}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Debug|x86.Build.0 = Debug|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Release|x86.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.Release|x86.Build.0 = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.ReleaseUnsigned|Any CPU.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.ReleaseUnsigned|Any CPU.Build.0 = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.ReleaseUnsigned|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.ReleaseUnsigned|Mixed Platforms.Build.0 = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.ReleaseUnsigned|x86.ActiveCfg = Release|Any CPU
+		{FA64A7F9-BB6B-42C7-ACD0-C0A42FD2650E}.ReleaseUnsigned|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
