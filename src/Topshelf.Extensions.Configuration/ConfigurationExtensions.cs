@@ -22,13 +22,19 @@ namespace Topshelf.Configuration
     public static class ConfigurationExtensions
     {
         public static void ApplyConfiguration(this HostConfigurator configurator, IConfiguration configuration)
+            => configurator.ApplyConfiguration(configuration.GetSection("Topshelf"));
+
+        public static void ApplyConfiguration(this HostConfigurator configurator, IConfigurationSection configuration)
         {
-            var options = Parse(configuration);
+            var options = configuration.Parse();
 
             configurator.ApplyOptions(options);
         }
 
-        public static IEnumerable<Option> Parse(IConfiguration configuration)
+        public static IEnumerable<Option> Parse(this IConfiguration configuration)
+            => configuration.GetSection("Topshelf").Parse();
+
+        public static IEnumerable<Option> Parse(this IConfigurationSection configuration)
         {
 
             var options = new List<Option>();
