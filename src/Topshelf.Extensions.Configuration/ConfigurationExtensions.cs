@@ -19,11 +19,24 @@ namespace Topshelf.Configuration
     using Topshelf.HostConfigurators;
     using Topshelf.Options;
 
+    /// <summary>
+    /// Provides Topshelf extensions for Microsoft extensions for configuration.
+    /// </summary>
     public static class ConfigurationExtensions
     {
+        /// <summary>
+        /// Applies the configuration.
+        /// </summary>
+        /// <param name="configurator">The host configurator.</param>
+        /// <param name="configuration">The configuration.</param>
         public static void ApplyConfiguration(this HostConfigurator configurator, IConfiguration configuration)
-            => configurator.ApplyConfiguration(configuration.GetSection("Topshelf"));
+            => configurator.ApplyConfiguration(configuration.GetTopshelfSection());
 
+        /// <summary>
+        /// Applies the configuration.
+        /// </summary>
+        /// <param name="configurator">The host configurator.</param>
+        /// <param name="configuration">The configuration section.</param>
         public static void ApplyConfiguration(this HostConfigurator configurator, IConfigurationSection configuration)
         {
             var options = configuration.Parse();
@@ -31,12 +44,21 @@ namespace Topshelf.Configuration
             configurator.ApplyOptions(options);
         }
 
+        /// <summary>
+        /// Parses the specified configuration.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns>A list of configuration options.</returns>
         public static IEnumerable<Option> Parse(this IConfiguration configuration)
-            => configuration.GetSection("Topshelf").Parse();
+            => configuration.GetTopshelfSection().Parse();
 
+        /// <summary>
+        /// Parses the specified configuration.
+        /// </summary>
+        /// <param name="configuration">The configuration section.</param>
+        /// <returns>A list of configuration options.</returns>
         public static IEnumerable<Option> Parse(this IConfigurationSection configuration)
         {
-
             var options = new List<Option>();
 
             foreach (var entry in configuration.AsEnumerable(true))
@@ -141,6 +163,11 @@ namespace Topshelf.Configuration
             return options;
         }
 
+        /// <summary>
+        /// Applies the configuration options.
+        /// </summary>
+        /// <param name="configurator">The host configurator.</param>
+        /// <param name="options">The configuration options.</param>
         public static void ApplyOptions(this HostConfigurator configurator, IEnumerable<Option> options)
         {
             foreach (var option in options)
@@ -148,5 +175,13 @@ namespace Topshelf.Configuration
                 option.ApplyTo(configurator);
             }
         }
+
+        /// <summary>
+        /// Gets the default Topshelf configuration section.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns>The default Topshelf configuration section.</returns>
+        public static IConfigurationSection GetTopshelfSection(this IConfiguration configuration)
+            => configuration.GetSection("Topshelf");
     }
 }
