@@ -14,16 +14,31 @@ namespace Topshelf.Options
 {
     using Topshelf.HostConfigurators;
 
+    /// <summary>
+    /// Represents a option to set a service dependency.
+    /// </summary>
+    /// <seealso cref="Option" />
     internal class DependencyOption
         : Option
     {
-        private string dependencyName;
+        /// <summary>
+        /// The dependency name
+        /// </summary>
+        private readonly string dependencyName;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DependencyOption"/> class.
+        /// </summary>
+        /// <param name="dependencyName">Name of the dependency.</param>
         public DependencyOption(string dependencyName)
         {
             this.dependencyName = dependencyName;
         }
 
+        /// <summary>
+        /// Applies the option to the specified host configurator.
+        /// </summary>
+        /// <param name="configurator">The host configurator.</param>
         public void ApplyTo(HostConfigurator configurator)
         {
             configurator.AddDependency(this.dependencyName);
