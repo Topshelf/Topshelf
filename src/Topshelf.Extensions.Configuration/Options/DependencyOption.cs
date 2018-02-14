@@ -15,7 +15,7 @@ namespace Topshelf.Options
     using Topshelf.HostConfigurators;
 
     /// <summary>
-    /// Represents a option to set a service dependency.
+    /// Represents an option to set a service dependency.
     /// </summary>
     /// <seealso cref="Option" />
     internal class DependencyOption
