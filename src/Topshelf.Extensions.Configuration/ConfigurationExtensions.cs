@@ -18,6 +18,7 @@ namespace Topshelf.Configuration
     using Microsoft.Extensions.Configuration;
     using Topshelf.HostConfigurators;
     using Topshelf.Options;
+    using Topshelf.Runtime.Windows;
 
     /// <summary>
     /// Provides Topshelf extensions for Microsoft extensions for configuration.
@@ -115,7 +116,7 @@ namespace Topshelf.Configuration
                 }
                 else if (string.Equals(entry.Key, "Interactive", StringComparison.OrdinalIgnoreCase))
                 {
-                    if ((bool)TypeDescriptor.GetConverter(typeof(bool)).ConvertFromInvariantString(entry.Value))
+                    if (configuration.GetSection("Interactive").Get<bool>())
                     {
                         options.Add(new InteractiveOption());
                     }
@@ -156,6 +157,47 @@ namespace Topshelf.Configuration
                     {
                         options.Add(new DependencyOption(dependency.Value));
                     }
+                }
+                else if (string.Equals(entry.Key, "ServiceRecovery", StringComparison.OrdinalIgnoreCase))
+                {
+                    var section = configuration.GetSection("ServiceRecovery");
+
+                    var serviceRecoveryOptions = new ServiceRecoveryOptions
+                    {
+                        RecoverOnCrashOnly = section.GetSection(nameof(ServiceRecoveryOptions.RecoverOnCrashOnly)).Get<bool>(),
+                        ResetPeriod = section.GetSection(nameof(ServiceRecoveryOptions.ResetPeriod)).Get<int>()
+                    };
+
+                    foreach (var recoveryActionSecion in section.GetSection("RecoveryActions")?.GetChildren())
+                    {
+                        var recoveryActionType = recoveryActionSecion.GetSection("Type")?.Value;
+
+                        switch (recoveryActionType)
+                        {
+                            case "RestartService":
+                                serviceRecoveryOptions.AddAction(
+                                    new RestartServiceRecoveryAction(
+                                        TimeSpan.FromMinutes(
+                                            recoveryActionSecion.GetSection("Delay").Get<int>())));
+                                break;
+                            case "RestartSystem":
+                                serviceRecoveryOptions.AddAction(
+                                    new RestartSystemRecoveryAction(
+                                        TimeSpan.FromMinutes(
+                                            recoveryActionSecion.GetSection("Delay").Get<int>()),
+                                            recoveryActionSecion.GetSection("Message").Value));
+                                break;
+                            case "RunProgram":
+                                serviceRecoveryOptions.AddAction(
+                                    new RunProgramRecoveryAction(
+                                        TimeSpan.FromMinutes(
+                                            recoveryActionSecion.GetSection("Delay").Get<int>()),
+                                            recoveryActionSecion.GetSection("Command").Value));
+                                break;
+                        }
+                    }
+
+                    options.Add(new ServiceRecoveryOption(serviceRecoveryOptions));
                 }
 #endif
             }

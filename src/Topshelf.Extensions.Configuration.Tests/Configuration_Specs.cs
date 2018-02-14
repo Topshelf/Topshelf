@@ -14,11 +14,15 @@ namespace Topshelf.Extensions.Configuration.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Hosts;
     using Microsoft.Extensions.Configuration;
     using NUnit.Framework;
     using Runtime;
     using Topshelf.Configuration;
+    using Topshelf.HostConfigurators;
+    using Topshelf.Options;
+    using Topshelf.Runtime.Windows;
 
     [TestFixture]
     public class Passing_install
@@ -406,6 +410,52 @@ namespace Topshelf.Extensions.Configuration.Tests
             Assert.AreEqual("", installHost.InstallSettings.Credentials.Password);
         }
 
+        [Test]
+        public void Should_create_a_service_with_recovery_options()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                    {
+                        { "topshelf:ServiceRecovery:RecoverOnCrashOnly", "true" },
+                        { "topshelf:ServiceRecovery:ResetPeriod", "123" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:0:Type", "RestartService" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:0:Delay", "1234" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:1:Type", "RestartSystem" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:1:Delay", "4567" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:1:Message", "message" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:2:Type", "RunProgram" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:2:Delay", "8901" },
+                        { "topshelf:ServiceRecovery:RecoveryActions:2:Message", "command" },
+                    })
+                .Build()
+                .GetSection("topshelf");
+
+            var parsedConfiguration = configuration.Parse().First();
+
+            Assert.IsInstanceOf<ServiceRecoveryOption>(parsedConfiguration);
+            var serviceRecoveryOptions = typeof(ServiceRecoveryOption)
+                .GetField("serviceRecoveryOptions", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                .GetValue(parsedConfiguration) as ServiceRecoveryOptions;
+
+            Assert.AreEqual(true, serviceRecoveryOptions.RecoverOnCrashOnly);
+            Assert.AreEqual(123, serviceRecoveryOptions.ResetPeriod);
+
+            var actions = serviceRecoveryOptions.Actions.ToArray();
+
+            Assert.IsInstanceOf<RestartServiceRecoveryAction>(actions[0]);
+            var restartServiceRecoveryAction = actions[0] as RestartServiceRecoveryAction;
+            Assert.AreEqual(TimeSpan.FromMinutes(1234).TotalMilliseconds, restartServiceRecoveryAction.Delay);
+
+            Assert.IsInstanceOf<RestartSystemRecoveryAction>(actions[1]);
+            var restartSystemRecoveryAction = actions[1] as RestartSystemRecoveryAction;
+            Assert.AreEqual(TimeSpan.FromMinutes(4567).TotalMilliseconds, restartSystemRecoveryAction.Delay);
+            Assert.AreEqual("message", restartSystemRecoveryAction.RestartMessage);
+
+            Assert.IsInstanceOf<RunProgramRecoveryAction>(actions[2]);
+            var runProgramRecoveryAction = actions[2] as RunProgramRecoveryAction;
+            Assert.AreEqual(TimeSpan.FromMinutes(8901).TotalMilliseconds, runProgramRecoveryAction.Delay);
+        }
+
         class MyService : ServiceControl
         {
             public bool Start(HostControl hostControl)
@@ -424,6 +474,101 @@ namespace Topshelf.Extensions.Configuration.Tests
             }
 
             public bool Continue(HostControl hostControl)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class MyHostConfigurator : HostConfigurator
+        {
+            public HostBuilderConfigurator Configuratior { get; private set; }
+
+            public void AddCommandLineDefinition(string name, Action<string> callback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void AddCommandLineSwitch(string name, Action<bool> callback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void AddConfigurator(HostBuilderConfigurator configurator)
+            {
+                this.Configuratior = configurator;
+            }
+
+            public void ApplyCommandLine()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ApplyCommandLine(string commandLine)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void EnablePauseAndContinue()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void EnableSessionChanged()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void EnableShutdown()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnException(Action<Exception> callback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetDescription(string description)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetDisplayName(string name)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetInstanceName(string instanceName)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetServiceName(string name)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetStartTimeout(TimeSpan startTimeOut)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetStopTimeout(TimeSpan stopTimeOut)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void UseEnvironmentBuilder(EnvironmentBuilderFactory environmentBuilderFactory)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void UseServiceBuilder(ServiceBuilderFactory serviceBuilderFactory)
             {
                 throw new NotImplementedException();
             }
