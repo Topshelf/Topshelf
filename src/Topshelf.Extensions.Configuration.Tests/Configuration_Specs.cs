@@ -411,6 +411,52 @@ namespace Topshelf.Extensions.Configuration.Tests
         }
 
         [Test]
+        public void Should_create_a_service_that_has_start_timeout()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                    {
+                        { "topshelf:StartTimeout", "123" },
+                    })
+                .Build()
+                .GetSection("topshelf");
+
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+                    x.ApplyConfiguration(configuration);
+                    x.ApplyCommandLine("install");
+                });
+
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual(TimeSpan.FromSeconds(123), installHost.InstallSettings.StartTimeOut);
+        }
+
+        [Test]
+        public void Should_create_a_service_that_has_stopt_timeout()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                    {
+                        { "topshelf:StopTimeout", "123" },
+                    })
+                .Build()
+                .GetSection("topshelf");
+
+            Host host = HostFactory.New(x =>
+                {
+                    x.Service<MyService>();
+                    x.ApplyConfiguration(configuration);
+                    x.ApplyCommandLine("install");
+                });
+
+            Assert.IsInstanceOf<InstallHost>(host);
+            var installHost = (InstallHost)host;
+            Assert.AreEqual(TimeSpan.FromSeconds(123), installHost.InstallSettings.StopTimeOut);
+        }
+
+        [Test]
         public void Should_create_a_service_with_recovery_options()
         {
             var configuration = new ConfigurationBuilder()
