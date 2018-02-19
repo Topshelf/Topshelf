@@ -87,6 +87,14 @@ namespace Topshelf.Configuration
                 {
                     options.Add(new InstanceOption(entry.Value));
                 }
+                else if (string.Equals(entry.Key, "StartTimeout", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.Add(new StartTimeoutOption(configuration.GetSection("StartTimeout").Get<int>()));
+                }
+                else if (string.Equals(entry.Key, "StopTimeout", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.Add(new StopTimeoutOption(configuration.GetSection("StopTimeout").Get<int>()));
+                }
 #if !NETCORE
                 else if (string.Equals(entry.Key, "StartMode", StringComparison.OrdinalIgnoreCase))
                 {
