@@ -69,6 +69,6 @@ Examples
     
 **Service Installation with Quoted Arguments**
 
-    MyService.exe install -username "DOMAIN\\Service Account" -password:"Its A Secret" -servicename "Awesome Service" --autostart
+    MyService.exe install -username "DOMAIN\\Service Account" -password "Its A Secret" -servicename "Awesome Service" --autostart
     
     
