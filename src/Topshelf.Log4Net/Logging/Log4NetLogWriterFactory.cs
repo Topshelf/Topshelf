@@ -20,9 +20,11 @@ namespace Topshelf.Logging
     public class Log4NetLogWriterFactory :
         LogWriterFactory
     {
+        private static readonly System.Reflection.Assembly _callingAssembly = typeof(Log4NetLogWriterFactory).Assembly;
+
         public LogWriter Get(string name)
         {
-            return new Log4NetLogWriter(LogManager.GetLogger(name));
+            return new Log4NetLogWriter(LogManager.GetLogger(_callingAssembly, name));
         }
 
         public void Shutdown()
@@ -73,11 +75,11 @@ namespace Topshelf.Logging
                     {
                         if (_watch)
                         {
-                            XmlConfigurator.ConfigureAndWatch(configFile);
+                            XmlConfigurator.ConfigureAndWatch(LogManager.GetRepository(_callingAssembly), configFile);
                         }
                         else
                         {
-                            XmlConfigurator.Configure(configFile);
+                            XmlConfigurator.Configure(LogManager.GetRepository(_callingAssembly), configFile);
                         }
                     }
                 }
