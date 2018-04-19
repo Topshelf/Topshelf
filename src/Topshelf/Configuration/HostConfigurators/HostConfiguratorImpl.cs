@@ -206,7 +206,16 @@ namespace Topshelf.HostConfigurators
             foreach (HostBuilderConfigurator configurator in _configurators)
                 builder = configurator.Configure(builder);
 
-            return builder.Build(serviceBuilder);
+            try
+            {
+                return builder.Build(serviceBuilder);
+            }
+            //Intercept exceptions from serviceBuilder, TopShelf handling is in HostFactory
+            catch (Exception ex)
+            {
+                builder.Settings?.ExceptionCallback(ex);
+                throw;
+            }
         }
 
         void ApplyCommandLineOptions(IEnumerable<Option> options)
