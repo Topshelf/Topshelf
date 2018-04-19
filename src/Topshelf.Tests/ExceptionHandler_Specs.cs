@@ -128,6 +128,57 @@ namespace Topshelf.Tests
 
         }
 
+        [Test]
+        public void Should_be_called_when_exception_thrown_in_constructor()
+        {
+            var sawException = false;
+
+            var exitCode = HostFactory.Run(x =>
+            {
+                x.UseTestHost();
+
+                x.Service<ServiceThrowingExceptionInConstructor>();
+
+                x.OnException(_ => sawException = true);
+            });
+
+            Assert.IsTrue(sawException);
+            Assert.AreEqual(TopshelfExitCode.AbnormalExit, exitCode);
+        }
+
+        [Test]
+        public void Should_be_called_when_exception_thrown_in_construct_using()
+        {
+            var sawException = false;
+
+            var exitCode = HostFactory.Run(x =>
+            {
+                x.UseTestHost();
+
+                x.Service<ExceptionThrowingService>(s =>
+                {
+                    s.ConstructUsing(() => throw new Exception($"Unable to resolve {nameof(ExceptionThrowingService)} from DI container"));
+                    s.WhenStarted((es,hc) => true);
+                    s.WhenStopped((es, hc) => true);
+                });
+
+                x.OnException(_ => sawException = true);
+            });
+
+            Assert.IsTrue(sawException);
+            Assert.AreEqual(TopshelfExitCode.AbnormalExit, exitCode);
+        }
+
+        class ServiceThrowingExceptionInConstructor : ServiceControl
+        {
+            public ServiceThrowingExceptionInConstructor()
+                => throw new Exception("Exception from constructor");
+
+        public bool Start(HostControl hostControl) => true;
+
+        public bool Stop(HostControl hostControl) => true;
+    }
+
         /// <summary>
         /// A simple service that can be configured to throw exceptions while starting or stopping.
         /// </summary>
