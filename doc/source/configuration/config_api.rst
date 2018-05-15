@@ -214,7 +214,7 @@ Services can be configured to run as a number of different identities, using the
     });
 
 Runs the service using the specified username and password. This can also be configured using the command-line. 
-Please be sure to include the domain or UPN suffix in the username value e.g. **domain\username** or **username@suffix.com**.
+Please be sure to include the domain or UPN suffix in the username value e.g. **domain\\username** or **username@suffix.com**.
 
 
 .. sourcecode:: csharp
