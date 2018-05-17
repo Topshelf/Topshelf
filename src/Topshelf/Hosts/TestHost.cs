@@ -21,7 +21,6 @@ namespace Topshelf.Hosts
         Host,
         HostControl
     {
-        readonly HostEnvironment _environment;
         readonly LogWriter _log = HostLogger.Get<TestHost>();
         readonly ServiceHandle _serviceHandle;
         readonly HostSettings _settings;
@@ -29,12 +28,11 @@ namespace Topshelf.Hosts
         public TestHost(HostSettings settings, HostEnvironment environment, ServiceHandle serviceHandle)
         {
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             if (environment == null)
-                throw new ArgumentNullException("environment");
+                throw new ArgumentNullException(nameof(environment));
 
             _settings = settings;
-            _environment = environment;
             _serviceHandle = serviceHandle;
         }
 

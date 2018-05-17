@@ -13,6 +13,7 @@
 namespace Topshelf.Hosts
 {
     using System;
+    using System.Runtime.InteropServices;
     using Logging;
     using Runtime;
 
@@ -22,22 +23,22 @@ namespace Topshelf.Hosts
         readonly HostEnvironment _environment;
         readonly LogWriter _log = HostLogger.Get<StartHost>();
         readonly Host _parentHost;
-        HostSettings _settings;
+        readonly HostSettings _settings;
 
-        public StartHost(HostEnvironment environment, HostSettings settings, Host parentHost)
+        public StartHost(HostEnvironment environment, HostSettings settings, Host parentHost = null)
         {
             _environment = environment;
             _settings = settings;
             _parentHost = parentHost;
         }
 
-        public StartHost(HostEnvironment environment, HostSettings settings)
-            : this(environment, settings, null)
-        {
-        }
-
         public TopshelfExitCode Run()
         {
+#if NETCORE
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return TopshelfExitCode.NotRunningOnWindows;
+#endif
+
             if (!_environment.IsAdministrator)
             {
                 if (!_environment.RunAsAdministrator())
@@ -46,8 +47,7 @@ namespace Topshelf.Hosts
                 return TopshelfExitCode.SudoRequired;
             }
 
-            if (_parentHost != null)
-                _parentHost.Run();
+            _parentHost?.Run();
 
             if (!_environment.IsServiceInstalled(_settings.ServiceName))
             {

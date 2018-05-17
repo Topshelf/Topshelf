@@ -21,10 +21,9 @@ namespace Topshelf
         public static HostConfigurator BeforeInstall(this HostConfigurator configurator, Action callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeInstall",
-                x => x.BeforeInstall(settings => callback())));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeInstall", x => x.BeforeInstall(settings => callback())));
 
             return configurator;
         }
@@ -33,10 +32,9 @@ namespace Topshelf
             Action<InstallHostSettings> callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeInstall",
-                x => x.BeforeInstall(callback)));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeInstall", x => x.BeforeInstall(callback)));
 
             return configurator;
         }
@@ -44,10 +42,9 @@ namespace Topshelf
         public static HostConfigurator AfterInstall(this HostConfigurator configurator, Action callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterInstall",
-                x => x.AfterInstall(settings => callback())));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterInstall", x => x.AfterInstall(settings => callback())));
 
             return configurator;
         }
@@ -56,7 +53,7 @@ namespace Topshelf
             Action<InstallHostSettings> callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterInstall", x => x.AfterInstall(callback)));
 
@@ -66,10 +63,9 @@ namespace Topshelf
         public static HostConfigurator BeforeRollback(this HostConfigurator configurator, Action callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeRollback",
-                x => x.BeforeRollback(settings => callback())));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeRollback", x => x.BeforeRollback(settings => callback())));
 
             return configurator;
         }
@@ -78,10 +74,9 @@ namespace Topshelf
             Action<InstallHostSettings> callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeRollback",
-                x => x.BeforeRollback(callback)));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("BeforeRollback", x => x.BeforeRollback(callback)));
 
             return configurator;
         }
@@ -89,10 +84,9 @@ namespace Topshelf
         public static HostConfigurator AfterRollback(this HostConfigurator configurator, Action callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterRollback",
-                x => x.AfterRollback(settings => callback())));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterRollback", x => x.AfterRollback(settings => callback())));
 
             return configurator;
         }
@@ -101,10 +95,9 @@ namespace Topshelf
             Action<InstallHostSettings> callback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
-            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterRollback", 
-                x => x.AfterRollback(callback)));
+            configurator.AddConfigurator(new InstallHostConfiguratorAction("AfterRollback", x => x.AfterRollback(callback)));
 
             return configurator;
         }

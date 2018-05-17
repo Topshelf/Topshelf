@@ -21,7 +21,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.ConstructUsing(settings => factory());
 
@@ -33,7 +33,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.ConstructUsing(settings => factory(typeof(T).Name));
 
@@ -44,7 +44,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.WhenStarted((service, control) =>
                 {
@@ -60,7 +60,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.WhenStopped((service, control) =>
                 {
@@ -76,7 +76,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.WhenPaused((service, control) =>
                 {
@@ -93,7 +93,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.WhenContinued((service, control) =>
                 {
@@ -110,7 +110,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.WhenShutdown((service, control) =>
                 {
@@ -125,7 +125,7 @@ namespace Topshelf
            where T : class
        {
            if (configurator == null)
-               throw new ArgumentNullException("configurator");
+               throw new ArgumentNullException(nameof(configurator));
 
            configurator.WhenSessionChanged((service, control, arguments) =>
            {
@@ -140,7 +140,7 @@ namespace Topshelf
             where T : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.WhenPowerEvent((service, control, arguments) => callback(service, arguments));
 

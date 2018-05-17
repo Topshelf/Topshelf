@@ -1,4 +1,4 @@
-// Copyright 2007-2011 The Apache Software Foundation.
+// Copyright 2007-2018 Chris Patterson, Dru Sellers, Travis Smith, et. al.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -12,20 +12,19 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-	using System.ServiceProcess;
+    using System.ServiceProcess;
 
+    public class Credentials
+    {
+        public Credentials(string username, string password, ServiceAccount account)
+        {
+            Username = username;
+            Account = account;
+            Password = password;
+        }
 
-	public class Credentials
-	{
-		public Credentials(string username, string password, ServiceAccount account)
-		{
-			Username = username;
-			Account = account;
-			Password = password;
-		}
-
-		public string Username { get; set; }
-		public string Password { get; set; }
-		public ServiceAccount Account { get; set; }
-	}
+        public string Username { get; }
+        public string Password { get; }
+        public ServiceAccount Account { get; }
+    }
 }

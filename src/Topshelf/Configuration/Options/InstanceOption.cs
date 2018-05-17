@@ -28,7 +28,7 @@ namespace Topshelf.Options
         public void ApplyTo(HostConfigurator configurator)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.SetInstanceName(_instanceName);
         }

@@ -21,10 +21,9 @@ namespace Topshelf
         public static HostConfigurator AddDependency(this HostConfigurator configurator, string name)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
-
+                throw new ArgumentNullException(nameof(configurator));
             if (name == null)
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
 
             var dependencyConfigurator = new DependencyHostConfigurator(name);
 

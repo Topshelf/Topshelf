@@ -17,7 +17,7 @@ namespace Topshelf.Options
     public class ServiceDescriptionOption : 
         Option
     {
-        string _description;
+        readonly string _description;
 
         public ServiceDescriptionOption(string description)
         {

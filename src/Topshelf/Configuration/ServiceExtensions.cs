@@ -27,7 +27,7 @@ namespace Topshelf
             where TService : class, ServiceControl
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             ServiceBuilderFactory serviceBuilderFactory = CreateServiceBuilderFactory(serviceFactory, callback);
 
@@ -42,26 +42,25 @@ namespace Topshelf
             where TService : class, ServiceControl
         {
             if (serviceFactory == null)
-                throw new ArgumentNullException("serviceFactory");
+                throw new ArgumentNullException(nameof(serviceFactory));
             if (callback == null)
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
 
             var serviceConfigurator = new ControlServiceConfigurator<TService>(serviceFactory);
 
             callback(serviceConfigurator);
 
-            ServiceBuilderFactory serviceBuilderFactory = x =>
-                {
-                    ConfigurationResult configurationResult =
-                        ValidateConfigurationResult.CompileResults(serviceConfigurator.Validate());
-                    if (configurationResult.Results.Any())
-                        throw new HostConfigurationException("The service was not properly configured");
+            ServiceBuilder ServiceBuilderFactory(HostSettings x)
+            {
+                ConfigurationResult configurationResult = ValidateConfigurationResult.CompileResults(serviceConfigurator.Validate());
+                if (configurationResult.Results.Any()) throw new HostConfigurationException("The service was not properly configured");
 
-                    ServiceBuilder serviceBuilder = serviceConfigurator.Build();
+                ServiceBuilder serviceBuilder = serviceConfigurator.Build();
 
-                    return serviceBuilder;
-                };
-            return serviceBuilderFactory;
+                return serviceBuilder;
+            }
+
+            return ServiceBuilderFactory;
         }
 
         public static HostConfigurator Service<T>(this HostConfigurator configurator)
@@ -96,7 +95,7 @@ namespace Topshelf
             where TService : class
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
             
             ServiceBuilderFactory serviceBuilderFactory = CreateServiceBuilderFactory(callback);
 
@@ -109,24 +108,23 @@ namespace Topshelf
             where TService : class
         {
             if (callback == null)
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
 
             var serviceConfigurator = new DelegateServiceConfigurator<TService>();
 
             callback(serviceConfigurator);
 
-            ServiceBuilderFactory serviceBuilderFactory = x =>
-                {
-                    ConfigurationResult configurationResult =
-                        ValidateConfigurationResult.CompileResults(serviceConfigurator.Validate());
-                    if (configurationResult.Results.Any())
-                        throw new HostConfigurationException("The service was not properly configured");
+            ServiceBuilder ServiceBuilderFactory(HostSettings x)
+            {
+                ConfigurationResult configurationResult = ValidateConfigurationResult.CompileResults(serviceConfigurator.Validate());
+                if (configurationResult.Results.Any()) throw new HostConfigurationException("The service was not properly configured");
 
-                    ServiceBuilder serviceBuilder = serviceConfigurator.Build();
+                ServiceBuilder serviceBuilder = serviceConfigurator.Build();
 
-                    return serviceBuilder;
-                };
-            return serviceBuilderFactory;
+                return serviceBuilder;
+            }
+
+            return ServiceBuilderFactory;
         }
     }
 }

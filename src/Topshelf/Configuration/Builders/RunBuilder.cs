@@ -23,31 +23,22 @@ namespace Topshelf.Builders
     {
         static readonly LogWriter _log = HostLogger.Get<RunBuilder>();
 
-        readonly HostSettings _settings;
-        readonly HostEnvironment _environment;
-
         public RunBuilder(HostEnvironment environment, HostSettings settings)
         {
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
 
-            _environment = environment;
-            _settings = settings;
+            Environment = environment;
+            Settings = settings;
         }
 
-        public HostEnvironment Environment
-        {
-            get { return _environment; }
-        }
+        public HostEnvironment Environment { get; }
 
-        public HostSettings Settings
-        {
-            get { return _settings; }
-        }
+        public HostSettings Settings { get; }
 
         public virtual Host Build(ServiceBuilder serviceBuilder)
         {
-            ServiceHandle serviceHandle = serviceBuilder.Build(_settings);
+            ServiceHandle serviceHandle = serviceBuilder.Build(Settings);
 
             return CreateHost(serviceHandle);
         }
@@ -56,25 +47,22 @@ namespace Topshelf.Builders
             where T : class, HostBuilder
         {
             if (callback == null)
-                throw new ArgumentNullException("callback");
+                throw new ArgumentNullException(nameof(callback));
 
-            var self = this as T;
-            if (self != null)
-            {
+            if (this is T self)
                 callback(self);
-            }
         }
 
         Host CreateHost(ServiceHandle serviceHandle)
         {
-            if (_environment.IsRunningAsAService)
+            if (Environment.IsRunningAsAService)
             {
                 _log.Debug("Running as a service, creating service host.");
-                return _environment.CreateServiceHost(_settings, serviceHandle);
+                return Environment.CreateServiceHost(Settings, serviceHandle);
             }
 
             _log.Debug("Running as a console application, creating the console host.");
-            return new ConsoleRunHost(_settings, _environment, serviceHandle);
+            return new ConsoleRunHost(Settings, Environment, serviceHandle);
         }
     }
 }

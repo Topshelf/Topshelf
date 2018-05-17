@@ -41,9 +41,9 @@ namespace Topshelf.Hosts
         public ConsoleRunHost(HostSettings settings, HostEnvironment environment, ServiceHandle serviceHandle)
         {
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             if (environment == null)
-                throw new ArgumentNullException("environment");
+                throw new ArgumentNullException(nameof(environment));
 
             _settings = settings;
             _environment = environment;
@@ -251,53 +251,39 @@ namespace Topshelf.Hosts
         class ConsoleSessionChangedArguments :
             SessionChangedArguments
         {
-            readonly SessionChangeReasonCode _reasonCode;
-            readonly int _sessionId;
-
             public ConsoleSessionChangedArguments(SessionSwitchReason reason)
             {
-                _reasonCode = (SessionChangeReasonCode) Enum.ToObject(typeof(SessionChangeReasonCode), (int) reason);
-                _sessionId = Process.GetCurrentProcess().SessionId;
+                ReasonCode = (SessionChangeReasonCode) Enum.ToObject(typeof(SessionChangeReasonCode), (int) reason);
+                SessionId = Process.GetCurrentProcess().SessionId;
             }
 
-            public SessionChangeReasonCode ReasonCode
-            {
-                get { return _reasonCode; }
-            }
+            public SessionChangeReasonCode ReasonCode { get; }
 
-            public int SessionId
-            {
-                get { return _sessionId; }
-            }
+            public int SessionId { get; }
         }
 
         class ConsolePowerEventArguments :
             PowerEventArguments
         {
-            readonly PowerEventCode _eventCode;
-
             public ConsolePowerEventArguments(PowerModes powerMode)
             {
                 switch (powerMode)
                 {
                     case PowerModes.Resume:
-                        _eventCode = PowerEventCode.ResumeAutomatic;
+                        EventCode = PowerEventCode.ResumeAutomatic;
                         break;
                     case PowerModes.StatusChange:
-                        _eventCode = PowerEventCode.PowerStatusChange;
+                        EventCode = PowerEventCode.PowerStatusChange;
                         break;
                     case PowerModes.Suspend:
-                        _eventCode = PowerEventCode.Suspend;
+                        EventCode = PowerEventCode.Suspend;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(powerMode), powerMode, null);
                 }
             }
 
-            public PowerEventCode EventCode
-            {
-                get { return _eventCode; }
-            }
+            public PowerEventCode EventCode { get; }
         }
 #endif
     }

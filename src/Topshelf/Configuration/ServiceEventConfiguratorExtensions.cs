@@ -24,7 +24,7 @@ namespace Topshelf
             where T : ServiceConfigurator
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.BeforeStartingService(x => callback());
 
@@ -38,7 +38,7 @@ namespace Topshelf
             where T : ServiceConfigurator
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AfterStartingService(x => callback());
 
@@ -52,7 +52,7 @@ namespace Topshelf
             where T : ServiceConfigurator
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.BeforeStoppingService(x => callback());
 
@@ -66,7 +66,7 @@ namespace Topshelf
             where T : ServiceConfigurator
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AfterStoppingService(x => callback());
 
