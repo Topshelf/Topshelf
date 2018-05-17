@@ -21,7 +21,9 @@ namespace Topshelf.HostConfigurators
     using Logging;
     using Options;
     using Runtime;
+#if NETCORE
     using Runtime.DotNetCore;
+#endif
     using Runtime.Windows;
 
 

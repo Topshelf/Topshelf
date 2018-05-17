@@ -17,6 +17,10 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.ServiceProcess" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Compile Remove="Runtime/DotNetCore/DotNetCoreHostEnvironment.cs" />
+    <Compile Remove="Runtime/DotNetCore/DotNetCoreEnvironmentBuilder.cs" />
+  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.0-rc1" />
   </ItemGroup>
