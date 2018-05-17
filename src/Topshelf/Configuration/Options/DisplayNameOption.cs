@@ -14,9 +14,10 @@ namespace Topshelf.Options
 {
     using HostConfigurators;
 
-    public class DisplayNameOption : Option
+    public class DisplayNameOption :
+        Option
     {
-        string _name;
+        readonly string _name;
 
         public DisplayNameOption(string name)
         {

@@ -25,5 +25,6 @@ namespace Topshelf
         UnhandledServiceException = 8,
         ServiceNotRunning = 9,
         SendCommandFailed = 10,
+        NotRunningOnWindows = 11,
     }
 }
