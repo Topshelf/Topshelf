@@ -33,7 +33,7 @@ namespace Topshelf
             try
             {
                 if (configureCallback == null)
-                    throw new ArgumentNullException("configureCallback");
+                    throw new ArgumentNullException(nameof(configureCallback));
 
                 var configurator = new HostConfiguratorImpl();
 

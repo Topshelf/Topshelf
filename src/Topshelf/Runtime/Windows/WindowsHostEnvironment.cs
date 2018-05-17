@@ -122,14 +122,9 @@ namespace Topshelf.Runtime.Windows
             {
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
 
-                if (null != identity)
-                {
-                    var principal = new WindowsPrincipal(identity);
+                var principal = new WindowsPrincipal(identity);
 
-                    return principal.IsInRole(WindowsBuiltInRole.Administrator);
-                }
-
-                return false;
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
         }
 

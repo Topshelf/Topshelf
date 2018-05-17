@@ -55,12 +55,9 @@ namespace Topshelf
                 return accessor(attribute);
             }
 
-            public static String ToServiceNameSafeString(this String input)
+            public static string ToServiceNameSafeString(this String input)
             {
-                if (input == null)
-                    return null;
-
-                return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input).Replace(" ", String.Empty);
+                return input == null ? null : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input).Replace(" ", string.Empty);
             }
         }
     }

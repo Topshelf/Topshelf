@@ -29,7 +29,7 @@ namespace Topshelf.Options
         public void ApplyTo(HostConfigurator configurator)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             var commandConfigurator = new CommandConfigurator(_command);
 

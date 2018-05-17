@@ -20,9 +20,9 @@ namespace Topshelf
         public static HostConfigurator EnableServiceRecovery(this HostConfigurator configurator, Action<ServiceRecoveryConfigurator> configureCallback)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
             if (configureCallback == null)
-                throw new ArgumentNullException("configureCallback");
+                throw new ArgumentNullException(nameof(configureCallback));
 
             var recoveryHostConfigurator = new ServiceRecoveryHostConfigurator();
 

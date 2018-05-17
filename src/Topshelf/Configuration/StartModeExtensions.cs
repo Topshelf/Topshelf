@@ -21,7 +21,7 @@ namespace Topshelf
         public static HostConfigurator StartAutomatically(this HostConfigurator configurator)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.Automatic));
 
@@ -31,7 +31,7 @@ namespace Topshelf
         public static HostConfigurator StartAutomaticallyDelayed(this HostConfigurator configurator)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.AutomaticDelayed));
 
@@ -41,7 +41,7 @@ namespace Topshelf
         public static HostConfigurator StartManually(this HostConfigurator configurator)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.Manual));
 
@@ -51,7 +51,7 @@ namespace Topshelf
         public static HostConfigurator Disabled(this HostConfigurator configurator)
         {
             if (configurator == null)
-                throw new ArgumentNullException("configurator");
+                throw new ArgumentNullException(nameof(configurator));
 
             configurator.AddConfigurator(new StartModeHostConfigurator(HostStartMode.Disabled));
 

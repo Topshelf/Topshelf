@@ -17,7 +17,7 @@ namespace Topshelf.Options
     public class ServiceNameOption :
         Option
     {
-        string _serviceName;
+        readonly string _serviceName;
 
         public ServiceNameOption(string name)
         {

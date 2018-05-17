@@ -19,7 +19,7 @@ namespace Topshelf.Options
     {
         public void ApplyTo(HostConfigurator configurator)
         {
-                configurator.StartAutomatically();
+            configurator.StartAutomatically();
         }
     }
 }

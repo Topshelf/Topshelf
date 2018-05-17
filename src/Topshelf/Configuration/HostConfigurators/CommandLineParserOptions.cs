@@ -41,15 +41,15 @@ namespace Topshelf.HostConfigurators
                     select (Option)new DisplayNameOption(disp.Value))
                 .Or(from instance in x.Definition("instance")
                     select (Option)new InstanceOption(instance.Value))
-#if !NETCORE
                 .Or(from arg in x.Argument("stop")
                     select (Option)new StopOption())
+                .Or(from arg in x.Argument("start")
+                    select (Option)new StartOption())
+#if !NETCORE
                 .Or(from arg in x.Argument("install")
                     select (Option)new InstallOption())
                 .Or(from arg in x.Argument("uninstall")
                     select (Option)new UninstallOption())
-                .Or(from arg in x.Argument("start")
-                    select (Option)new StartOption())
                 .Or(from arg in x.Switch("sudo")
                     select (Option)new SudoOption())
                 .Or(from username in x.Definition("username")

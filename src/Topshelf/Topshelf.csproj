@@ -6,55 +6,60 @@
     <DebugType>portable</DebugType>
     <AssemblyOriginatorKeyFile>..\..\Topshelf.snk</AssemblyOriginatorKeyFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Topshelf.xml</DocumentationFile>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System"/>
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Configuration.Install"/>
-    <Reference Include="System.ServiceProcess"/>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.ServiceProcess" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.0-rc1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <Compile Remove="Configuration/Builders/InstallBuilder.cs"/>
-    <Compile Remove="Configuration/Builders/StartBuilder.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/DependencyHostConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/InstallHostConfiguratorAction.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/RunAsServiceAccountHostConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/RunAsUserHostConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/RunAsVirtualAccountHostConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/ServiceRecoveryHostConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/StartModeHostConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/StartConfigurator.cs"/>
-    <Compile Remove="Configuration/HostConfigurators/SudoConfigurator.cs"/>
-    <Compile Remove="Configuration/Options/AutostartOption.cs"/>
-    <Compile Remove="Configuration/Options/DelayedOption.cs"/>
-    <Compile Remove="Configuration/Options/DisabledOption.cs"/>
-    <Compile Remove="Configuration/Options/InstallOption.cs"/>
-    <Compile Remove="Configuration/Options/InteractiveOption.cs"/>
-    <Compile Remove="Configuration/Options/LocalServiceOption.cs"/>
-    <Compile Remove="Configuration/Options/LocalSystemOption.cs"/>
-    <Compile Remove="Configuration/Options/ManualStartOption.cs"/>
-    <Compile Remove="Configuration/Options/NetworkServiceOption.cs"/>
-    <Compile Remove="Configuration/Options/ServiceAccountOption.cs"/>
-    <Compile Remove="Configuration/Options/StartOption.cs"/>
-    <Compile Remove="Configuration/Options/SudoOption.cs"/>
-    <Compile Remove="Configuration/Credentials.cs"/>
-    <Compile Remove="Configuration/DependencyExtensions.cs"/>
-    <Compile Remove="Configuration/InstallHostConfiguratorExtensions.cs"/>
-    <Compile Remove="Configuration/RunAsExtensions.cs"/>
-    <Compile Remove="Configuration/ServiceRecoveryConfiguratorExtensions.cs"/>
-    <Compile Remove="Configuration/StartModeExtensions.cs"/>
-    <Compile Remove="Hosts/InstallHost.cs"/>
-    <Compile Remove="Runtime/Windows/HostInstaller.cs"/>
-    <Compile Remove="Runtime/Windows/HostServiceInstaller.cs"/>
-    <Compile Remove="Runtime/Windows/WindowsHostEnvironment.cs"/>
-    <Compile Remove="Runtime/Windows/WindowsHostEnvironmentBuilder.cs"/>
-    <Compile Remove="Runtime/Windows/WindowsServiceHost.cs"/>
-    <Compile Remove="Runtime/InstallHostSettings.cs"/>
+    <Compile Remove="Configuration/Builders/InstallBuilder.cs" />
+    <Compile Remove="Configuration/HostConfigurators/DependencyHostConfigurator.cs" />
+    <Compile Remove="Configuration/HostConfigurators/InstallHostConfiguratorAction.cs" />
+    <Compile Remove="Configuration/HostConfigurators/RunAsServiceAccountHostConfigurator.cs" />
+    <Compile Remove="Configuration/HostConfigurators/RunAsUserHostConfigurator.cs" />
+    <Compile Remove="Configuration/HostConfigurators/RunAsVirtualAccountHostConfigurator.cs" />
+    <Compile Remove="Configuration/HostConfigurators/ServiceRecoveryHostConfigurator.cs" />
+    <Compile Remove="Configuration/HostConfigurators/StartModeHostConfigurator.cs" />
+    <Compile Remove="Configuration/HostConfigurators/SudoConfigurator.cs" />
+    <Compile Remove="Configuration/Options/AutostartOption.cs" />
+    <Compile Remove="Configuration/Options/DelayedOption.cs" />
+    <Compile Remove="Configuration/Options/DisabledOption.cs" />
+    <Compile Remove="Configuration/Options/InstallOption.cs" />
+    <Compile Remove="Configuration/Options/InteractiveOption.cs" />
+    <Compile Remove="Configuration/Options/LocalServiceOption.cs" />
+    <Compile Remove="Configuration/Options/LocalSystemOption.cs" />
+    <Compile Remove="Configuration/Options/ManualStartOption.cs" />
+    <Compile Remove="Configuration/Options/NetworkServiceOption.cs" />
+    <Compile Remove="Configuration/Options/ServiceAccountOption.cs" />
+    <Compile Remove="Configuration/Options/SudoOption.cs" />
+    <Compile Remove="Configuration/Credentials.cs" />
+    <Compile Remove="Configuration/DependencyExtensions.cs" />
+    <Compile Remove="Configuration/InstallHostConfiguratorExtensions.cs" />
+    <Compile Remove="Configuration/RunAsExtensions.cs" />
+    <Compile Remove="Configuration/ServiceRecoveryConfiguratorExtensions.cs" />
+    <Compile Remove="Configuration/StartModeExtensions.cs" />
+    <Compile Remove="Hosts/InstallHost.cs" />
+    <Compile Remove="Runtime/Windows/HostInstaller.cs" />
+    <Compile Remove="Runtime/Windows/HostServiceInstaller.cs" />
+    <Compile Remove="Runtime/Windows/WindowsHostEnvironment.cs" />
+    <Compile Remove="Runtime/Windows/WindowsHostEnvironmentBuilder.cs" />
+    <Compile Remove="Runtime/InstallHostSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HelpText.txt"/>
+    <EmbeddedResource Include="HelpText.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\..\..\.nuget\packages\system.runtime.interopservices.runtimeinformation\4.3.0\ref\netstandard1.1\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
