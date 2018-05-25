@@ -16,7 +16,7 @@ To ship logs with Logary, use the Logary.Adapters.Topshelf nuget. Once you've ad
             x.UseLogary(logary);
         });
         
-This makes it possible to get your logs off your node, so that you avoid running out of disk space and can log to modern log tagrets, such as ElasticSearch and InfluxDB.
+This makes it possible to get your logs off your node, so that you avoid running out of disk space and can log to modern log targets, such as ElasticSearch and InfluxDB.
 
 For more information, see the Logary README at https://github.com/logary/logary.
 
