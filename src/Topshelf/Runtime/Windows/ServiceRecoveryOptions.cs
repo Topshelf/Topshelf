@@ -25,10 +25,7 @@ namespace Topshelf.Runtime.Windows
 
         public int ResetPeriod { get; set; }
 
-        public IEnumerable<ServiceRecoveryAction> Actions
-        {
-            get { return _actions; }
-        }
+        public IEnumerable<ServiceRecoveryAction> Actions => _actions;
 
         public bool RecoverOnCrashOnly { get; set; }
 

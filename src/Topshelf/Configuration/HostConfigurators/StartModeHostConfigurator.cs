@@ -27,14 +27,11 @@ namespace Topshelf.HostConfigurators
             StartMode = startMode;
         }
 
-        public HostStartMode StartMode { get; private set; }
+        public HostStartMode StartMode { get; }
 
         public IEnumerable<ValidateResult> Validate()
         {
-#if NET35
-            if (StartMode == HostStartMode.AutomaticDelayed)
-                yield return this.Failure("StartMode", "Automatic (Delayed) is only available on .NET 4.0 or later");
-#endif
+
             yield break;
         }
 
@@ -43,8 +40,10 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
+#if !NETCORE
             builder.Match<InstallBuilder>(x => x.SetStartMode(StartMode));
-
+#endif
+            
             return builder;
         }
     }
