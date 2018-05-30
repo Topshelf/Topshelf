@@ -43,7 +43,6 @@ namespace SampleTopshelfService
                     x.SetStartTimeout(TimeSpan.FromSeconds(10));
                     x.SetStopTimeout(TimeSpan.FromSeconds(10));
 
-#if !NETCORE
                     x.EnableServiceRecovery(r =>
                         {
                             r.RestartService(3);
@@ -53,7 +52,7 @@ namespace SampleTopshelfService
                             r.OnCrashOnly();
                             r.SetResetPeriod(2);
                         });
-#endif
+
                     x.AddCommandLineSwitch("throwonstart", v => throwOnStart = v);
                     x.AddCommandLineSwitch("throwonstop", v => throwOnStop = v);
                     x.AddCommandLineSwitch("throwunhandled", v => throwUnhandled = v);
