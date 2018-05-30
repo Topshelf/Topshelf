@@ -21,7 +21,7 @@ namespace Topshelf.Runtime.Windows
             Delay = (int)delay.TotalMilliseconds;
         }
 
-        public int Delay { get; private set; }
+        public int Delay { get; }
 
         public abstract NativeMethods.SC_ACTION GetAction();
     }

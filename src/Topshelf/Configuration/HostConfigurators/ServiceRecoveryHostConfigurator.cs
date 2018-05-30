@@ -27,10 +27,7 @@ namespace Topshelf.HostConfigurators
         ServiceRecoveryOptions _options;
         HostSettings _settings;
 
-        ServiceRecoveryOptions Options
-        {
-            get { return _options ?? (_options = new ServiceRecoveryOptions()); }
-        }
+        ServiceRecoveryOptions Options => _options ?? (_options = new ServiceRecoveryOptions());
 
         public IEnumerable<ValidateResult> Validate()
         {
@@ -46,11 +43,13 @@ namespace Topshelf.HostConfigurators
         public HostBuilder Configure(HostBuilder builder)
         {
             if (builder == null)
-                throw new ArgumentNullException("builder");
+                throw new ArgumentNullException(nameof(builder));
 
             _settings = builder.Settings;
 
+#if !NETCORE
             builder.Match<InstallBuilder>(x => x.AfterInstall(ConfigureServiceRecovery));
+#endif
 
             return builder;
         }
@@ -103,10 +102,12 @@ namespace Topshelf.HostConfigurators
             Options.RecoverOnCrashOnly = true;
         }
 
+#if !NETCORE
         void ConfigureServiceRecovery(InstallHostSettings installSettings)
         {
             var controller = new WindowsServiceRecoveryController();
             controller.SetServiceRecoveryOptions(_settings, _options);
         }
+#endif
     }
 }
