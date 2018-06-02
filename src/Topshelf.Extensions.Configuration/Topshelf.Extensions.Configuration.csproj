@@ -14,9 +14,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <Compile Remove="Options\DependencyOption.cs" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj" />
   </ItemGroup>
