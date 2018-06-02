@@ -45,9 +45,8 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
 
-#if !NETCORE
             builder.Match<InstallBuilder>(x => x.AddDependency(Name));
-#endif
+
             return builder;
         }
     }

@@ -1,0 +1,427 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="InstallSuccessful" xml:space="preserve">
+    <value>Service was installed successfully.</value>
+  </data>
+  <data name="CantInstallOnWin9x" xml:space="preserve">
+    <value>A Windows service cannot be installed on this operating system. It can only be installed on Windows NT, Windows 2000, or later.</value>
+  </data>
+  <data name="ServiceDependency" xml:space="preserve">
+    <value>Service dependency name {1} of service {0} contains invalid characters.</value>
+  </data>
+  <data name="ServiceStartedIncorrectly" xml:space="preserve">
+    <value>Service was not started correctly. Type net start [&lt;ServiceName&gt;] from the command line or use the Control Panel to start the service.</value>
+  </data>
+  <data name="CantControlOnWin9x" xml:space="preserve">
+    <value>Operating system does not support controlling a Windows service. A service can only be controlled on Windows NT, Windows 2000, or later.</value>
+  </data>
+  <data name="ServiceProcessInstallerAccount" xml:space="preserve">
+    <value>Indicates the account type under which the service will run.</value>
+  </data>
+  <data name="InstallFailed" xml:space="preserve">
+    <value>Failed to install service. Service may have been installed already.</value>
+  </data>
+  <data name="ServiceName" xml:space="preserve">
+    <value>Service name {0} contains invalid characters, is empty, or is too long (max length = {1}).</value>
+  </data>
+  <data name="SBAutoLog" xml:space="preserve">
+    <value>Whether the service should automatically write to the event log on common events such as Install and Start.</value>
+  </data>
+  <data name="ServiceControllerDesc" xml:space="preserve">
+    <value>Provides the ability to connect to, query, and manipulate running or stopped Windows services.</value>
+  </data>
+  <data name="ResumeService" xml:space="preserve">
+    <value>Cannot resume {0} service on computer '{1}'.</value>
+  </data>
+  <data name="UserCanceledInstall" xml:space="preserve">
+    <value>User has canceled installation of services in executable {0}.</value>
+  </data>
+  <data name="BadMachineName" xml:space="preserve">
+    <value>MachineName value {0} is invalid.</value>
+  </data>
+  <data name="CommandFailed" xml:space="preserve">
+    <value>Failed to process service command. {0}</value>
+  </data>
+  <data name="InstallService" xml:space="preserve">
+    <value>Install Service : {0}</value>
+  </data>
+  <data name="OpenSC" xml:space="preserve">
+    <value>Cannot open Service Control Manager on computer '{0}'. This operation might require other privileges.</value>
+  </data>
+  <data name="CantStartFromCommandLineTitle" xml:space="preserve">
+    <value>Windows Service Start Failure</value>
+  </data>
+  <data name="ServiceInstallerStartType" xml:space="preserve">
+    <value>Indicates how and when this service is started.</value>
+  </data>
+  <data name="SPDependentServices" xml:space="preserve">
+    <value>The services that depend on this service in order to run.</value>
+  </data>
+  <data name="NoMachineName" xml:space="preserve">
+    <value>MachineName was not set.</value>
+  </data>
+  <data name="ServiceRemoved" xml:space="preserve">
+    <value>Service {0} was successfully removed from the system.</value>
+  </data>
+  <data name="CantStartFromCommandLine" xml:space="preserve">
+    <value>Cannot start service from the command line or a debugger.  A Windows Service must first be installed (using installutil.exe) and then started with the ServerExplorer, Windows Services Administrative tool or the NET START command.</value>
+  </data>
+  <data name="PauseFailed" xml:space="preserve">
+    <value>Failed to pause service. {0}</value>
+  </data>
+  <data name="NotAService" xml:space="preserve">
+    <value>ServiceInstaller cannot install the component because it does not inherit from Service.</value>
+  </data>
+  <data name="PauseService" xml:space="preserve">
+    <value>Cannot pause {0} service on computer '{1}'.</value>
+  </data>
+  <data name="TryToStop" xml:space="preserve">
+    <value>Attempt to stop service {0}.</value>
+  </data>
+  <data name="Timeout" xml:space="preserve">
+    <value>Time out has expired and the operation has not been completed.</value>
+  </data>
+  <data name="NoGivenName" xml:space="preserve">
+    <value>ServiceName and DisplayName have not been set. Either ServiceName or DisplayName is required. </value>
+  </data>
+  <data name="UnattendedCannotPrompt" xml:space="preserve">
+    <value>Username and password were not provided when installing the service located at {0}. Unattended installation does not provide a logon prompt for the username and password during installation.   </value>
+  </data>
+  <data name="CommandSuccessful" xml:space="preserve">
+    <value>Service command was processed successfully.</value>
+  </data>
+  <data name="SPServiceType" xml:space="preserve">
+    <value>The type of this service.</value>
+  </data>
+  <data name="SPServiceName" xml:space="preserve">
+    <value>The short name of the service.</value>
+  </data>
+  <data name="NotInPendingState" xml:space="preserve">
+    <value>UpdatePendingStatus can only be called during the handling of Start, Stop, Pause and Continue commands.</value>
+  </data>
+  <data name="CannotStart" xml:space="preserve">
+    <value>Cannot start service {0} on computer '{1}'.</value>
+  </data>
+  <data name="SPStartType" xml:space="preserve">
+    <value>The start type of the service, e.g. Automatic or Disabled.</value>
+  </data>
+  <data name="StartSuccessful" xml:space="preserve">
+    <value>Service started successfully.</value>
+  </data>
+  <data name="ContinueSuccessful" xml:space="preserve">
+    <value>Service continued successfully.</value>
+  </data>
+  <data name="NoInstaller" xml:space="preserve">
+    <value>Installation failed due to the absence of a ServiceProcessInstaller. The ServiceProcessInstaller must either be the containing installer, or it must be present in the Installers collection on the same installer as the ServiceInstaller.</value>
+  </data>
+  <data name="FailedToUnloadAppDomain" xml:space="preserve">
+    <value>Failed to unload app domain {0}.  The following exception occurred: {1}.</value>
+  </data>
+  <data name="CannotChangeProperties" xml:space="preserve">
+    <value>Cannot change CanStop, CanPauseAndContinue, CanShutdown, CanHandlePowerEvent, or CanHandleSessionChangeEvent property values after the service has been started.</value>
+  </data>
+  <data name="SBServiceName" xml:space="preserve">
+    <value>The name by which the service is identified to the system.</value>
+  </data>
+  <data name="SPCanStop" xml:space="preserve">
+    <value>Whether this service can be stopped.</value>
+  </data>
+  <data name="SPServicesDependedOn" xml:space="preserve">
+    <value>Services that must be started in order for this one to start.</value>
+  </data>
+  <data name="CantRunOnWin9x" xml:space="preserve">
+    <value>Operating system does not support a Windows service. A service can only be run on Windows NT, Windows 2000, or later.</value>
+  </data>
+  <data name="InstallOK" xml:space="preserve">
+    <value>Service {0} has been successfully installed.</value>
+  </data>
+  <data name="ServiceInstallerServicesDependedOn" xml:space="preserve">
+    <value>Indicates the services that must be running in order for this service to run.</value>
+  </data>
+  <data name="ServiceRemoving" xml:space="preserve">
+    <value>Service {0} is being removed from the system...</value>
+  </data>
+  <data name="StartingService" xml:space="preserve">
+    <value>Starting service {0}...</value>
+  </data>
+  <data name="CannotChangeName" xml:space="preserve">
+    <value>Cannot change service name when the service is running.</value>
+  </data>
+  <data name="ServiceInstallerDescription" xml:space="preserve">
+    <value>Indicates the service's description (a brief comment that explains the purpose of the service). </value>
+  </data>
+  <data name="StopService" xml:space="preserve">
+    <value>Cannot stop {0} service on computer '{1}'.</value>
+  </data>
+  <data name="SPDisplayName" xml:space="preserve">
+    <value>The descriptive name of the service.</value>
+  </data>
+  <data name="StopFailed" xml:space="preserve">
+    <value>Failed to stop service. {0}</value>
+  </data>
+  <data name="ShutdownOK" xml:space="preserve">
+    <value>Service has been successfully shut down.</value>
+  </data>
+  <data name="InvalidParameter" xml:space="preserve">
+    <value>Invalid value {1} for parameter {0}.</value>
+  </data>
+  <data name="StartFailed" xml:space="preserve">
+    <value>Service cannot be started. {0}</value>
+  </data>
+  <data name="InstallingService" xml:space="preserve">
+    <value>Installing service {0}...</value>
+  </data>
+  <data name="UninstallSuccessful" xml:space="preserve">
+    <value>Service was uninstalled successfully.</value>
+  </data>
+  <data name="NoDisplayName" xml:space="preserve">
+    <value>Display name could not be retrieved for service {0} on computer '{1}'.</value>
+  </data>
+  <data name="ServiceNameTooLongForNt4" xml:space="preserve">
+    <value>Service name must be 80 characters or less on this operating system.</value>
+  </data>
+  <data name="NoServices" xml:space="preserve">
+    <value>Service has not been supplied. At least one object derived from ServiceBase is required in order to run.</value>
+  </data>
+  <data name="RTL" xml:space="preserve">
+    <value>RTL_False</value>
+  </data>
+  <data name="DisplayNameTooLong" xml:space="preserve">
+    <value>Display name {0} is too long. Display name must be 255 characters or less.</value>
+  </data>
+  <data name="PowerEventOK" xml:space="preserve">
+    <value>PowerEvent handled successfully by the service.</value>
+  </data>
+  <data name="ServiceInstallerDelayedAutoStart" xml:space="preserve">
+    <value>Contains the delayed auto-start setting of service. This setting is ignored unless the service is an auto-start service.</value>
+  </data>
+  <data name="UserName" xml:space="preserve">
+    <value>User Name:</value>
+  </data>
+  <data name="ButtonOK" xml:space="preserve">
+    <value>&amp;OK</value>
+  </data>
+  <data name="SBServiceDescription" xml:space="preserve">
+    <value>The description of the service.</value>
+  </data>
+  <data name="CantRunOnWin9xTitle" xml:space="preserve">
+    <value>Windows Service Error</value>
+  </data>
+  <data name="ServiceUsage" xml:space="preserve">
+    <value>Usage: &lt;ServiceExeName&gt; &lt;Options&gt; 
+ -Install 
+ -InstallLogin [&lt;UserName&gt; &lt;Password&gt;] 
+ -Uninstall</value>
+  </data>
+  <data name="ServiceInstallerServiceName" xml:space="preserve">
+    <value>Indicates the name used by the system to identify this service.</value>
+  </data>
+  <data name="SPCanShutdown" xml:space="preserve">
+    <value>Whether this service can respond to a system shutdown.</value>
+  </data>
+  <data name="Label_SetServiceLogin" xml:space="preserve">
+    <value>Set Service Login</value>
+  </data>
+  <data name="OpenService" xml:space="preserve">
+    <value>Cannot open {0} service on computer '{1}'.</value>
+  </data>
+  <data name="ServiceInstallerDisplayName" xml:space="preserve">
+    <value>Indicates the friendly name that identifies the service to the user.</value>
+  </data>
+  <data name="SPCanPauseAndContinue" xml:space="preserve">
+    <value>Whether this service recognizes the Pause and Continue commands.</value>
+  </data>
+  <data name="ErrorNumber" xml:space="preserve">
+    <value>Windows Error number: {0}.</value>
+  </data>
+  <data name="PauseSuccessful" xml:space="preserve">
+    <value>Service paused successfully.</value>
+  </data>
+  <data name="SPMachineName" xml:space="preserve">
+    <value>The name of the machine on which this service resides.</value>
+  </data>
+  <data name="StopSuccessful" xml:space="preserve">
+    <value>Service stopped successfully.</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>Cannot get service file name.</value>
+  </data>
+  <data name="ControlService" xml:space="preserve">
+    <value>Cannot control {0} service on computer '{1}'.</value>
+  </data>
+  <data name="ShutdownFailed" xml:space="preserve">
+    <value>Failed to shut down service. The error that occurred was: {0}.</value>
+  </data>
+  <data name="ArgsCantBeNull" xml:space="preserve">
+    <value>Arguments within the 'args' array passed to Start cannot be null. </value>
+  </data>
+  <data name="Label_MissmatchedPasswords" xml:space="preserve">
+    <value>The passwords do not match.  Re-enter the password.</value>
+  </data>
+  <data name="SessionChangeFailed" xml:space="preserve">
+    <value>Failed to process session change. {0}</value>
+  </data>
+  <data name="ContinueFailed" xml:space="preserve">
+    <value>Failed to continue service. {0}</value>
+  </data>
+  <data name="StartService" xml:space="preserve">
+    <value>Cannot start {0} service on computer '{1}'.</value>
+  </data>
+  <data name="NoService" xml:space="preserve">
+    <value>Service {0} was not found on computer '{1}'.</value>
+  </data>
+  <data name="SPStatus" xml:space="preserve">
+    <value>The status of the service, e.g., Running or Stopped.</value>
+  </data>
+  <data name="HelpText" xml:space="preserve">
+    <value>Options for installing a Service Application:
+/username=name
+    Sets the user account to run the service under. You must also
+    specify the /password= option.
+
+/password=pwd
+    Sets the password for the account to run the service under.
+
+The /username and /password options will be used only if the vendor of
+the service designated it as requiring a user account. If a service was
+so designated, and you do not use the /username and /password options,
+you will be prompted at install time for the account.
+/unattended
+    Unattended install.  Will not prompt for username or password.</value>
+  </data>
+  <data name="CallbackHandler" xml:space="preserve">
+    <value>Cannot register control callback handler for service {0}.</value>
+  </data>
+  <data name="ServiceStartType" xml:space="preserve">
+    <value>Start type {0} is invalid for non-device driver services. </value>
+  </data>
+  <data name="PowerEventFailed" xml:space="preserve">
+    <value>Failed in handling the PowerEvent. The error that occurred was: {0}.</value>
+  </data>
+  <data name="UserPassword" xml:space="preserve">
+    <value>Password:</value>
+  </data>
+  <data name="InstallError" xml:space="preserve">
+    <value>Install Error</value>
+  </data>
+  <data name="UninstallFailed" xml:space="preserve">
+    <value>Failed to uninstall service. Service may be running.</value>
+  </data>
+</root>

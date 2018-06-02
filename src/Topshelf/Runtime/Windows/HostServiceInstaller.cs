@@ -156,7 +156,13 @@ namespace Topshelf.Runtime.Windows
             if (assembly == null)
                 throw new TopshelfException("Assembly.GetEntryAssembly() is null for some reason.");
 
-            string path = string.Format("/assemblypath={0}", assembly.Location);
+#if NETCORE
+            // Must run off Self Contained Deployment
+            string path = $"/assemblypath={assembly.Location.Replace(".dll", ".exe")}";
+#else
+            string path = $"/assemblypath={assembly.Location}";
+
+#endif
             string[] commandLine = { path };
 
             var context = new InstallContext(null, commandLine);

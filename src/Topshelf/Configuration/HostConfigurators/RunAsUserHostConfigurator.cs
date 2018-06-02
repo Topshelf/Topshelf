@@ -36,9 +36,8 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
             
-#if !NETCORE
             builder.Match<InstallBuilder>(x => x.RunAs(Username, Password, ServiceAccount.User));
-#endif
+
             return builder;
         }
 
