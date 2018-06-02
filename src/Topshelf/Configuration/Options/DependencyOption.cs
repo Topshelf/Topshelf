@@ -18,7 +18,7 @@ namespace Topshelf.Options
     /// Represents an option to set a service dependency.
     /// </summary>
     /// <seealso cref="Option" />
-    internal class DependencyOption
+    public class DependencyOption
         : Option
     {
         /// <summary>
