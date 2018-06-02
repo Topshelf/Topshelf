@@ -21,10 +21,7 @@ namespace Topshelf.HostConfigurators
     using Logging;
     using Options;
     using Runtime;
-#if NETCORE
-    using Runtime.DotNetCore;
-#endif
-    using Runtime.Windows;
+   using Runtime.Windows;
 
 
     public class HostConfiguratorImpl :
@@ -243,11 +240,7 @@ namespace Topshelf.HostConfigurators
 
         static EnvironmentBuilder DefaultEnvironmentBuilderFactory(HostConfigurator configurator)
         {
-#if NETCORE
-            return new DotNetCoreEnvironmentBuilder(configurator);
-#else
             return new WindowsHostEnvironmentBuilder(configurator);
-#endif
-        }
+        }   
     }
 }

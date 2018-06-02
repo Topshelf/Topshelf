@@ -1,0 +1,448 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Desc_Installer_Parent" xml:space="preserve">
+    <value>The installer containing the collection that this installer belongs to</value>
+  </data>
+  <data name="NotCustomPerformanceCategory" xml:space="preserve">
+    <value>You cannot create an installer for a system or a nonextensible PerformanceCategory.</value>
+  </data>
+  <data name="InstallInitializeException" xml:space="preserve">
+    <value>Exception occurred while initializing the installation:
+{0}: {1}.</value>
+  </data>
+  <data name="RemovingInstallState" xml:space="preserve">
+    <value>Remove InstallState file because there are no installers.</value>
+  </data>
+  <data name="Desc_Source" xml:space="preserve">
+    <value>The application name (source name) to use when writing to the event log.</value>
+  </data>
+  <data name="InstallSeverityWarning" xml:space="preserve">
+    <value>Warning!</value>
+  </data>
+  <data name="InstallActivityRollingBack" xml:space="preserve">
+    <value>Rolling back assembly '{0}'.</value>
+  </data>
+  <data name="InvalidProperty" xml:space="preserve">
+    <value>Invalid value {1} for property {0}</value>
+  </data>
+  <data name="InstallHelpMessageStart" xml:space="preserve">
+    <value>Usage: InstallUtil [/u | /uninstall] [option [...]] assembly [[option [...]] assembly] [...]]
+
+InstallUtil executes the installers in each given assembly.
+If the /u or /uninstall switch is specified, it uninstalls
+the assemblies, otherwise it installs them. Unlike other
+options, /u applies to all assemblies, regardless of where it
+appears on the command line.
+
+Installation is done in a transactioned way: If one of the
+assemblies fails to install, the installations of all other
+assemblies are rolled back. Uninstall is not transactioned.
+
+Options take the form /switch=[value]. Any option that occurs
+before the name of an assembly will apply to that assembly's
+installation. Options are cumulative but overridable - options
+specified for one assembly will apply to the next as well unless
+the option is specified with a new value. The default for all
+options is empty or false unless otherwise specified.
+
+Options recognized:</value>
+  </data>
+  <data name="PCMachineName" xml:space="preserve">
+    <value>Specifies the machine from where to read the performance data.</value>
+  </data>
+  <data name="InstallLogRollbackException" xml:space="preserve">
+    <value>An exception occurred during the Rollback phase of the {0} installer.</value>
+  </data>
+  <data name="InstallCommitException" xml:space="preserve">
+    <value>An exception occurred during the Commit phase of the installation. This exception will be ignored and installation will continue. However, the application might not function correctly after installation is complete.</value>
+  </data>
+  <data name="InstallLogParameters" xml:space="preserve">
+    <value>Affected parameters are:</value>
+  </data>
+  <data name="InstallLogNone" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="Desc_ParameterResourceFile" xml:space="preserve">
+    <value>The path to the dll containing the parameter replacement strings.</value>
+  </data>
+  <data name="InstallNullParameter" xml:space="preserve">
+    <value>The {0} parameter cannot be null.</value>
+  </data>
+  <data name="InstallNoPublicInstallers" xml:space="preserve">
+    <value>No public installers with the RunInstallerAttribute.Yes attribute could be found in the {0} assembly.</value>
+  </data>
+  <data name="InstallHelpMessageEnd" xml:space="preserve">
+    <value>
+Individual installers used within an assembly may recognize other
+options. To learn about these options, run InstallUtil with the paths
+of the assemblies on the command line along with the /? or /help option.
+</value>
+  </data>
+  <data name="CantAddSelf" xml:space="preserve">
+    <value>An installer cannot be added to its own collection.</value>
+  </data>
+  <data name="InstallCannotCreateInstance" xml:space="preserve">
+    <value>Unable to create an instance of the {0} installer type.</value>
+  </data>
+  <data name="IncompleteEventLog" xml:space="preserve">
+    <value>Log and Source properties must be set on the EventLog to create an installer.</value>
+  </data>
+  <data name="InstallInfoCommitDone" xml:space="preserve">
+    <value>The Commit phase completed successfully.</value>
+  </data>
+  <data name="Desc_CategoryResourceFile" xml:space="preserve">
+    <value>The path to the dll containing category names. </value>
+  </data>
+  <data name="InstallActivityInstalling" xml:space="preserve">
+    <value>Installing assembly '{0}'.</value>
+  </data>
+  <data name="WinNTRequired" xml:space="preserve">
+    <value>Feature requires Windows NT.</value>
+  </data>
+  <data name="InstallFileDoesntExist" xml:space="preserve">
+    <value>File {0} does not exist.</value>
+  </data>
+  <data name="InstallException" xml:space="preserve">
+    <value>An exception occurred while trying to find the installers in the {0} assembly.</value>
+  </data>
+  <data name="PCCounterName" xml:space="preserve">
+    <value>Counter name of the performance counter object.</value>
+  </data>
+  <data name="InstallDictionaryMissingValues" xml:space="preserve">
+    <value>The {0} dictionary does not contain the expected values and might have been corrupted.</value>
+  </data>
+  <data name="WrappedExceptionSource" xml:space="preserve">
+    <value>Wrapped Exception from System.Configuration.Install.Installer</value>
+  </data>
+  <data name="InstallFileLocation" xml:space="preserve">
+    <value>The file is located at {0}.</value>
+  </data>
+  <data name="InstallInfoTransacted" xml:space="preserve">
+    <value>Running a transacted installation.</value>
+  </data>
+  <data name="InstallFileNotFound" xml:space="preserve">
+    <value>The {0} file could not be found.</value>
+  </data>
+  <data name="InstallSavedStateFileCorruptedWarning" xml:space="preserve">
+    <value>The file containing the saved state for the {0} assembly, located at {1}, could not be read, and the file might have been corrupted. The uninstall will continue without the saved information.</value>
+  </data>
+  <data name="Desc_Log" xml:space="preserve">
+    <value>The name of the log to read from and write to.</value>
+  </data>
+  <data name="InstallInfoException" xml:space="preserve">
+    <value>An exception occurred during the Install phase.</value>
+  </data>
+  <data name="Desc_AssemblyInstaller_UseNewContext" xml:space="preserve">
+    <value>Value indicating whether to create a new InstallContext object for the assembly's installation</value>
+  </data>
+  <data name="PCI_UninstallAction" xml:space="preserve">
+    <value>Determines behavior of the installer at uninstall time.</value>
+  </data>
+  <data name="PerfInvalidCategoryName" xml:space="preserve">
+    <value>Invalid category name. Its length must be in the range between '{0}' and '{1}'. Double quotes, control characters and leading or trailing spaces are not allowed.</value>
+  </data>
+  <data name="RestoringEventLog" xml:space="preserve">
+    <value>Restoring event log to previous state for source {0}.</value>
+  </data>
+  <data name="Desc_MessageResourceFile" xml:space="preserve">
+    <value>The path to the resource dll containing event messages.</value>
+  </data>
+  <data name="InstallRollback" xml:space="preserve">
+    <value>The installation failed, and the rollback has been performed.</value>
+  </data>
+  <data name="InstallCommitNtRun" xml:space="preserve">
+    <value>Running Commit phase of non-transacted install.</value>
+  </data>
+  <data name="PCCategoryName" xml:space="preserve">
+    <value>Category name of the performance counter object.</value>
+  </data>
+  <data name="NotAPerformanceCounter" xml:space="preserve">
+    <value>PerformanceCounterInstaller can only be used to install objects of type PerformanceCounter.</value>
+  </data>
+  <data name="InstallInfoBeginUninstall" xml:space="preserve">
+    <value>The uninstall is beginning.</value>
+  </data>
+  <data name="InstallSeverityError" xml:space="preserve">
+    <value>Error!</value>
+  </data>
+  <data name="Desc_UninstallAction" xml:space="preserve">
+    <value>The action to take on the Log on uninstall. </value>
+  </data>
+  <data name="InstallUninstallException" xml:space="preserve">
+    <value>An exception occurred while uninstalling. This exception will be ignored and the uninstall will continue. However, the application might not be fully uninstalled after the uninstall is complete.</value>
+  </data>
+  <data name="InstallInstallerNotFound" xml:space="preserve">
+    <value>The given item could not be found in the collection.</value>
+  </data>
+  <data name="Desc_AssemblyInstaller_Path" xml:space="preserve">
+    <value>The path of the assembly to install</value>
+  </data>
+  <data name="InstallRollbackNtRun" xml:space="preserve">
+    <value>Running Rollback phase of non-transacted install.</value>
+  </data>
+  <data name="RemovingEventLog" xml:space="preserve">
+    <value>Removing EventLog source {0}.</value>
+  </data>
+  <data name="NotAnEventLog" xml:space="preserve">
+    <value>EventLogInstaller cannot copy properties from components that are not EventLogs.</value>
+  </data>
+  <data name="InstallDictionaryCorrupted" xml:space="preserve">
+    <value>The {0} dictionary contains inconsistent data and might have been corrupted.</value>
+  </data>
+  <data name="Desc_CategoryCount" xml:space="preserve">
+    <value>The number of categories contained in the CategoryResourceFile. </value>
+  </data>
+  <data name="DeletingEventLog" xml:space="preserve">
+    <value>Deleting event log {0}.</value>
+  </data>
+  <data name="InstallInstallNtRun" xml:space="preserve">
+    <value>Running Install phase of non-transacted install</value>
+  </data>
+  <data name="InstallInfoRollbackDone" xml:space="preserve">
+    <value>The Rollback phase completed successfully.</value>
+  </data>
+  <data name="InstallUninstallNtRun" xml:space="preserve">
+    <value>Running Uninstall phase of non-transacted install</value>
+  </data>
+  <data name="InstallInfoUninstallDone" xml:space="preserve">
+    <value>The uninstall has completed.</value>
+  </data>
+  <data name="Desc_Installer_HelpText" xml:space="preserve">
+    <value>The help text for all the installers in the installer collection</value>
+  </data>
+  <data name="CreatingEventLog" xml:space="preserve">
+    <value>Creating EventLog source {0} in log {1}...</value>
+  </data>
+  <data name="PCI_Counters" xml:space="preserve">
+    <value>The set of counters to install with this category.</value>
+  </data>
+  <data name="InstallAssemblyHelp" xml:space="preserve">
+    <value>Options for installing any assembly:
+/AssemblyName
+ The assembly parameter will be interpreted as an assembly name (Name,
+ Locale, PublicKeyToken, Version). The default is to interpret the
+ assembly parameter as the filename of the assembly on disk.
+
+/LogFile=[filename]
+ File to write progress to. If empty, do not write log. Default
+ is &lt;assemblyname&gt;.InstallLog
+
+/LogToConsole={true|false}
+ If false, suppresses output to the console.
+
+/ShowCallStack
+ If an exception occurs at any point during installation, the call
+ stack will be printed to the log.
+
+/InstallStateDir=[directoryname]
+ Directory in which the .InstallState file will be stored. Default
+ is the directory of the assembly.</value>
+  </data>
+  <data name="InstallNoInstallerTypes" xml:space="preserve">
+    <value>Unable to get installer types in the {0} assembly.</value>
+  </data>
+  <data name="InstallRollbackException" xml:space="preserve">
+    <value>An exception occurred during the Rollback phase of the installation. This exception will be ignored and the rollback will continue. However, the machine might not fully revert to its initial state after the rollback is complete.</value>
+  </data>
+  <data name="InstallInfoBeginRollback" xml:space="preserve">
+    <value>The Rollback phase of the installation is beginning.</value>
+  </data>
+  <data name="PCInstanceName" xml:space="preserve">
+    <value>Instance name of the performance counter object.</value>
+  </data>
+  <data name="InstallActivityUninstalling" xml:space="preserve">
+    <value>Uninstalling assembly '{0}'.</value>
+  </data>
+  <data name="InstallEventException" xml:space="preserve">
+    <value>An exception occurred in the {0} event handler of {1}.</value>
+  </data>
+  <data name="InstallInfoBeginInstall" xml:space="preserve">
+    <value>Beginning the Install phase of the installation.</value>
+  </data>
+  <data name="Desc_AssemblyInstaller_CommandLine" xml:space="preserve">
+    <value>The command line to use when creating a new InstallContext object for the assembly's installation</value>
+  </data>
+  <data name="InstallLogUninstallException" xml:space="preserve">
+    <value>An exception occurred during the uninstallation of the {0} installer.</value>
+  </data>
+  <data name="PCI_CategoryHelp" xml:space="preserve">
+    <value>Help information about this category.</value>
+  </data>
+  <data name="InstallLogError" xml:space="preserve">
+    <value>An exception occurred in the {1} event handler of {2}.</value>
+  </data>
+  <data name="InstallLogInner" xml:space="preserve">
+    <value>The inner exception {0} was thrown with the following error message: {1}.</value>
+  </data>
+  <data name="IncompletePerformanceCounter" xml:space="preserve">
+    <value>CategoryName property must be set on the PerformanceCounter to create an installer.</value>
+  </data>
+  <data name="PCI_IsMultiInstance" xml:space="preserve">
+    <value>Whether this category is a multi-instance or single-instance category.</value>
+  </data>
+  <data name="NewCategory" xml:space="preserve">
+    <value>PerformanceCounterInstaller can only install multiple counters in the same category. To install this counter, create a new instance of PerformanceCounterInstaller.</value>
+  </data>
+  <data name="InstallLogCommitException" xml:space="preserve">
+    <value>An exception occurred during the Commit phase of the {0} installer.</value>
+  </data>
+  <data name="InstallLogContent" xml:space="preserve">
+    <value>See the contents of the log file for the {0} assembly's progress.</value>
+  </data>
+  <data name="InstallRecursiveParent" xml:space="preserve">
+    <value>You cannot set an installer's Parent to an installer that creates a circular dependency.</value>
+  </data>
+  <data name="CreatingPerformanceCounter" xml:space="preserve">
+    <value>Creating performance counter category {0}.</value>
+  </data>
+  <data name="LocalSourceNotRegisteredWarning" xml:space="preserve">
+    <value>Warning: The source {0} is not registered on the local machine.</value>
+  </data>
+  <data name="InstallFileDoesntExistCommandLine" xml:space="preserve">
+    <value>File {0} does not exist. If this parameter is used as an installer option, the format must be /key=[value].</value>
+  </data>
+  <data name="InstallUnableDeleteFile" xml:space="preserve">
+    <value>Unable to delete file {0}.</value>
+  </data>
+  <data name="InstallBadParent" xml:space="preserve">
+    <value>An installer's parent cannot be equal to itself.</value>
+  </data>
+  <data name="RemovingPerformanceCounter" xml:space="preserve">
+    <value>Removing performance counter category {0}.</value>
+  </data>
+  <data name="InstallActivityCommitting" xml:space="preserve">
+    <value>Committing assembly '{0}'.</value>
+  </data>
+  <data name="Desc_AssemblyInstaller_Assembly" xml:space="preserve">
+    <value>The assembly to install</value>
+  </data>
+  <data name="RestoringPerformanceCounter" xml:space="preserve">
+    <value>Restoring performance counter data to previous state for performance counter category {0}.</value>
+  </data>
+  <data name="InstallAbort" xml:space="preserve">
+    <value>Aborting installation for {0}.</value>
+  </data>
+  <data name="InstallInfoTransactedDone" xml:space="preserve">
+    <value>The transacted install has completed.</value>
+  </data>
+  <data name="InstallInfoBeginCommit" xml:space="preserve">
+    <value>The Install phase completed successfully, and the Commit phase is beginning.</value>
+  </data>
+</root>

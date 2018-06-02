@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Topshelf.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="System.Configuration.Install\System.Configuration.Install.resx">
+      <LogicalName>System.Configuration.Install.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="System.ServiceProcess\System.ServiceProcess.resx">
+      <LogicalName>System.ServiceProcess.resources</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
