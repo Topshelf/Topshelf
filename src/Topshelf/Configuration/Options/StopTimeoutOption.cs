@@ -15,24 +15,24 @@ namespace Topshelf.Options
     using Topshelf.HostConfigurators;
 
     /// <summary>
-    /// Represents an option to set a service start timeout (in seconds).
+    /// Represents an option to set a service stop timeout (in seconds).
     /// </summary>
     /// <seealso cref="Option" />
-    internal class StartTimeoutOption
+    public class StopTimeoutOption
         : Option
     {
         /// <summary>
-        /// The start timeout (in seconds).
+        /// The stop timeout (in seconds).
         /// </summary>
-        private readonly int startTimeout;
+        private readonly int stopTimeoout;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StartTimeoutOption"/> class.
+        /// Initializes a new instance of the <see cref="StopTimeoutOption"/> class.
         /// </summary>
-        /// <param name="startTimeout">The start timeout (in seconds).</param>
-        public StartTimeoutOption(int startTimeout)
+        /// <param name="stopTimeoout">The stop timeout (in seconds).</param>
+        public StopTimeoutOption(int stopTimeoout)
         {
-            this.startTimeout = startTimeout;
+            this.stopTimeoout = stopTimeoout;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Topshelf.Options
         /// <param name="configurator">The host configurator.</param>
         public void ApplyTo(HostConfigurator configurator)
         {
-            configurator.SetStartTimeout(System.TimeSpan.FromSeconds(this.startTimeout));
+            configurator.SetStopTimeout(System.TimeSpan.FromSeconds(this.stopTimeoout));
         }
     }
 }
