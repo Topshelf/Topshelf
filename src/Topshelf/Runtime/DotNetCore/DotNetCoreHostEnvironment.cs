@@ -10,6 +10,7 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
+#if NETCORE
 namespace Topshelf.Runtime.DotNetCore
 {
     using System;
@@ -21,7 +22,9 @@ namespace Topshelf.Runtime.DotNetCore
     using Windows;
     using HostConfigurators;
     using Logging;
-
+    using System.Configuration.Install;
+    using System.Reflection;
+    using System.ComponentModel;
 
     public class DotNetCoreHostEnvironment :
         HostEnvironment
@@ -153,22 +156,128 @@ namespace Topshelf.Runtime.DotNetCore
             }
         }
 
-#if !NETCORE
         public void InstallService(InstallHostSettings settings, Action<InstallHostSettings> beforeInstall, Action afterInstall, Action beforeRollback,
             Action afterRollback)
         {
-            throw new NotImplementedException();
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("Not running windows");
+            }
+
+            using (var installer = new HostServiceInstaller(settings))
+            {
+                Action<InstallEventArgs> before = x =>
+                {
+                    if (beforeInstall != null)
+                    {
+                        beforeInstall(settings);
+                        installer.ServiceProcessInstaller.Username = settings.Credentials.Username;
+                        installer.ServiceProcessInstaller.Account = settings.Credentials.Account;
+
+                        bool gMSA = false;
+                        // Group Managed Service Account (gMSA) workaround per
+                        // https://connect.microsoft.com/VisualStudio/feedback/details/795196/service-process-installer-should-support-virtual-service-accounts
+                        if (settings.Credentials.Account == ServiceAccount.User &&
+                            settings.Credentials.Username != null &&
+                            ((gMSA = settings.Credentials.Username.EndsWith("$", StringComparison.InvariantCulture)) ||
+                            string.Equals(settings.Credentials.Username, "NT SERVICE\\" + settings.ServiceName, StringComparison.InvariantCulture)))
+                        {
+                            _log.InfoFormat(gMSA ? "Installing as gMSA {0}." : "Installing as virtual service account", settings.Credentials.Username);
+                            installer.ServiceProcessInstaller.Password = null;
+                            installer.ServiceProcessInstaller
+                                .GetType()
+                                .GetField("haveLoginInfo", BindingFlags.Instance | BindingFlags.NonPublic)
+                                .SetValue(installer.ServiceProcessInstaller, true);
+                        }
+                        else
+                        {
+                            installer.ServiceProcessInstaller.Password = settings.Credentials.Password;
+                        }
+                    }
+                };
+
+                Action<InstallEventArgs> after = x =>
+                {
+                    if (afterInstall != null)
+                        afterInstall();
+                };
+
+                Action<InstallEventArgs> before2 = x =>
+                {
+                    if (beforeRollback != null)
+                        beforeRollback();
+                };
+
+                Action<InstallEventArgs> after2 = x =>
+                {
+                    if (afterRollback != null)
+                        afterRollback();
+                };
+
+                installer.InstallService(before, after, before2, after2);
+            }
         }
-#endif
 
         public void UninstallService(HostSettings settings, Action beforeUninstall, Action afterUninstall)
         {
-            throw new NotImplementedException();
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("Not running windows");
+            }
+
+            using (var installer = new HostServiceInstaller(settings))
+            {
+                Action<InstallEventArgs> before = x =>
+                {
+                    if (beforeUninstall != null)
+                        beforeUninstall();
+                };
+
+                Action<InstallEventArgs> after = x =>
+                {
+                    if (afterUninstall != null)
+                        afterUninstall();
+                };
+
+                installer.UninstallService(before, after);
+            }
         }
 
         public bool RunAsAdministrator()
         {
-            throw new NotImplementedException();
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("Not running windows");
+            }
+
+            if (Environment.OSVersion.Version.Major == 6)
+            {
+                string commandLine = CommandLine.Replace("--sudo", "");
+
+                var startInfo = new ProcessStartInfo(Assembly.GetEntryAssembly().Location, commandLine)
+                {
+                    Verb = "runas",
+                    UseShellExecute = true,
+                    CreateNoWindow = true,
+                };
+
+                try
+                {
+                    HostLogger.Shutdown();
+
+                    Process process = Process.Start(startInfo);
+                    process.WaitForExit();
+
+                    return true;
+                }
+                catch (Win32Exception ex)
+                {
+                    _log.Debug("Process Start Exception", ex);
+                }
+            }
+
+            return false;
+
         }
 
         public Host CreateServiceHost(HostSettings settings, ServiceHandle serviceHandle)
@@ -249,3 +358,4 @@ namespace Topshelf.Runtime.DotNetCore
         }
     }
 }
+#endif

@@ -17,29 +17,11 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.ServiceProcess" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Compile Remove="Runtime/DotNetCore/DotNetCoreHostEnvironment.cs" />
-    <Compile Remove="Runtime/DotNetCore/DotNetCoreEnvironmentBuilder.cs" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.0" />
+    <ProjectReference Include="..\TopShelf.ServiceInstaller\TopShelf.ServiceInstaller.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <Compile Remove="Configuration/Builders/InstallBuilder.cs" />
-    <Compile Remove="Configuration/HostConfigurators/InstallHostConfiguratorAction.cs" />
-    <Compile Remove="Configuration/HostConfigurators/SudoConfigurator.cs" />
-    <Compile Remove="Configuration/HostConfigurators/RunAsServiceAccountHostConfigurator.cs" />
-    <Compile Remove="Configuration/Options/InstallOption.cs" />
-    <Compile Remove="Configuration/Options/SudoOption.cs" />
-    <Compile Remove="Configuration/Credentials.cs" />
-    <Compile Remove="Configuration/InstallHostConfiguratorExtensions.cs" />
-    <Compile Remove="Hosts/InstallHost.cs" />
-    <Compile Remove="Runtime/Windows/HostInstaller.cs" />
-    <Compile Remove="Runtime/Windows/HostServiceInstaller.cs" />
-    <Compile Remove="Runtime/Windows/WindowsHostEnvironment.cs" />
-    <Compile Remove="Runtime/Windows/WindowsHostEnvironmentBuilder.cs" />
-    <Compile Remove="Runtime/InstallHostSettings.cs" />
-  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="HelpText.txt" />
   </ItemGroup>
