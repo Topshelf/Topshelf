@@ -47,9 +47,7 @@ namespace Topshelf.HostConfigurators
 
             _settings = builder.Settings;
 
-#if !NETCORE
             builder.Match<InstallBuilder>(x => x.AfterInstall(ConfigureServiceRecovery));
-#endif
 
             return builder;
         }
@@ -102,12 +100,10 @@ namespace Topshelf.HostConfigurators
             Options.RecoverOnCrashOnly = true;
         }
 
-#if !NETCORE
         void ConfigureServiceRecovery(InstallHostSettings installSettings)
         {
             var controller = new WindowsServiceRecoveryController();
             controller.SetServiceRecoveryOptions(_settings, _options);
         }
-#endif
     }
 }

@@ -47,11 +47,9 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException(nameof(configurator));
 
-#if !NETCORE
             var runAsConfigurator = new RunAsServiceAccountHostConfigurator(ServiceAccount.User);
 
             configurator.AddConfigurator(runAsConfigurator);
-#endif
 
             return configurator;
         }
@@ -61,11 +59,9 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException(nameof(configurator));
 
-#if !NETCORE
             var runAsConfigurator = new RunAsServiceAccountHostConfigurator(ServiceAccount.NetworkService);
 
             configurator.AddConfigurator(runAsConfigurator);
-#endif
 
             return configurator;
         }
@@ -75,11 +71,9 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException(nameof(configurator));
 
-#if !NETCORE
             var runAsConfigurator = new RunAsServiceAccountHostConfigurator(ServiceAccount.LocalSystem);
 
             configurator.AddConfigurator(runAsConfigurator);
-#endif
 
             return configurator;
         }
@@ -89,11 +83,9 @@ namespace Topshelf
             if (configurator == null)
                 throw new ArgumentNullException(nameof(configurator));
 
-#if !NETCORE
             var runAsConfigurator = new RunAsServiceAccountHostConfigurator(ServiceAccount.LocalService);
 
             configurator.AddConfigurator(runAsConfigurator);
-#endif
 
             return configurator;
         }

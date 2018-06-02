@@ -40,10 +40,8 @@ namespace Topshelf.HostConfigurators
             if (builder == null)
                 throw new ArgumentNullException("builder");
 
-#if !NETCORE
             builder.Match<InstallBuilder>(x => x.SetStartMode(StartMode));
-#endif
-            
+
             return builder;
         }
     }

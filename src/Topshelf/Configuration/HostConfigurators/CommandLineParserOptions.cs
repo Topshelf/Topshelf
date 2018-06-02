@@ -45,7 +45,6 @@ namespace Topshelf.HostConfigurators
                     select (Option)new StopOption())
                 .Or(from arg in x.Argument("start")
                     select (Option)new StartOption())
-#if !NETCORE
                 .Or(from arg in x.Argument("install")
                     select (Option)new InstallOption())
                 .Or(from arg in x.Argument("uninstall")
@@ -71,7 +70,6 @@ namespace Topshelf.HostConfigurators
                     select (Option)new LocalServiceOption())
                 .Or(from autostart in x.Switch("networkservice")
                     select (Option)new NetworkServiceOption())
-#endif
 );
         }
 
