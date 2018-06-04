@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD2_0
-namespace System.Diagnostics
+﻿namespace System.Diagnostics
 {
     /// <summary>Specifies what an installer should do during an uninstallation.</summary>
     public enum UninstallAction
@@ -10,4 +9,3 @@ namespace System.Diagnostics
         NoAction
     }
 }
-#endif
