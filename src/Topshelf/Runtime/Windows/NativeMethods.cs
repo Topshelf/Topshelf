@@ -217,7 +217,14 @@ namespace Topshelf.Runtime.Windows
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct SC_ACTION
         {
+            /// <summary>
+            /// The action to be performed. This member can be one of the following values from the <see cref="SC_ACTION_TYPE" /> enumeration type.
+            /// </summary>
             public int Type;
+
+            /// <summary>
+            /// The time to wait before performing the specified action, in milliseconds.
+            /// </summary>
             public int Delay;
         }
 

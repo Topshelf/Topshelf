@@ -47,13 +47,13 @@ namespace Topshelf.Options
                 switch (option)
                 {
                     case RestartServiceRecoveryAction restartServiceRecoveryAction:
-                        recoveryHostConfigurator.RestartService(restartServiceRecoveryAction.Delay);
+                        recoveryHostConfigurator.RestartService(restartServiceRecoveryAction.Delay / 60000);
                         break;
                     case RestartSystemRecoveryAction restartSystemRecoveryAction:
-                        recoveryHostConfigurator.RestartComputer(restartSystemRecoveryAction.Delay, restartSystemRecoveryAction.RestartMessage);
+                        recoveryHostConfigurator.RestartComputer(restartSystemRecoveryAction.Delay / 60000, restartSystemRecoveryAction.RestartMessage);
                         break;
                     case RunProgramRecoveryAction runProgramRecoveryAction:
-                        recoveryHostConfigurator.RunProgram(runProgramRecoveryAction.Delay, runProgramRecoveryAction.Command);
+                        recoveryHostConfigurator.RunProgram(runProgramRecoveryAction.Delay / 60000, runProgramRecoveryAction.Command);
                         break;
                 }
             }

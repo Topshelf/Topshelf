@@ -134,7 +134,6 @@ namespace Topshelf.Configuration
                     var account = configuration.GetSection("Account");
                     var accountValue = account.Value;
 
-
                     if (string.Equals(accountValue, "LocalSystem", StringComparison.OrdinalIgnoreCase))
                     {
                         options.Add(new LocalSystemOption());
