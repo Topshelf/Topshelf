@@ -12,24 +12,41 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Runtime.Windows
 {
+    /// <summary>
+    /// Represents a run command service recovery action.
+    /// </summary>
+    /// <seealso cref="Topshelf.Runtime.Windows.ServiceRecoveryAction" />
     public class RunProgramRecoveryAction :
         ServiceRecoveryAction
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RunProgramRecoveryAction"/> class.
+        /// </summary>
+        /// <param name="delay">The delay.</param>
+        /// <param name="command">The command.</param>
         public RunProgramRecoveryAction(System.TimeSpan delay, string command)
             : base(delay)
         {
             Command = command;
         }
 
+        /// <summary>
+        /// Gets the command to run.
+        /// </summary>
+        /// <value>The command. to run</value>
         public string Command { get; private set; }
 
+        /// <summary>
+        /// Gets the service recovery configuration action.
+        /// </summary>
+        /// <returns>A <see cref="NativeMethods.SC_ACTION"/> representing the run command service recovery configuration action.</returns>
         public override NativeMethods.SC_ACTION GetAction()
         {
             return new NativeMethods.SC_ACTION
-                {
-                    Delay = Delay,
-                    Type = (int)NativeMethods.SC_ACTION_TYPE.RunCommand,
-                };
+            {
+                Delay = Delay,
+                Type = (int)NativeMethods.SC_ACTION_TYPE.RunCommand,
+            };
         }
     }
 }

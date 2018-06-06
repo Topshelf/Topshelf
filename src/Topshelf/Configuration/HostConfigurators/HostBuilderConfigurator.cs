@@ -16,12 +16,17 @@ namespace Topshelf.HostConfigurators
     using Configurators;
 
     /// <summary>
-    /// Can configure/replace the input HostBuilder, returning the original
-    /// or a new HostBuilder
+    /// Can configure/replace the input <see cref="HostBuilder"/>, returning the original
+    /// or a new <see cref="HostBuilder"/>.
     /// </summary>
     public interface HostBuilderConfigurator :
         Configurator
     {
+        /// <summary>
+        /// Configures the host builder.
+        /// </summary>
+        /// <param name="builder">The host builder.</param>
+        /// <returns>The configured host builder.</returns>
         HostBuilder Configure(HostBuilder builder);
     }
 }
