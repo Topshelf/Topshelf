@@ -257,7 +257,7 @@ Runs the service using the local service account.
 Custom Install Actions
 ======================
 
-These settings allow user-specified code to be executed during the service install/uninstall process.
+These actions allow user-specified code to be executed during the service install/uninstall process. Each install action takes a *settings* parameter of type Topshelf.HostSettings, providing you with an API to service-related properties such as the *InstanceName*, *ServiceName*, etc.
 
 Before Install Actions
 ----------------------
@@ -268,7 +268,7 @@ Topshelf allows actions to be specified that are executed before the service is 
 
     HostFactory.New(x =>
     {
-        x.BeforeInstall(() => { ... });
+        x.BeforeInstall(settings => { ... });
     });
 
 
@@ -281,7 +281,7 @@ Topshelf allows actions to be specified that are executed after the service is i
 
     HostFactory.New(x =>
     {
-        x.AfterInstall(() => { ... });
+        x.AfterInstall(settings => { ... });
     });
 
 Before Uninstall Actions
