@@ -31,6 +31,12 @@ namespace Topshelf.Runtime.Windows
 
         public void AddAction(ServiceRecoveryAction serviceRecoveryAction)
         {
+            if (_actions.Count == 3)
+            {
+                throw new TopshelfException("Recovery action can not be added. " +
+                                            "Windows recovery does not support more than 3 actions");
+            }
+
             _actions.Add(serviceRecoveryAction);
         }
     }
