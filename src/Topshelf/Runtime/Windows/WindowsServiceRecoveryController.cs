@@ -57,12 +57,6 @@ namespace Topshelf.Runtime.Windows
                     nextAction = (IntPtr)(nextAction.ToInt64() + actionSize);
                 }
 
-                var finalAction = new NativeMethods.SC_ACTION();
-                finalAction.Type = (int)NativeMethods.SC_ACTION_TYPE.None;
-                finalAction.Delay = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
-
-                Marshal.StructureToPtr(finalAction, nextAction, false);
-
                 string rebootMessage = options.Actions.Where(x => x.GetType() == typeof(RestartSystemRecoveryAction))
                                            .OfType<RestartSystemRecoveryAction>().Select(x => x.RestartMessage).
                                            FirstOrDefault() ?? "";
@@ -77,7 +71,7 @@ namespace Topshelf.Runtime.Windows
                     (int)TimeSpan.FromDays(options.ResetPeriod).TotalSeconds;
                 failureActions.lpRebootMsg = rebootMessage;
                 failureActions.lpCommand = runProgramCommand;
-                failureActions.cActions = actions.Count + 1;
+                failureActions.cActions = actions.Count;
                 failureActions.actions = lpsaActions;
 
                 lpInfo = Marshal.AllocHGlobal(Marshal.SizeOf(failureActions));
