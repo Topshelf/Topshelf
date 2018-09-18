@@ -1,0 +1,44 @@
+branches:
+  only:
+  - develop
+  - master
+skip_tags: true
+skip_commits:
+  files:
+    - doc/*
+    - docs/*
+    - '**/*.html'
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+nuget:
+  project_feed: true
+  disable_publish_on_pr: true
+build_script:
+- cmd: >-
+    @echo off
+
+    cls
+
+    If Not Exist src\.nuget\nuget.exe msbuild src\.nuget\NuGet.targets -Target:RestorePackages
+
+    If Not Exist src\packages\FAKE\tools\fake.exe src\.nuget\nuget.exe Install FAKE -OutputDirectory "src\packages" -ExcludeVersion
+
+    src\packages\FAKE\tools\fake.exe build.fsx %*
+artifacts:
+- path: build_artifacts/*.nupkg
+  name: Packages
+deploy:
+- provider: NuGet
+  api_key:
+    secure: qZNrnYhYhNeqn7ogd6uigc1Z45xvw+QWSK53B8fqGjd9LcxllcGl6P6lo/ylYGdB
+  artifact: Packages
+  on:
+    branch: master
+- provider: NuGet
+  name: Prerelease
+  api_key:
+    secure: qZNrnYhYhNeqn7ogd6uigc1Z45xvw+QWSK53B8fqGjd9LcxllcGl6P6lo/ylYGdB
+  artifact: Packages
+  on:
+    branch: develop
