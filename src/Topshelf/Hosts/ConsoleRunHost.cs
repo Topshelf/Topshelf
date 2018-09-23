@@ -159,7 +159,7 @@ namespace Topshelf.Hosts
 
             if (e.IsTerminating)
             {
-                _exitCode = TopshelfExitCode.UnhandledServiceException;
+                _exitCode = TopshelfExitCode.AbnormalExit;
                 _exit.Set();
 
                 // it isn't likely that a TPL thread should land here, but if it does let's no block it
@@ -195,7 +195,7 @@ namespace Topshelf.Hosts
                 _settings.ExceptionCallback?.Invoke(ex);
 
                 _log.Error("The service did not shut down gracefully", ex);
-                _exitCode = TopshelfExitCode.StopServiceFailed;
+                _exitCode = TopshelfExitCode.ServiceControlRequestFailed;
             }
             finally
             {

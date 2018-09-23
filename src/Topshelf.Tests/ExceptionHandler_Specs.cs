@@ -50,7 +50,7 @@ namespace Topshelf.Tests
 
             Assert.IsTrue(sawExceptionInStart);
             Assert.IsFalse(sawExceptionInStop);
-            Assert.AreEqual(TopshelfExitCode.StartServiceFailed, exitCode);
+            Assert.AreEqual(TopshelfExitCode.ServiceControlRequestFailed, exitCode);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace Topshelf.Tests
 
             Assert.IsFalse(sawExceptionInStart);
             Assert.IsTrue(sawExceptionInStop);
-            Assert.AreEqual(TopshelfExitCode.StopServiceFailed, exitCode);
+            Assert.AreEqual(TopshelfExitCode.ServiceControlRequestFailed, exitCode);
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace Topshelf.Tests
                 x.Service(settings => new ExceptionThrowingService(true, false));
             });
 
-            Assert.AreEqual(TopshelfExitCode.StartServiceFailed, exitCode);
+            Assert.AreEqual(TopshelfExitCode.ServiceControlRequestFailed, exitCode);
 
             exitCode = HostFactory.Run(x =>
             {
@@ -124,7 +124,7 @@ namespace Topshelf.Tests
                 x.Service(settings => new ExceptionThrowingService(false, true));
             });
 
-            Assert.AreEqual(TopshelfExitCode.StopServiceFailed, exitCode);
+            Assert.AreEqual(TopshelfExitCode.ServiceControlRequestFailed, exitCode);
 
         }
 

@@ -65,7 +65,7 @@ namespace Topshelf.Hosts
             catch (Exception ex)
             {
                 _log.Error("The service failed to stop.", ex);
-                return TopshelfExitCode.StopServiceFailed;
+                return TopshelfExitCode.ServiceControlRequestFailed;
             }
         }
     }

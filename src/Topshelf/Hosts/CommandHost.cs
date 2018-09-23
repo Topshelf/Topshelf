@@ -58,7 +58,7 @@ namespace Topshelf.Hosts
             catch (Exception ex)
             {
                 _log.Error("The command could not be sent to the service.", ex);
-                return TopshelfExitCode.SendCommandFailed;
+                return TopshelfExitCode.ServiceControlRequestFailed;
             }
         }
     }
