@@ -35,7 +35,7 @@ namespace Topshelf.Tests
                 });
 
             Assert.IsFalse(started);
-            Assert.AreEqual(TopshelfExitCode.StartServiceFailed, exitCode);
+            Assert.AreEqual(TopshelfExitCode.ServiceControlRequestFailed, exitCode);
         }
 
 

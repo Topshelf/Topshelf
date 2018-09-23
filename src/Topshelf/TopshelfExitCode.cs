@@ -12,19 +12,37 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf
 {
-    public enum TopshelfExitCode
+    public struct TopshelfExitCode
     {
-        Ok = 0,
-        AbnormalExit = 1,
-        SudoRequired = 2,
-        ServiceAlreadyInstalled = 3,
-        ServiceNotInstalled = 4,
-        StartServiceFailed = 5,
-        StopServiceFailed = 6,
-        ServiceAlreadyRunning = 7,
-        UnhandledServiceException = 8,
-        ServiceNotRunning = 9,
-        SendCommandFailed = 10,
-        NotRunningOnWindows = 11,
+        private readonly int _exitCode;
+
+        public TopshelfExitCode(int exitCode)
+        {
+            _exitCode = exitCode;
+        }
+        
+        public static explicit operator int(TopshelfExitCode topshelfExitCode)
+        {
+            return topshelfExitCode._exitCode;
+        }
+
+        // windows service exit code compliant 
+        // https://docs.microsoft.com/en-us/windows/desktop/Debug/system-error-codes
+        public static TopshelfExitCode Ok { get; } = new TopshelfExitCode(0);
+        public static TopshelfExitCode ServiceAlreadyInstalled { get; } = new TopshelfExitCode(1242);
+        public static TopshelfExitCode ServiceNotInstalled { get; } = new TopshelfExitCode(1243);
+        public static TopshelfExitCode ServiceAlreadyRunning { get; } = new TopshelfExitCode(1056);
+        public static TopshelfExitCode ServiceNotRunning { get; } = new TopshelfExitCode(1062);
+        public static TopshelfExitCode ServiceControlRequestFailed { get; } = new TopshelfExitCode(1064);
+        public static TopshelfExitCode AbnormalExit { get; } = new TopshelfExitCode(1067);
+        
+        // non-compliant
+        public static TopshelfExitCode SudoRequired { get; } = new TopshelfExitCode(2);
+        public static TopshelfExitCode NotRunningOnWindows { get; } = new TopshelfExitCode(11);
+
+        public override string ToString()
+        {
+            return $"Exit code: {_exitCode}";
+        }
     }
 }

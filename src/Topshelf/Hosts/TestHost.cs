@@ -41,7 +41,7 @@ namespace Topshelf.Hosts
             var exitCode = TopshelfExitCode.AbnormalExit;
             try
             {
-                exitCode = TopshelfExitCode.StartServiceFailed;
+                exitCode = TopshelfExitCode.ServiceControlRequestFailed;
 
                 _log.InfoFormat("The {0} service is being started.", _settings.ServiceName);
                 _serviceHandle.Start(this);
@@ -49,7 +49,7 @@ namespace Topshelf.Hosts
 
                 Thread.Sleep(100);
 
-                exitCode = TopshelfExitCode.StopServiceFailed;
+                exitCode = TopshelfExitCode.ServiceControlRequestFailed;
 
                 _log.InfoFormat("The {0} service is being stopped.", _settings.ServiceName);
                 _serviceHandle.Stop(this);
