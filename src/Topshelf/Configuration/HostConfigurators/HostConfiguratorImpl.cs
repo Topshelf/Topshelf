@@ -187,6 +187,12 @@ namespace Topshelf.HostConfigurators
             _settings.ExceptionCallback = callback;
         }
 
+        public UnhandledExceptionPolicyCode UnhandledExceptionPolicy
+        {
+          get { return _settings.UnhandledExceptionPolicy; }
+          set { _settings.UnhandledExceptionPolicy = value; }
+        }
+
         public Host CreateHost()
         {
             Type type = typeof(HostFactory);

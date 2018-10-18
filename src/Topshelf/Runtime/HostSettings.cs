@@ -80,5 +80,11 @@ namespace Topshelf.Runtime
         /// own handling.
         /// </summary>
         Action<Exception> ExceptionCallback { get; }
+
+        /// <summary>
+        /// The policy that will be used when Topself detects an UnhandledException in the
+        /// application. The default policy is to log an error and to stop the service.
+        /// </summary>
+        UnhandledExceptionPolicyCode UnhandledExceptionPolicy { get; }
     }
 }

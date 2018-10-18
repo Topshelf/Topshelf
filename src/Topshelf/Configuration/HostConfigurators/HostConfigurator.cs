@@ -13,6 +13,7 @@
 namespace Topshelf.HostConfigurators
 {
     using System;
+    using Runtime;
 
     public interface HostConfigurator
     {
@@ -125,5 +126,11 @@ namespace Topshelf.HostConfigurators
         /// </summary>
         /// <param name="callback">The action to run when an exception occurs.</param>
         void OnException(Action<Exception> callback);
-    }
+
+      /// <summary>
+      /// The policy that will be used when Topself detects an UnhandledException in the
+      /// application. The default policy is to log an error and to stop the service.
+      /// </summary>
+      UnhandledExceptionPolicyCode UnhandledExceptionPolicy { get; }
+  }
 }
