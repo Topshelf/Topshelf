@@ -153,7 +153,13 @@ namespace Topshelf.Hosts
         {
             _settings.ExceptionCallback?.Invoke((Exception) e.ExceptionObject);
 
+            if (_settings.UnhandledExceptionPolicy == UnhandledExceptionPolicyCode.TakeNoAction)
+              return;
+
             _log.Fatal("The service threw an unhandled exception", (Exception) e.ExceptionObject);
+
+            if (_settings.UnhandledExceptionPolicy == UnhandledExceptionPolicyCode.LogErrorOnly)
+              return;
 
             HostLogger.Shutdown();
 

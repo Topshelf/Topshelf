@@ -217,6 +217,11 @@ namespace Topshelf.Hosts
             {
                 get { return _settings.ExceptionCallback; }
             }
+
+            public UnhandledExceptionPolicyCode UnhandledExceptionPolicy
+            {
+              get { return _settings.UnhandledExceptionPolicy; }
+            }
         }
     }
 }
