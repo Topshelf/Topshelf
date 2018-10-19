@@ -529,6 +529,8 @@ namespace Topshelf.Extensions.Configuration.Tests
         {
             public HostBuilderConfigurator Configuratior { get; private set; }
 
+            public UnhandledExceptionPolicyCode UnhandledExceptionPolicy => throw new NotImplementedException();
+
             public void AddCommandLineDefinition(string name, Action<string> callback)
             {
                 throw new NotImplementedException();
