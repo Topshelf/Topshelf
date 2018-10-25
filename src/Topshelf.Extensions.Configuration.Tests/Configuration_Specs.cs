@@ -531,6 +531,8 @@ namespace Topshelf.Extensions.Configuration.Tests
 
             public UnhandledExceptionPolicyCode UnhandledExceptionPolicy => throw new NotImplementedException();
 
+            UnhandledExceptionPolicyCode HostConfigurator.UnhandledExceptionPolicy { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
             public void AddCommandLineDefinition(string name, Action<string> callback)
             {
                 throw new NotImplementedException();
