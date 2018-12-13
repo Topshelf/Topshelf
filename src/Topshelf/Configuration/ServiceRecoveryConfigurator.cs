@@ -64,6 +64,12 @@ namespace Topshelf
         ServiceRecoveryConfigurator RunProgram(int delayInMinutes, string command);
 
         /// <summary>
+        ///   Take no action
+        /// </summary>
+        /// <returns>The service recovery configurator.</returns>
+        ServiceRecoveryConfigurator TakeNoAction();
+
+        /// <summary>
         ///   Specifies the reset period for the restart options
         /// </summary>
         /// <param name="days">The reset period in days.</param>
