@@ -77,12 +77,7 @@ namespace Topshelf.Runtime.Windows
 
             Run(this);
 
-            // this error code does not matter when running as a windows service
-            // the actual exit code is taken from the ServiceBase.ExitCode
-            // Windows service tooling already sees the service as stopped here -
-            // once ServiceBase.OnStop method exits, but the process is not yet finished here.
-            // even if we put Thread.Sleep(600000) the process will be killed after some timeout
-            return new TopshelfExitCode(ExitCode);
+            return (TopshelfExitCode) Enum.ToObject(typeof(TopshelfExitCode), ExitCode);
         }
 
         void HostControl.RequestAdditionalTime(TimeSpan timeRemaining)
