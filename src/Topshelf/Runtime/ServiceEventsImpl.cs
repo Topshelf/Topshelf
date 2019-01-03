@@ -101,11 +101,6 @@ namespace Topshelf.Runtime
             {
                 _hostControl.Stop(exitCode);
             }
-
-            public void Restart()
-            {
-                _hostControl.Restart();
-            }
         }
 
         class HostStartContextImpl :

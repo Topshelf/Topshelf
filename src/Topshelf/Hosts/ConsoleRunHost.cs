@@ -142,13 +142,6 @@ namespace Topshelf.Hosts
             _exit.Set();
         }
 
-        void HostControl.Restart()
-        {
-            _log.Info("Service Restart requested, but we don't support that here, so we are exiting.");
-            _exit.Set();
-        }
-
-
         void CatchUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             _settings.ExceptionCallback?.Invoke((Exception) e.ExceptionObject);

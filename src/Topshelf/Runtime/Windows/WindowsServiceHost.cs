@@ -92,13 +92,6 @@ namespace Topshelf.Runtime.Windows
             RequestAdditionalTime((int) timeRemaining.TotalMilliseconds);
         }
 
-        void HostControl.Restart()
-        {
-            _log.Fatal("Restart is not yet implemented");
-
-            throw new NotImplementedException("This is not done yet, so I'm trying");
-        }
-
         void HostControl.Stop()
         {
             InternalStop();
