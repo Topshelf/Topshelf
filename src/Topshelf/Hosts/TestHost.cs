@@ -86,10 +86,5 @@ namespace Topshelf.Hosts
         {
             _log.Info($"Service Stop requested with exit code {exitCode}, exiting.");
         }
-
-        void HostControl.Restart()
-        {
-            _log.Info("Service Restart requested, but we don't support that here, so we are exiting.");
-        }
     }
 }
