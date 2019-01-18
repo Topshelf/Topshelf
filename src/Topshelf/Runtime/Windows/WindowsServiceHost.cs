@@ -66,7 +66,7 @@ namespace Topshelf.Runtime.Windows
 
             if (!_environment.IsServiceInstalled(_settings.ServiceName))
             {
-                string message = $"The {_settings} service has not been installed yet. Please run '{Assembly.GetEntryAssembly().GetName()} install'.";
+                string message = $"The {_settings.ServiceName} service has not been installed yet. Please run '{Assembly.GetEntryAssembly().GetName()} install'.";
                 _log.Fatal(message);
 
                 ExitCode = (int) TopshelfExitCode.ServiceNotInstalled;
