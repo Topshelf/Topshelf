@@ -218,7 +218,7 @@ namespace Topshelf.HostConfigurators
             //Intercept exceptions from serviceBuilder, TopShelf handling is in HostFactory
             catch (Exception ex)
             {
-                builder.Settings?.ExceptionCallback(ex);
+                builder.Settings?.ExceptionCallback?.Invoke(ex);
                 throw;
             }
         }
