@@ -21,9 +21,7 @@ namespace Topshelf.Hosts
     using System.Threading;
     using System.Threading.Tasks;
     using Logging;
-#if !NETCORE
     using Microsoft.Win32;
-#endif
     using Runtime;
 
 
@@ -57,7 +55,6 @@ namespace Topshelf.Hosts
             _environment = environment;
             _serviceHandle = serviceHandle;
 
-#if !NETCORE
             if (settings.CanSessionChanged)
             {
                 SystemEvents.SessionSwitch += OnSessionChanged;
@@ -67,7 +64,6 @@ namespace Topshelf.Hosts
             {
                 SystemEvents.PowerModeChanged += OnPowerModeChanged;
             }
-    #endif
         }
 
         public TopshelfExitCode Run()
@@ -262,7 +258,6 @@ namespace Topshelf.Hosts
             }
         }
 
-#if !NETCORE
         void OnSessionChanged(object sender, SessionSwitchEventArgs e)
         {
             var arguments = new ConsoleSessionChangedArguments(e.Reason);
@@ -315,6 +310,5 @@ namespace Topshelf.Hosts
 
             public PowerEventCode EventCode { get; }
         }
-#endif
     }
 }
