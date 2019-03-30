@@ -50,6 +50,9 @@ Get started in four simple steps!
 2. Set Visual Studio Tools -> Options -> Text Editor -> All Languages -> Tabs to use "Tab Size" = 4, "Indent Size" = 4, and "Insert Spaces"
 3. Double-click/open the .sln file.
 
+### Deploying TopShelf with Azure DevOps
+
+The [Windows Service Manager](https://marketplace.visualstudio.com/items?itemName=MDSolutions.WindowsServiceManagerWindowsServiceManager) Azure DevOps extension supports TopShelf deployments to a group of target machines or a deployment group target.
 
 # REQUIREMENTS
 
