@@ -4,6 +4,11 @@
     <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageTags>Topshelf;Elmah</PackageTags>
+    <Description>$(Description)</Description>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
