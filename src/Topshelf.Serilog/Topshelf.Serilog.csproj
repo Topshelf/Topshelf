@@ -1,23 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SignAssembly>true</SignAssembly>
-    <DebugType>portable</DebugType>
     <AssemblyOriginatorKeyFile>..\..\Topshelf.snk</AssemblyOriginatorKeyFile>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Topshelf.Serilog.xml</DocumentationFile>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
     <PackageReference Include="Serilog" Version="2.7.1" />
   </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Topshelf\Topshelf.csproj" />
   </ItemGroup>
+  
 </Project>

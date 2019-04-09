@@ -1,25 +1,47 @@
-﻿<?xml version="1.0" encoding="utf-8"?><!-- The new msbuild allows you to set properties in this file that will be inherited by all projects -->
-<!-- see: http://blog.seravy.com/directory-build-targets-solution-wide-msbuild-target-part-2/ -->
-<Project>
+﻿<Project>
   <!-- These properties will be shared for all projects -->
+
   <PropertyGroup>
     <Product>Topshelf</Product>
-    <Description>Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.</Description>
-    <PackageProjectUrl>https://github.com/Topshelf/Topshelf</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/Topshelf/Topshelf/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/Topshelf/Topshelf</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>Topshelf</PackageTags>
-    <Authors>Chris Patterson;Dru Sellers;Travis Smith</Authors>
     <Copyright>Copyright 2007-2018 Chris Patterson, Dru Sellers, Travis Smith, et. al.</Copyright>
+    <Authors>Chris Patterson;Dru Sellers;Travis Smith</Authors>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningLevel>4</WarningLevel>
-    <NoWarn>1587,1591,1998,3008,3001</NoWarn>
+    <NoWarn>CS1587,CS1591,CS1998,CS0675,CS1998,CS3008,CS3001,NU5105</NoWarn>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
     <DefineConstants>DEBUG;TRACE;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
     <DefineConstants>TRACE;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName.Contains(Tests))' == false">
+    <!-- Nuget Package Details -->
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Description>Topshelf is an open source project for hosting services without friction. By referencing Topshelf, your console application *becomes* a service installer with a comprehensive set of command-line options for installing, configuring, and running your application as a service.</Description>
+    <IsPackable>True</IsPackable>
+
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- SourceLink Config, needs nuget package in each csproj Microsoft.SourceLink.GitHub in order to work -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName.Contains(Tests))' == true">
+    <NoWarn>$(NoWarn),CS0618</NoWarn>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>False</IsPackable>
+  </PropertyGroup>
+
 </Project>
