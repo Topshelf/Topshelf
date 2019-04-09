@@ -29,3 +29,10 @@ _ReSharper*
 # osx noise
 .DS_Store
 Gemfile.lock
+
+# Cake
+tools/**
+!tools/packages.config
+
+# Artifacts
+artifacts/**

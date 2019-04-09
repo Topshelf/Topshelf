@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.5.0" />
   </ItemGroup>
@@ -19,4 +20,5 @@
       <LogicalName>System.ServiceProcess.resources</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
+  
 </Project>
