@@ -153,16 +153,19 @@ namespace Topshelf.Runtime.Windows
 
             Assembly assembly = Assembly.GetEntryAssembly();
 
+            Process currentProcess = Process.GetCurrentProcess();
+
             if (assembly == null)
                 throw new TopshelfException("Assembly.GetEntryAssembly() is null for some reason.");
 
-#if NETCORE
-            // Must run off Self Contained Deployment
-            string path = $"/assemblypath={assembly.Location.Replace(".dll", ".exe")}";
-#else
-            string path = $"/assemblypath={assembly.Location}";
+            if (currentProcess == null)
+                throw new TopshelfException("Process.GetCurrentProcess() is null for some reason.");
 
-#endif
+            string path =
+                IsDotnetExe(currentProcess)
+                ? $"/assemblypath={currentProcess.MainModule.FileName} \"{assembly.Location}\""
+                : $"/assemblypath={currentProcess.MainModule.FileName}";
+
             string[] commandLine = { path };
 
             var context = new InstallContext(null, commandLine);
@@ -170,6 +173,12 @@ namespace Topshelf.Runtime.Windows
 
             return transactedInstaller;
         }
+
+        static bool IsDotnetExe(Process process) =>
+            process
+            .MainModule
+            .ModuleName
+            .Equals("dotnet.exe", StringComparison.InvariantCultureIgnoreCase);
 
         static ServiceInstaller ConfigureServiceInstaller(HostSettings settings, string[] dependencies,
             HostStartMode startMode)
