@@ -68,16 +68,24 @@ namespace Topshelf.Hosts
 
             AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
-            if (_environment.IsServiceInstalled(_settings.ServiceName))
+#if NETCORE
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
             {
-                if (!_environment.IsServiceStopped(_settings.ServiceName))
+#endif
+                if (_environment.IsServiceInstalled(_settings.ServiceName))
                 {
-                    _log.ErrorFormat("The {0} service is running and must be stopped before running via the console",
-                        _settings.ServiceName);
+                    if (!_environment.IsServiceStopped(_settings.ServiceName))
+                    {
+                        _log.ErrorFormat(
+                            "The {0} service is running and must be stopped before running via the console",
+                            _settings.ServiceName);
 
-                    return TopshelfExitCode.ServiceAlreadyRunning;
+                        return TopshelfExitCode.ServiceAlreadyRunning;
+                    }
                 }
+#if NETCORE
             }
+#endif
 
             bool started = false;
             try
