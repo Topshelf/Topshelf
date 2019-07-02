@@ -11,7 +11,7 @@ let packagesPath = FullName "./src/packages"
 let keyFile = FullName "./Topshelf.snk"
 
 let assemblyVersion = "4.0.0.0"
-let baseVersion = "4.2.0"
+let baseVersion = "4.2.1"
 
 let envVersion = (environVarOrDefault "APPVEYOR_BUILD_VERSION" (baseVersion + ".0"))
 let buildVersion = (envVersion.Substring(0, envVersion.LastIndexOf('.')))
