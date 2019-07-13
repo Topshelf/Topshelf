@@ -568,6 +568,11 @@ namespace Topshelf.Extensions.Configuration.Tests
                 throw new NotImplementedException();
             }
 
+            public void EnablePowerChanged()
+            {
+                throw new NotImplementedException();
+            }
+
             public void EnableShutdown()
             {
                 throw new NotImplementedException();

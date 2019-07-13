@@ -69,6 +69,11 @@ namespace Topshelf.HostConfigurators
         void EnableSessionChanged();
 
         /// <summary>
+        /// Enabled support for power events (signaled by the host OS)
+        /// </summary>
+        void EnablePowerChanged();
+
+        /// <summary>
         ///   Specifies the builder factory to use when the service is invoked
         /// </summary>
         /// <param name="hostBuilderFactory"> </param>

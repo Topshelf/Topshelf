@@ -131,6 +131,11 @@ namespace Topshelf.HostConfigurators
             _settings.CanSessionChanged = true;
         }
 
+        public void EnablePowerChanged()
+        {
+            _settings.CanHandlePowerEvent = true;
+        }
+
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
         {
             _hostBuilderFactory = hostBuilderFactory;
