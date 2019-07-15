@@ -131,7 +131,7 @@ namespace Topshelf.HostConfigurators
             _settings.CanSessionChanged = true;
         }
 
-        public void EnablePowerChanged()
+        public void EnablePowerEvents()
         {
             _settings.CanHandlePowerEvent = true;
         }

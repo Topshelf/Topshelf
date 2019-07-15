@@ -64,14 +64,14 @@ namespace Topshelf.HostConfigurators
         void EnableShutdown();
 
         /// <summary>
-        /// Enabled support for the session changed event
+        /// Enables support for the session changed event
         /// </summary>
         void EnableSessionChanged();
 
         /// <summary>
-        /// Enabled support for power events (signaled by the host OS)
+        /// Enables support for power events (signaled by the host OS)
         /// </summary>
-        void EnablePowerChanged();
+        void EnablePowerEvents();
 
         /// <summary>
         ///   Specifies the builder factory to use when the service is invoked
