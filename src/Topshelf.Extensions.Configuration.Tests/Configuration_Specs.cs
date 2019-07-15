@@ -568,7 +568,7 @@ namespace Topshelf.Extensions.Configuration.Tests
                 throw new NotImplementedException();
             }
 
-            public void EnablePowerChanged()
+            public void EnablePowerEvents()
             {
                 throw new NotImplementedException();
             }
