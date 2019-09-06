@@ -129,8 +129,7 @@ namespace Topshelf.Logging
         /// <param name="exception">The exception.</param>
         public void Debug(object obj, Exception exception)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogDebug(0, exception, text);
             }
@@ -184,8 +183,7 @@ namespace Topshelf.Logging
         /// <param name="exception">The exception.</param>
         public void Info(object obj, Exception exception)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogInformation(0, exception, text);
             }
@@ -232,8 +230,7 @@ namespace Topshelf.Logging
         /// <param name="obj">The object.</param>
         public void Warn(object obj)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogWarning(text);
             }
@@ -250,8 +247,7 @@ namespace Topshelf.Logging
         /// <param name="exception">The exception.</param>
         public void Warn(object obj, Exception exception)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogWarning(0, exception, text);
             }
@@ -298,8 +294,7 @@ namespace Topshelf.Logging
         /// <param name="obj">The object.</param>
         public void Error(object obj)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogError(text);
             }
@@ -316,8 +311,7 @@ namespace Topshelf.Logging
         /// <param name="exception">The exception.</param>
         public void Error(object obj, Exception exception)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogError(0, exception, text);
             }
@@ -364,8 +358,7 @@ namespace Topshelf.Logging
         /// <param name="obj">The object.</param>
         public void Fatal(object obj)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogCritical(text);
             }
@@ -382,8 +375,7 @@ namespace Topshelf.Logging
         /// <param name="exception">The exception.</param>
         public void Fatal(object obj, Exception exception)
         {
-            var text = obj as string;
-            if (obj != null)
+            if (obj is string text)
             {
                 this.logger.LogCritical(0, exception, text);
             }
