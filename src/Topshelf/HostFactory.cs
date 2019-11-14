@@ -54,7 +54,7 @@ namespace Topshelf
                 if (result.Message.Length > 0)
                 {
                     HostLogger.Get(typeof(HostFactory))
-                              .InfoFormat("Configuration Result:\n{0}", result.Message);
+                              .InfoFormat("Configuration Result:{0}{1}", Environment.NewLine, result.Message);
                 }
 
                 return configurator.CreateHost();
