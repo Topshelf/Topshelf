@@ -15,6 +15,9 @@ namespace Topshelf.Hosts
     using System;
     using System.Diagnostics;
     using System.IO;
+#if !NETCORE
+    using System.Runtime.InteropServices;
+#endif
     using System.Threading;
     using System.Threading.Tasks;
     using Logging;
@@ -28,6 +31,11 @@ namespace Topshelf.Hosts
         Host,
         HostControl
     {
+
+#if !NETCORE
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+#endif
         readonly LogWriter _log = HostLogger.Get<ConsoleRunHost>();
         readonly HostEnvironment _environment;
         readonly ServiceHandle _serviceHandle;
@@ -94,8 +102,23 @@ namespace Topshelf.Hosts
 
                 _exit = new ManualResetEvent(false);
                 _exitCode = TopshelfExitCode.Ok;
-
-                Console.Title = _settings.DisplayName;
+#if !NETCORE
+                if(GetConsoleWindow() != IntPtr.Zero)
+                {
+                    try
+                    {
+                        // It is common to run console applications in windowless mode, this prevents
+                        // the process from crashing when attempting to set the title.
+#endif
+                        Console.Title = _settings.DisplayName;
+#if !NETCORE
+                    }
+                    catch(IOException e)
+                    {
+                        _log.Info("It was not possible to set the console window title. See the inner exception for details.", e);
+                    }
+                }
+#endif
                 Console.CancelKeyPress += HandleCancelKeyPress;
 
                 if (!_serviceHandle.Start(this))
