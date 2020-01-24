@@ -39,7 +39,7 @@ Topshelf.
             });                                                             //10
 
             var exitCode = (int) Convert.ChangeType(rc, rc.GetTypeCode());  //11
-            Environment.ExitCode = exitCode;
+            Environment.Exit(exitCode);
         }
     }
 
