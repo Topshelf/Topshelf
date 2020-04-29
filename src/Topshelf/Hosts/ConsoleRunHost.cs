@@ -15,9 +15,7 @@ namespace Topshelf.Hosts
     using System;
     using System.Diagnostics;
     using System.IO;
-#if !NETCORE
     using System.Runtime.InteropServices;
-#endif
     using System.Threading;
     using System.Threading.Tasks;
     using Logging;
@@ -30,10 +28,8 @@ namespace Topshelf.Hosts
         HostControl
     {
 
-#if !NETCORE
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
-#endif
         readonly LogWriter _log = HostLogger.Get<ConsoleRunHost>();
         readonly HostEnvironment _environment;
         readonly ServiceHandle _serviceHandle;
@@ -73,7 +69,7 @@ namespace Topshelf.Hosts
             AppDomain.CurrentDomain.UnhandledException += CatchUnhandledException;
 
 #if NETCORE
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
 #endif
                 if (_environment.IsServiceInstalled(_settings.ServiceName))
@@ -98,23 +94,23 @@ namespace Topshelf.Hosts
 
                 _exit = new ManualResetEvent(false);
                 _exitCode = TopshelfExitCode.Ok;
-#if !NETCORE
-                if(GetConsoleWindow() != IntPtr.Zero)
+                if (
+#if NETCORE
+                    !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ||
+#endif
+                     IntPtr.Zero != GetConsoleWindow())
                 {
                     try
                     {
                         // It is common to run console applications in windowless mode, this prevents
                         // the process from crashing when attempting to set the title.
-#endif
                         Console.Title = _settings.DisplayName;
-#if !NETCORE
                     }
-                    catch(IOException e)
+                    catch(Exception e) when (e is IOException || e is PlatformNotSupportedException)
                     {
                         _log.Info("It was not possible to set the console window title. See the inner exception for details.", e);
                     }
                 }
-#endif
                 Console.CancelKeyPress += HandleCancelKeyPress;
 
                 if (!_serviceHandle.Start(this))
