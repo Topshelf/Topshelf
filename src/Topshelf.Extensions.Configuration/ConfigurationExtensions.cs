@@ -95,7 +95,6 @@ namespace Topshelf.Configuration
                 {
                     options.Add(new StopTimeoutOption(configuration.GetSection("StopTimeout").Get<int>()));
                 }
-#if !NETCORE
                 else if (string.Equals(entry.Key, "StartMode", StringComparison.OrdinalIgnoreCase))
                 {
                     var startMode = entry.Value;
@@ -206,7 +205,6 @@ namespace Topshelf.Configuration
 
                     options.Add(new ServiceRecoveryOption(serviceRecoveryOptions));
                 }
-#endif
             }
 
             return options;

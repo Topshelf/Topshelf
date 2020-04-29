@@ -19,17 +19,13 @@ namespace Topshelf.Builders
     public class StartBuilder :
         HostBuilder
     {
-#if !NETCORE
         readonly HostBuilder _builder;
-#endif
         readonly HostEnvironment _environment;
         readonly HostSettings _settings;
 
         public StartBuilder(HostBuilder builder)
         {
-#if !NETCORE
             _builder = GetParentBuilder(builder);
-#endif
             _settings = builder.Settings;
             _environment = builder.Environment;
         }
@@ -40,14 +36,12 @@ namespace Topshelf.Builders
 
         public Host Build(ServiceBuilder serviceBuilder)
         {
-#if !NETCORE
             if (_builder != null)
             {
                 Host parentHost = _builder.Build(serviceBuilder);
 
                 return new StartHost(_environment, _settings, parentHost);
             }
-#endif
 
             return new StartHost(_environment, _settings);
         }
@@ -65,7 +59,6 @@ namespace Topshelf.Builders
             }
         }
 
-#if !NETCORE
         static HostBuilder GetParentBuilder(HostBuilder builder)
         {
             HostBuilder result = null;
@@ -74,6 +67,5 @@ namespace Topshelf.Builders
 
             return result;
         }
-#endif
     }
 }
