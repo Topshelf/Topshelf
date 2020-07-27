@@ -13,15 +13,7 @@ NuGet.::
 Raw Binaries
 ''''''''''''
 
-If you are a fan of getting the binaries you can get released builds from
-
-http://github.com/topshelf/Topshelf/downloads
-
-Then you will need to add references to 
-=======================================
-
- * Topshelf.dll
-
+If you are a fan of getting the binaries you can get released builds from `http://github.com/topshelf/Topshelf/downloads` then you will need to add references to `Topshelf.dll`
 
 Compiling From Source
 '''''''''''''''''''''
