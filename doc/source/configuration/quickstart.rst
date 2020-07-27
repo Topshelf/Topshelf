@@ -46,13 +46,12 @@ Topshelf.
 
 Now for the play by play.
 """""""""""""""""""""""""""""""""""
-#. Here we are setting up the host using the HostFactory.Run  the runner. We open up a new lambda where the ‘x’ in this case exposes all of the host level configuration. Using this approach the command arguments are extracted from environment variables. We also capture the return code of the service - which we return on line 11.
-#. Here we are telling Topshelf that there is a service of type ‘TownCrier”. The lambda that gets opened here is exposing the service configuration options through the ‘s’ parameter.
-#. This tells Topshelf how to build an instance of the service. Currently we are just going to ‘new it up’ but we could just as easily pull it from an IoC container with some code that would look something like ‘container.GetInstance<TownCrier>()’
+#. Here we are setting up the host using the `HostFactory.Run`  the runner. We open up a new lambda where the `x` in this case exposes all of the host level configuration. Using this approach the command arguments are extracted from environment variables. We also capture the return code of the service - which we return on line 11.
+#. Here we are telling Topshelf that there is a service of type `TownCrier`. The lambda that gets opened here is exposing the service configuration options through the `s` parameter.
+#. This tells Topshelf how to build an instance of the service. Currently we are just going to ‘new it up’ but we could just as easily pull it from an IoC container with some code that would look something like `container.GetInstance<TownCrier>()`
 #. How does Topshelf start the service
 #. How does Topshelf stop the service
-#. Here we are setting up the ‘run as’ and have selected the ‘local system’. We can also set up from the command line
-   Interactively with a win from type prompt and we can also just pass in some username/password as string arguments
+#. Here we are setting up the ‘run as’ and have selected the ‘local system’. We can also set up from the command line interactively with a win from type prompt and we can also just pass in some username/password as string arguments
 #. Here we are setting up the description for the winservice to be use in the windows service monitor
 #. Here we are setting up the display name for the winservice to be use in the windows service monitor
 #. Here we are setting up the service name for the winservice to be use in the windows service monitor
