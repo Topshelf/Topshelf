@@ -111,5 +111,7 @@ namespace Topshelf.Runtime.Windows
         public Action<Exception> ExceptionCallback { get; set; }
 
         public UnhandledExceptionPolicyCode UnhandledExceptionPolicy { get; set; }
+
+        public bool CanHandleCtrlBreak { get; set; }
     }
 }

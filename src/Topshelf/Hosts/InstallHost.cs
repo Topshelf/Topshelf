@@ -222,6 +222,11 @@ namespace Topshelf.Hosts
             {
               get { return _settings.UnhandledExceptionPolicy; }
             }
+
+            public bool CanHandleCtrlBreak
+            {
+                get { return _settings.CanHandleCtrlBreak; }
+            }
         }
     }
 }

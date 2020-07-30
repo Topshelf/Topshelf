@@ -136,6 +136,11 @@ namespace Topshelf.HostConfigurators
             _settings.CanHandlePowerEvent = true;
         }
 
+        public void EnableHandleCtrlBreak()
+        {
+            _settings.CanHandleCtrlBreak = true;
+        }
+
         public void UseHostBuilder(HostBuilderFactory hostBuilderFactory)
         {
             _hostBuilderFactory = hostBuilderFactory;

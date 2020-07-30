@@ -230,10 +230,13 @@ namespace Topshelf.Hosts
 
         void HandleCancelKeyPress(object sender, ConsoleCancelEventArgs consoleCancelEventArgs)
         {
-            if (consoleCancelEventArgs.SpecialKey == ConsoleSpecialKey.ControlBreak)
+            if (!_settings.CanHandleCtrlBreak)
             {
-                _log.Error("Control+Break detected, terminating service (not cleanly, use Control+C to exit cleanly)");
-                return;
+                if (consoleCancelEventArgs.SpecialKey == ConsoleSpecialKey.ControlBreak)
+                {
+                    _log.Error("Control+Break detected, terminating service (not cleanly, use Control+C to exit cleanly)");
+                    return;
+                }
             }
 
             consoleCancelEventArgs.Cancel = true;
@@ -241,7 +244,7 @@ namespace Topshelf.Hosts
             if (_hasCancelled)
                 return;
 
-            _log.Info("Control+C detected, attempting to stop service.");
+            _log.InfoFormat("Control+{0} detected, attempting to stop service.", consoleCancelEventArgs.SpecialKey == ConsoleSpecialKey.ControlBreak ? "Break" : "C");
             if (_serviceHandle.Stop(this))
             {
                 _hasCancelled = true;
