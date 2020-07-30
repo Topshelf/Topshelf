@@ -74,6 +74,11 @@ namespace Topshelf.HostConfigurators
         void EnablePowerEvents();
 
         /// <summary>
+        /// Enables support for gracefully handling Ctrl+Break signals
+        /// </summary>
+        void EnableHandleCtrlBreak();
+
+        /// <summary>
         ///   Specifies the builder factory to use when the service is invoked
         /// </summary>
         /// <param name="hostBuilderFactory"> </param>

@@ -86,5 +86,10 @@ namespace Topshelf.Runtime
         /// application. The default policy is to log an error and to stop the service.
         /// </summary>
         UnhandledExceptionPolicyCode UnhandledExceptionPolicy { get; }
+
+        /// <summary>
+        /// True if the service handles Ctrl+Break gracefully
+        /// </summary>
+        bool CanHandleCtrlBreak { get; }
     }
 }
