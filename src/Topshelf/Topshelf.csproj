@@ -23,4 +23,7 @@
   <ItemGroup>
     <EmbeddedResource Include="HelpText.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+  </ItemGroup>
 </Project>
