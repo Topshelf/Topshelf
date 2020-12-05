@@ -28,6 +28,7 @@ artifacts:
 build_script:
   - ps: .\Build.ps1
 
+deploy:
 - provider: NuGet
   name: Prerelease
   symbol_server: https://www.nuget.org
