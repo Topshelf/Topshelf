@@ -20,7 +20,7 @@ public class BuildParameters
     {
         get
         {
-            return !IsLocalBuild && IsRunningOnWindows && !IsPullRequest && IsMainMassTransitRepo && (IsMasterBranch
+            return !IsLocalBuild && IsRunningOnWindows && !IsPullRequest && IsMainTopshelfRepo && (IsMasterBranch
                 || IsDevelopBranch);
         }
     }
@@ -47,7 +47,7 @@ public class BuildParameters
             IsRunningOnWindows = context.IsRunningOnWindows(),
             IsRunningOnAppVeyor = buildSystem.AppVeyor.IsRunningOnAppVeyor,
             IsPullRequest = buildSystem.AppVeyor.Environment.PullRequest.IsPullRequest,
-            IsMainMassTransitRepo = StringComparer.OrdinalIgnoreCase.Equals("phatboyg/newid", buildSystem.AppVeyor.Environment.Repository.Name),
+            IsMainTopshelfRepo = StringComparer.OrdinalIgnoreCase.Equals("topshelf/topshelf", buildSystem.AppVeyor.Environment.Repository.Name),
             IsMasterBranch = StringComparer.OrdinalIgnoreCase.Equals("master", buildSystem.AppVeyor.Environment.Repository.Branch),
             IsDevelopBranch = StringComparer.OrdinalIgnoreCase.Equals("develop", buildSystem.AppVeyor.Environment.Repository.Branch),
             IsTagged = IsBuildTagged(buildSystem),
