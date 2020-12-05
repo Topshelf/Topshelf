@@ -9,7 +9,7 @@ public class BuildParameters
     public bool IsRunningOnWindows { get; private set; }
     public bool IsRunningOnAppVeyor { get; private set; }
     public bool IsPullRequest { get; private set; }
-    public bool IsMainMassTransitRepo { get; private set; }
+    public bool IsMainTopshelfRepo { get; private set; }
     public bool IsMasterBranch { get; private set; }
     public bool IsDevelopBranch { get; private set; }
     public bool IsTagged { get; private set; }
