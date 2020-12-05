@@ -1,4 +1,4 @@
-version: 4.2.0.{build}
+version: 4.3.0.{build}
 
 branches:
   only:
@@ -20,21 +20,26 @@ build: off
 test: off
 
 artifacts:
-  - path: artifacts/*.*nupkg
-    name: Packages
-  
+  - path: artifacts/*.nupkg
+    name: NuGet
+  - path: artifacts/*.snupkg
+    name: Symbols
+
 build_script:
   - ps: .\Build.ps1
 
-deploy:
 - provider: NuGet
   name: Prerelease
+  symbol_server: https://www.nuget.org
+  artifact: NuGet, Symbols
   api_key:
     secure: OxGFtmO9BbWN4+be0SkCVwoRmwyES/Ve7k/wufyQfvG+dEZkaXSjKnnoolk9yktn
   on:
     branch: develop
 - provider: NuGet
   name: Release
+  symbol_server: https://www.nuget.org
+  artifact: NuGet, Symbols
   api_key:
     secure: OxGFtmO9BbWN4+be0SkCVwoRmwyES/Ve7k/wufyQfvG+dEZkaXSjKnnoolk9yktn
   on:

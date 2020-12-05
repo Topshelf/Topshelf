@@ -84,6 +84,7 @@ Task("Pack")
     .Does<BuildParameters>(data =>
 {
     var settings = new DotNetCorePackSettings{
+        NoRestore = true,
         NoBuild = true,
         OutputDirectory = data.Paths.Directories.Artifacts,
         Configuration = data.Configuration,
