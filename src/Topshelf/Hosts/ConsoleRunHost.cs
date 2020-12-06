@@ -193,7 +193,11 @@ namespace Topshelf.Hosts
                 // this is evil, but perhaps a good thing to let us clean up properly.
                 int deadThreadId = Interlocked.Increment(ref _deadThread);
                 Thread.CurrentThread.IsBackground = true;
-                Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
+                
+                // Only set name if thread does not already have one.
+                if (Thread.CurrentThread.Name == null)
+                    Thread.CurrentThread.Name = "Unhandled Exception " + deadThreadId.ToString();
+
                 while (true)
                     Thread.Sleep(TimeSpan.FromHours(1));
             }
