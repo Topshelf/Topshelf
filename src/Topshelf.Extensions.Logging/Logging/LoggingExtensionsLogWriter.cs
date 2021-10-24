@@ -13,8 +13,11 @@
 namespace Topshelf.Logging
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.Extensions.Logging;
+#if NET452
     using Microsoft.Extensions.Logging.Internal;
+#endif
 
     /// <summary>
     /// Implements a Topshelf <see cref="LogWriter"/> for Microsoft extensions for logging.
@@ -108,13 +111,25 @@ namespace Topshelf.Logging
         /// <param name="args">The arguments.</param>
         public void LogFormat(LoggingLevel level, IFormatProvider formatProvider, string format, params object[] args) => this.LogFormat(level, format, args);
 
+
         /// <summary>
         /// Logs the format.
         /// </summary>
         /// <param name="level">The level.</param>
         /// <param name="format">The format.</param>
         /// <param name="args">The arguments.</param>
+#if NET452
         public void LogFormat(LoggingLevel level, string format, params object[] args) => this.Log(level, new FormattedLogValues(format, args));
+#else
+        public void LogFormat(LoggingLevel level, string format, params object[] args)
+        {
+            var list = new List<KeyValuePair<string, object>>
+            {
+                new (format,args)
+            };
+            this.Log(level, list);
+        }
+#endif
 
         /// <summary>
         /// Debugs the specified object.
